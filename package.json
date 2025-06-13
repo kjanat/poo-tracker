@@ -4,16 +4,17 @@
   "description": "The brutally honest app for tracking your bowel movements",
   "private": true,
   "scripts": {
+    "start": "node dist/index.js",
     "dev": "concurrently \"pnpm run dev:backend\" \"pnpm run dev:frontend\"",
-    "dev:frontend": "pnpm run dev --workspace=frontend",
-    "dev:backend": "pnpm run dev --workspace=backend",
-    "build": "pnpm run build --workspace=frontend && pnpm run build --workspace=backend",
-    "lint": "pnpm run lint --workspaces",
-    "test": "pnpm run test --workspaces",
+    "dev:frontend": "cd frontend & pnpm run dev",
+    "dev:backend": "cd backend & pnpm run dev",
+    "build": "cd frontend & pnpm run build && cd ../backend & pnpm run build",
+    "lint": "pnpm -r run lint",
+    "test": "pnpm -r run test",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "db:migrate": "pnpm run db:migrate --workspace=backend",
-    "db:seed": "pnpm run db:seed --workspace=backend"
+    "db:migrate": "cd backend & pnpm run db:migrate",
+    "db:seed": "cd backend & pnpm run db:seed"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
