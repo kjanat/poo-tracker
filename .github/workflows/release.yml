@@ -98,7 +98,7 @@ jobs:
             type=semver,pattern={{major}}
 
       - name: 🏗️ Build and push AI Service Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./ai-service
           file: ./ai-service/Dockerfile
