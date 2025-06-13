@@ -271,9 +271,9 @@ def analyze_consistency_trends(df: pd.DataFrame) -> Dict[str, Any]:
     consistency_counts = df["consistency"].value_counts()
     return {
         "distribution": consistency_counts.to_dict(),
-        "most_common": consistency_counts.idxmax()
-        if not consistency_counts.empty
-        else None,
+        "most_common": (
+            consistency_counts.idxmax() if not consistency_counts.empty else None
+        ),
     }
 
 

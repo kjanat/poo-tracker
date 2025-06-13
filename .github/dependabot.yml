@@ -1,0 +1,153 @@
+version: 2
+updates:
+  # Frontend dependencies
+  - package-ecosystem: 'npm'
+    directory: '/frontend'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    open-pull-requests-limit: 10
+    labels:
+      - 'dependencies'
+      - 'frontend'
+    commit-message:
+      prefix: '⬆️'
+      include: 'scope'
+    groups:
+      react:
+        patterns:
+          - 'react*'
+          - '@types/react*'
+      vite:
+        patterns:
+          - 'vite*'
+          - '@vitejs/*'
+      testing:
+        patterns:
+          - '*test*'
+          - '*jest*'
+          - 'vitest'
+      linting:
+        patterns:
+          - 'eslint*'
+          - 'prettier'
+          - '@typescript-eslint/*'
+
+  # Backend dependencies
+  - package-ecosystem: 'npm'
+    directory: '/backend'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    open-pull-requests-limit: 10
+    labels:
+      - 'dependencies'
+      - 'backend'
+    commit-message:
+      prefix: '⬆️'
+      include: 'scope'
+    groups:
+      express:
+        patterns:
+          - 'express*'
+          - '@types/express*'
+      prisma:
+        patterns:
+          - 'prisma*'
+          - '@prisma/*'
+      testing:
+        patterns:
+          - '*test*'
+          - '*jest*'
+      linting:
+        patterns:
+          - 'eslint*'
+          - 'prettier'
+          - '@typescript-eslint/*'
+
+  # Root workspace dependencies
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    open-pull-requests-limit: 5
+    labels:
+      - 'dependencies'
+      - 'workspace'
+    commit-message:
+      prefix: '⬆️'
+      include: 'scope'
+
+  # AI Service Python dependencies
+  - package-ecosystem: 'pip'
+    directory: '/ai-service'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    open-pull-requests-limit: 10
+    labels:
+      - 'dependencies'
+      - 'ai-service'
+      - 'python'
+    commit-message:
+      prefix: '⬆️'
+      include: 'scope'
+    groups:
+      fastapi:
+        patterns:
+          - 'fastapi*'
+          - 'uvicorn*'
+          - 'pydantic*'
+      data-science:
+        patterns:
+          - 'numpy*'
+          - 'pandas*'
+          - 'scikit-learn*'
+      testing:
+        patterns:
+          - 'pytest*'
+          - 'httpx'
+
+  # Docker dependencies
+  - package-ecosystem: 'docker'
+    directory: '/ai-service'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    labels:
+      - 'dependencies'
+      - 'docker'
+    commit-message:
+      prefix: '🐳'
+
+  # Docker Compose
+  - package-ecosystem: 'docker'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    labels:
+      - 'dependencies'
+      - 'docker-compose'
+    commit-message:
+      prefix: '🐳'
+
+  # GitHub Actions
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    labels:
+      - 'dependencies'
+      - 'github-actions'
+    commit-message:
+      prefix: '⚡'

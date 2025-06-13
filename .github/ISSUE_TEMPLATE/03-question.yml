@@ -1,0 +1,90 @@
+name: ❓ Question/Support
+description: Ask a question or get help using the project
+title: "[Question]: "
+labels: ["question", "needs-triage"]
+assignees:
+  - kjanat
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reaching out! 🤝
+        
+        Before asking, please check:
+        - 📚 [Documentation](https://github.com/kjanat/poo-tracker/wiki)
+        - 🔍 [Existing Issues](https://github.com/kjanat/poo-tracker/issues)
+        - 💬 [Discord Community](https://discord.gg/your-server)
+
+  - type: textarea
+    id: question
+    attributes:
+      label: What's your question?
+      description: Describe what you're trying to do or understand
+      placeholder: I'm trying to... but I can't figure out how to...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Question Category
+      description: What area is your question about?
+      options:
+        - Getting Started/Setup
+        - Frontend Development
+        - Backend Development
+        - AI Service Integration
+        - Database Setup
+        - Docker/Deployment
+        - API Usage
+        - Configuration
+        - Troubleshooting
+        - Best Practices
+        - Contributing
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What have you tried? What's your current setup?
+      placeholder: |
+        - I'm using Docker version...
+        - I tried following the setup guide...
+        - My environment is...
+
+  - type: textarea
+    id: expected-outcome
+    attributes:
+      label: What are you trying to achieve?
+      description: What's your end goal?
+      placeholder: I want to be able to...
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information
+      description: Any error messages, screenshots, or other relevant details
+      placeholder: You can drag and drop images or paste error logs here
+
+  - type: checkboxes
+    id: research
+    attributes:
+      label: Research Done
+      description: Please confirm you've done some research first
+      options:
+        - label: I've searched existing issues and discussions
+          required: true
+        - label: I've checked the documentation
+          required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our Code of Conduct
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true

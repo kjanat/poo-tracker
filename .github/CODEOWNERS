@@ -1,0 +1,56 @@
+# 💩 Poo Tracker Codeowners
+# 
+# These owners will be requested for review when someone opens a pull request.
+# The last matching pattern takes the most precedence.
+
+# Global fallback - kjanat owns everything by default
+* @kjanat
+
+# Frontend specific files
+/frontend/ @kjanat
+*.tsx @kjanat
+*.ts @kjanat
+*.css @kjanat
+*.scss @kjanat
+/frontend/src/components/ @kjanat
+/frontend/src/pages/ @kjanat
+/frontend/src/stores/ @kjanat
+
+# Backend API and database
+/backend/ @kjanat
+/backend/src/routes/ @kjanat
+/backend/src/middleware/ @kjanat
+/backend/prisma/ @kjanat
+*.prisma @kjanat
+
+# AI Service and machine learning
+/ai-service/ @kjanat
+*.py @kjanat
+requirements.txt @kjanat
+
+# Infrastructure and DevOps
+docker-compose.yml @kjanat
+Dockerfile @kjanat
+.dockerignore @kjanat
+/.github/ @kjanat
+*.yml @kjanat
+*.yaml @kjanat
+
+# Configuration files - require extra scrutiny
+package.json @kjanat
+pnpm-workspace.yaml @kjanat
+tsconfig.json @kjanat
+.eslintrc.* @kjanat
+.prettierrc* @kjanat
+tailwind.config.* @kjanat
+vite.config.* @kjanat
+
+# Documentation - anyone can contribute but kjanat reviews
+README.md @kjanat
+*.md @kjanat
+/docs/ @kjanat
+
+# Security and sensitive files - only kjanat
+.env.example @kjanat
+.gitignore @kjanat
+LICENSE @kjanat

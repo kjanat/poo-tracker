@@ -19,7 +19,9 @@ If your code stinks, it won’t get merged. And yes, we’ll know.
 - **Testing**: Vitest (frontend), Jest/Supertest (backend), pytest (AI service)
 - **Linting**: ESLint (StandardJS rules), Prettier (and don’t “fix” the config, just follow it)
 - **Infra**: Docker everywhere. No raw installs.
-- **Package Manager**: pnpm (because npm is for amateurs)
+- **Package Managers**:
+  - pnpm (because npm is for amateurs)
+  <!-- - uv (for Python, because pip is for amateurs) -->
 
 ---
 
@@ -55,7 +57,7 @@ If your code stinks, it won’t get merged. And yes, we’ll know.
 
 ## Branching, PRs, and CI
 
-- **Branch off `main`**
+- **Branch off `master`**
 - Use feature branches (`feat/`, `fix/`, `chore/`).
 - Every PR needs a description, a passing test suite, and a code review from someone who’s at least 80% awake.
 - Green CI/CD or no merge.
@@ -64,7 +66,7 @@ If your code stinks, it won’t get merged. And yes, we’ll know.
 
 ## What NOT to do
 
-- No direct pushes to `main`
+- No direct pushes to `master`
 - No wild dependencies (“left-pad” jokes will get you a one-way ticket to dependency hell)
 - No copying Stack Overflow code without understanding it
 - No “console.log debugging” left in PRs

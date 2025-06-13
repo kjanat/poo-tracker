@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 🔒 Security Issues
+    url: https://github.com/kjanat/poo-tracker/security/advisories/new
+    about: Report security vulnerabilities privately
+  # - name: 💬 Discord Community
+  #   url: https://discord.gg/your-server
+  #   about: Chat with the community on Discord
+  # - name: 📚 Documentation
+  #   url: https://github.com/kjanat/poo-tracker/wiki
+  #   about: Check our documentation and guides
