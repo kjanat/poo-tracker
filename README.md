@@ -1,31 +1,222 @@
-# Poo Tracker
+# 💩 Poo Tracker
 
-Ever wondered if your gut’s on a winning streak, or if your last kebab is about to take its revenge? Welcome to **Poo Tracker**, the brutally honest app that lets you log every majestic turd, rabbit pellet, and volcanic diarrhea eruption without shame or censorship. Because your bowel movements _do_ matter, and no, your GP isn’t getting this level of data.
+Ever wondered if your gut's on a winning streak, or if your last kebab is about to take its revenge? Welcome to **Poo Tracker**, the brutally honest app that lets you log every majestic turd, rabbit pellet, and volcanic diarrhea eruption without shame or censorship. Because your bowel movements _do_ matter, and no, your GP isn't getting this level of data.
 
-## What’s the fucking point?
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+
+- Docker & Docker Compose
+- pnpm (because npm is for amateurs)
+
+### Setup
+
+1. **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/kjanat/poo-tracker.git
+    cd poo-tracker
+    ```
+
+2. **Install dependencies:**
+
+    ```bash
+    pnpm install
+    ```
+
+3. **Set up environment variables:**
+
+    ```bash
+    cp .env.example .env
+    # Edit .env with your configuration
+    ```
+
+4. **Start the services:**
+
+    ```bash
+    # Start database and supporting services
+    pnpm run docker:up
+
+    # Start the development servers
+    pnpm run dev
+    ```
+
+5. **Set up the database:**
+
+    ```bash
+    # Run database migrations
+    pnpm run db:migrate
+
+    # (Optional) Seed with test data
+    pnpm run db:seed
+    ```
+
+6. **Open your browser:**
+
+- Frontend: <http://localhost:5173>
+- Backend API: <http://localhost:3001>
+- AI Service: <http://localhost:8001>
+- MinIO Console: <http://localhost:9001> (admin/minioadmin123)
+
+## 🏗️ Tech Stack
+
+- **Frontend**: React + Vite + TypeScript + TailwindCSS
+- **Backend**: Node.js + Express + TypeScript + Prisma
+- **Database**: PostgreSQL
+- **Storage**: MinIO (S3-compatible for photos)
+- **AI Service**: Python + FastAPI + scikit-learn
+- **Infrastructure**: Docker + Docker Compose
+
+## 📖 What's the fucking point?
 
 - **Track your shits**: Log every glorious bowel movement in a timeline worthy of its own Netflix docu-series. Date, time, volume, Bristol score, color, floaters—you name it.
-- **Photo evidence**: Snap a pic for science (or just to traumatize your friends and family, your call). Upload and catalog the full visual glory of your rectal output.
-- **Meal log**: Record what you’ve stuffed down your throat so you can finally prove that Taco Tuesday was, in fact, a war crime against your colon.
-- **AI-powered analysis**: Our cold, heartless machine learning model doesn’t judge—just coldly correlates your food, stress, and fiber intake with your latest gut grenade. Get insights about patterns, triggers, and maybe even a round of applause for that legendary monster log you laid last Friday.
-- **Export & share**: PDF reports for your doctor, gastroenterologist, or weird fetish community. It’s your data, so overshare as you wish.
+- **Photo evidence**: Snap a pic for science (or just to traumatize your friends and family). Upload and catalog the full visual glory of your rectal output.
+- **Meal log**: Record what you've stuffed down your throat so you can finally prove that Taco Tuesday was, in fact, a war crime against your colon.
+- **AI-powered analysis**: Our cold, heartless machine learning model doesn't judge—just coldly correlates your food, stress, and fiber intake with your latest gut grenade.
+- **Export & share**: PDF reports for your doctor, gastroenterologist, or weird fetish community. It's your data, so overshare as you wish.
 
-## How it works
+## 🔧 Development
+
+### Available Scripts
+
+```bash
+# Development
+pnpm run dev             # Start frontend + backend
+pnpm run dev:frontend    # Start frontend only
+pnpm run dev:backend     # Start backend only
+
+# Database
+pnpm run db:migrate      # Run Prisma migrations
+pnpm run db:seed         # Seed database
+
+# Docker
+pnpm run docker:up       # Start all services
+pnpm run docker:down     # Stop all services
+
+# Testing & Linting
+pnpm run test            # Run all tests
+pnpm run lint            # Run linters
+pnpm run build           # Build for production
+```
+
+### Project Structure
+
+```tree
+poo-tracker/
+├── frontend/          # React frontend (Vite + TypeScript + TailwindCSS)
+├── backend/           # Express.js API (TypeScript + Prisma)
+├── ai-service/        # Python FastAPI AI service
+├── docker-compose.yml # Infrastructure setup
+└── package.json       # Root workspace config
+```
+
+### API Endpoints
+
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User authentication
+- `GET /api/entries` - Get bowel movement entries
+- `POST /api/entries` - Create new entry
+- `PUT /api/entries/:id` - Update entry
+- `DELETE /api/entries/:id` - Delete entry
+- `POST /api/uploads/photo` - Upload photos
+- `GET /api/analytics/summary` - Get AI analysis
+
+## 📝 How it works
 
 1. **Eat** something questionable.
-2. **Shit**. (Preferably in a toilet, but we’re not here to kink-shame.)
-3. **Log** your experience in Poo Tracker—optionally add a photo, rate your suffering, describe the smell if you’re brave enough.
-4. **Repeat** until you finally realize you’re lactose intolerant or have IBS.
+2. **Shit**. (Preferably in a toilet, but we're not here to kink-shame.)
+3. **Log** your experience in Poo Tracker—optionally add a photo, rate your suffering, describe the smell if you're brave enough.
+4. **Repeat** until you finally realize you're lactose intolerant or have IBS.
 
-## Privacy, baby
+## 🔒 Privacy, baby
 
-We encrypt your brown notes and hide them away. Nobody’s reading your logs except you—and whatever godforsaken AI wants to learn about the day-after effects of your sushi buffet.
+We encrypt your brown notes and hide them away. Nobody's reading your logs except you—and whatever godforsaken AI wants to learn about the day-after effects of your sushi buffet.
 
-## Who is this for?
+## 👥 Who is this for?
 
-- People with IBS, Crohn, colitis, or “nobody shits like me” syndrome.
+- People with IBS, Crohn, colitis, or "nobody shits like me" syndrome.
 - Control freaks and data lovers.
 - Curious bastards who just want to know if spicy food really _is_ their nemesis.
+
+## 🎯 Features
+
+### Bristol Stool Chart Integration
+
+- Complete 7-type Bristol Stool Chart support
+- Visual indicators and descriptions
+- Trend analysis over time
+
+### AI-Powered Insights
+
+- Pattern recognition in bowel movements
+- Meal correlation analysis
+- Health recommendations
+- Risk factor identification
+
+### Photo Documentation
+
+- Secure photo upload and storage
+- Image compression and optimization
+- Privacy-focused MinIO storage
+
+### Export & Analytics
+
+- Detailed charts and visualizations
+- Data export capabilities
+- Comprehensive health insights
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feat/amazing-feature`)
+3. Follow the coding standards (see copilot instructions)
+4. Write tests for new features
+5. Commit using conventional commits (`feat: add Bristol chart selector`)
+6. Push and create a Pull Request
+
+### Coding Standards
+
+- TypeScript everywhere (no JS allowed)
+- Component-based architecture
+- TailwindCSS for styling (no CSS modules)
+- RESTful API design
+- Comprehensive test coverage
+- ESLint + Prettier (follow the config, don't "fix" it)
+
+## 🚀 Deployment
+
+### Environment Variables
+
+```env
+# Database
+DATABASE_URL="postgresql://poo_user:secure_password_123@localhost:5432/poo_tracker"
+
+# Storage (MinIO)
+MINIO_ENDPOINT="localhost:9000"
+MINIO_ACCESS_KEY="minioadmin"
+MINIO_SECRET_KEY="minioadmin123"
+
+# API Configuration
+API_PORT=3001
+CORS_ORIGIN="http://localhost:5173"
+
+# AI Service
+AI_SERVICE_URL="http://localhost:8001"
+
+# JWT
+JWT_SECRET="your-super-secret-jwt-key-change-in-production"
+```
+
+### Production Build
+
+```bash
+pnpm run build
+```
+
+## 📄 License
+
+GNU AGPLv3 License, see [LICENSE](LICENSE) file for details.
 
 ---
 
@@ -33,4 +224,6 @@ We encrypt your brown notes and hide them away. Nobody’s reading your logs exc
 
 ---
 
-Laat maar weten als je nog features wilt toevoegen, of als het nog iets grover moet.
+**Golden Rule:** If your code stinks, it won't get merged. And yes, we'll know. 💩
+
+Ready to track some legendary logs? Get started above!

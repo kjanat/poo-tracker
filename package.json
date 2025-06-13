@@ -1,0 +1,25 @@
+{
+  "name": "poo-tracker",
+  "version": "1.0.0",
+  "description": "The brutally honest app for tracking your bowel movements",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"pnpm run dev:backend\" \"pnpm run dev:frontend\"",
+    "dev:frontend": "pnpm run dev --workspace=frontend",
+    "dev:backend": "pnpm run dev --workspace=backend",
+    "build": "pnpm run build --workspace=frontend && pnpm run build --workspace=backend",
+    "lint": "pnpm run lint --workspaces",
+    "test": "pnpm run test --workspaces",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "db:migrate": "pnpm run db:migrate --workspace=backend",
+    "db:seed": "pnpm run db:seed --workspace=backend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=3"
+  }
+}

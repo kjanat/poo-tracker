@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  entries Entry[]
+  meals   Meal[]
+
+  @@map("users")
+}
+
+model Entry {
+  id          String    @id @default(cuid())
+  userId      String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Bristol Stool Chart (1-7)
+  bristolType Int       @db.SmallInt
+  
+  // Physical characteristics
+  volume      String?   // Small, Medium, Large, Massive
+  color       String?   // Brown, Dark Brown, Light Brown, Yellow, Green, Red, Black
+  consistency String?   // Solid, Soft, Loose, Watery
+  floaters    Boolean   @default(false)
+  
+  // Experience
+  pain        Int?      @db.SmallInt // 1-10 scale
+  strain      Int?      @db.SmallInt // 1-10 scale
+  satisfaction Int?     @db.SmallInt // 1-10 scale
+  
+  // Optional fields
+  notes       String?
+  photoUrl    String?
+  smell       String?   // None, Mild, Moderate, Strong, Toxic
+  
+  // AI Analysis (populated by AI service)
+  aiAnalysis  Json?
+  
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("entries")
+}
+
+model Meal {
+  id          String   @id @default(cuid())
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Meal details
+  name        String
+  description String?
+  mealTime    DateTime
+  
+  // Categories
+  category    String?  // Breakfast, Lunch, Dinner, Snack
+  cuisine     String?  // Italian, Mexican, Fast Food, etc.
+  
+  // Health factors
+  spicyLevel  Int?     @db.SmallInt // 1-10 scale
+  fiberRich   Boolean  @default(false)
+  dairy       Boolean  @default(false)
+  gluten      Boolean  @default(false)
+  
+  // Optional
+  photoUrl    String?
+  notes       String?
+  
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("meals")
+}

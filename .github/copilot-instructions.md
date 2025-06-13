@@ -1,7 +1,3 @@
-Here you go, Kaj. **copilot-instructions.md**—no-nonsense, clear, direct, and fully tailored for the average dev who’s about to cry because they have to touch something called “Poo Tracker”. No corporate cringe, just the brutal reality of what you want (and what you absolutely don’t).
-
----
-
 # Copilot Instructions: Poo Tracker
 
 ## Repo: [github.com/kjanat/poo-tracker](https://github.com/kjanat/poo-tracker)
@@ -23,28 +19,29 @@ If your code stinks, it won’t get merged. And yes, we’ll know.
 - **Testing**: Vitest (frontend), Jest/Supertest (backend), pytest (AI service)
 - **Linting**: ESLint (StandardJS rules), Prettier (and don’t “fix” the config, just follow it)
 - **Infra**: Docker everywhere. No raw installs.
+- **Package Manager**: pnpm (because npm is for amateurs)
 
 ---
 
 ## Coding Practices
 
-1. **TypeScript is not optional.**
+1. **TypeScript is not optional.**  
    If you sneak in any plain JavaScript, I will revert your commit and send you a brown paper bag.
-2. **Component-based everything.**
+2. **Component-based everything.**  
    No 1,000-line files. If your React component grows a tumor, split it.
-3. **Tailwind > CSS files**
+3. **Tailwind > CSS files**  
    No CSS modules, no SCSS, no “quick fixes” in styles.css. Utility-first or GTFO.
-4. **Backend: RESTful.**
+4. **Backend: RESTful.**  
    If you say “GraphQL” I’ll call your mother.
-5. **Database migrations with Prisma only.**
+5. **Database migrations with Prisma only.**  
    No SQL scripts in the repo, unless you’re writing a damn seed file.
-6. **Photo uploads must stream.**
+6. **Photo uploads must stream.**  
    No base64 blobs in the database, you animal.
-7. **AI service is firewalled from main app.**
+7. **AI service is firewalled from main app.**  
    Only ever accessible via backend. Don’t let your SPA talk directly to Python, or you’ll make me regret giving you network access.
-8. **Write tests.**
+8. **Write tests.**  
    Every new feature needs tests. If you “forget”, the next person gets to refactor your code, and nobody wants that.
-9. **Env vars go in `.env.example`**
+9. **Env vars go in `.env.example`**  
    Don’t hardcode keys, don’t commit real secrets.
 10. **Follow commit conventions**:
 

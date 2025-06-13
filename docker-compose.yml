@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: poo-tracker-postgres
+    environment:
+      POSTGRES_DB: poo_tracker
+      POSTGRES_USER: poo_user
+      POSTGRES_PASSWORD: secure_password_123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/prisma/seed.sql:/docker-entrypoint-initdb.d/seed.sql
+    networks:
+      - poo-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: poo-tracker-minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - poo-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: poo-tracker-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - poo-network
+
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: poo-tracker-ai
+    environment:
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "8001:8000"
+    depends_on:
+      - redis
+    networks:
+      - poo-network
+
+volumes:
+  postgres_data:
+  minio_data:
+  redis_data:
+
+networks:
+  poo-network:
+    driver: bridge
