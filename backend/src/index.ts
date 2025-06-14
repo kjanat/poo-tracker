@@ -48,7 +48,7 @@ app.use('/api/uploads', uploadRoutes)
 app.use('/api/analytics', analyticsRoutes)
 
 // 404 handler
-app.use('*', (_req, res) => {
+app.use((_req, res, next) => {
   res.status(404).json({ error: 'Not found' })
 })
 
