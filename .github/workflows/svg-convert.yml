@@ -4,6 +4,10 @@ on:
   push:
     paths:
       - 'branding/**/*.svg'
+  pull_request:
+    branches: [master, develop]
+    # Run if PR branch name contains 'svg'
+    # This allows testing SVG changes in feature branches
   workflow_dispatch:
     inputs:
       svg-path:
@@ -24,6 +28,11 @@ jobs:
   convert-svg:
     name: 🎨 Convert SVG to Multiple Formats
     runs-on: ubuntu-latest
+    # Run on push to branding SVGs, manual dispatch, or PR with 'svg' in branch name
+    if: >
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && contains(github.head_ref, 'svg'))
     permissions:
       contents: write
 
@@ -55,6 +64,18 @@ jobs:
           ico-sizes: '16,32,48,64'
           react-typescript: ${{ github.event.inputs.typescript }}
 
+      - name: 🎨 Convert SVG Assets (Pull Request)
+        if: github.event_name == 'pull_request'
+        id: convert-pr
+        uses: ./.github/actions/svg-converter
+        with:
+          svg-path: 'branding/logo.svg'  # Default SVG for PR testing
+          output-dir: 'branding/'
+          formats: 'ico,png,react,react-native'
+          png-sizes: '16,32,48,64,128,256,512'
+          ico-sizes: '16,32,48,64'
+          react-typescript: 'true'
+
       - name: 📋 Show conversion results
         run: |
           echo "## 🎨 SVG Conversion Results" >> $GITHUB_STEP_SUMMARY
@@ -64,14 +85,22 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Summary:**" >> $GITHUB_STEP_SUMMARY
             echo "${{ steps.convert-auto.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
-          else
+          elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             echo "**Files created:** ${{ steps.convert-manual.outputs.files-created }}" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Summary:**" >> $GITHUB_STEP_SUMMARY
             echo "${{ steps.convert-manual.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "**Files created:** ${{ steps.convert-pr.outputs.files-created }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Summary:**" >> $GITHUB_STEP_SUMMARY
+            echo "${{ steps.convert-pr.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "🔍 **Note:** This is a test conversion for PR branch \`${{ github.head_ref }}\`" >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: 📤 Commit generated assets
+        if: github.event_name != 'pull_request'  # Don't commit on PRs
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -92,6 +121,16 @@ jobs:
             echo "## ✅ Assets Committed" >> $GITHUB_STEP_SUMMARY
             echo "Generated assets have been committed to the repository" >> $GITHUB_STEP_SUMMARY
           fi
+
+      - name: 📋 Show PR test results
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "## 🧪 PR Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ SVG conversion test completed successfully for branch \`${{ github.head_ref }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Generated files are available as artifacts but not committed to the PR branch." >> $GITHUB_STEP_SUMMARY
+          echo "Assets will be committed when this PR is merged and triggers the main workflow." >> $GITHUB_STEP_SUMMARY
 
   convert-all-svgs:
     name: 🎨 Batch Convert All SVGs
