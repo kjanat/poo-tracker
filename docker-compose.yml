@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: postgres:17-alpine
     container_name: poo-tracker-postgres
     environment:
       POSTGRES_DB: poo_tracker
@@ -32,7 +32,7 @@ services:
       - poo-network
 
   redis:
-    image: redis:7-alpine
+    image: redis:8-alpine
     container_name: poo-tracker-redis
     ports:
       - "6379:6379"
