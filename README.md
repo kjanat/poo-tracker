@@ -113,14 +113,16 @@ poo-tracker/
 
 ### API Endpoints
 
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User authentication
-- `GET /api/entries` - Get bowel movement entries
-- `POST /api/entries` - Create new entry
-- `PUT /api/entries/:id` - Update entry
-- `DELETE /api/entries/:id` - Delete entry
-- `POST /api/uploads/photo` - Upload photos
-- `GET /api/analytics/summary` - Get AI analysis
+| Endpoint                 | Method   | Description                           |
+| ------------------------ | -------- | ------------------------------------- |
+| `/api/auth/register`     | `POST`   | Register a new user                   |
+| `/api/auth/login`        | `POST`   | Authenticate user                     |
+| `/api/entries`           | `GET`    | Get bowel movement entries            |
+| `/api/entries`           | `POST`   | Create a new bowel movement entry     |
+| `/api/entries/:id`       | `PUT`    | Update a bowel movement entry         |
+| `/api/entries/:id`       | `DELETE` | Delete a bowel movement entry         |
+| `/api/uploads/photo`     | `POST`   | Upload a photo of your bowel movement |
+| `/api/analytics/summary` | `GET`    | Get AI analysis summary               |
 
 ## 📝 How it works
 
@@ -216,7 +218,19 @@ pnpm run build
 
 ## 📄 License
 
-GNU AGPLv3 License, see [LICENSE](LICENSE) file for details.
+This project is licensed under the **GNU Affero General Public License v3.0** (AGPLv3).
+
+See the [LICENSE](LICENSE) file for full license details.
+
+### What this means?
+
+- ✅ Free to use, modify, and distribute
+- ✅ Commercial use allowed
+- ⚠️ Must share source code if you distribute
+- ⚠️ Network use triggers copyleft (AGPLv3 special sauce)
+- 📋 Must include license and copyright notices
+
+**TL;DR**: Keep it open source, keep it free. Don't be a corporate asshole.
 
 ---
 
