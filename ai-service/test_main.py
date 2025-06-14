@@ -18,7 +18,9 @@ def test_health_endpoint():
     assert "status" in data
     assert data["status"] == "healthy"
     assert "timestamp" in data
-    # Note: redis_connected might be False in CI if Redis isn't available
+    assert "redis_connected" in data
+    # redis_connected should be a boolean
+    assert isinstance(data["redis_connected"], bool)
 
 
 def test_app_info():
@@ -53,3 +55,23 @@ def test_bristol_types_validation():
     valid_bristol_types = [1, 2, 3, 4, 5, 6, 7]
     for bristol_type in valid_bristol_types:
         assert 1 <= bristol_type <= 7
+
+
+def test_redis_connection_handling():
+    """Test that Redis connection is handled gracefully"""
+    import os
+    from main import redis_client
+
+    # Test that the redis client is properly initialized
+    assert redis_client is not None
+
+    # Test health endpoint with Redis (should work in CI with Redis service)
+    response = client.get("/health")
+    assert response.status_code == 200
+    data = response.json()
+
+    # If REDIS_URL is set, Redis should be connected
+    if os.getenv("REDIS_URL"):
+        assert data["redis_connected"] is True
+    # If no Redis URL, connection might be False but endpoint should still work
+    assert isinstance(data["redis_connected"], bool)

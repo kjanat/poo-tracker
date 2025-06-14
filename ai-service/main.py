@@ -61,10 +61,18 @@ class AnalysisResponse(BaseModel):
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
+    # Check Redis connection without failing if Redis is unavailable
+    redis_connected = False
+    try:
+        redis_connected = redis_client.ping()
+    except Exception:
+        # Redis connection failed, but service can still function
+        pass
+
     return {
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
-        "redis_connected": redis_client.ping(),
+        "redis_connected": redis_connected,
     }
 
 
