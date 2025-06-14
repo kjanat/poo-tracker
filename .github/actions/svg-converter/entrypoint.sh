@@ -20,7 +20,7 @@ set -euo pipefail
 get_input() {
     local key="$1"
     local default_value="${2:-}"
-    
+
     # Use env to get the value since bash can't handle hyphens in variable names
     local value
     value=$(env | grep "^INPUT_${key}=" | cut -d'=' -f2- || echo "")
@@ -38,14 +38,14 @@ readonly NC='\033[0m' # No Color
 # Input variables from GitHub Actions
 # Handle both hyphenated and underscore environment variable formats
 # GitHub Actions sometimes passes hyphenated names to Docker containers
-SVG_PATH="$(get_input 'SVG-PATH')"
-OUTPUT_DIR="$(get_input 'OUTPUT-DIR' './')"
-FORMATS="$(get_input 'FORMATS' 'ico,png,react,react-native')"
-PNG_SIZES="$(get_input 'PNG-SIZES' '16,32,64,128,256')"
-ICO_SIZES="$(get_input 'ICO-SIZES' '16,32,48,64')"
-BASE_NAME="$(get_input 'BASE-NAME' '')"
-REACT_TYPESCRIPT="$(get_input 'REACT-TYPESCRIPT' 'false')"
-REACT_PROPS_INTERFACE="$(get_input 'REACT-PROPS-INTERFACE' 'SVGProps')"
+SVG_PATH=$(get_input 'SVG-PATH')
+OUTPUT_DIR=$(get_input 'OUTPUT-DIR' './')
+FORMATS=$(get_input 'FORMATS' 'ico,png,react,react-native')
+PNG_SIZES=$(get_input 'PNG-SIZES' '16,32,64,128,256')
+ICO_SIZES=$(get_input 'ICO-SIZES' '16,32,48,64')
+BASE_NAME=$(get_input 'BASE-NAME' '')
+REACT_TYPESCRIPT=$(get_input 'REACT-TYPESCRIPT' 'false')
+REACT_PROPS_INTERFACE=$(get_input 'REACT-PROPS-INTERFACE' 'SVGProps')
 
 # Make variables readonly
 readonly SVG_PATH OUTPUT_DIR FORMATS PNG_SIZES ICO_SIZES BASE_NAME REACT_TYPESCRIPT REACT_PROPS_INTERFACE
@@ -83,7 +83,7 @@ validate_inputs() {
         env | grep "^INPUT_" | sort
         exit 1
     fi
-    
+
     if [[ ! -f "$SVG_PATH" ]]; then
         log_error "SVG file not found: $SVG_PATH"
         exit 1
@@ -96,7 +96,7 @@ validate_inputs() {
 
     # Create output directory if it doesn't exist
     mkdir -p "$OUTPUT_DIR"
-    
+
     log_info "Input validation passed"
     log_info "SVG_PATH: $SVG_PATH"
     log_info "OUTPUT_DIR: $OUTPUT_DIR"
@@ -108,7 +108,7 @@ check_dependencies() {
     local missing_deps=()
 
     log_info "Checking dependencies..."
-    
+
     if ! command -v rsvg-convert >/dev/null 2>&1; then
         log_warn "rsvg-convert not found, checking alternatives..."
         # Check for alternative commands
@@ -118,7 +118,7 @@ check_dependencies() {
     else
         log_info "✓ rsvg-convert found"
     fi
-    
+
     command -v convert >/dev/null 2>&1 || missing_deps+=("imagemagick")
     command -v svgr >/dev/null 2>&1 || missing_deps+=("@svgr/cli")
     command -v jq >/dev/null 2>&1 || missing_deps+=("jq")
@@ -271,7 +271,7 @@ set_outputs() {
 main() {
     # Validate inputs first
     validate_inputs
-    
+
     log_info "🎨 SVG Converter Pro - Starting conversion..."
     log_info "📁 Input: $SVG_PATH"
     log_info "📁 Output: $OUTPUT_DIR"
