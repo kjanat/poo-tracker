@@ -1,6 +1,18 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  /* Custom colors */
+  --color-poo-brown-50: #F7F3F0;
+  --color-poo-brown-100: #E8DDD6;
+  --color-poo-brown-200: #D0BBA6;
+  --color-poo-brown-300: #B89976;
+  --color-poo-brown-400: #A07746;
+  --color-poo-brown-500: #8B5A2B;
+  --color-poo-brown-600: #6F4622;
+  --color-poo-brown-700: #533318;
+  --color-poo-brown-800: #37200F;
+  --color-poo-brown-900: #1C0E05;
+}
 
 @layer base {
   html {
@@ -8,7 +20,7 @@
   }
   
   body {
-    @apply bg-gradient-to-br from-orange-50 to-yellow-50 min-h-screen;
+    @apply bg-gradient-to-br from-orange-100 to-yellow-100 min-h-screen;
   }
 }
 

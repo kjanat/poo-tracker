@@ -55,7 +55,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 6. **Open your browser:**
 
 - Frontend: <http://localhost:5173>
-- Backend API: <http://localhost:3001>
+- Backend API: <http://localhost:3002>
 - AI Service: <http://localhost:8001>
 - MinIO Console: <http://localhost:9001> (admin/minioadmin123)
 
@@ -198,7 +198,7 @@ MINIO_ACCESS_KEY="minioadmin"
 MINIO_SECRET_KEY="minioadmin123"
 
 # API Configuration
-API_PORT=3001
+API_PORT=3002
 CORS_ORIGIN="http://localhost:5173"
 
 # AI Service
