@@ -107,13 +107,26 @@ validate_inputs() {
 check_dependencies() {
     local missing_deps=()
 
-    command -v rsvg-convert >/dev/null 2>&1 || missing_deps+=("librsvg")
+    log_info "Checking dependencies..."
+    
+    if ! command -v rsvg-convert >/dev/null 2>&1; then
+        log_warn "rsvg-convert not found, checking alternatives..."
+        # Check for alternative commands
+        find /usr -name "*rsvg*" -executable 2>/dev/null || true
+        ls -la /usr/bin/*svg* 2>/dev/null || true
+        missing_deps+=("librsvg")
+    else
+        log_info "✓ rsvg-convert found"
+    fi
+    
     command -v convert >/dev/null 2>&1 || missing_deps+=("imagemagick")
     command -v svgr >/dev/null 2>&1 || missing_deps+=("@svgr/cli")
     command -v jq >/dev/null 2>&1 || missing_deps+=("jq")
 
     if [[ ${#missing_deps[@]} -gt 0 ]]; then
         log_error "Missing dependencies: ${missing_deps[*]}"
+        log_error "Available packages:"
+        apk list --installed | grep -E "(librsvg|imagemagick|node)" || true
         exit 1
     fi
 }

@@ -23,23 +23,23 @@ A powerful GitHub Action that converts SVG files to multiple formats including I
 
 ## 📋 Inputs
 
-| Input | Description | Required | Default |
-|-------|-------------|----------|---------|
-| `svg-path` | Path to the SVG file to convert | ✅ Yes | - |
-| `output-dir` | Directory to output converted files | ❌ No | `.` |
-| `formats` | Comma-separated formats: `ico,png,react,react-native` | ❌ No | `ico,png,react,react-native` |
-| `png-sizes` | Comma-separated PNG sizes (e.g., `16,32,64,128,256`) | ❌ No | `16,32,64,128,256` |
-| `ico-sizes` | Comma-separated ICO sizes (e.g., `16,32,48,64`) | ❌ No | `16,32,48,64` |
-| `base-name` | Base name for output files (without extension) | ❌ No | *SVG filename* |
-| `react-typescript` | Generate TypeScript React components | ❌ No | `false` |
-| `react-props-interface` | Interface name for React component props | ❌ No | `SVGProps` |
+| Input                   | Description                                           | Required | Default                      |
+| ----------------------- | ----------------------------------------------------- | -------- | ---------------------------- |
+| `svg-path`              | Path to the SVG file to convert                       | ✅ Yes    | -                            |
+| `output-dir`            | Directory to output converted files                   | ❌ No     | `.`                          |
+| `formats`               | Comma-separated formats: `ico,png,react,react-native` | ❌ No     | `ico,png,react,react-native` |
+| `png-sizes`             | Comma-separated PNG sizes (e.g., `16,32,64,128,256`)  | ❌ No     | `16,32,64,128,256`           |
+| `ico-sizes`             | Comma-separated ICO sizes (e.g., `16,32,48,64`)       | ❌ No     | `16,32,48,64`                |
+| `base-name`             | Base name for output files (without extension)        | ❌ No     | *SVG filename*               |
+| `react-typescript`      | Generate TypeScript React components                  | ❌ No     | `false`                      |
+| `react-props-interface` | Interface name for React component props              | ❌ No     | `SVGProps`                   |
 
 ## 📤 Outputs
 
-| Output | Description |
-|--------|-------------|
-| `files-created` | JSON array of all created file paths |
-| `summary` | Human-readable summary of conversion results |
+| Output          | Description                                  |
+| --------------- | -------------------------------------------- |
+| `files-created` | JSON array of all created file paths         |
+| `summary`       | Human-readable summary of conversion results |
 
 ## 🎯 Usage Examples
 
