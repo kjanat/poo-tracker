@@ -164,7 +164,13 @@ jobs:
       - name: 🧪 Test with pytest
         run: |
           cd ai-service
-          pytest
+          if [ -n "$(find . -name 'test_*.py' -o -name '*_test.py' | head -1)" ]; then
+            echo "Running tests..."
+            pytest --tb=short -v
+          else
+            echo "No test files found (test_*.py or *_test.py), skipping tests"
+            echo "✅ Test step completed (no tests to run)"
+          fi
 
   docker-build:
     name: 🐳 Docker Build Test

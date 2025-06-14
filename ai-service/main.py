@@ -169,7 +169,7 @@ def analyze_bristol_patterns(df: pd.DataFrame) -> Dict[str, Any]:
         "percentages": bristol_percentages.to_dict(),
         "most_common": {
             "type": int(most_common_type),
-            "description": bristol_descriptions.get(most_common_type, "Unknown"),
+            "description": bristol_descriptions.get(int(most_common_type), "Unknown type"),
             "percentage": float(bristol_percentages[most_common_type]),
         },
         "health_indicator": assess_bristol_health(bristol_percentages),
@@ -196,7 +196,7 @@ def analyze_meal_correlations(
     entries_df: pd.DataFrame, meals_df: pd.DataFrame
 ) -> Dict[str, Any]:
     """Analyze correlations between meals and bowel movements"""
-    correlations = {}
+    correlations: Dict[str, Any] = {}
 
     # Look for patterns within 24 hours of meals
     for _, meal in meals_df.iterrows():
