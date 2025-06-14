@@ -34,19 +34,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
+          cache: pnpm
 
-      - name: 🐍 Setup Python
-        uses: actions/setup-python@v5
+      - name: 📦 Install uv and 🐍 Python
+        uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.13'
-          cache: 'pip'
+          activate-environment: true
+          python-version: 3.13
+          version: latest
 
       - name: 📦 Install dependencies
         run: |
           pnpm install --frozen-lockfile
-          cd ai-service && pip install -r requirements.txt
-          pip install black isort flake8 ruff
+          cd ai-service && uv pip install -r requirements.txt
 
       - name: 🎨 Format TypeScript/JavaScript
         run: |
@@ -56,14 +56,14 @@ jobs:
       - name: 🎨 Format Python
         run: |
           cd ai-service
-          black .
-          isort .
+          uvx black .
+          uvx isort .
 
       - name: 🦀 Format with Ruff
         run: |
           cd ai-service
-          ruff check --fix .
-          ruff format .
+          uvx ruff check --fix .
+          uvx ruff format .
 
       - name: 📝 Check for changes
         id: verify-changed-files
@@ -109,19 +109,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
+          cache: pnpm
 
-      - name: 🐍 Setup Python
-        uses: actions/setup-python@v5
+      - name: 📦 Install uv and 🐍 Python
+        uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.13'
-          cache: 'pip'
+          activate-environment: true
+          python-version: 3.13
+          version: latest
 
       - name: 📦 Install dependencies
         run: |
           pnpm install --frozen-lockfile
-          cd ai-service && pip install -r requirements.txt
-          pip install black isort flake8 ruff
+          cd ai-service && uv pip install -r requirements.txt
 
       - name: 🧹 Lint Frontend
         run: pnpm run --filter frontend lint
@@ -132,7 +132,7 @@ jobs:
       - name: 🧹 Lint Python
         run: |
           cd ai-service
-          ruff check .
-          ruff format --check .
-          black --check .
-          isort --check-only .
+          uvx ruff check .
+          uvx ruff format --check .
+          uvx black --check .
+          uvx isort --check-only .

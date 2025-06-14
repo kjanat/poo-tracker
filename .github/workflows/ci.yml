@@ -34,7 +34,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
+          cache: pnpm
 
       - name: 📦 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -98,7 +98,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
+          cache: pnpm
 
       - name: 📦 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -136,30 +136,35 @@ jobs:
       - name: 📦 Checkout
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - name: 📦 Install uv and 🐍 Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@v6
         with:
+          activate-environment: true
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+          version: latest
 
       - name: 📦 Install dependencies
         run: |
           cd ai-service
-          pip install -r requirements.txt
-          pip install pytest pytest-asyncio httpx
+          uv pip install -r requirements.txt
+          uv pip install pytest pytest-asyncio httpx
 
       - name: 🧹 Lint with flake8
         run: |
           cd ai-service
-          pip install flake8
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          uvx flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          uvx flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: 🧹 Format check with black
         run: |
           cd ai-service
-          pip install black
-          black --check .
+          uvx black --check .
+
+      - name: 🦀 Lint with Ruff
+        run: |
+          cd ai-service
+          uvx ruff check .
+          uvx ruff format --check .
 
       - name: 🧪 Test with pytest
         run: |
