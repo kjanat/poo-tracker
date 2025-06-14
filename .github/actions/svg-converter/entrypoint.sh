@@ -53,6 +53,7 @@ readonly SVG_PATH OUTPUT_DIR FORMATS PNG_SIZES ICO_SIZES BASE_NAME REACT_TYPESCR
 # Global variables
 declare -a CREATED_FILES=()
 declare -a CONVERSION_SUMMARY=()
+SVG_CONVERTER=""  # Will be set by check_dependencies
 
 # Logging functions
 log_info() {
@@ -108,18 +109,24 @@ check_dependencies() {
     local missing_deps=()
 
     log_info "Checking dependencies..."
-
-    if ! command -v rsvg-convert >/dev/null 2>&1; then
-        log_warn "rsvg-convert not found, checking alternatives..."
-        # Check for alternative commands
-        find /usr -name "*rsvg*" -executable 2>/dev/null || true
-        ls -la /usr/bin/*svg* 2>/dev/null || true
-        missing_deps+=("librsvg")
-    else
+    
+    # Check for SVG conversion capability
+    if command -v rsvg-convert >/dev/null 2>&1; then
         log_info "✓ rsvg-convert found"
+        SVG_CONVERTER="rsvg-convert"
+    elif command -v convert >/dev/null 2>&1; then
+        log_info "✓ ImageMagick convert found (will use for SVG conversion)"
+        SVG_CONVERTER="convert"
+        # Test if ImageMagick can handle SVG
+        if convert -list format | grep -q SVG; then
+            log_info "✓ ImageMagick SVG support confirmed"
+        else
+            log_warn "ImageMagick may not have full SVG support"
+        fi
+    else
+        missing_deps+=("imagemagick or librsvg")
     fi
-
-    command -v convert >/dev/null 2>&1 || missing_deps+=("imagemagick")
+    
     command -v svgr >/dev/null 2>&1 || missing_deps+=("@svgr/cli")
     command -v jq >/dev/null 2>&1 || missing_deps+=("jq")
 
@@ -129,6 +136,9 @@ check_dependencies() {
         apk list --installed | grep -E "(librsvg|imagemagick|node)" || true
         exit 1
     fi
+    
+    # Make SVG_CONVERTER available globally
+    readonly SVG_CONVERTER
 }
 
 # Get base name for output files
@@ -137,6 +147,24 @@ get_base_name() {
         echo "$BASE_NAME"
     else
         basename "$SVG_PATH" .svg
+    fi
+}
+
+# Helper function to convert SVG to PNG with specified size
+convert_svg_to_png() {
+    local input_svg="$1"
+    local output_png="$2"
+    local width="$3"
+    local height="$4"
+    
+    if [[ "$SVG_CONVERTER" == "rsvg-convert" ]]; then
+        rsvg-convert -w "$width" -h "$height" "$input_svg" -o "$output_png"
+    elif [[ "$SVG_CONVERTER" == "convert" ]]; then
+        # Use ImageMagick convert with proper SVG handling
+        convert -background transparent -size "${width}x${height}" "$input_svg" "$output_png"
+    else
+        log_error "No SVG converter available"
+        return 1
     fi
 }
 
@@ -149,7 +177,7 @@ convert_to_ico() {
     log_step "Converting to ICO format..."
 
     # Convert SVG to high-res PNG first
-    rsvg-convert -w 256 -h 256 "$SVG_PATH" -o "$tmp_png"
+    convert_svg_to_png "$SVG_PATH" "$tmp_png" 256 256
 
     # Create multi-resolution ICO
     convert "$tmp_png" -define icon:auto-resize="$ICO_SIZES" "$output_file"
@@ -172,7 +200,7 @@ convert_to_png() {
     for size in "${SIZES[@]}"; do
         local output_file="$OUTPUT_DIR/${base_name}_${size}x${size}.png"
 
-        rsvg-convert -w "$size" -h "$size" "$SVG_PATH" -o "$output_file"
+        convert_svg_to_png "$SVG_PATH" "$output_file" "$size" "$size"
 
         CREATED_FILES+=("$output_file")
         log_success "Created PNG: $output_file"
