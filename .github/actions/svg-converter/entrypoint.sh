@@ -84,6 +84,19 @@ validate_inputs() {
         exit 1
     fi
     
+    if [[ ! -f "$SVG_PATH" ]]; then
+        log_error "SVG file not found: $SVG_PATH"
+        exit 1
+    fi
+
+    if [[ ! "$SVG_PATH" =~ \.svg$ ]]; then
+        log_error "File is not an SVG: $SVG_PATH"
+        exit 1
+    fi
+
+    # Create output directory if it doesn't exist
+    mkdir -p "$OUTPUT_DIR"
+    
     log_info "Input validation passed"
     log_info "SVG_PATH: $SVG_PATH"
     log_info "OUTPUT_DIR: $OUTPUT_DIR"
@@ -103,22 +116,6 @@ check_dependencies() {
         log_error "Missing dependencies: ${missing_deps[*]}"
         exit 1
     fi
-}
-
-# Validate inputs
-validate_inputs() {
-    if [[ ! -f "$SVG_PATH" ]]; then
-        log_error "SVG file not found: $SVG_PATH"
-        exit 1
-    fi
-
-    if [[ ! "$SVG_PATH" =~ \.svg$ ]]; then
-        log_error "File is not an SVG: $SVG_PATH"
-        exit 1
-    fi
-
-    # Create output directory if it doesn't exist
-    mkdir -p "$OUTPUT_DIR"
 }
 
 # Get base name for output files
