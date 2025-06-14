@@ -4,6 +4,7 @@ Basic tests for the Poo Tracker AI Service
 
 import pytest
 from fastapi.testclient import TestClient
+
 from main import app
 
 client = TestClient(app)

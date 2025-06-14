@@ -169,7 +169,9 @@ def analyze_bristol_patterns(df: pd.DataFrame) -> Dict[str, Any]:
         "percentages": bristol_percentages.to_dict(),
         "most_common": {
             "type": int(most_common_type),
-            "description": bristol_descriptions.get(int(most_common_type), "Unknown type"),
+            "description": bristol_descriptions.get(
+                int(most_common_type), "Unknown type"
+            ),
             "percentage": float(bristol_percentages[most_common_type]),
         },
         "health_indicator": assess_bristol_health(bristol_percentages),
