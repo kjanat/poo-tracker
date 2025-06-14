@@ -60,6 +60,7 @@ def test_bristol_types_validation():
 def test_redis_connection_handling():
     """Test that Redis connection is handled gracefully"""
     import os
+
     from main import redis_client
 
     # Test that the redis client is properly initialized
