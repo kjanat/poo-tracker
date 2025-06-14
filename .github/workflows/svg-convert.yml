@@ -69,7 +69,7 @@ jobs:
         id: convert-pr
         uses: ./.github/actions/svg-converter
         with:
-          svg-path: 'branding/logo.svg'  # Default SVG for PR testing
+          svg-path: 'branding/logo.svg' # Default SVG for PR testing
           output-dir: 'branding/'
           formats: 'ico,png,react,react-native'
           png-sizes: '16,32,48,64,128,256,512'
@@ -100,13 +100,13 @@ jobs:
           fi
 
       - name: 📤 Commit generated assets
-        if: github.event_name != 'pull_request'  # Don't commit on PRs
+        if: github.event_name != 'pull_request' # Don't commit on PRs
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          
+
           git add branding/
-          
+
           if git diff --staged --quiet; then
             echo "No changes to commit"
             echo "## ℹ️ No Changes" >> $GITHUB_STEP_SUMMARY
@@ -157,7 +157,7 @@ jobs:
         run: |
           echo "## 🎨 Batch SVG Conversion Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           while IFS= read -r svg_file; do
             if [ -n "$svg_file" ]; then
               echo "Converting: $svg_file"
@@ -187,9 +187,9 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          
+
           git add branding/
-          
+
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else

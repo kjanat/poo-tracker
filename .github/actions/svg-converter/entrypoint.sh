@@ -301,8 +301,8 @@ main() {
     validate_inputs
 
     log_info "🎨 SVG Converter Pro - Starting conversion..."
-    log_info "📁 Input: $SVG_PATH"
-    log_info "📁 Output: $OUTPUT_DIR"
+    log_info "📁 Input:   $SVG_PATH"
+    log_info "📁 Output:  $OUTPUT_DIR"
     log_info "🎯 Formats: $FORMATS"
 
     check_dependencies
