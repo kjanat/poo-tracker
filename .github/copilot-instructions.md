@@ -21,7 +21,7 @@ If your code stinks, it won’t get merged. And yes, we’ll know.
 - **Infra**: Docker everywhere. No raw installs.
 - **Package Managers**:
   - pnpm (because npm is for amateurs)
-  <!-- - uv (for Python, because pip is for amateurs) -->
+  - uv (for Python, because pip is for amateurs)
 
 ---
 
