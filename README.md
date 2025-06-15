@@ -1,5 +1,7 @@
 # 💩 Poo Tracker
 
+<img align="right" width="150" height="150" src="branding/logo.svg">
+
 Ever wondered if your gut's on a winning streak, or if your last kebab is about to take its revenge? Welcome to **Poo Tracker**, the brutally honest app that lets you log every majestic turd, rabbit pellet, and volcanic diarrhea eruption without shame or censorship. Because your bowel movements _do_ matter, and no, your GP isn't getting this level of data.
 
 ## 🚀 Quick Start
@@ -115,7 +117,7 @@ poo-tracker/
 ### API Endpoints
 
 | Endpoint                 | Method   | Description                           |
-| ------------------------ | -------- | ------------------------------------- |
+|--------------------------|----------|---------------------------------------|
 | `/api/auth/register`     | `POST`   | Register a new user                   |
 | `/api/auth/login`        | `POST`   | Authenticate user                     |
 | `/api/entries`           | `GET`    | Get bowel movement entries            |
