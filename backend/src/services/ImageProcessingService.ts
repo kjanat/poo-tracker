@@ -85,7 +85,10 @@ export class SharpImageProcessingService implements ImageProcessingService {
   }
 
   async deleteImage(filename: string): Promise<void> {
-    const filePath = path.join(this.uploadDir, filename)
+    const filePath = path.resolve(this.uploadDir, filename)
+    if (!filePath.startsWith(this.uploadDir)) {
+      throw new Error(`Invalid file path: ${filename}`)
+    }
     try {
       await fs.unlink(filePath)
     } catch (error) {

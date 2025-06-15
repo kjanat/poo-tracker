@@ -101,6 +101,11 @@ router.delete(
         res.status(400).json({ error: 'Invalid filename' })
         return
       }
+      // Additional sanitization to prevent path traversal
+      if (filename.includes('..') || filename.startsWith('/')) {
+        res.status(400).json({ error: 'Invalid filename' })
+        return
+      }
 
       const imageProcessor = ImageProcessingFactory.getInstance()
       await imageProcessor.deleteImage(filename)
