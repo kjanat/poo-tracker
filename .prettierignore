@@ -9,3 +9,16 @@ pnpm-lock.yaml
 **/.svn
 **/.hg
 **/node_modules
+
+# Docker files - Prettier cannot parse Dockerfile syntax
+**/Dockerfile
+**/Dockerfile.*
+**/.dockerignore
+**/docker-compose*.yml
+**/docker-compose*.yaml
+
+# Other files that may cause parsing issues
+**/*.log
+**/.env
+**/.env.*
+# **/prisma/migrations/**/*.sql
