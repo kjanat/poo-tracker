@@ -58,6 +58,15 @@ class AnalysisResponse(BaseModel):
     bristol_trends: Dict[str, Any]
 
 
+class PredictionRequest(BaseModel):
+    entries: List[EntryData]
+
+
+class PredictionResponse(BaseModel):
+    next_time: str
+    confidence: float
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
@@ -111,6 +120,36 @@ async def analyze_patterns(request: AnalysisRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+
+
+@app.post("/predict", response_model=PredictionResponse)
+async def predict_next_bowel_time(request: PredictionRequest) -> PredictionResponse:
+    """Predict the user's next bowel movement time."""
+    if len(request.entries) < 2:
+        raise HTTPException(
+            status_code=400, detail="At least two entries required for prediction"
+        )
+
+    entries_df = pd.DataFrame([entry.dict() for entry in request.entries])
+    entries_df["createdAt"] = pd.to_datetime(entries_df["createdAt"])
+    entries_df.sort_values("createdAt", inplace=True)
+
+    diffs = entries_df["createdAt"].diff().dropna().dt.total_seconds()
+    median_seconds = diffs.median()
+    if pd.isna(median_seconds) or median_seconds <= 0:
+        median_seconds = 24 * 3600
+
+    next_time = entries_df["createdAt"].iloc[-1] + pd.Timedelta(seconds=median_seconds)
+    confidence = min(1.0, len(entries_df) / 10)
+
+    cache_key = f"prediction:{request.entries[0].userId}"
+    try:
+        redis_client.setex(cache_key, 1800, next_time.isoformat())
+    except Exception:
+        # Redis not available - skip caching
+        pass
+
+    return PredictionResponse(next_time=next_time.isoformat(), confidence=confidence)
 
 
 def perform_comprehensive_analysis(

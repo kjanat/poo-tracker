@@ -211,6 +211,14 @@ AI_SERVICE_URL="http://localhost:8001"
 JWT_SECRET="your-super-secret-jwt-key-change-in-production"
 ```
 
+### AI Service Endpoints
+
+| Endpoint   | Method | Description                      |
+| ---------- | ------ | -------------------------------- |
+| `/health`  | `GET`  | Health check for the AI service  |
+| `/analyze` | `POST` | Analyze entries and meals        |
+| `/predict` | `POST` | Predict your next bowel movement |
+
 ### Production Build
 
 ```bash

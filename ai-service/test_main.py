@@ -4,7 +4,6 @@ Basic tests for the Poo Tracker AI Service
 
 import pytest
 from fastapi.testclient import TestClient
-
 from main import app
 
 client = TestClient(app)
@@ -76,3 +75,45 @@ def test_redis_connection_handling():
         assert data["redis_connected"] is True
     # If no Redis URL, connection might be False but endpoint should still work
     assert isinstance(data["redis_connected"], bool)
+
+
+def test_predict_endpoint():
+    """Ensure the predict endpoint returns a future timestamp"""
+    payload = {
+        "entries": [
+            {
+                "id": "1",
+                "userId": "abc",
+                "bristolType": 4,
+                "createdAt": "2024-01-01T08:00:00Z",
+            },
+            {
+                "id": "2",
+                "userId": "abc",
+                "bristolType": 4,
+                "createdAt": "2024-01-02T08:00:00Z",
+            },
+        ]
+    }
+    response = client.post("/predict", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert "next_time" in data
+    assert "confidence" in data
+    assert float(data["confidence"]) > 0
+
+
+def test_predict_requires_two_entries():
+    """Prediction should fail with less than two entries"""
+    payload = {
+        "entries": [
+            {
+                "id": "1",
+                "userId": "abc",
+                "bristolType": 4,
+                "createdAt": "2024-01-01T08:00:00Z",
+            }
+        ]
+    }
+    response = client.post("/predict", json=payload)
+    assert response.status_code == 400
