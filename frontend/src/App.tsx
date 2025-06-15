@@ -1,5 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import { useAuthStore } from "./stores/authStore";
 import { Navbar } from "./components/Navbar";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
@@ -10,8 +9,6 @@ import { MealsPage } from "./pages/MealsPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 function App() {
-  const { isAuthenticated } = useAuthStore();
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50">
       <Navbar />

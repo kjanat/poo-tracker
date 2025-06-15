@@ -55,7 +55,19 @@ async function main() {
     }
   })
 
-  console.log(`✅ Created ${3} users with separate auth records - password: ${defaultPassword}`)
+  const user4 = await prisma.user.create({
+    data: {
+      email: 'kjanat@test.com',
+      name: 'kjanat',
+      auth: {
+        create: {
+          password: hashedPassword
+        }
+      }
+    }
+  })
+
+  console.log(`✅ Created ${4} users with separate auth records - password: ${defaultPassword}`)
 
   // Create sample meals for user1
   console.log('🍽️  Creating sample meals...')
