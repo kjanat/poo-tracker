@@ -2,9 +2,11 @@
 Basic tests for the Poo Tracker AI Service
 """
 
+import json
+
+import fakeredis
 import pytest
 from fastapi.testclient import TestClient
-
 from main import app
 
 client = TestClient(app)
@@ -76,3 +78,22 @@ def test_redis_connection_handling():
         assert data["redis_connected"] is True
     # If no Redis URL, connection might be False but endpoint should still work
     assert isinstance(data["redis_connected"], bool)
+
+
+def test_summary_endpoint(monkeypatch):
+    """Ensure cached summaries are returned."""
+    fake = fakeredis.FakeStrictRedis()
+    monkeypatch.setattr("main.redis_client", fake)
+
+    result = {
+        "patterns": {},
+        "correlations": {},
+        "recommendations": [],
+        "risk_factors": [],
+        "bristol_trends": {},
+    }
+    fake.set("analysis:user123:20240101", json.dumps(result))
+
+    response = client.get("/summary/user123")
+    assert response.status_code == 200
+    assert response.json() == result

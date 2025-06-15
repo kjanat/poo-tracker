@@ -10,3 +10,4 @@ python-multipart==0.0.20
 redis==6.2.0
 scikit-learn==1.7.0
 uvicorn[standard]==0.34.3
+fakeredis==2.29.0

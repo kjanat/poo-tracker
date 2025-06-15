@@ -158,6 +158,7 @@ We encrypt your brown notes and hide them away. Nobody's reading your logs excep
 - Meal correlation analysis
 - Health recommendations
 - Risk factor identification
+- Cached summary endpoint for quick retrieval
 
 ### Photo Documentation
 
