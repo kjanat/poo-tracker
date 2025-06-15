@@ -12,6 +12,10 @@ import { entryRoutes } from './routes/entries'
 import { mealRoutes } from './routes/meals'
 import { uploadRoutes } from './routes/uploads'
 import { analyticsRoutes } from './routes/analytics'
+import { ImageProcessingFactory } from './services/ImageProcessingService'
+
+// Initialize image processing factory
+ImageProcessingFactory.configure(config.uploads.directory, config.uploads.baseUrl)
 
 const app: express.Application = express()
 
@@ -52,6 +56,9 @@ app.use('/api/entries', entryRoutes)
 app.use('/api/meals', mealRoutes)
 app.use('/api/uploads', uploadRoutes)
 app.use('/api/analytics', analyticsRoutes)
+
+// Serve uploaded images
+app.use('/uploads', express.static(config.uploads.directory))
 
 // 404 handler
 app.use((_req, res, next) => {

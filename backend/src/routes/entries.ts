@@ -22,7 +22,8 @@ const createEntrySchema = z.object({
   strain: z.number().int().min(1).max(10).optional(),
   satisfaction: z.number().int().min(1).max(10).optional(),
   notes: z.string().optional(),
-  smell: z.enum(['None', 'Mild', 'Moderate', 'Strong', 'Toxic']).optional()
+  smell: z.enum(['None', 'Mild', 'Moderate', 'Strong', 'Toxic']).optional(),
+  photoUrl: z.string().url().optional()
 })
 
 const updateEntrySchema = createEntrySchema.partial()
@@ -135,7 +136,8 @@ router.post(
         strain: validatedData.strain ?? null,
         satisfaction: validatedData.satisfaction ?? null,
         notes: validatedData.notes ?? null,
-        smell: validatedData.smell ?? null
+        smell: validatedData.smell ?? null,
+        photoUrl: validatedData.photoUrl ?? null
       }
 
       const entry = await prisma.entry.create({
@@ -191,6 +193,7 @@ router.put(
         updateData.satisfaction = validatedData.satisfaction ?? null
       if (validatedData.notes !== undefined) updateData.notes = validatedData.notes ?? null
       if (validatedData.smell !== undefined) updateData.smell = validatedData.smell ?? null
+      if (validatedData.photoUrl !== undefined) updateData.photoUrl = validatedData.photoUrl ?? null
 
       const entry = await prisma.entry.update({
         where: { id },

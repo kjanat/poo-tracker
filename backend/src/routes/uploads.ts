@@ -1,33 +1,23 @@
 import { Router, Response, NextFunction } from 'express'
 import multer from 'multer'
-import { Client as MinioClient } from 'minio'
-import { v4 as uuidv4 } from 'uuid'
 import { config } from '../config'
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth'
+import { ImageProcessingFactory } from '../services/ImageProcessingService'
 
 const router: Router = Router()
-
-// Initialize MinIO client
-const minioClient = new MinioClient({
-  endPoint: config.minio.endpoint.split(':')[0]!,
-  port: parseInt(config.minio.endpoint.split(':')[1]!),
-  useSSL: config.minio.useSSL,
-  accessKey: config.minio.accessKey,
-  secretKey: config.minio.secretKey
-})
 
 // Configure multer for memory storage
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB limit
+    fileSize: config.uploads.maxFileSize
   },
   fileFilter: (_req, file, cb) => {
-    // Only allow images
-    if (file.mimetype.startsWith('image/')) {
+    // Only allow specified image types
+    if (config.uploads.allowedTypes.includes(file.mimetype as any)) {
       cb(null, true)
     } else {
-      cb(new Error('Only image files are allowed'))
+      cb(new Error(`Only these image types are allowed: ${config.uploads.allowedTypes.join(', ')}`))
     }
   }
 })
@@ -35,53 +25,91 @@ const upload = multer({
 // Apply authentication to all routes
 router.use(authenticateToken)
 
-// Ensure bucket exists
-const ensureBucket = async (): Promise<void> => {
-  const bucketExists = await minioClient.bucketExists(config.minio.bucketName)
-  if (!bucketExists) {
-    await minioClient.makeBucket(config.minio.bucketName)
-  }
-}
+// POST /api/uploads/photo - Upload and process photo
+router.post(
+  '/photo',
+  upload.single('photo') as any,
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.file) {
+        res.status(400).json({ error: 'No file uploaded' })
+        return
+      }
 
-// POST /api/uploads/photo - Upload photo
-const uploadPhotoHandler = async (req: any, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const authenticatedReq = req as AuthenticatedRequest
+      if (!req.userId) {
+        res.status(401).json({ error: 'User not authenticated' })
+        return
+      }
 
-    if (!req.file) {
-      res.status(400).json({ error: 'No file provided' })
-      return
+      const imageProcessor = ImageProcessingFactory.getInstance()
+
+      // Process the image (resize, convert to WebP)
+      const processedImage = await imageProcessor.processImage(
+        req.file.buffer,
+        req.file.originalname,
+        {
+          maxWidth: 1024,
+          maxHeight: 1024,
+          quality: 85,
+          format: 'webp'
+        }
+      )
+
+      res.status(201).json({
+        message: 'Photo uploaded successfully',
+        photo: {
+          filename: processedImage.filename,
+          url: processedImage.url,
+          size: processedImage.size,
+          width: processedImage.width,
+          height: processedImage.height
+        }
+      })
+    } catch (error) {
+      if (error instanceof multer.MulterError) {
+        if (error.code === 'LIMIT_FILE_SIZE') {
+          res.status(400).json({
+            error: `File too large. Maximum size is ${Math.round(config.uploads.maxFileSize / 1024 / 1024)}MB`
+          })
+          return
+        }
+      }
+      next(error)
     }
-
-    if (!authenticatedReq.userId) {
-      res.status(401).json({ error: 'User not authenticated' })
-      return
-    }
-
-    await ensureBucket()
-
-    const fileExtension = req.file.originalname.split('.').pop()
-    const filename = `${authenticatedReq.userId}/${uuidv4()}.${fileExtension}`
-
-    // Upload to MinIO - fix the putObject signature
-    await minioClient.putObject(config.minio.bucketName, filename, req.file.buffer, req.file.size, {
-      'Content-Type': req.file.mimetype
-    })
-
-    // Generate URL (in production you'd want signed URLs)
-    const photoUrl = `http://${config.minio.endpoint}/${config.minio.bucketName}/${filename}`
-
-    res.json({
-      photoUrl,
-      filename,
-      size: req.file.size,
-      mimetype: req.file.mimetype
-    })
-  } catch (error) {
-    next(error)
   }
-}
+)
 
-router.post('/photo', upload.single('photo') as any, uploadPhotoHandler)
+// DELETE /api/uploads/photo/:filename - Delete photo
+router.delete(
+  '/photo/:filename',
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.userId) {
+        res.status(401).json({ error: 'User not authenticated' })
+        return
+      }
+
+      const { filename } = req.params
+
+      if (!filename) {
+        res.status(400).json({ error: 'Filename is required' })
+        return
+      }
+
+      // Basic security check - only allow alphanumeric, dots, and dashes
+      if (!/^[a-zA-Z0-9.-]+$/.test(filename)) {
+        res.status(400).json({ error: 'Invalid filename' })
+        return
+      }
+
+      const imageProcessor = ImageProcessingFactory.getInstance()
+      await imageProcessor.deleteImage(filename)
+
+      res.json({ message: 'Photo deleted successfully' })
+    } catch (error) {
+      next(error)
+    }
+  }
+)
 
 export { router as uploadRoutes }
