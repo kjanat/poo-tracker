@@ -7,6 +7,7 @@ interface StoolEntry {
   volume?: string;
   color?: string;
   notes?: string;
+  photoUrl?: string;
 }
 
 interface EntryResponse {
@@ -15,6 +16,7 @@ interface EntryResponse {
   volume?: string;
   color?: string;
   notes?: string;
+  photoUrl?: string;
   createdAt: string;
   userId: string;
 }
@@ -46,12 +48,16 @@ const getBristolTypeDescription = (type: number): string => {
 
 export function NewEntryPage() {
   const { token } = useAuthStore();
+
   const [formData, setFormData] = useState<StoolEntry>({
     bristolType: 0,
     volume: "",
     color: "",
     notes: ""
   });
+
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<
     "idle" | "success" | "error"
@@ -59,6 +65,7 @@ export function NewEntryPage() {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [entries, setEntries] = useState<EntryResponse[]>([]);
   const [isLoadingEntries, setIsLoadingEntries] = useState(true);
+  const [editingEntry, setEditingEntry] = useState<EntryResponse | null>(null);
 
   const fetchEntries = async () => {
     try {
@@ -100,6 +107,126 @@ export function NewEntryPage() {
     }));
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        setErrorMessage("Please select a valid image file");
+        setSubmitStatus("error");
+        return;
+      }
+
+      // Validate file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        setErrorMessage("Image size must be less than 5MB");
+        setSubmitStatus("error");
+        return;
+      }
+
+      setSelectedImage(file);
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      // Clear any previous errors
+      setSubmitStatus("idle");
+      setErrorMessage("");
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+  };
+
+  const uploadImage = async (): Promise<string | null> => {
+    if (!selectedImage) return null;
+
+    const uploadFormData = new FormData();
+    uploadFormData.append("image", selectedImage);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/uploads`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: uploadFormData
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to upload image");
+      }
+
+      const data = await response.json();
+      return data.imageUrl;
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      throw error;
+    }
+  };
+
+  const startEdit = (entry: EntryResponse) => {
+    setEditingEntry(entry);
+    setFormData({
+      bristolType: entry.bristolType,
+      volume: entry.volume || "",
+      color: entry.color || "",
+      notes: entry.notes || "",
+      photoUrl: entry.photoUrl
+    });
+    // Reset image states when editing (user can upload new image if desired)
+    setSelectedImage(null);
+    setImagePreview(null);
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const cancelEdit = () => {
+    setEditingEntry(null);
+    setFormData({
+      bristolType: 0,
+      volume: "",
+      color: "",
+      notes: ""
+    });
+    setSelectedImage(null);
+    setImagePreview(null);
+    setSubmitStatus("idle");
+    setErrorMessage("");
+  };
+
+  const deleteEntry = async (entryId: string) => {
+    if (!confirm("Are you sure you want to delete this entry?")) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/entries/${entryId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete entry");
+      }
+
+      // Remove from local state
+      setEntries((prev) => prev.filter((entry) => entry.id !== entryId));
+    } catch (error) {
+      console.error("Error deleting entry:", error);
+      setErrorMessage(
+        error instanceof Error ? error.message : "Failed to delete entry"
+      );
+      setSubmitStatus("error");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -114,15 +241,31 @@ export function NewEntryPage() {
     setErrorMessage("");
 
     try {
+      // Upload image if selected
+      let photoUrl = formData.photoUrl;
+      if (selectedImage) {
+        const uploadedUrl = await uploadImage();
+        if (uploadedUrl) {
+          photoUrl = uploadedUrl;
+        }
+      }
+
       const submitData = {
         bristolType: formData.bristolType,
         volume: formData.volume || undefined,
         color: formData.color || undefined,
-        notes: formData.notes || undefined
+        notes: formData.notes || undefined,
+        photoUrl: photoUrl || undefined
       };
 
-      const response = await fetch(`${API_BASE_URL}/api/entries`, {
-        method: "POST",
+      const isEditing = editingEntry !== null;
+      const url = isEditing
+        ? `${API_BASE_URL}/api/entries/${editingEntry.id}`
+        : `${API_BASE_URL}/api/entries`;
+      const method = isEditing ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
@@ -132,24 +275,46 @@ export function NewEntryPage() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to save entry");
+        throw new Error(
+          error.error || `Failed to ${isEditing ? "update" : "save"} entry`
+        );
       }
 
       const savedEntry: EntryResponse = await response.json();
-      console.log("Entry saved successfully:", savedEntry);
+      console.log(
+        `Entry ${isEditing ? "updated" : "saved"} successfully:`,
+        savedEntry
+      );
 
       setSubmitStatus("success");
+
+      if (isEditing) {
+        // Update the entry in the list
+        setEntries((prev) =>
+          prev.map((entry) =>
+            entry.id === editingEntry.id ? savedEntry : entry
+          )
+        );
+        setEditingEntry(null);
+      } else {
+        // Add new entry to the list
+        setEntries((prev) => [savedEntry, ...prev]);
+      }
+
+      // Reset form
       setFormData({
         bristolType: 0,
         volume: "",
         color: "",
         notes: ""
       });
-
-      // Refresh the entries list to show the new entry
-      await fetchEntries();
+      setSelectedImage(null);
+      setImagePreview(null);
     } catch (error) {
-      console.error("Error saving entry:", error);
+      console.error(
+        `Error ${editingEntry ? "updating" : "saving"} entry:`,
+        error
+      );
       setErrorMessage(
         error instanceof Error ? error.message : "An error occurred"
       );
@@ -161,16 +326,22 @@ export function NewEntryPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Log New Entry</h1>
+      <h1 className="text-3xl font-bold mb-8">
+        {editingEntry ? "Edit Entry" : "Log New Entry"}
+      </h1>
 
       <div className="card">
         <p className="text-center text-gray-600 mb-8 flex items-center justify-center gap-2">
-          Time to document another masterpiece! <Logo size={24} />
+          {editingEntry
+            ? "Update your masterpiece!"
+            : "Time to document another masterpiece!"}{" "}
+          <Logo size={24} />
         </p>
 
         {submitStatus === "success" && (
           <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-            Entry saved successfully! Keep tracking your progress.
+            Entry {editingEntry ? "updated" : "saved"} successfully! Keep
+            tracking your progress.
           </div>
         )}
 
@@ -257,16 +428,85 @@ export function NewEntryPage() {
               placeholder="Any additional observations..."
               value={formData.notes}
               onChange={(e) => handleInputChange("notes", e.target.value)}
-            ></textarea>
+            />
           </div>
 
-          <button
-            type="submit"
-            className="btn-primary w-full"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Saving..." : "Save Entry"}
-          </button>
+          {/* Image Upload Section */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Photo (Optional)
+            </label>
+            <div className="space-y-3">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="input-field"
+              />
+
+              {imagePreview && (
+                <div className="relative">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="max-w-xs max-h-48 object-cover rounded border"
+                  />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+
+              {editingEntry?.photoUrl && !imagePreview && (
+                <div className="text-sm text-gray-600">
+                  Current photo:
+                  <img
+                    src={`${API_BASE_URL}${editingEntry.photoUrl}`}
+                    alt="Current entry photo"
+                    className="mt-2 max-w-xs max-h-48 object-cover rounded border"
+                  />
+                  <p className="mt-1 text-xs">
+                    Upload a new image to replace it
+                  </p>
+                </div>
+              )}
+
+              <p className="text-xs text-gray-500">
+                Max file size: 5MB. Accepted formats: JPG, PNG, GIF, WebP
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              type="submit"
+              className="btn-primary flex-1"
+              disabled={isSubmitting}
+            >
+              {isSubmitting
+                ? editingEntry
+                  ? "Updating..."
+                  : "Saving..."
+                : editingEntry
+                  ? "Update Entry"
+                  : "Save Entry"}
+            </button>
+
+            {editingEntry && (
+              <button
+                type="button"
+                onClick={cancelEdit}
+                className="btn-secondary"
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
+            )}
+          </div>
         </form>
       </div>
 
@@ -296,13 +536,31 @@ export function NewEntryPage() {
                       {getBristolTypeDescription(entry.bristolType)}
                     </p>
                   </div>
-                  <span className="text-sm text-gray-500">
-                    {new Date(entry.createdAt).toLocaleDateString()} at{" "}
-                    {new Date(entry.createdAt).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit"
-                    })}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500">
+                      {new Date(entry.createdAt).toLocaleDateString()} at{" "}
+                      {new Date(entry.createdAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                      })}
+                    </span>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => startEdit(entry)}
+                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                        disabled={isSubmitting}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => deleteEntry(entry.id)}
+                        className="text-red-600 hover:text-red-800 text-sm font-medium"
+                        disabled={isSubmitting}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
@@ -318,6 +576,16 @@ export function NewEntryPage() {
                     </div>
                   )}
                 </div>
+
+                {entry.photoUrl && (
+                  <div className="mb-3">
+                    <img
+                      src={`${API_BASE_URL}${entry.photoUrl}`}
+                      alt="Entry photo"
+                      className="max-w-xs max-h-48 object-cover rounded border"
+                    />
+                  </div>
+                )}
 
                 {entry.notes && (
                   <div className="mt-3 p-3 bg-gray-50 rounded">

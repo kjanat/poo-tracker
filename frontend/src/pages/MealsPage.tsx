@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuthStore } from "../stores/authStore";
+import Logo from "../components/Logo";
 
 interface Meal {
   id: string;
@@ -12,6 +13,7 @@ interface Meal {
   dairy: boolean;
   gluten: boolean;
   notes?: string;
+  photoUrl?: string;
   mealTime: string;
   createdAt: string;
 }
@@ -26,6 +28,7 @@ interface MealFormData {
   dairy: boolean;
   gluten: boolean;
   notes: string;
+  photoUrl?: string;
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3002";
@@ -47,6 +50,9 @@ export function MealsPage() {
   const [loadingMeals, setLoadingMeals] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [editingMeal, setEditingMeal] = useState<Meal | null>(null);
 
   const token = useAuthStore((state) => state.token);
 
@@ -76,6 +82,133 @@ export function MealsPage() {
     fetchMeals();
   }, [token]);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        setError("Please select a valid image file");
+        return;
+      }
+
+      // Validate file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        setError("Image size must be less than 5MB");
+        return;
+      }
+
+      setSelectedImage(file);
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      // Clear any previous errors
+      setError("");
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+  };
+
+  const uploadImage = async (): Promise<string | null> => {
+    if (!selectedImage) return null;
+
+    const uploadFormData = new FormData();
+    uploadFormData.append("image", selectedImage);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/uploads`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: uploadFormData
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to upload image");
+      }
+
+      const data = await response.json();
+      return data.imageUrl;
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      throw error;
+    }
+  };
+
+  const startEdit = (meal: Meal) => {
+    setEditingMeal(meal);
+    setFormData({
+      name: meal.name,
+      category: meal.category || "",
+      description: meal.description || "",
+      cuisine: meal.cuisine || "",
+      spicyLevel: meal.spicyLevel || 1,
+      fiberRich: meal.fiberRich,
+      dairy: meal.dairy,
+      gluten: meal.gluten,
+      notes: meal.notes || "",
+      photoUrl: meal.photoUrl
+    });
+    // Reset image states when editing
+    setSelectedImage(null);
+    setImagePreview(null);
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const cancelEdit = () => {
+    setEditingMeal(null);
+    setFormData({
+      name: "",
+      category: "",
+      description: "",
+      cuisine: "",
+      spicyLevel: 1,
+      fiberRich: false,
+      dairy: false,
+      gluten: false,
+      notes: ""
+    });
+    setSelectedImage(null);
+    setImagePreview(null);
+    setError("");
+    setSuccess("");
+  };
+
+  const deleteMeal = async (mealId: string) => {
+    if (!confirm("Are you sure you want to delete this meal?")) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/meals/${mealId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete meal");
+      }
+
+      // Remove from local state
+      setMeals((prev) => prev.filter((meal) => meal.id !== mealId));
+      setSuccess("Meal deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting meal:", error);
+      setError(
+        error instanceof Error ? error.message : "Failed to delete meal"
+      );
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -87,9 +220,19 @@ export function MealsPage() {
         throw new Error("Not authenticated");
       }
 
+      // Upload image if selected
+      let photoUrl = formData.photoUrl;
+      if (selectedImage) {
+        const uploadedUrl = await uploadImage();
+        if (uploadedUrl) {
+          photoUrl = uploadedUrl;
+        }
+      }
+
       const mealData = {
         ...formData,
-        mealTime: new Date().toISOString(), // Current time for now
+        photoUrl: photoUrl || undefined,
+        mealTime: editingMeal ? editingMeal.mealTime : new Date().toISOString(),
         spicyLevel: formData.spicyLevel || null,
         // Convert empty strings to undefined for optional fields
         category: formData.category || undefined,
@@ -98,8 +241,14 @@ export function MealsPage() {
         notes: formData.notes || undefined
       };
 
-      const response = await fetch(`${API_BASE_URL}/api/meals`, {
-        method: "POST",
+      const isEditing = editingMeal !== null;
+      const url = isEditing
+        ? `${API_BASE_URL}/api/meals/${editingMeal.id}`
+        : `${API_BASE_URL}/api/meals`;
+      const method = isEditing ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
@@ -109,12 +258,25 @@ export function MealsPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to save meal");
+        throw new Error(
+          errorData.error || `Failed to ${isEditing ? "update" : "save"} meal`
+        );
       }
 
-      const newMeal = await response.json();
-      setMeals((prev) => [newMeal, ...prev]); // Add new meal to top of list
-      setSuccess("🎉 Meal saved successfully!");
+      const savedMeal = await response.json();
+
+      if (isEditing) {
+        // Update the meal in the list
+        setMeals((prev) =>
+          prev.map((meal) => (meal.id === editingMeal.id ? savedMeal : meal))
+        );
+        setSuccess("🎉 Meal updated successfully!");
+        setEditingMeal(null);
+      } else {
+        // Add new meal to top of list
+        setMeals((prev) => [savedMeal, ...prev]);
+        setSuccess("🎉 Meal saved successfully!");
+      }
 
       // Reset form
       setFormData({
@@ -128,8 +290,12 @@ export function MealsPage() {
         gluten: false,
         notes: ""
       });
+      setSelectedImage(null);
+      setImagePreview(null);
     } catch (err: any) {
-      setError(err.message || "Failed to save meal");
+      setError(
+        err.message || `Failed to ${editingMeal ? "update" : "save"} meal`
+      );
     } finally {
       setLoading(false);
     }
@@ -154,10 +320,14 @@ export function MealsPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">🍽️ Meals</h1>
+      <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">
+        <Logo size={32} /> Meals
+      </h1>
 
       <div className="card mb-6">
-        <h3 className="text-lg font-semibold mb-4">Log New Meal</h3>
+        <h3 className="text-lg font-semibold mb-4">
+          {editingMeal ? "Edit Meal" : "Log New Meal"}
+        </h3>
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -249,7 +419,7 @@ export function MealsPage() {
               className="input-field"
               rows={2}
               placeholder="Describe the meal..."
-            ></textarea>
+            />
           </div>
 
           <div>
@@ -263,7 +433,57 @@ export function MealsPage() {
               className="input-field"
               rows={2}
               placeholder="Any additional notes..."
-            ></textarea>
+            />
+          </div>
+
+          {/* Image Upload Section */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Photo (Optional)
+            </label>
+            <div className="space-y-3">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="input-field"
+              />
+
+              {imagePreview && (
+                <div className="relative">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="max-w-xs max-h-48 object-cover rounded border"
+                  />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+
+              {editingMeal?.photoUrl && !imagePreview && (
+                <div className="text-sm text-gray-600">
+                  Current photo:
+                  <img
+                    src={`${API_BASE_URL}${editingMeal.photoUrl}`}
+                    alt="Current meal photo"
+                    className="mt-2 max-w-xs max-h-48 object-cover rounded border"
+                  />
+                  <p className="mt-1 text-xs">
+                    Upload a new image to replace it
+                  </p>
+                </div>
+              )}
+
+              <p className="text-xs text-gray-500">
+                Max file size: 5MB. Accepted formats: JPG, PNG, GIF, WebP
+              </p>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-4">
@@ -301,9 +521,32 @@ export function MealsPage() {
             </label>
           </div>
 
-          <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? "Saving..." : "Save Meal"}
-          </button>
+          <div className="flex gap-3">
+            <button
+              type="submit"
+              className="btn-primary flex-1"
+              disabled={loading}
+            >
+              {loading
+                ? editingMeal
+                  ? "Updating..."
+                  : "Saving..."
+                : editingMeal
+                  ? "Update Meal"
+                  : "Save Meal"}
+            </button>
+
+            {editingMeal && (
+              <button
+                type="button"
+                onClick={cancelEdit}
+                className="btn-secondary"
+                disabled={loading}
+              >
+                Cancel
+              </button>
+            )}
+          </div>
         </form>
       </div>
 
@@ -315,7 +558,9 @@ export function MealsPage() {
           <div className="text-center py-4">Loading meals...</div>
         ) : meals.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <p>No meals logged yet. Add your first meal above!</p>
+            <p className="flex items-center justify-center gap-2">
+              No meals logged yet. Add your first meal above! <Logo size={24} />
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -323,9 +568,27 @@ export function MealsPage() {
               <div key={meal.id} className="border rounded-lg p-4 bg-gray-50">
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="font-semibold text-lg">{meal.name}</h4>
-                  <div className="text-sm text-gray-500">
-                    {new Date(meal.mealTime).toLocaleDateString()}{" "}
-                    {new Date(meal.mealTime).toLocaleTimeString()}
+                  <div className="flex items-center gap-2">
+                    <div className="text-sm text-gray-500">
+                      {new Date(meal.mealTime).toLocaleDateString()}{" "}
+                      {new Date(meal.mealTime).toLocaleTimeString()}
+                    </div>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => startEdit(meal)}
+                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                        disabled={loading}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => deleteMeal(meal.id)}
+                        className="text-red-600 hover:text-red-800 text-sm font-medium"
+                        disabled={loading}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -360,6 +623,16 @@ export function MealsPage() {
                     )}
                   </div>
                 </div>
+
+                {meal.photoUrl && (
+                  <div className="mt-3">
+                    <img
+                      src={`${API_BASE_URL}${meal.photoUrl}`}
+                      alt="Meal photo"
+                      className="max-w-xs max-h-48 object-cover rounded border"
+                    />
+                  </div>
+                )}
 
                 {(meal.fiberRich || meal.dairy || meal.gluten) && (
                   <div className="mt-2 flex flex-wrap gap-2">
