@@ -1,5 +1,13 @@
-# Created by https://www.toptal.com/developers/gitignore/api/node,python,visualstudiocode,jetbrains+all,windows,macos,linux
-# Edit at https://www.toptal.com/developers/gitignore?templates=node,python,visualstudiocode,jetbrains+all,windows,macos,linux
+# Created by https://www.toptal.com/developers/gitignore/api/node,linux,macos,python,windows,jetbrains+all,visualstudiocode,adobe
+# Edit at https://www.toptal.com/developers/gitignore?templates=node,linux,macos,python,windows,jetbrains+all,visualstudiocode,adobe
+
+### Adobe ###
+# Adobe Source Files
+*.psd
+*.ai
+*.indd
+*.prproj
+*.aep
 
 ### JetBrains+all ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
@@ -491,8 +499,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/node,python,visualstudiocode,jetbrains+all,windows,macos,linux
-
+# End of https://www.toptal.com/developers/gitignore/api/node,linux,macos,python,windows,jetbrains+all,visualstudiocode,adobe
 
 # Python
 .venv/

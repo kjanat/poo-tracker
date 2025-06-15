@@ -1,0 +1,94 @@
+name: 🎨 Convert SVG Assets
+
+on:
+  # push:
+  #   paths:
+  #     - 'branding/**/*.svg'
+  # pull_request:
+  #   branches: [master, develop]
+  #   # Run if PR branch name contains 'svg'
+  #   # This allows testing SVG changes in feature branches
+  workflow_dispatch:
+    inputs:
+      svg-path:
+        description: 'Path to SVG file to convert'
+        required: false
+        default: 'branding/logo.svg'
+        type: string
+      output-dir:
+        description: 'Directory to output converted files'
+        required: false
+        default: 'branding/'
+        type: string
+      formats:
+        description: 'Formats to generate (ico,png,react,react-native)'
+        required: false
+        default: 'ico,png,react,react-native'
+        type: string
+      typescript:
+        description: 'Generate TypeScript components'
+        required: false
+        default: false
+        type: boolean
+      base-name:
+        description: 'Base name for output files (without extension) Defaults to SVG filename'
+        required: false
+        type: string
+      png-sizes:
+        description: 'Sizes for PNG output (comma-separated)'
+        required: false
+        default: '16,32,64,128,256'
+        type: string
+      ico-sizes:
+        description: 'Sizes for ICO output (comma-separated)'
+        required: false
+        default: '16,32,48,64'
+        type: string
+      react-props-interface:
+        description: 'Interface name for React component props'
+        required: false
+        default: 'SVGProps'
+        type: string
+      debug:
+        description: 'Enable debug logging'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  convert-assets:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Convert SVG Assets
+        id: convert
+        uses: kjanat/svg-converter-action@v1.0.8
+        with:
+          svg-path: ${{ inputs.svg-path }}
+          output-dir: ${{ inputs.output-dir }}
+          formats: ${{ inputs.formats }}
+          png-sizes: ${{ inputs.png-sizes }}
+          ico-sizes: ${{ inputs.ico-sizes }}
+          react-typescript: ${{ inputs.typescript }}
+          react-props-interface: ${{ inputs.react-props-interface }}
+          base-name: ${{ inputs.base-name }}
+          debug: ${{ inputs.debug }}
+
+      - name: Show conversion results
+        run: |
+          echo "Files created: ${{ steps.convert.outputs.files-created }}"
+          echo "Summary:"
+          echo "${{ steps.convert.outputs.summary }}"
+
+      - name: Commit generated assets
+        run: |
+          git config --local user.name github-actions[bot]
+          git config --local user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add ${{ inputs.output-dir }}
+          git diff --staged --quiet || git commit -m "🎨 Auto-generate assets from SVG"
+          git push
