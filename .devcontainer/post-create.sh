@@ -3,18 +3,20 @@
 # This script runs after the container is created
 echo "🚽 Setting up Poo Tracker development environment..."
 
-# Set proper permissions
-chmod +x backend/src/utils/seed.ts 2> /dev/null || true
-chmod +x .devcontainer/devcontainer.sh
-chmod +x .devcontainer/post-start.sh
-chmod +x .devcontainer/uv-manager.shonfigure GPG
+# Set proper permissions (ignore failures due to mounted volumes)
+chmod +x backend/src/utils/seed.ts 2>/dev/null || true
+chmod +x .devcontainer/devcontainer.sh 2>/dev/null || true
+chmod +x .devcontainer/post-start.sh 2>/dev/null || true
+chmod +x .devcontainer/uv-manager.sh 2>/dev/null || true
+
+# Configure GPG
 echo "🔐 Configuring GPG for commit signing..."
 
-if [ -d ~/.gnupg ] && [ "$(ls -A ~/.gnupg 2> /dev/null)" ]; then
+if [ -d ~/.gnupg ] && [ "$(ls -A ~/.gnupg 2>/dev/null)" ]; then
   echo "GPG keys found, configuring signing..."
-  # Fix permissions for GPG
-  chmod 700 ~/.gnupg
-  chmod 600 ~/.gnupg/* 2> /dev/null || true
+  # Fix permissions for GPG (ignore failures on mounted volumes)
+  chmod 700 ~/.gnupg 2>/dev/null || true
+  chmod 600 ~/.gnupg/* 2>/dev/null || true
 
   # Configure git to use GPG signing if keys are available
   if gpg --list-secret-keys --keyid-format LONG | grep -q 'sec'; then
@@ -40,12 +42,20 @@ else
 fi
 
 # Activate virtual environment for this session
-source .venv/bin/activate
-echo "✅ Virtual environment activated: $(which python)"
+if [ -f ".venv/bin/activate" ]; then
+  source .venv/bin/activate
+  echo "✅ Virtual environment activated: $(which python)"
+else
+  echo "⚠️ Virtual environment activation script not found, using system Python: $(which python)"
+fi
+
+# Set up PNPM first
+echo "📦 Setting up PNPM..."
+pnpm setup || echo "⚠️ PNPM setup failed, continuing..."
 
 # Install global dependencies
 echo "📦 Installing global Node.js dependencies..."
-pnpm install -g concurrently husky
+pnpm install -g concurrently husky 2>/dev/null || echo "⚠️ Global package installation skipped (no global bin dir)"
 
 # Install project dependencies
 echo "📦 Installing project dependencies..."
@@ -126,10 +136,10 @@ mkdir -p backend/uploads
 mkdir -p backend/logs
 mkdir -p ai-service/logs
 
-# Set proper permissions
-chmod +x backend/src/utils/seed.ts 2> /dev/null || true
-chmod +x .devcontainer/devcontainer.sh
-chmod +x .devcontainer/post-start.sh
+# Set proper permissions (ignore failures due to mounted volumes)
+chmod +x backend/src/utils/seed.ts 2>/dev/null || true
+chmod +x .devcontainer/devcontainer.sh 2>/dev/null || true
+chmod +x .devcontainer/post-start.sh 2>/dev/null || true
 
 echo "✅ Post-create setup completed!"
 echo ""

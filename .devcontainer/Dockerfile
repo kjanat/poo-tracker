@@ -44,6 +44,8 @@ RUN if ! getent group $USERNAME; then \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
 # Install pnpm
+ENV PNPM_HOME="/home/$USERNAME/.local/share/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 RUN wget -qO- https://get.pnpm.io/install.sh | ENV="/home/$USERNAME/.bashrc" SHELL="$(which bash)" bash -
 
 # Install Python UV

@@ -524,3 +524,5 @@ docker-compose.override.yml
 .idea/
 *.swp
 *.swo
+
+.pnpm-store/

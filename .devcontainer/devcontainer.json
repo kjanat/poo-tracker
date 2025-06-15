@@ -127,6 +127,8 @@
     "COMPOSE_FILE": "docker-compose.yml:.devcontainer/docker-compose.dev.yml",
     "GPG_TTY": "/dev/pts/0",
     "UV_CACHE_DIR": "/home/kjanat/.cache/uv",
-    "VIRTUAL_ENV": "/workspaces/poo-tracker/.venv"
+    "VIRTUAL_ENV": "/workspaces/poo-tracker/.venv",
+    "PNPM_HOME": "/home/kjanat/.local/share/pnpm",
+    "PATH": "/home/kjanat/.local/share/pnpm:${PATH}"
   }
 }
