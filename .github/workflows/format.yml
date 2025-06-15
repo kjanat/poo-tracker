@@ -70,20 +70,24 @@ jobs:
         run: |
           if [ -n "$(git status --porcelain)" ]; then
             echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Changed files:"
+            git status --porcelain
           else
             echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes to commit"
           fi
 
       - name: 💾 Commit changes
         if: steps.verify-changed-files.outputs.changed == 'true'
+        continue-on-error: true
         run: |
           git config --local user.email 41898282+github-actions[bot]@users.noreply.github.com
           git config --local user.name github-actions[bot]
           git add .
-          git commit -m "🎨 Auto-fix formatting and linting issues" -a
+          git commit -m "🎨 Auto-fix formatting and linting issues
 
       - name: 🚀 Push changes
-        if: steps.verify-changed-files.outputs.changed == 'true'
+        if: success() && steps.verify-changed-files.outputs.changed == 'true'
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
