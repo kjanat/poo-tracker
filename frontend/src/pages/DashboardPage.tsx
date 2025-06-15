@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuthStore } from "../stores/authStore";
+import Logo from "../components/Logo";
 
 interface AnalyticsSummary {
   totalEntries: number;
@@ -151,7 +152,10 @@ export function DashboardPage() {
   if (isLoading) {
     return (
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">💩 Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-8 flex items-center gap-3">
+          <Logo size={32} className="text-poo-brown-600" />
+          Dashboard
+        </h1>
         <div className="card text-center py-8">
           <p className="text-gray-600">Loading your poo data...</p>
         </div>
@@ -162,7 +166,10 @@ export function DashboardPage() {
   if (error) {
     return (
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">💩 Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-8 flex items-center gap-3">
+          <Logo size={32} className="text-poo-brown-600" />
+          Dashboard
+        </h1>
         <div className="card text-center py-8">
           <p className="text-red-600">Error: {error}</p>
         </div>
@@ -177,7 +184,10 @@ export function DashboardPage() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">💩 Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-8 flex items-center gap-3">
+        <Logo size={32} className="text-poo-brown-600" />
+        Dashboard
+      </h1>
 
       <div className="grid md:grid-cols-3 gap-6 mb-8">
         <div className="card">

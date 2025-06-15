@@ -99,7 +99,9 @@ export function HomePage() {
             </div>
 
             <div className="space-y-4">
-              <div className="text-4xl">💩</div>
+              <div className="text-4xl flex justify-center">
+                <Logo size={48} />
+              </div>
               <h3 className="text-xl font-semibold">2. Shit</h3>
               <p className="text-gray-600">
                 Preferably in a toilet, but we're not here to kink-shame.

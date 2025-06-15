@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuthStore } from "../stores/authStore";
+import Logo from "../components/Logo";
 
 interface StoolEntry {
   bristolType: number;
@@ -163,8 +164,8 @@ export function NewEntryPage() {
       <h1 className="text-3xl font-bold mb-8">Log New Entry</h1>
 
       <div className="card">
-        <p className="text-center text-gray-600 mb-8">
-          Time to document another masterpiece! 💩
+        <p className="text-center text-gray-600 mb-8 flex items-center justify-center gap-2">
+          Time to document another masterpiece! <Logo size={24} />
         </p>
 
         {submitStatus === "success" && (
@@ -278,8 +279,8 @@ export function NewEntryPage() {
           </div>
         ) : entries.length === 0 ? (
           <div className="card text-center py-8">
-            <p className="text-gray-600">
-              No entries yet. Create your first one above! 💩
+            <p className="text-gray-600 flex items-center justify-center gap-2">
+              No entries yet. Create your first one above! <Logo size={24} />
             </p>
           </div>
         ) : (
