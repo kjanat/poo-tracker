@@ -2,9 +2,10 @@
 Basic tests for the Poo Tracker AI Service
 """
 
+import json
+
 import pytest
 from fastapi.testclient import TestClient
-
 from main import app
 
 client = TestClient(app)
@@ -76,3 +77,38 @@ def test_redis_connection_handling():
         assert data["redis_connected"] is True
     # If no Redis URL, connection might be False but endpoint should still work
     assert isinstance(data["redis_connected"], bool)
+
+
+def test_get_cached_analysis_success(monkeypatch):
+    """Return cached analysis when available."""
+
+    sample = {
+        "patterns": {"timing": {}},
+        "correlations": {},
+        "recommendations": [],
+        "risk_factors": [],
+        "bristol_trends": {},
+    }
+
+    class FakeRedis:
+        def get(self, key):
+            return json.dumps(sample)
+
+    monkeypatch.setattr("main.redis_client", FakeRedis())
+
+    response = client.get("/analysis/user123?date=20240101")
+    assert response.status_code == 200
+    assert response.json() == sample
+
+
+def test_get_cached_analysis_missing(monkeypatch):
+    """Return 404 if cached analysis does not exist."""
+
+    class FakeRedis:
+        def get(self, key):
+            return None
+
+    monkeypatch.setattr("main.redis_client", FakeRedis())
+
+    response = client.get("/analysis/user123?date=20240101")
+    assert response.status_code == 404
