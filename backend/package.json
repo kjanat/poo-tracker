@@ -1,5 +1,5 @@
 {
-  "name": "poo-tracker-backend",
+  "name": "@poo-tracker/backend",
   "version": "1.0.0",
   "description": "Backend API for Poo Tracker",
   "main": "dist/index.js",
@@ -10,7 +10,7 @@
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "test": "vitest run",
-    "test:watch": "vitest",
+    "test:watch": "vitest --watch",
     "test:coverage": "vitest run --coverage",
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset",
