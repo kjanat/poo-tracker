@@ -25,17 +25,17 @@ export const useAuthStore = create<AuthState>()(
         set({
           user,
           token,
-          isAuthenticated: true,
+          isAuthenticated: true
         }),
       logout: () =>
         set({
           user: null,
           token: null,
-          isAuthenticated: false,
-        }),
+          isAuthenticated: false
+        })
     }),
     {
-      name: "poo-tracker-auth",
-    },
-  ),
+      name: "poo-tracker-auth"
+    }
+  )
 );

@@ -7,12 +7,12 @@ export default defineConfig({
     setupFiles: ["./src/test/setup.ts"],
     coverage: {
       include: ["src/**/*.{ts,tsx}"],
-      exclude: ["src/**/*.d.ts", "src/main.tsx", "src/vite-env.d.ts"],
-    },
+      exclude: ["src/**/*.d.ts", "src/main.tsx", "src/vite-env.d.ts"]
+    }
   },
   resolve: {
     alias: {
-      "@": resolve(__dirname, "./src"),
-    },
-  },
+      "@": resolve(__dirname, "./src")
+    }
+  }
 });

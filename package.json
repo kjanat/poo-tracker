@@ -13,13 +13,46 @@
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "db:migrate": "cd backend & pnpm run db:migrate",
-    "db:seed": "cd backend & pnpm run db:seed"
+    "db:seed": "cd backend & pnpm run db:seed",
+    "prettier": "prettier --write --ignore-unknown .",
+    "prettier:watch": "pnpm dlx onchange \"**/*\" -- prettier --write --ignore-unknown {{changed}}",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.1",
+    "prettier": "^3.5.3"
   },
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=3"
+  },
+  "prettier": {
+    "trailingComma": "none",
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": false
+  },
+  "lint-staged": {
+    "backend/**/*.{ts,tsx,js,jsx}": [
+      "pnpm --filter backend run lint:fix",
+      "prettier --write"
+    ],
+    "frontend/**/*.{ts,tsx,js,jsx}": [
+      "pnpm --filter frontend run lint:fix",
+      "prettier --write"
+    ],
+    "ai-service/**/*.py": [
+      "uvx black",
+      "uvx isort",
+      "uvx ruff check --fix"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ],
+    "*.{css,scss,less}": [
+      "prettier --write"
+    ]
   }
 }

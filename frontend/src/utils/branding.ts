@@ -9,7 +9,7 @@ export const BRAND_COLORS = {
   accent: "#CA7047",
   text: "#6B4423",
   light: "#DF8963",
-  dark: "#37161B",
+  dark: "#37161B"
 } as const;
 
 // Logo sizes for different contexts
@@ -18,7 +18,7 @@ export const LOGO_SIZES = {
   medium: 32,
   large: 64,
   hero: 96,
-  icon: 24,
+  icon: 24
 } as const;
 
 // Available PNG logo assets
@@ -29,7 +29,7 @@ export const LOGO_ASSETS = {
   png32: "/logo_32x32.png",
   png64: "/logo_64x64.png",
   png128: "/logo_128x128.png",
-  png256: "/logo_256x256.png",
+  png256: "/logo_256x256.png"
 } as const;
 
 // App metadata
@@ -39,7 +39,7 @@ export const APP_META = {
   description:
     "Track your bowel movements, analyze patterns, and optimize your digestive health with Poo Tracker.",
   themeColor: BRAND_COLORS.primary,
-  backgroundColor: "#ffffff",
+  backgroundColor: "#ffffff"
 } as const;
 
 // Logo component props helper
