@@ -2,10 +2,42 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <!-- Favicon and app icons -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="apple-touch-icon" href="/logo_256x256.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    <!-- Various icon sizes for different contexts -->
+    <link rel="icon" type="image/png" sizes="16x16" href="/logo_16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/logo_32x32.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/logo_64x64.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="128x128"
+      href="/logo_128x128.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="256x256"
+      href="/logo_256x256.png"
+    />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>💩 Poo Tracker - Your Bowel Movement Journal</title>
-    <meta name="description" content="Track your bowel movements, analyze patterns, and optimize your digestive health with Poo Tracker.">
+    <meta
+      name="description"
+      content="Track your bowel movements, analyze patterns, and optimize your digestive health with Poo Tracker."
+    />
+
+    <!-- PWA and mobile app meta tags -->
+    <meta name="theme-color" content="#8B4513" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Poo Tracker" />
+    <link rel="manifest" href="/manifest.json" />
   </head>
   <body>
     <div id="root"></div>

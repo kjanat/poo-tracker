@@ -1,8 +1,17 @@
 import * as React from "react";
-const SvgLogo = (props) => (
+
+interface LogoProps extends React.SVGProps<SVGSVGElement> {
+  size?: number | string;
+  className?: string;
+}
+
+const Logo: React.FC<LogoProps> = ({ size = 24, className = "", ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 403.65 403.65"
+    width={size}
+    height={size}
+    className={className}
     {...props}
   >
     <path
@@ -62,4 +71,5 @@ const SvgLogo = (props) => (
     </g>
   </svg>
 );
-export default SvgLogo;
+
+export default Logo;

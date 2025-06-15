@@ -12,12 +12,12 @@ router.use(authenticateToken)
 router.get('/summary', async (req: AuthenticatedRequest, res, next) => {
   try {
     const userId = req.userId
-    
+
     // Get basic stats
     const totalEntries = await prisma.entry.count({
       where: { userId }
     })
-    
+
     // Get bristol type distribution
     const bristolDistribution = await prisma.entry.groupBy({
       by: ['bristolType'],
@@ -25,7 +25,7 @@ router.get('/summary', async (req: AuthenticatedRequest, res, next) => {
       _count: true,
       orderBy: { bristolType: 'asc' }
     })
-    
+
     // Get recent entries
     const recentEntries = await prisma.entry.findMany({
       where: { userId },
@@ -38,10 +38,10 @@ router.get('/summary', async (req: AuthenticatedRequest, res, next) => {
         satisfaction: true
       }
     })
-    
+
     // Calculate average satisfaction if available
     const avgSatisfaction = await prisma.entry.aggregate({
-      where: { 
+      where: {
         userId,
         satisfaction: { not: null }
       },
@@ -49,10 +49,10 @@ router.get('/summary', async (req: AuthenticatedRequest, res, next) => {
         satisfaction: true
       }
     })
-    
+
     res.json({
       totalEntries,
-      bristolDistribution: bristolDistribution.map(item => ({
+      bristolDistribution: bristolDistribution.map((item) => ({
         type: item.bristolType,
         count: item._count
       })),

@@ -30,7 +30,7 @@ router.get('/', async (req: AuthenticatedRequest, res, next) => {
       where: { userId: req.userId },
       orderBy: { mealTime: 'desc' }
     })
-    
+
     res.json(meals)
   } catch (error) {
     next(error)
@@ -41,7 +41,7 @@ router.get('/', async (req: AuthenticatedRequest, res, next) => {
 router.post('/', async (req: AuthenticatedRequest, res, next) => {
   try {
     const validatedData = createMealSchema.parse(req.body)
-    
+
     const meal = await prisma.meal.create({
       data: {
         ...validatedData,
@@ -49,7 +49,7 @@ router.post('/', async (req: AuthenticatedRequest, res, next) => {
         userId: req.userId!
       }
     })
-    
+
     res.status(201).json(meal)
   } catch (error) {
     if (error instanceof z.ZodError) {

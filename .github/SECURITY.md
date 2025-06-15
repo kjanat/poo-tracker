@@ -20,11 +20,13 @@ We take security vulnerabilities seriously. If you discover a security issue, pl
 Instead, please report security issues through one of these methods:
 
 1. **GitHub Security Advisories** (Preferred)
+
    - Go to [Security Advisories](https://github.com/kjanat/poo-tracker/security/advisories/new)
    - Click "Report a vulnerability"
    - Fill out the form with details
 
 2. **Email**
+
    - Send details to: <poo-tracker+security@kjanat.com>
    - Include "SECURITY" in the subject line
    - Use PGP encryption if possible (key available on request)

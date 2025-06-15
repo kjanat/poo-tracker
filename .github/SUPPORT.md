@@ -67,8 +67,8 @@ If you're developing with or contributing to Poo Tracker:
 
 ### Community Support (Public)
 
-| Method               | Best For                         | Response Time |
-| -------------------- | -------------------------------- | ------------- |
+| Method                | Best For                         | Response Time |
+| --------------------- | -------------------------------- | ------------- |
 | 💬 GitHub Discussions | General questions, feature ideas | 24-48 hours   |
 | 🐛 GitHub Issues      | Bug reports, specific problems   | 24-72 hours   |
 | 💬 Discord            | Quick questions, real-time help  | Varies        |
@@ -117,12 +117,14 @@ When creating issues, these labels help us categorize and prioritize:
 
 ```markdown
 **Environment:**
+
 - OS: Windows 11 / macOS 14 / Ubuntu 22.04
 - Node.js version: v18.17.0
 - Browser: Chrome 119 (if frontend issue)
 - Docker version: 24.0.6 (if relevant)
 
 **Steps to Reproduce:**
+
 1. Go to...
 2. Click on...
 3. See error...
@@ -241,6 +243,7 @@ pnpm prisma migrate reset
    ```
 
 2. **Use the debugger:**
+
    - Frontend: Browser dev tools
    - Backend: VS Code debugger or `console.log`
    - AI Service: Python debugger or print statements
@@ -276,7 +279,7 @@ pnpm prisma migrate reset
 | **Question**        | Within 24-48 hours | Usually same day |
 | **Documentation**   | Within 48 hours    | 1-2 weeks        |
 
-*Note: These are goals, not guarantees. Response times may vary based on complexity and maintainer availability.*
+_Note: These are goals, not guarantees. Response times may vary based on complexity and maintainer availability._
 
 ## 🤝 Community Guidelines
 

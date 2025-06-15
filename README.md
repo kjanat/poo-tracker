@@ -14,43 +14,43 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
 1. **Clone the repository:**
 
-    ```bash
-    git clone https://github.com/kjanat/poo-tracker.git
-    cd poo-tracker
-    ```
+   ```bash
+   git clone https://github.com/kjanat/poo-tracker.git
+   cd poo-tracker
+   ```
 
 2. **Install dependencies:**
 
-    ```bash
-    pnpm install
-    ```
+   ```bash
+   pnpm install
+   ```
 
 3. **Set up environment variables:**
 
-    ```bash
-    cp .env.example .env
-    # Edit .env with your configuration
-    ```
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
 
 4. **Start the services:**
 
-    ```bash
-    # Start database and supporting services
-    pnpm run docker:up
+   ```bash
+   # Start database and supporting services
+   pnpm run docker:up
 
-    # Start the development servers
-    pnpm run dev
-    ```
+   # Start the development servers
+   pnpm run dev
+   ```
 
 5. **Set up the database:**
 
-    ```bash
-    # Run database migrations
-    pnpm run db:migrate
+   ```bash
+   # Run database migrations
+   pnpm run db:migrate
 
-    # (Optional) Seed with test data
-    pnpm run db:seed
-    ```
+   # (Optional) Seed with test data
+   pnpm run db:seed
+   ```
 
 6. **Open your browser:**
 

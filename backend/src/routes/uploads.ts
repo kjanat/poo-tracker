@@ -17,7 +17,7 @@ const minioClient = new MinioClient({
 })
 
 // Configure multer for memory storage
-const upload = multer({ 
+const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
     fileSize: 10 * 1024 * 1024 // 10MB limit
@@ -51,23 +51,18 @@ router.post('/photo', upload.single('photo'), async (req: AuthenticatedRequest, 
     }
 
     await ensureBucket()
-    
+
     const fileExtension = req.file.originalname.split('.').pop()
     const filename = `${req.userId}/${uuidv4()}.${fileExtension}`
-    
+
     // Upload to MinIO
-    await minioClient.putObject(
-      config.minio.bucketName,
-      filename,
-      req.file.buffer,
-      {
-        'Content-Type': req.file.mimetype
-      }
-    )
-    
+    await minioClient.putObject(config.minio.bucketName, filename, req.file.buffer, {
+      'Content-Type': req.file.mimetype
+    })
+
     // Generate URL (in production you'd want signed URLs)
     const photoUrl = `http://${config.minio.endpoint}/${config.minio.bucketName}/${filename}`
-    
+
     res.json({
       photoUrl,
       filename,

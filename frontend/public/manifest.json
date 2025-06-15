@@ -1,0 +1,52 @@
+{
+  "name": "Poo Tracker - Your Bowel Movement Journal",
+  "short_name": "Poo Tracker",
+  "description": "Track your bowel movements, analyze patterns, and optimize your digestive health with Poo Tracker.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8B4513",
+  "orientation": "portrait",
+  "categories": ["health", "medical", "lifestyle"],
+  "icons": [
+    {
+      "src": "/logo_16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo_32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo_64x64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo_128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo_256x256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/logo_256x256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ]
+}

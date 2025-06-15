@@ -9,7 +9,7 @@ body:
     attributes:
       value: |
         Thanks for suggesting a feature! 🚀
-        
+
         Before you submit, please search existing issues and discussions to see if someone else has already suggested this.
 
   - type: textarea

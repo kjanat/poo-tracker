@@ -7,6 +7,7 @@
 ## 🔗 Related Issue
 
 <!-- Link to the issue this PR addresses -->
+
 Closes #<!-- issue number -->
 
 ## 🧪 Type of Change
@@ -29,15 +30,19 @@ Closes #<!-- issue number -->
 <!-- Describe the changes in detail -->
 
 ### Frontend Changes
+
 <!-- If applicable, describe frontend changes -->
 
 ### Backend Changes
+
 <!-- If applicable, describe backend changes -->
 
 ### AI Service Changes
+
 <!-- If applicable, describe AI service changes -->
 
 ### Database Changes
+
 <!-- If applicable, describe database schema changes -->
 
 ## 🧪 Testing
@@ -53,18 +58,20 @@ Closes #<!-- issue number -->
 
 <!-- Provide step-by-step instructions for testing this PR -->
 
-1.  
-2.  
-3.  
+1.
+2.
+3.
 
 ## 📸 Screenshots
 
 <!-- If your changes affect the UI, please include screenshots -->
 
 ### Before
+
 <!-- Screenshot of UI before changes -->
 
 ### After
+
 <!-- Screenshot of UI after changes -->
 
 ## 🔍 Code Quality
@@ -110,6 +117,7 @@ Closes #<!-- issue number -->
 ## 🙏 Reviewers
 
 <!-- Tag specific reviewers if needed -->
+
 @kjanat
 
 ---

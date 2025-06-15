@@ -91,7 +91,7 @@ Before making changes:
 # Frontend tests
 pnpm run --filter frontend test
 
-# Backend tests  
+# Backend tests
 pnpm run --filter backend test
 
 # AI service tests
@@ -156,7 +156,7 @@ Follow conventional commits with emojis:
 
 ```txt
 feat: add Bristol stool chart selector
-fix: correct off-by-one in shit counter  
+fix: correct off-by-one in shit counter
 chore: update dependencies
 🎨 feat: add SVG Converter Pro GitHub Action
 ```
@@ -274,4 +274,4 @@ chore: update dependencies
 
 ---
 
-*Remember: If your code stinks, it won't get merged. Keep it clean, tested, and documented!* 💩✨
+_Remember: If your code stinks, it won't get merged. Keep it clean, tested, and documented!_ 💩✨

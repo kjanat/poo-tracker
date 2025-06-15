@@ -13,7 +13,9 @@ router.use(authenticateToken)
 const createEntrySchema = z.object({
   bristolType: z.number().int().min(1).max(7),
   volume: z.enum(['Small', 'Medium', 'Large', 'Massive']).optional(),
-  color: z.enum(['Brown', 'Dark Brown', 'Light Brown', 'Yellow', 'Green', 'Red', 'Black']).optional(),
+  color: z
+    .enum(['Brown', 'Dark Brown', 'Light Brown', 'Yellow', 'Green', 'Red', 'Black'])
+    .optional(),
   consistency: z.enum(['Solid', 'Soft', 'Loose', 'Watery']).optional(),
   floaters: z.boolean().default(false),
   pain: z.number().int().min(1).max(10).optional(),
@@ -29,11 +31,11 @@ const updateEntrySchema = createEntrySchema.partial()
 router.get('/', async (req: AuthenticatedRequest, res, next) => {
   try {
     const { page = '1', limit = '20', sortBy = 'createdAt', sortOrder = 'desc' } = req.query
-    
+
     const pageNum = parseInt(page as string)
     const limitNum = parseInt(limit as string)
     const skip = (pageNum - 1) * limitNum
-    
+
     const entries = await prisma.entry.findMany({
       where: { userId: req.userId },
       orderBy: { [sortBy as string]: sortOrder },
@@ -45,11 +47,11 @@ router.get('/', async (req: AuthenticatedRequest, res, next) => {
         }
       }
     })
-    
+
     const total = await prisma.entry.count({
       where: { userId: req.userId }
     })
-    
+
     res.json({
       entries,
       pagination: {
@@ -68,11 +70,11 @@ router.get('/', async (req: AuthenticatedRequest, res, next) => {
 router.get('/:id', async (req: AuthenticatedRequest, res, next) => {
   try {
     const { id } = req.params
-    
+
     const entry = await prisma.entry.findFirst({
-      where: { 
+      where: {
         id,
-        userId: req.userId 
+        userId: req.userId
       },
       include: {
         user: {
@@ -80,11 +82,11 @@ router.get('/:id', async (req: AuthenticatedRequest, res, next) => {
         }
       }
     })
-    
+
     if (!entry) {
       return res.status(404).json({ error: 'Entry not found' })
     }
-    
+
     res.json(entry)
   } catch (error) {
     next(error)
@@ -95,14 +97,14 @@ router.get('/:id', async (req: AuthenticatedRequest, res, next) => {
 router.post('/', async (req: AuthenticatedRequest, res, next) => {
   try {
     const validatedData = createEntrySchema.parse(req.body)
-    
+
     const entry = await prisma.entry.create({
       data: {
         ...validatedData,
         userId: req.userId!
       }
     })
-    
+
     res.status(201).json(entry)
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -117,20 +119,20 @@ router.put('/:id', async (req: AuthenticatedRequest, res, next) => {
   try {
     const { id } = req.params
     const validatedData = updateEntrySchema.parse(req.body)
-    
+
     const existingEntry = await prisma.entry.findFirst({
       where: { id, userId: req.userId }
     })
-    
+
     if (!existingEntry) {
       return res.status(404).json({ error: 'Entry not found' })
     }
-    
+
     const entry = await prisma.entry.update({
       where: { id },
       data: validatedData
     })
-    
+
     res.json(entry)
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -144,19 +146,19 @@ router.put('/:id', async (req: AuthenticatedRequest, res, next) => {
 router.delete('/:id', async (req: AuthenticatedRequest, res, next) => {
   try {
     const { id } = req.params
-    
+
     const existingEntry = await prisma.entry.findFirst({
       where: { id, userId: req.userId }
     })
-    
+
     if (!existingEntry) {
       return res.status(404).json({ error: 'Entry not found' })
     }
-    
+
     await prisma.entry.delete({
       where: { id }
     })
-    
+
     res.status(204).send()
   } catch (error) {
     next(error)

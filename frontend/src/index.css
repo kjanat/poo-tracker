@@ -2,23 +2,23 @@
 
 @theme {
   /* Custom colors */
-  --color-poo-brown-50: #F7F3F0;
-  --color-poo-brown-100: #E8DDD6;
-  --color-poo-brown-200: #D0BBA6;
-  --color-poo-brown-300: #B89976;
-  --color-poo-brown-400: #A07746;
-  --color-poo-brown-500: #8B5A2B;
-  --color-poo-brown-600: #6F4622;
+  --color-poo-brown-50: #f7f3f0;
+  --color-poo-brown-100: #e8ddd6;
+  --color-poo-brown-200: #d0bba6;
+  --color-poo-brown-300: #b89976;
+  --color-poo-brown-400: #a07746;
+  --color-poo-brown-500: #8b5a2b;
+  --color-poo-brown-600: #6f4622;
   --color-poo-brown-700: #533318;
-  --color-poo-brown-800: #37200F;
-  --color-poo-brown-900: #1C0E05;
+  --color-poo-brown-800: #37200f;
+  --color-poo-brown-900: #1c0e05;
 }
 
 @layer base {
   html {
     font-family: system-ui, sans-serif;
   }
-  
+
   body {
     @apply bg-gradient-to-br from-orange-100 to-yellow-100 min-h-screen;
   }
@@ -28,15 +28,15 @@
   .btn-primary {
     @apply bg-poo-brown-600 hover:bg-poo-brown-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200;
   }
-  
+
   .btn-secondary {
     @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors duration-200;
   }
-  
+
   .card {
     @apply bg-white rounded-xl shadow-lg p-6 border border-gray-100;
   }
-  
+
   .input-field {
     @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-poo-brown-500 focus:border-transparent;
   }

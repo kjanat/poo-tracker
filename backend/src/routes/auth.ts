@@ -24,19 +24,19 @@ const loginSchema = z.object({
 router.post('/register', async (req, res, next) => {
   try {
     const { email, name, password } = registerSchema.parse(req.body)
-    
+
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email }
     })
-    
+
     if (existingUser) {
       return res.status(400).json({ error: 'User already exists with this email' })
     }
-    
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12)
-    
+
     // Create user
     const user = await prisma.user.create({
       data: {
@@ -44,14 +44,12 @@ router.post('/register', async (req, res, next) => {
         name: name ?? null
       }
     })
-    
+
     // Generate JWT
-    const token = jwt.sign(
-      { userId: user.id },
-      config.jwt.secret,
-      { expiresIn: config.jwt.expiresIn }
-    )
-    
+    const token = jwt.sign({ userId: user.id }, config.jwt.secret, {
+      expiresIn: config.jwt.expiresIn
+    })
+
     res.status(201).json({
       message: 'User created successfully',
       token,
@@ -73,26 +71,24 @@ router.post('/register', async (req, res, next) => {
 router.post('/login', async (req, res, next) => {
   try {
     const { email, password } = loginSchema.parse(req.body)
-    
+
     // Find user
     const user = await prisma.user.findUnique({
       where: { email }
     })
-    
+
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' })
     }
-    
+
     // For now, we'll skip password verification since we don't store passwords in the schema
     // In a real app, you'd verify the password here
-    
+
     // Generate JWT
-    const token = jwt.sign(
-      { userId: user.id },
-      config.jwt.secret,
-      { expiresIn: config.jwt.expiresIn }
-    )
-    
+    const token = jwt.sign({ userId: user.id }, config.jwt.secret, {
+      expiresIn: config.jwt.expiresIn
+    })
+
     res.json({
       message: 'Login successful',
       token,

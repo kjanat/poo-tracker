@@ -64,4 +64,3 @@ const SvgLogo = (props) => (
   </Svg>
 );
 export default SvgLogo;
-

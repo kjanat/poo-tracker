@@ -118,31 +118,35 @@ export const Toilet: React.FC<ToiletProps> = ({ isOccupied, onFlush }) => {
 
 ```typescript
 // ✅ Good - Proper error handling and validation
-import { z } from 'zod'
-import { Request, Response, NextFunction } from 'express'
+import { z } from "zod";
+import { Request, Response, NextFunction } from "express";
 
 const createPooSchema = z.object({
   bristolScale: z.number().min(1).max(7),
   imageUrl: z.string().url().optional(),
-  notes: z.string().max(500).optional()
-})
+  notes: z.string().max(500).optional(),
+});
 
-export const createPoo = async (req: Request, res: Response, next: NextFunction) => {
+export const createPoo = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const data = createPooSchema.parse(req.body)
-    
+    const data = createPooSchema.parse(req.body);
+
     const poo = await prisma.poo.create({
       data: {
         ...data,
-        userId: req.user.id
-      }
-    })
-    
-    res.status(201).json(poo)
+        userId: req.user.id,
+      },
+    });
+
+    res.status(201).json(poo);
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 ```
 
 ### Testing Standards
@@ -158,12 +162,12 @@ import { Toilet } from '../Toilet'
 describe('Toilet', () => {
   it('should flush data when button is clicked', async () => {
     const mockOnFlush = vi.fn().mockResolvedValue(undefined)
-    
+
     render(<Toilet isOccupied={false} onFlush={mockOnFlush} />)
-    
+
     const flushButton = screen.getByRole('button', { name: /flush data/i })
     fireEvent.click(flushButton)
-    
+
     await waitFor(() => {
       expect(mockOnFlush).toHaveBeenCalledTimes(1)
     })
@@ -175,31 +179,31 @@ describe('Toilet', () => {
 
 ```typescript
 // ✅ Good - API endpoint testing
-import request from 'supertest'
-import { app } from '../app'
-import { createTestUser } from '../test-utils'
+import request from "supertest";
+import { app } from "../app";
+import { createTestUser } from "../test-utils";
 
-describe('POST /api/poos', () => {
-  it('should create a new poo entry', async () => {
-    const user = await createTestUser()
-    const token = generateToken(user.id)
-    
+describe("POST /api/poos", () => {
+  it("should create a new poo entry", async () => {
+    const user = await createTestUser();
+    const token = generateToken(user.id);
+
     const response = await request(app)
-      .post('/api/poos')
-      .set('Authorization', `Bearer ${token}`)
+      .post("/api/poos")
+      .set("Authorization", `Bearer ${token}`)
       .send({
         bristolScale: 4,
-        notes: 'Perfect consistency'
+        notes: "Perfect consistency",
       })
-      .expect(201)
-    
+      .expect(201);
+
     expect(response.body).toMatchObject({
       bristolScale: 4,
-      notes: 'Perfect consistency',
-      userId: user.id
-    })
-  })
-})
+      notes: "Perfect consistency",
+      userId: user.id,
+    });
+  });
+});
 ```
 
 ## 🎯 Contributing Guidelines
@@ -292,7 +296,7 @@ pnpm test:watch
 
 ### Documentation Standards
 
-```typescript
+````typescript
 /**
  * Analyzes poo consistency using Bristol Stool Chart classification
  * @param imageBuffer - Raw image data from uploaded photo
@@ -307,11 +311,11 @@ pnpm test:watch
  */
 export async function analyzePooConsistency(
   imageBuffer: Buffer,
-  userId: string
+  userId: string,
 ): Promise<number> {
   // Implementation here
 }
-```
+````
 
 ## 🚫 What NOT to Do
 
@@ -440,4 +444,4 @@ Happy coding, you magnificent bastards! 🚀
 
 ---
 
-*For questions about contributing, reach out to [@kjanat](https://github.com/kjanat) or start a discussion.*
+_For questions about contributing, reach out to [@kjanat](https://github.com/kjanat) or start a discussion._

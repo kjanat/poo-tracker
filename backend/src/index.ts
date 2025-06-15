@@ -4,6 +4,7 @@ import helmet from 'helmet'
 import compression from 'compression'
 import morgan from 'morgan'
 import rateLimit from 'express-rate-limit'
+import path from 'path'
 import { config } from './config'
 import { errorHandler } from './middleware/errorHandler'
 import { authRoutes } from './routes/auth'
@@ -12,14 +13,16 @@ import { mealRoutes } from './routes/meals'
 import { uploadRoutes } from './routes/uploads'
 import { analyticsRoutes } from './routes/analytics'
 
-const app = express()
+const app: express.Application = express()
 
 // Security middleware
 app.use(helmet())
-app.use(cors({
-  origin: config.corsOrigin,
-  credentials: true
-}))
+app.use(
+  cors({
+    origin: config.corsOrigin,
+    credentials: true
+  })
+)
 
 // Rate limiting
 const limiter = rateLimit({
@@ -34,6 +37,9 @@ app.use(compression())
 app.use(morgan('combined'))
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
+
+// Serve static assets (logos, etc.)
+app.use('/assets', express.static(path.join(__dirname, '../public')))
 
 // Health check
 app.get('/health', (_req, res) => {
