@@ -2,6 +2,7 @@ import sharp from 'sharp'
 import { v4 as uuidv4 } from 'uuid'
 import path from 'path'
 import fs from 'fs/promises'
+import { sanitizeFilename } from '../utils/filename'
 
 export interface ImageProcessingConfig {
   maxWidth: number
@@ -85,8 +86,11 @@ export class SharpImageProcessingService implements ImageProcessingService {
   }
 
   async deleteImage(filename: string): Promise<void> {
-    const safeName = path.basename(filename)
-    const filePath = path.join(this.uploadDir, safeName)
+    const safeFilename = sanitizeFilename(filename)
+    if (!safeFilename) {
+      throw new Error(`Invalid filename: ${filename}`)
+    }
+    const filePath = path.join(this.uploadDir, safeFilename)
     try {
       await fs.unlink(filePath)
     } catch (error) {
