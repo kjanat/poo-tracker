@@ -24,6 +24,7 @@
     "lint-staged": "^16.1.1",
     "prettier": "^3.5.3",
     "prettier-plugin-prisma": "^5.0.0",
+    "prettier-plugin-sh": "^0.17.4",
     "prettier-plugin-sql": "^0.19.1"
   },
   "engines": {
@@ -37,7 +38,8 @@
     "singleQuote": false,
     "plugins": [
       "prettier-plugin-sql",
-      "prettier-plugin-prisma"
+      "prettier-plugin-prisma",
+      "prettier-plugin-sh"
     ]
   },
   "lint-staged": {
