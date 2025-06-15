@@ -23,9 +23,11 @@ poo-tracker/
 │   ├── prisma/
 │   └── package.json    # @poo-tracker/backend
 ├── ai-service/         # Python FastAPI + Redis + ML/AI features
-│   ├── main.py
+│   ├── main.py         # FastAPI application and analysis logic
+│   ├── test_main.py    # Test suite
 │   ├── pyproject.toml  # Modern uv-compatible configuration
-│   └── uv.lock
+│   ├── Dockerfile      # Container configuration
+│   └── README.md       # Service documentation
 ├── .github/            # GitHub Actions workflows and custom actions
 │   ├── workflows/      # CI/CD pipelines
 │   └── actions/        # Custom reusable actions (e.g., svg-converter)
@@ -139,12 +141,15 @@ pnpm --recursive run build
 **Python** (uv):
 
 ```bash
+# Must be in ai-service directory for Python commands
 cd ai-service
-uv add fastapi          # Add runtime dependency
-uv add --dev pytest     # Add dev dependency
-uv sync                 # Install all dependencies
-uvx ruff format .       # Format code
-uvx ruff check .        # Lint code
+uv add fastapi      # Add runtime dependency
+uv add --dev pytest # Add dev dependency
+uv sync             # Install all dependencies
+uv sync --group dev # Install with dev dependencies
+uvx ruff format .   # Format code
+uvx ruff check .    # Lint code
+uvx pytest          # Run tests
 ```
 
 ---
@@ -167,11 +172,12 @@ pnpm --filter @poo-tracker/frontend test
 pnpm --filter @poo-tracker/backend test
 
 # All workspaces
-pnpm test                   # Runs all workspace tests
-pnpm test:watch             # Watch mode for all workspaces
+pnpm test       # Runs all workspace tests
+pnpm test:watch # Watch mode for all workspaces
 
-# AI service testing
-cd ai-service && uv run pytest
+# AI service testing (must be in directory)
+cd ai-service && uvx pytest
+cd ai-service && uvx pytest --cov=main # With coverage
 ```
 
 ### ✅ Test Requirements
@@ -193,19 +199,20 @@ All code changes must pass these checks:
 **Frontend/Backend** (workspace commands):
 
 ```bash
-pnpm lint              # ESLint across all workspaces
-pnpm lint:fix          # Auto-fix linting issues
-pnpm build             # Production build test
-pnpm test              # All workspace tests
+pnpm lint     # ESLint across all workspaces
+pnpm lint:fix # Auto-fix linting issues
+pnpm build    # Production build test
+pnpm test     # All workspace tests
 ```
 
 **AI Service**:
 
 ```bash
 cd ai-service
-uvx ruff format --check .  # Code formatting
-uvx ruff check .           # Linting
-uv run pytest              # Run tests
+uvx ruff format --check . # Code formatting
+uvx ruff check .          # Linting
+uvx pytest                # Run tests
+uvx mypy main.py          # Type checking
 ```
 
 ### 🚦 GitHub Actions Workflows

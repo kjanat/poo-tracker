@@ -1,7 +1,7 @@
 import json
 import os
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import numpy as np
 import pandas as pd
@@ -46,16 +46,16 @@ class MealData(BaseModel):
 
 
 class AnalysisRequest(BaseModel):
-    entries: List[EntryData]
-    meals: List[MealData]
+    entries: list[EntryData]
+    meals: list[MealData]
 
 
 class AnalysisResponse(BaseModel):
-    patterns: Dict[str, Any]
-    correlations: Dict[str, Any]
-    recommendations: List[str]
-    risk_factors: List[str]
-    bristol_trends: Dict[str, Any]
+    patterns: dict[str, Any]
+    correlations: dict[str, Any]
+    recommendations: list[str]
+    risk_factors: list[str]
+    bristol_trends: dict[str, Any]
 
 
 @app.get("/health")
@@ -110,12 +110,12 @@ async def analyze_patterns(request: AnalysisRequest):
         return AnalysisResponse(**analysis_result)
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}") from e
 
 
 def perform_comprehensive_analysis(
     entries_df: pd.DataFrame, meals_df: pd.DataFrame
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Perform comprehensive analysis of bowel movements and correlations.
     """
@@ -150,7 +150,7 @@ def perform_comprehensive_analysis(
     }
 
 
-def analyze_bristol_patterns(df: pd.DataFrame) -> Dict[str, Any]:
+def analyze_bristol_patterns(df: pd.DataFrame) -> dict[str, Any]:
     """Analyze Bristol Stool Chart patterns"""
     bristol_counts = df["bristolType"].value_counts().sort_index()
 
@@ -186,7 +186,7 @@ def analyze_bristol_patterns(df: pd.DataFrame) -> Dict[str, Any]:
     }
 
 
-def analyze_timing_patterns(df: pd.DataFrame) -> Dict[str, Any]:
+def analyze_timing_patterns(df: pd.DataFrame) -> dict[str, Any]:
     """Analyze timing patterns of bowel movements"""
     df["hour"] = df["createdAt"].dt.hour
     df["day_of_week"] = df["createdAt"].dt.day_name()
@@ -204,9 +204,9 @@ def analyze_timing_patterns(df: pd.DataFrame) -> Dict[str, Any]:
 
 def analyze_meal_correlations(
     entries_df: pd.DataFrame, meals_df: pd.DataFrame
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Analyze correlations between meals and bowel movements"""
-    correlations: Dict[str, Any] = {}
+    correlations: dict[str, Any] = {}
 
     # Look for patterns within 24 hours of meals
     for _, meal in meals_df.iterrows():
@@ -260,7 +260,7 @@ def analyze_meal_correlations(
     return correlations
 
 
-def calculate_frequency_stats(df: pd.DataFrame) -> Dict[str, Any]:
+def calculate_frequency_stats(df: pd.DataFrame) -> dict[str, Any]:
     """Calculate frequency statistics"""
     df["date"] = df["createdAt"].dt.date
     daily_counts = df.groupby("date").size()
@@ -274,7 +274,7 @@ def calculate_frequency_stats(df: pd.DataFrame) -> Dict[str, Any]:
     }
 
 
-def analyze_consistency_trends(df: pd.DataFrame) -> Dict[str, Any]:
+def analyze_consistency_trends(df: pd.DataFrame) -> dict[str, Any]:
     """Analyze consistency trends over time"""
     if "consistency" not in df.columns:
         return {}
@@ -290,7 +290,7 @@ def analyze_consistency_trends(df: pd.DataFrame) -> Dict[str, Any]:
 
 def generate_recommendations(
     entries_df: pd.DataFrame, meals_df: pd.DataFrame
-) -> List[str]:
+) -> list[str]:
     """Generate personalized recommendations based on patterns"""
     recommendations = []
 
@@ -343,7 +343,7 @@ def generate_recommendations(
     return recommendations
 
 
-def identify_risk_factors(df: pd.DataFrame) -> List[str]:
+def identify_risk_factors(df: pd.DataFrame) -> list[str]:
     """Identify potential risk factors based on patterns"""
     risk_factors = []
 
