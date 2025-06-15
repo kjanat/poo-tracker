@@ -68,17 +68,23 @@ app.use((_req, res, next) => {
 // Error handling
 app.use(errorHandler)
 
-const server = app.listen(config.port, () => {
-  console.log(`🚽 Poo Tracker API running on port ${config.port}`)
-  console.log(`📊 Health check available at http://localhost:${config.port}/health`)
-})
+let server: import('http').Server | null = null
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully')
-  server.close(() => {
-    console.log('Process terminated')
+if (config.nodeEnv !== 'test') {
+  server = app.listen(config.port, () => {
+    console.log(`🚽 Poo Tracker API running on port ${config.port}`)
+    console.log(`📊 Health check available at http://localhost:${config.port}/health`)
   })
-})
+
+  // Graceful shutdown
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully')
+    server?.close(() => {
+      console.log('Process terminated')
+    })
+  })
+}
+
+export { server }
 
 export default app
