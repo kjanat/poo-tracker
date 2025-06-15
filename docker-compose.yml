@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   postgres:
     image: postgres:17-alpine
@@ -11,7 +9,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - poo-postgres_data:/var/lib/postgresql/data
       - ./backend/prisma/seed.sql:/docker-entrypoint-initdb.d/seed.sql
     networks:
       - poo-network
@@ -22,12 +20,13 @@ services:
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin123
+      MINIO_DEFAULT_BUCKETS: poo-photos
     ports:
       - "9000:9000"
-      - "9001:9001"
+      - "9002:9002"
     volumes:
-      - minio_data:/data
-    command: server /data --console-address ":9001"
+      - poo-minio_data:/data
+    command: server /data --console-address ":9002"
     networks:
       - poo-network
 
@@ -37,7 +36,7 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - redis_data:/data
+      - poo-redis_data:/data
     networks:
       - poo-network
 
@@ -56,9 +55,9 @@ services:
       - poo-network
 
 volumes:
-  postgres_data:
-  minio_data:
-  redis_data:
+  poo-postgres_data:
+  poo-minio_data:
+  poo-redis_data:
 
 networks:
   poo-network:

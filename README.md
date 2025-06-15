@@ -57,7 +57,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 - Frontend: <http://localhost:5173>
 - Backend API: <http://localhost:3002>
 - AI Service: <http://localhost:8001>
-- MinIO Console: <http://localhost:9001> (admin/minioadmin123)
+- MinIO Console: <http://localhost:9002> (minioadmin/minioadmin123)
 
 ## 🏗️ Tech Stack
 

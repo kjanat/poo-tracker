@@ -1,11 +1,11 @@
-import { Router } from 'express'
+import { Router, Response, NextFunction } from 'express'
 import multer from 'multer'
 import { Client as MinioClient } from 'minio'
 import { v4 as uuidv4 } from 'uuid'
 import { config } from '../config'
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth'
 
-const router = Router()
+const router: Router = Router()
 
 // Initialize MinIO client
 const minioClient = new MinioClient({
@@ -44,19 +44,27 @@ const ensureBucket = async (): Promise<void> => {
 }
 
 // POST /api/uploads/photo - Upload photo
-router.post('/photo', upload.single('photo'), async (req: AuthenticatedRequest, res, next) => {
+const uploadPhotoHandler = async (req: any, res: Response, next: NextFunction): Promise<void> => {
   try {
+    const authenticatedReq = req as AuthenticatedRequest
+
     if (!req.file) {
-      return res.status(400).json({ error: 'No file provided' })
+      res.status(400).json({ error: 'No file provided' })
+      return
+    }
+
+    if (!authenticatedReq.userId) {
+      res.status(401).json({ error: 'User not authenticated' })
+      return
     }
 
     await ensureBucket()
 
     const fileExtension = req.file.originalname.split('.').pop()
-    const filename = `${req.userId}/${uuidv4()}.${fileExtension}`
+    const filename = `${authenticatedReq.userId}/${uuidv4()}.${fileExtension}`
 
-    // Upload to MinIO
-    await minioClient.putObject(config.minio.bucketName, filename, req.file.buffer, {
+    // Upload to MinIO - fix the putObject signature
+    await minioClient.putObject(config.minio.bucketName, filename, req.file.buffer, req.file.size, {
       'Content-Type': req.file.mimetype
     })
 
@@ -72,6 +80,8 @@ router.post('/photo', upload.single('photo'), async (req: AuthenticatedRequest, 
   } catch (error) {
     next(error)
   }
-})
+}
+
+router.post('/photo', upload.single('photo') as any, uploadPhotoHandler)
 
 export { router as uploadRoutes }

@@ -33,7 +33,7 @@ const limiter = rateLimit({
 app.use(limiter)
 
 // General middleware
-app.use(compression())
+app.use(compression() as any)
 app.use(morgan('combined'))
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))

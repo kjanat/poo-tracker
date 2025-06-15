@@ -1,11 +1,11 @@
-import { Router } from 'express'
+import { Router, Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { z } from 'zod'
 import { PrismaClient } from '@prisma/client'
 import { config } from '../config'
 
-const router = Router()
+const router: Router = Router()
 const prisma = new PrismaClient()
 
 // Validation schemas
@@ -21,7 +21,7 @@ const loginSchema = z.object({
 })
 
 // Register
-router.post('/register', async (req, res, next) => {
+router.post('/register', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { email, name, password } = registerSchema.parse(req.body)
 
@@ -31,7 +31,8 @@ router.post('/register', async (req, res, next) => {
     })
 
     if (existingUser) {
-      return res.status(400).json({ error: 'User already exists with this email' })
+      res.status(400).json({ error: 'User already exists with this email' })
+      return
     }
 
     // Hash password
@@ -48,7 +49,7 @@ router.post('/register', async (req, res, next) => {
     // Generate JWT
     const token = jwt.sign({ userId: user.id }, config.jwt.secret, {
       expiresIn: config.jwt.expiresIn
-    })
+    } as jwt.SignOptions)
 
     res.status(201).json({
       message: 'User created successfully',
@@ -61,14 +62,15 @@ router.post('/register', async (req, res, next) => {
     })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: error.errors })
+      res.status(400).json({ error: error.errors })
+      return
     }
     next(error)
   }
 })
 
 // Login
-router.post('/login', async (req, res, next) => {
+router.post('/login', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { email, password } = loginSchema.parse(req.body)
 
@@ -78,7 +80,8 @@ router.post('/login', async (req, res, next) => {
     })
 
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' })
+      res.status(401).json({ error: 'Invalid credentials' })
+      return
     }
 
     // For now, we'll skip password verification since we don't store passwords in the schema
@@ -87,7 +90,7 @@ router.post('/login', async (req, res, next) => {
     // Generate JWT
     const token = jwt.sign({ userId: user.id }, config.jwt.secret, {
       expiresIn: config.jwt.expiresIn
-    })
+    } as jwt.SignOptions)
 
     res.json({
       message: 'Login successful',
@@ -100,7 +103,8 @@ router.post('/login', async (req, res, next) => {
     })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: error.errors })
+      res.status(400).json({ error: error.errors })
+      return
     }
     next(error)
   }

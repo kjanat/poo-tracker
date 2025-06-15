@@ -1,9 +1,9 @@
-import { Router } from 'express'
+import { Router, Response, NextFunction } from 'express'
 import { z } from 'zod'
 import { PrismaClient } from '@prisma/client'
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth'
 
-const router = Router()
+const router: Router = Router()
 const prisma = new PrismaClient()
 
 // Apply authentication to all routes
@@ -24,39 +24,67 @@ const createMealSchema = z.object({
 })
 
 // GET /api/meals - Get all user meals
-router.get('/', async (req: AuthenticatedRequest, res, next) => {
-  try {
-    const meals = await prisma.meal.findMany({
-      where: { userId: req.userId },
-      orderBy: { mealTime: 'desc' }
-    })
+router.get(
+  '/',
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.userId) {
+        res.status(401).json({ error: 'User not authenticated' })
+        return
+      }
 
-    res.json(meals)
-  } catch (error) {
-    next(error)
+      const meals = await prisma.meal.findMany({
+        where: { userId: req.userId },
+        orderBy: { mealTime: 'desc' }
+      })
+
+      res.json(meals)
+    } catch (error) {
+      next(error)
+    }
   }
-})
+)
 
 // POST /api/meals - Create new meal
-router.post('/', async (req: AuthenticatedRequest, res, next) => {
-  try {
-    const validatedData = createMealSchema.parse(req.body)
-
-    const meal = await prisma.meal.create({
-      data: {
-        ...validatedData,
-        mealTime: new Date(validatedData.mealTime),
-        userId: req.userId!
+router.post(
+  '/',
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.userId) {
+        res.status(401).json({ error: 'User not authenticated' })
+        return
       }
-    })
 
-    res.status(201).json(meal)
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: error.errors })
+      const validatedData = createMealSchema.parse(req.body)
+
+      // Convert undefined values to null for Prisma
+      const mealData = {
+        name: validatedData.name,
+        description: validatedData.description ?? null,
+        mealTime: new Date(validatedData.mealTime),
+        category: validatedData.category ?? null,
+        cuisine: validatedData.cuisine ?? null,
+        spicyLevel: validatedData.spicyLevel ?? null,
+        fiberRich: validatedData.fiberRich,
+        dairy: validatedData.dairy,
+        gluten: validatedData.gluten,
+        notes: validatedData.notes ?? null,
+        userId: req.userId
+      }
+
+      const meal = await prisma.meal.create({
+        data: mealData
+      })
+
+      res.status(201).json(meal)
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: error.errors })
+        return
+      }
+      next(error)
     }
-    next(error)
   }
-})
+)
 
 export { router as mealRoutes }
