@@ -103,14 +103,54 @@ async def analyze_patterns(request: AnalysisRequest):
         cache_key = (
             f"analysis:{request.entries[0].userId}:{datetime.now().strftime('%Y%m%d')}"
         )
-        redis_client.setex(
-            cache_key, 3600, json.dumps(analysis_result)
-        )  # Cache for 1 hour
+        try:
+            redis_client.setex(
+                cache_key, 3600, json.dumps(analysis_result)
+            )  # Cache for 1 hour
+        except Exception:
+            # If caching fails, log and continue without raising
+            pass
 
         return AnalysisResponse(**analysis_result)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+
+
+@app.get("/analysis/{user_id}", response_model=AnalysisResponse)
+async def get_cached_analysis(
+    user_id: str, date: Optional[str] = None
+) -> AnalysisResponse:
+    """Retrieve cached analysis results for a given user."""
+    try:
+        dates_to_check: List[datetime] = []
+        if date:
+            try:
+                target = datetime.strptime(date, "%Y%m%d")
+            except ValueError as exc:
+                raise HTTPException(
+                    status_code=400, detail="Invalid date format, use YYYYMMDD"
+                ) from exc
+            dates_to_check.append(target)
+        else:
+            today = datetime.now()
+            dates_to_check = [today - timedelta(days=i) for i in range(7)]
+
+        for dt in dates_to_check:
+            cache_key = f"analysis:{user_id}:{dt.strftime('%Y%m%d')}"
+            try:
+                cached = redis_client.get(cache_key)
+            except Exception:
+                cached = None
+            if cached:
+                return AnalysisResponse(**json.loads(cached))
+        raise HTTPException(status_code=404, detail="Analysis not found")
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to retrieve analysis: {exc}"
+        )
 
 
 def perform_comprehensive_analysis(

@@ -4,7 +4,6 @@ Basic tests for the Poo Tracker AI Service
 
 import pytest
 from fastapi.testclient import TestClient
-
 from main import app
 
 client = TestClient(app)
@@ -76,3 +75,50 @@ def test_redis_connection_handling():
         assert data["redis_connected"] is True
     # If no Redis URL, connection might be False but endpoint should still work
     assert isinstance(data["redis_connected"], bool)
+
+
+def test_analyze_and_fetch_cached_result():
+    """Ensure analyze endpoint caches results and retrieval works."""
+    from datetime import datetime, timedelta
+
+    user_id = "test-user"
+    now = datetime.now()
+
+    entries = [
+        {
+            "id": "e1",
+            "userId": user_id,
+            "bristolType": 4,
+            "createdAt": now.isoformat(),
+        }
+    ]
+
+    meals = [
+        {
+            "id": "m1",
+            "userId": user_id,
+            "name": "Toast",
+            "category": "breakfast",
+            "mealTime": (now - timedelta(hours=8)).isoformat(),
+        }
+    ]
+
+    analyze_resp = client.post("/analyze", json={"entries": entries, "meals": meals})
+    assert analyze_resp.status_code == 200
+    analysis_data = analyze_resp.json()
+
+    cache_resp = client.get(f"/analysis/{user_id}")
+
+    from main import redis_client
+
+    try:
+        redis_up = redis_client.ping()
+    except Exception:
+        redis_up = False
+
+    if redis_up:
+        assert cache_resp.status_code == 200
+        cached_data = cache_resp.json()
+        assert cached_data == analysis_data
+    else:
+        assert cache_resp.status_code == 404
