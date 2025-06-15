@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
@@ -9,32 +10,52 @@ async function main() {
   console.log('🧹 Cleaning existing data...')
   await prisma.entry.deleteMany()
   await prisma.meal.deleteMany()
+  await prisma.userAuth.deleteMany()
   await prisma.user.deleteMany()
+
+  // Hash password for all seed users
+  const defaultPassword = 'password123'
+  const hashedPassword = await bcrypt.hash(defaultPassword, 12)
 
   // Create sample users
   console.log('👤 Creating sample users...')
   const user1 = await prisma.user.create({
     data: {
       email: 'john.doe@example.com',
-      name: 'John Doe'
+      name: 'John Doe',
+      auth: {
+        create: {
+          password: hashedPassword
+        }
+      }
     }
   })
 
   const user2 = await prisma.user.create({
     data: {
       email: 'jane.smith@example.com',
-      name: 'Jane Smith'
+      name: 'Jane Smith',
+      auth: {
+        create: {
+          password: hashedPassword
+        }
+      }
     }
   })
 
   const user3 = await prisma.user.create({
     data: {
       email: 'test@example.com',
-      name: 'Test User'
+      name: 'Test User',
+      auth: {
+        create: {
+          password: hashedPassword
+        }
+      }
     }
   })
 
-  console.log(`✅ Created ${3} users`)
+  console.log(`✅ Created ${3} users with separate auth records - password: ${defaultPassword}`)
 
   // Create sample meals for user1
   console.log('🍽️  Creating sample meals...')

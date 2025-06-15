@@ -6,9 +6,10 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
 ### Prerequisites
 
-- Node.js 18+
-- Docker & Docker Compose
-- pnpm (because npm is for amateurs)
+- [Node.js](https://nodejs.org/) 18+
+- [Docker](https://docs.docker.com/engine/) & [Docker Compose](https://docs.docker.com/compose/)
+- [pnpm](https://pnpm.io/) (because npm is for amateurs)
+- [uv](https://docs.astral.sh/uv/) for Python (because pip is for the weak)
 
 ### Setup
 
