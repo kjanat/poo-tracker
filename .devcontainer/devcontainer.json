@@ -61,29 +61,28 @@
       "onAutoForward": "silent"
     }
   },
-  "postCreateCommand": "chmod +x .devcontainer/post-create.sh && .devcontainer/post-create.sh",
-  "postStartCommand": "chmod +x .devcontainer/post-start.sh && .devcontainer/post-start.sh",
+  "postCreateCommand": ".devcontainer/post-create.sh",
+  "postStartCommand": ".devcontainer/post-start.sh",
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-vscode-remote.remote-containers",
-        "ms-vscode.vscode-typescript-next",
         "bradlc.vscode-tailwindcss",
-        "esbenp.prettier-vscode",
-        "dbaeumer.vscode-eslint",
-        "ms-python.python",
-        "ms-python.pylint",
-        "ms-python.black-formatter",
-        "ms-vscode.vscode-json",
-        "Prisma.prisma",
-        "ms-vscode.vscode-docker",
-        "ms-vscode-remote.remote-ssh",
-        "GitHub.copilot",
-        "GitHub.copilot-chat",
         "bradlc.vscode-tailwindcss",
-        "formulahendry.auto-rename-tag",
         "christian-kohler.path-intellisense",
-        "ms-vscode.vscode-node-azure-pack"
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "formulahendry.auto-rename-tag",
+        "GitHub.copilot-chat",
+        "GitHub.copilot",
+        "ms-python.black-formatter",
+        "ms-python.pylint",
+        "ms-python.python",
+        "ms-vscode-remote.remote-containers",
+        "ms-vscode-remote.remote-ssh",
+        "ms-vscode.vscode-docker",
+        "ms-vscode.vscode-json",
+        "ms-vscode.vscode-typescript-next",
+        "Prisma.prisma"
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "bash",

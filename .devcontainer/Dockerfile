@@ -32,15 +32,19 @@ ARG USERNAME=kjanat
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
-RUN groupadd --gid $USER_GID $USERNAME \
-    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+# Create group and user (handle existing conflicts gracefully)
+RUN if ! getent group $USERNAME; then \
+    groupadd --gid $USER_GID $USERNAME 2>/dev/null || groupadd $USERNAME; \
+    fi \
+    && if ! id -u $USERNAME > /dev/null 2>&1; then \
+    useradd --uid $USER_UID --gid $USERNAME -m -s /bin/bash $USERNAME 2>/dev/null || \
+    useradd -m -s /bin/bash -g $USERNAME $USERNAME; \
+    fi \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
 # Install pnpm
-RUN curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=9.15.0 sh -
-ENV PNPM_HOME="/root/.local/share/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
+RUN wget -qO- https://get.pnpm.io/install.sh | ENV="/home/$USERNAME/.bashrc" SHELL="$(which bash)" bash -
 
 # Install Python UV
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -64,18 +68,13 @@ RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-k
     && apt-get install -y postgresql-client-17 \
     && rm -rf /var/lib/apt/lists/*
 
-# Set up user environment
-USER $USERNAME
-WORKDIR /home/$USERNAME
-
-# Install pnpm for the user
-RUN curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=9.15.0 sh -
-ENV PNPM_HOME="/home/$USERNAME/.local/share/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-
 # Install Python UV for the user
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ENV PATH="/home/$USERNAME/.local/bin:$PATH"
+
+# Set up user environment
+USER $USERNAME
+WORKDIR /home/$USERNAME
 
 # Set up shell environment with GPG and UV configuration
 RUN echo 'export PATH="$HOME/.local/share/pnpm:$HOME/.local/bin:$PATH"' >> ~/.bashrc \
