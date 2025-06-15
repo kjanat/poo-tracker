@@ -113,6 +113,26 @@ async def analyze_patterns(request: AnalysisRequest):
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
 
+@app.get("/analysis/{user_id}", response_model=AnalysisResponse)
+async def get_cached_analysis(
+    user_id: str, date: Optional[str] = None
+) -> AnalysisResponse:
+    """Retrieve cached analysis results for a user."""
+    if date is None:
+        date = datetime.now().strftime("%Y%m%d")
+    cache_key = f"analysis:{user_id}:{date}"
+    cached = redis_client.get(cache_key)
+    if not cached:
+        raise HTTPException(status_code=404, detail="No cached analysis found")
+
+    try:
+        data = json.loads(cached)
+    except json.JSONDecodeError as exc:  # pragma: no cover - shouldn't happen
+        raise HTTPException(status_code=500, detail="Cached data corrupt") from exc
+
+    return AnalysisResponse(**data)
+
+
 def perform_comprehensive_analysis(
     entries_df: pd.DataFrame, meals_df: pd.DataFrame
 ) -> Dict[str, Any]:
