@@ -113,6 +113,28 @@ async def analyze_patterns(request: AnalysisRequest):
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
 
+@app.get("/summary/{user_id}", response_model=AnalysisResponse)
+async def get_cached_summary(user_id: str) -> AnalysisResponse:
+    """Return the most recent cached analysis for ``user_id``."""
+    try:
+        pattern = f"analysis:{user_id}:*"
+        keys = sorted(redis_client.keys(pattern))
+        if not keys:
+            raise HTTPException(status_code=404, detail="No cached analysis found")
+
+        latest_key = keys[-1]
+        cached = redis_client.get(latest_key)
+        if cached is None:
+            raise HTTPException(status_code=404, detail="Cached analysis missing")
+
+        data = json.loads(cached)
+        return AnalysisResponse(**data)
+    except HTTPException:
+        raise
+    except Exception as exc:  # pragma: no cover - unexpected errors
+        raise HTTPException(status_code=500, detail=f"Summary retrieval failed: {exc}")
+
+
 def perform_comprehensive_analysis(
     entries_df: pd.DataFrame, meals_df: pd.DataFrame
 ) -> Dict[str, Any]:
