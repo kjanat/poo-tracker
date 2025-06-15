@@ -130,8 +130,8 @@ jobs:
       
       - name: Commit generated assets
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git config --local user.name github-actions[bot]
           git add public/assets/
           git diff --staged --quiet || git commit -m "🎨 Auto-generate assets from SVG"
           git push
