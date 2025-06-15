@@ -22,7 +22,9 @@
     "concurrently": "^9.1.2",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.1",
-    "prettier": "^3.5.3"
+    "prettier": "^3.5.3",
+    "prettier-plugin-prisma": "^5.0.0",
+    "prettier-plugin-sql": "^0.19.1"
   },
   "engines": {
     "node": ">=18.0.0",
@@ -32,7 +34,11 @@
     "trailingComma": "none",
     "tabWidth": 2,
     "semi": true,
-    "singleQuote": false
+    "singleQuote": false,
+    "plugins": [
+      "prettier-plugin-sql",
+      "prettier-plugin-prisma"
+    ]
   },
   "lint-staged": {
     "backend/**/*.{ts,tsx,js,jsx}": [

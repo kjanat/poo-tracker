@@ -26,82 +26,82 @@ model User {
 }
 
 model UserAuth {
-  id          String    @id @default(cuid())
-  userId      String    @unique
-  password    String    // Hashed password
-  loginAttempts Int     @default(0)
-  lockedUntil DateTime?
-  lastLogin   DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  password      String // Hashed password
+  loginAttempts Int       @default(0)
+  lockedUntil   DateTime?
+  lastLogin     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   // Relations
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_auth")
 }
 
 model Entry {
-  id          String    @id @default(cuid())
-  userId      String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
+  id        String   @id @default(cuid())
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Bristol Stool Chart (1-7)
-  bristolType Int       @db.SmallInt
-  
+  bristolType Int @db.SmallInt
+
   // Physical characteristics
-  volume      String?   // Small, Medium, Large, Massive
-  color       String?   // Brown, Dark Brown, Light Brown, Yellow, Green, Red, Black
-  consistency String?   // Solid, Soft, Loose, Watery
-  floaters    Boolean   @default(false)
-  
+  volume      String? // Small, Medium, Large, Massive
+  color       String? // Brown, Dark Brown, Light Brown, Yellow, Green, Red, Black
+  consistency String? // Solid, Soft, Loose, Watery
+  floaters    Boolean @default(false)
+
   // Experience
-  pain        Int?      @db.SmallInt // 1-10 scale
-  strain      Int?      @db.SmallInt // 1-10 scale
-  satisfaction Int?     @db.SmallInt // 1-10 scale
-  
+  pain         Int? @db.SmallInt // 1-10 scale
+  strain       Int? @db.SmallInt // 1-10 scale
+  satisfaction Int? @db.SmallInt // 1-10 scale
+
   // Optional fields
-  notes       String?
-  photoUrl    String?
-  smell       String?   // None, Mild, Moderate, Strong, Toxic
-  
+  notes    String?
+  photoUrl String?
+  smell    String? // None, Mild, Moderate, Strong, Toxic
+
   // AI Analysis (populated by AI service)
-  aiAnalysis  Json?
-  
+  aiAnalysis Json?
+
   // Relations
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("entries")
 }
 
 model Meal {
-  id          String   @id @default(cuid())
-  userId      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  id        String   @id @default(cuid())
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Meal details
   name        String
   description String?
   mealTime    DateTime
-  
+
   // Categories
-  category    String?  // Breakfast, Lunch, Dinner, Snack
-  cuisine     String?  // Italian, Mexican, Fast Food, etc.
-  
+  category String? // Breakfast, Lunch, Dinner, Snack
+  cuisine  String? // Italian, Mexican, Fast Food, etc.
+
   // Health factors
-  spicyLevel  Int?     @db.SmallInt // 1-10 scale
-  fiberRich   Boolean  @default(false)
-  dairy       Boolean  @default(false)
-  gluten      Boolean  @default(false)
-  
+  spicyLevel Int?    @db.SmallInt // 1-10 scale
+  fiberRich  Boolean @default(false)
+  dairy      Boolean @default(false)
+  gluten     Boolean @default(false)
+
   // Optional
-  photoUrl    String?
-  notes       String?
-  
+  photoUrl String?
+  notes    String?
+
   // Relations
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("meals")
 }

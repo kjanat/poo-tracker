@@ -118,14 +118,14 @@ export const Toilet: React.FC<ToiletProps> = ({ isOccupied, onFlush }) => {
 
 ```typescript
 // ✅ Good - Proper error handling and validation
-import { z } from "zod"
-import { Request, Response, NextFunction } from "express"
+import { z } from "zod";
+import { Request, Response, NextFunction } from "express";
 
 const createPooSchema = z.object({
   bristolScale: z.number().min(1).max(7),
   imageUrl: z.string().url().optional(),
   notes: z.string().max(500).optional()
-})
+});
 
 export const createPoo = async (
   req: Request,
@@ -133,20 +133,20 @@ export const createPoo = async (
   next: NextFunction
 ) => {
   try {
-    const data = createPooSchema.parse(req.body)
+    const data = createPooSchema.parse(req.body);
 
     const poo = await prisma.poo.create({
       data: {
         ...data,
         userId: req.user.id
       }
-    })
+    });
 
-    res.status(201).json(poo)
+    res.status(201).json(poo);
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 ```
 
 ### Testing Standards
@@ -179,14 +179,14 @@ describe('Toilet', () => {
 
 ```typescript
 // ✅ Good - API endpoint testing
-import request from "supertest"
-import { app } from "../app"
-import { createTestUser } from "../test-utils"
+import request from "supertest";
+import { app } from "../app";
+import { createTestUser } from "../test-utils";
 
 describe("POST /api/poos", () => {
   it("should create a new poo entry", async () => {
-    const user = await createTestUser()
-    const token = generateToken(user.id)
+    const user = await createTestUser();
+    const token = generateToken(user.id);
 
     const response = await request(app)
       .post("/api/poos")
@@ -195,15 +195,15 @@ describe("POST /api/poos", () => {
         bristolScale: 4,
         notes: "Perfect consistency"
       })
-      .expect(201)
+      .expect(201);
 
     expect(response.body).toMatchObject({
       bristolScale: 4,
       notes: "Perfect consistency",
       userId: user.id
-    })
-  })
-})
+    });
+  });
+});
 ```
 
 ## 🎯 Contributing Guidelines
