@@ -3,6 +3,7 @@ import multer from 'multer'
 import { config } from '../config'
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth'
 import { ImageProcessingFactory } from '../services/ImageProcessingService'
+import { sanitizeFilename } from '../utils/filename'
 
 const router: Router = Router()
 
@@ -96,14 +97,14 @@ router.delete(
         return
       }
 
-      // Basic security check - only allow alphanumeric, dots, and dashes
-      if (!/^[a-zA-Z0-9.-]+$/.test(filename)) {
+      const safeFilename = sanitizeFilename(filename)
+      if (!safeFilename) {
         res.status(400).json({ error: 'Invalid filename' })
         return
       }
 
       const imageProcessor = ImageProcessingFactory.getInstance()
-      await imageProcessor.deleteImage(filename)
+      await imageProcessor.deleteImage(safeFilename)
 
       res.json({ message: 'Photo deleted successfully' })
     } catch (error) {
