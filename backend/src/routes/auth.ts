@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import { z } from 'zod'
 import { PrismaClient } from '@prisma/client'
 import { config } from '../config'
+import { authenticateToken, AuthenticatedRequest } from '../middleware/auth'
 
 const router: Router = Router()
 const prisma = new PrismaClient()
@@ -126,48 +127,131 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction): P
   }
 })
 
-// Get user profile (no auth data exposed)
-router.get('/profile', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const authHeader = req.headers.authorization
-    const token = authHeader?.split(' ')[1]
-
-    if (!token) {
-      res.status(401).json({ error: 'Access token required' })
-      return
-    }
-
-    const decoded = jwt.verify(token, config.jwt.secret) as { userId: string }
-
-    // Fetch only user profile data - NO AUTH DATA
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        createdAt: true
-        // Explicitly exclude auth relation - clean separation!
-        // auth: false // Not needed, default behavior
+// GET /api/auth/profile - Get user profile with auth info
+router.get(
+  '/profile',
+  authenticateToken,
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.userId) {
+        res.status(401).json({ error: 'User not authenticated' })
+        return
       }
-    })
 
-    if (!user) {
-      res.status(404).json({ error: 'User not found' })
-      return
-    }
+      const user = await prisma.user.findUnique({
+        where: {
+          id: req.userId
+        }
+      })
 
-    res.json({
-      user,
-      message: '✨ Clean profile data - no auth secrets leaked!'
-    })
-  } catch (error) {
-    if (error instanceof jwt.JsonWebTokenError) {
-      res.status(403).json({ error: 'Invalid token' })
-      return
+      const userAuth = await prisma.userAuth.findUnique({
+        where: {
+          userId: req.userId
+        },
+        select: {
+          lastLogin: true,
+          createdAt: true,
+          updatedAt: true
+        }
+      })
+
+      if (!user) {
+        res.status(404).json({ error: 'User not found' })
+        return
+      }
+
+      res.json({
+        user,
+        auth: userAuth
+      })
+    } catch (error) {
+      next(error)
     }
-    next(error)
   }
-})
+)
+
+// PUT /api/auth/profile - Update user profile
+router.put(
+  '/profile',
+  authenticateToken,
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.userId) {
+        res.status(401).json({ error: 'User not authenticated' })
+        return
+      }
+
+      const updateProfileSchema = z.object({
+        name: z.string().optional(),
+        email: z.string().email().optional(),
+        currentPassword: z.string().optional(),
+        newPassword: z.string().min(6).optional()
+      })
+
+      const { name, email, currentPassword, newPassword } = updateProfileSchema.parse(req.body)
+
+      // If changing password, verify current password
+      if (newPassword) {
+        if (!currentPassword) {
+          res.status(400).json({ error: 'Current password is required to change password' })
+          return
+        }
+
+        const userAuth = await prisma.userAuth.findUnique({
+          where: { userId: req.userId }
+        })
+
+        if (!userAuth) {
+          res.status(404).json({ error: 'User auth not found' })
+          return
+        }
+
+        const isCurrentPasswordValid = await bcrypt.compare(currentPassword, userAuth.password)
+        if (!isCurrentPasswordValid) {
+          res.status(400).json({ error: 'Current password is incorrect' })
+          return
+        }
+
+        // Hash new password and update
+        const hashedNewPassword = await bcrypt.hash(newPassword, 12)
+        await prisma.userAuth.update({
+          where: { userId: req.userId },
+          data: { password: hashedNewPassword }
+        })
+      }
+
+      // Update user profile
+      const updateData: any = {}
+      if (name !== undefined) updateData.name = name
+      if (email !== undefined) updateData.email = email
+
+      const user = await prisma.user.update({
+        where: { id: req.userId },
+        data: updateData
+      })
+
+      const userAuth = await prisma.userAuth.findUnique({
+        where: { userId: req.userId },
+        select: {
+          lastLogin: true,
+          createdAt: true,
+          updatedAt: true
+        }
+      })
+
+      res.json({
+        user,
+        auth: userAuth,
+        message: 'Profile updated successfully'
+      })
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: error.errors })
+        return
+      }
+      next(error)
+    }
+  }
+)
 
 export { router as authRoutes }

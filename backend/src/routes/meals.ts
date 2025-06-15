@@ -209,4 +209,143 @@ router.delete(
   }
 )
 
+// POST /api/meals/:id/link-entry - Link an entry to a meal
+router.post(
+  '/:id/link-entry',
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params
+      const { entryId } = req.body
+
+      if (!req.userId || !id || !entryId) {
+        res.status(400).json({ error: 'Invalid request - meal ID and entry ID required' })
+        return
+      }
+
+      // Verify the meal belongs to the user
+      const meal = await prisma.meal.findFirst({
+        where: { id, userId: req.userId }
+      })
+
+      if (!meal) {
+        res.status(404).json({ error: 'Meal not found' })
+        return
+      }
+
+      // Verify the entry belongs to the user
+      const entry = await prisma.entry.findFirst({
+        where: { id: entryId, userId: req.userId }
+      })
+
+      if (!entry) {
+        res.status(404).json({ error: 'Entry not found' })
+        return
+      }
+
+      // Check if the relation already exists
+      const existingRelation = await prisma.mealEntryRelation.findFirst({
+        where: { mealId: id, entryId }
+      })
+
+      if (existingRelation) {
+        res.status(409).json({ error: 'Entry is already linked to this meal' })
+        return
+      }
+
+      // Create the relation
+      const relation = await prisma.mealEntryRelation.create({
+        data: { mealId: id, entryId }
+      })
+
+      res.status(201).json({ message: 'Entry linked to meal successfully', relation })
+    } catch (error) {
+      next(error)
+    }
+  }
+)
+
+// DELETE /api/meals/:id/unlink-entry - Unlink an entry from a meal
+router.delete(
+  '/:id/unlink-entry',
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params
+      const { entryId } = req.body
+
+      if (!req.userId || !id || !entryId) {
+        res.status(400).json({ error: 'Invalid request - meal ID and entry ID required' })
+        return
+      }
+
+      // Verify the meal belongs to the user
+      const meal = await prisma.meal.findFirst({
+        where: { id, userId: req.userId }
+      })
+
+      if (!meal) {
+        res.status(404).json({ error: 'Meal not found' })
+        return
+      }
+
+      // Find and delete the relation
+      const relation = await prisma.mealEntryRelation.findFirst({
+        where: { mealId: id, entryId }
+      })
+
+      if (!relation) {
+        res.status(404).json({ error: 'Entry is not linked to this meal' })
+        return
+      }
+
+      await prisma.mealEntryRelation.delete({
+        where: { id: relation.id }
+      })
+
+      res.json({ message: 'Entry unlinked from meal successfully' })
+    } catch (error) {
+      next(error)
+    }
+  }
+)
+
+// GET /api/meals/:id/entries - Get all entries linked to a meal
+router.get(
+  '/:id/entries',
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params
+
+      if (!req.userId || !id) {
+        res.status(400).json({ error: 'Invalid request' })
+        return
+      }
+
+      // Verify the meal belongs to the user
+      const meal = await prisma.meal.findFirst({
+        where: { id, userId: req.userId }
+      })
+
+      if (!meal) {
+        res.status(404).json({ error: 'Meal not found' })
+        return
+      }
+
+      // Get all entries linked to this meal
+      const linkedEntries = await prisma.entry.findMany({
+        where: {
+          userId: req.userId,
+          meals: {
+            some: { mealId: id }
+          }
+        },
+        orderBy: { createdAt: 'desc' }
+      })
+
+      res.json(linkedEntries)
+    } catch (error) {
+      next(error)
+    }
+  }
+)
+
 export { router as mealRoutes }

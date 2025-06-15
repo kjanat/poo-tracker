@@ -70,7 +70,8 @@ model Entry {
   aiAnalysis Json?
 
   // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  meals MealEntryRelation[]
 
   @@map("entries")
 }
@@ -101,7 +102,22 @@ model Meal {
   notes    String?
 
   // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries MealEntryRelation[]
 
   @@map("meals")
+}
+
+// Junction table for many-to-many relationship between meals and entries
+model MealEntryRelation {
+  id      String @id @default(cuid())
+  mealId  String
+  entryId String
+
+  // Relations
+  meal  Meal  @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  entry Entry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+
+  @@unique([mealId, entryId])
+  @@map("meal_entry_relations")
 }

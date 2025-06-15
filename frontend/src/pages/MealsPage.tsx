@@ -18,6 +18,16 @@ interface Meal {
   createdAt: string;
 }
 
+interface Entry {
+  id: string;
+  bristolType: number;
+  volume?: string;
+  color?: string;
+  consistency?: string;
+  notes?: string;
+  createdAt: string;
+}
+
 interface MealFormData {
   name: string;
   category: string;
@@ -53,6 +63,10 @@ export function MealsPage() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [editingMeal, setEditingMeal] = useState<Meal | null>(null);
+  const [linkingMeal, setLinkingMeal] = useState<Meal | null>(null);
+  const [availableEntries, setAvailableEntries] = useState<Entry[]>([]);
+  const [linkedEntries, setLinkedEntries] = useState<Entry[]>([]);
+  const [showLinkingModal, setShowLinkingModal] = useState(false);
 
   const token = useAuthStore((state) => state.token);
 
@@ -316,6 +330,130 @@ export function MealsPage() {
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
+  };
+
+  // Functions for linking entries to meals
+  const openLinkingModal = async (meal: Meal) => {
+    setLinkingMeal(meal);
+    setShowLinkingModal(true);
+
+    try {
+      // Fetch available entries
+      const entriesResponse = await fetch(`${API_BASE_URL}/api/entries`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (entriesResponse.ok) {
+        const entriesData = await entriesResponse.json();
+        setAvailableEntries(entriesData.entries || []);
+      }
+
+      // Fetch already linked entries
+      const linkedResponse = await fetch(
+        `${API_BASE_URL}/api/meals/${meal.id}/entries`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      if (linkedResponse.ok) {
+        const linkedData = await linkedResponse.json();
+        setLinkedEntries(linkedData);
+      }
+    } catch (err) {
+      console.error("Failed to fetch entries:", err);
+    }
+  };
+
+  const linkEntryToMeal = async (entryId: string) => {
+    if (!linkingMeal) return;
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/meals/${linkingMeal.id}/link-entry`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ entryId })
+        }
+      );
+
+      if (response.ok) {
+        // Refresh linked entries
+        const linkedResponse = await fetch(
+          `${API_BASE_URL}/api/meals/${linkingMeal.id}/entries`,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+
+        if (linkedResponse.ok) {
+          const linkedData = await linkedResponse.json();
+          setLinkedEntries(linkedData);
+        }
+        setSuccess("Entry linked successfully!");
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || "Failed to link entry");
+      }
+    } catch (err) {
+      setError("Failed to link entry");
+    }
+  };
+
+  const unlinkEntryFromMeal = async (entryId: string) => {
+    if (!linkingMeal) return;
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/meals/${linkingMeal.id}/unlink-entry`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ entryId })
+        }
+      );
+
+      if (response.ok) {
+        // Refresh linked entries
+        const linkedResponse = await fetch(
+          `${API_BASE_URL}/api/meals/${linkingMeal.id}/entries`,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+
+        if (linkedResponse.ok) {
+          const linkedData = await linkedResponse.json();
+          setLinkedEntries(linkedData);
+        }
+        setSuccess("Entry unlinked successfully!");
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || "Failed to unlink entry");
+      }
+    } catch (err) {
+      setError("Failed to unlink entry");
+    }
+  };
+
+  const formatBristolType = (type: number) => {
+    const types = [
+      "Separate hard lumps",
+      "Lumpy sausage",
+      "Cracked sausage",
+      "Smooth snake",
+      "Soft blobs",
+      "Mushy stool",
+      "Liquid stool"
+    ];
+    return `Type ${type} - ${types[type - 1]}`;
   };
 
   return (
@@ -582,6 +720,13 @@ export function MealsPage() {
                         Edit
                       </button>
                       <button
+                        onClick={() => openLinkingModal(meal)}
+                        className="text-green-600 hover:text-green-800 text-sm font-medium"
+                        disabled={loading}
+                      >
+                        Link Entries
+                      </button>
+                      <button
                         onClick={() => deleteMeal(meal.id)}
                         className="text-red-600 hover:text-red-800 text-sm font-medium"
                         disabled={loading}
@@ -653,11 +798,195 @@ export function MealsPage() {
                     )}
                   </div>
                 )}
+
+                {/* Linked Entries Section */}
+                <div className="mt-4">
+                  <h5 className="font-semibold text-md mb-2">Linked Entries</h5>
+
+                  {linkedEntries.length === 0 ? (
+                    <p className="text-sm text-gray-500">
+                      No entries linked to this meal.
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {linkedEntries.map((entry) => (
+                        <div
+                          key={entry.id}
+                          className="p-3 rounded-lg bg-gray-100 flex justify-between items-center"
+                        >
+                          <div className="text-sm">
+                            <p>
+                              <strong>Bristol Type:</strong>{" "}
+                              {formatBristolType(entry.bristolType)}
+                            </p>
+                            {entry.notes && (
+                              <p>
+                                <strong>Notes:</strong> {entry.notes}
+                              </p>
+                            )}
+                          </div>
+
+                          <button
+                            onClick={() => unlinkEntryFromMeal(entry.id)}
+                            className="text-red-600 hover:text-red-800 text-sm font-medium"
+                            disabled={loading}
+                          >
+                            Unlink
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => openLinkingModal(meal)}
+                    className="mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                    disabled={loading}
+                  >
+                    Link Entries
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Linking Modal */}
+      {showLinkingModal && linkingMeal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold mb-4">
+              Link Entries to "{linkingMeal.name}"
+            </h3>
+
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                {success}
+              </div>
+            )}
+
+            {/* Already Linked Entries */}
+            <div className="mb-6">
+              <h4 className="font-medium mb-2">
+                Already Linked Entries ({linkedEntries.length})
+              </h4>
+              {linkedEntries.length === 0 ? (
+                <p className="text-sm text-gray-500 bg-gray-50 p-3 rounded">
+                  No entries linked to this meal yet.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {linkedEntries.map((entry) => (
+                    <div
+                      key={entry.id}
+                      className="p-3 rounded-lg bg-blue-50 border border-blue-200 flex justify-between items-center"
+                    >
+                      <div className="text-sm">
+                        <p className="font-medium">
+                          {formatBristolType(entry.bristolType)}
+                        </p>
+                        <p className="text-gray-600">
+                          {new Date(entry.createdAt).toLocaleDateString()}{" "}
+                          {new Date(entry.createdAt).toLocaleTimeString()}
+                        </p>
+                        {entry.volume && (
+                          <p className="text-gray-600">
+                            Volume: {entry.volume}
+                          </p>
+                        )}
+                        {entry.notes && (
+                          <p className="text-gray-600">Notes: {entry.notes}</p>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => unlinkEntryFromMeal(entry.id)}
+                        className="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded"
+                        disabled={loading}
+                      >
+                        Unlink
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Available Entries to Link */}
+            <div className="mb-6">
+              <h4 className="font-medium mb-2">Available Entries to Link</h4>
+              {availableEntries.length === 0 ? (
+                <p className="text-sm text-gray-500 bg-gray-50 p-3 rounded">
+                  No available entries to link. Create some stool entries first!
+                </p>
+              ) : (
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {availableEntries
+                    .filter(
+                      (entry) =>
+                        !linkedEntries.some((linked) => linked.id === entry.id)
+                    )
+                    .map((entry) => (
+                      <div
+                        key={entry.id}
+                        className="p-3 rounded-lg bg-green-50 border border-green-200 flex justify-between items-center"
+                      >
+                        <div className="text-sm">
+                          <p className="font-medium">
+                            {formatBristolType(entry.bristolType)}
+                          </p>
+                          <p className="text-gray-600">
+                            {new Date(entry.createdAt).toLocaleDateString()}{" "}
+                            {new Date(entry.createdAt).toLocaleTimeString()}
+                          </p>
+                          {entry.volume && (
+                            <p className="text-gray-600">
+                              Volume: {entry.volume}
+                            </p>
+                          )}
+                          {entry.notes && (
+                            <p className="text-gray-600">
+                              Notes: {entry.notes}
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => linkEntryToMeal(entry.id)}
+                          className="text-green-600 hover:text-green-800 text-sm font-medium px-2 py-1 rounded bg-green-100 hover:bg-green-200"
+                          disabled={loading}
+                        >
+                          Link
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex justify-end gap-3 pt-4 border-t">
+              <button
+                onClick={() => {
+                  setShowLinkingModal(false);
+                  setLinkingMeal(null);
+                  setError("");
+                  setSuccess("");
+                }}
+                className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+                disabled={loading}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

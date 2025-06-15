@@ -122,6 +122,8 @@ router.post(
         return
       }
 
+      console.log('Creating entry for userId:', req.userId)
+
       const validatedData = createEntrySchema.parse(req.body)
 
       // Convert undefined values to null for Prisma
@@ -139,6 +141,8 @@ router.post(
         smell: validatedData.smell ?? null,
         photoUrl: validatedData.photoUrl ?? null
       }
+
+      console.log('Entry data to be created:', entryData)
 
       const entry = await prisma.entry.create({
         data: entryData
@@ -237,6 +241,46 @@ router.delete(
       })
 
       res.status(204).send()
+    } catch (error) {
+      next(error)
+    }
+  }
+)
+
+// GET /api/entries/:id/meals - Get all meals linked to an entry
+router.get(
+  '/:id/meals',
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params
+
+      if (!req.userId || !id) {
+        res.status(400).json({ error: 'Invalid request' })
+        return
+      }
+
+      // Verify the entry belongs to the user
+      const entry = await prisma.entry.findFirst({
+        where: { id, userId: req.userId }
+      })
+
+      if (!entry) {
+        res.status(404).json({ error: 'Entry not found' })
+        return
+      }
+
+      // Get all meals linked to this entry
+      const linkedMeals = await prisma.meal.findMany({
+        where: {
+          userId: req.userId,
+          entries: {
+            some: { entryId: id }
+          }
+        },
+        orderBy: { mealTime: 'desc' }
+      })
+
+      res.json(linkedMeals)
     } catch (error) {
       next(error)
     }

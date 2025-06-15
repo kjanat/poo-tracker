@@ -6,6 +6,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { NewEntryPage } from "./pages/NewEntryPage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { MealsPage } from "./pages/MealsPage";
+import ProfilePage from "./pages/ProfilePage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 function App() {
@@ -50,6 +51,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <MealsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
               </ProtectedRoute>
             }
           />

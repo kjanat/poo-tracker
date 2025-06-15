@@ -1,6 +1,13 @@
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
-import { LogOut, Home, BarChart3, Plus, UtensilsCrossed } from "lucide-react";
+import {
+  LogOut,
+  Home,
+  BarChart3,
+  Plus,
+  UtensilsCrossed,
+  User
+} from "lucide-react";
 import Logo from "./Logo";
 import { getLogoProps } from "../utils/branding";
 
@@ -51,6 +58,14 @@ export function Navbar() {
                 >
                   <BarChart3 size={18} />
                   <span>Analytics</span>
+                </Link>
+
+                <Link
+                  to="/profile"
+                  className="flex items-center space-x-1 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                  <User size={18} />
+                  <span>Profile</span>
                 </Link>
 
                 <div className="flex items-center space-x-2">
