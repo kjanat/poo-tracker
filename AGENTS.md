@@ -98,7 +98,7 @@ pnpm run --filter backend test
 cd ai-service && python -m pytest
 
 # Full test suite
-pnpm test  # Runs all workspace tests
+pnpm test # Runs all workspace tests
 ```
 
 ### ✅ Test Requirements
@@ -119,17 +119,17 @@ All code changes must pass these checks:
 **Frontend/Backend**:
 
 ```bash
-pnpm run lint        # ESLint
-pnpm run tsc         # TypeScript compilation
-pnpm run build       # Production build test
+pnpm run lint  # ESLint
+pnpm run tsc   # TypeScript compilation
+pnpm run build # Production build test
 ```
 
 **AI Service**:
 
 ```bash
-uvx black --check .          # Code formatting
-uvx ruff check .             # Linting
-uvx ruff format --check .    # Format verification
+uvx black --check .       # Code formatting
+uvx ruff check .          # Linting
+uvx ruff format --check . # Format verification
 ```
 
 ### 🚦 GitHub Actions Workflows

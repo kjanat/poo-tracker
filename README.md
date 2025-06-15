@@ -38,7 +38,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
    ```bash
    # Start database and supporting services
    pnpm run docker:up
-
+   
    # Start the development servers
    pnpm run dev
    ```
@@ -48,7 +48,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
    ```bash
    # Run database migrations
    pnpm run db:migrate
-
+   
    # (Optional) Seed with test data
    pnpm run db:seed
    ```
@@ -83,22 +83,22 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
 ```bash
 # Development
-pnpm run dev             # Start frontend + backend
-pnpm run dev:frontend    # Start frontend only
-pnpm run dev:backend     # Start backend only
+pnpm run dev          # Start frontend + backend
+pnpm run dev:frontend # Start frontend only
+pnpm run dev:backend  # Start backend only
 
 # Database
-pnpm run db:migrate      # Run Prisma migrations
-pnpm run db:seed         # Seed database
+pnpm run db:migrate # Run Prisma migrations
+pnpm run db:seed    # Seed database
 
 # Docker
-pnpm run docker:up       # Start all services
-pnpm run docker:down     # Stop all services
+pnpm run docker:up   # Start all services
+pnpm run docker:down # Stop all services
 
 # Testing & Linting
-pnpm run test            # Run all tests
-pnpm run lint            # Run linters
-pnpm run build           # Build for production
+pnpm run test  # Run all tests
+pnpm run lint  # Run linters
+pnpm run build # Build for production
 ```
 
 ### Project Structure
