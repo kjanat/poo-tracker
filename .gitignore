@@ -526,3 +526,5 @@ docker-compose.override.yml
 *.swo
 
 .pnpm-store/
+
+.vscode/

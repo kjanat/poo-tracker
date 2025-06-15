@@ -82,7 +82,8 @@
         "ms-vscode.vscode-docker",
         "ms-vscode.vscode-json",
         "ms-vscode.vscode-typescript-next",
-        "Prisma.prisma"
+        "Prisma.prisma",
+        "vitest.explorer"
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "bash",
