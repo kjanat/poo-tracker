@@ -85,7 +85,8 @@ export class SharpImageProcessingService implements ImageProcessingService {
   }
 
   async deleteImage(filename: string): Promise<void> {
-    const filePath = path.join(this.uploadDir, filename)
+    const safeName = path.basename(filename)
+    const filePath = path.join(this.uploadDir, safeName)
     try {
       await fs.unlink(filePath)
     } catch (error) {
