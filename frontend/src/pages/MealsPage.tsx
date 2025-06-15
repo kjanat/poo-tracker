@@ -16,6 +16,7 @@ interface Meal {
   photoUrl?: string;
   mealTime: string;
   createdAt: string;
+  linkedEntries?: Entry[];
 }
 
 interface Entry {
@@ -84,7 +85,35 @@ export function MealsPage() {
 
         if (response.ok) {
           const mealsData = await response.json();
-          setMeals(mealsData);
+
+          // Fetch linked entries for each meal
+          const mealsWithLinkedEntries = await Promise.all(
+            mealsData.map(async (meal: Meal) => {
+              try {
+                const linkedResponse = await fetch(
+                  `${API_BASE_URL}/api/meals/${meal.id}/entries`,
+                  {
+                    headers: { Authorization: `Bearer ${token}` }
+                  }
+                );
+
+                if (linkedResponse.ok) {
+                  const linkedData = await linkedResponse.json();
+                  return { ...meal, linkedEntries: linkedData };
+                } else {
+                  return { ...meal, linkedEntries: [] };
+                }
+              } catch (err) {
+                console.error(
+                  `Failed to fetch linked entries for meal ${meal.id}:`,
+                  err
+                );
+                return { ...meal, linkedEntries: [] };
+              }
+            })
+          );
+
+          setMeals(mealsWithLinkedEntries);
         }
       } catch (err) {
         console.error("Failed to fetch meals:", err);
@@ -382,7 +411,7 @@ export function MealsPage() {
       );
 
       if (response.ok) {
-        // Refresh linked entries
+        // Refresh linked entries in the modal
         const linkedResponse = await fetch(
           `${API_BASE_URL}/api/meals/${linkingMeal.id}/entries`,
           {
@@ -393,6 +422,15 @@ export function MealsPage() {
         if (linkedResponse.ok) {
           const linkedData = await linkedResponse.json();
           setLinkedEntries(linkedData);
+
+          // Also update the main meals list to reflect the change
+          setMeals((prevMeals) =>
+            prevMeals.map((meal) =>
+              meal.id === linkingMeal.id
+                ? { ...meal, linkedEntries: linkedData }
+                : meal
+            )
+          );
         }
         setSuccess("Entry linked successfully!");
       } else {
@@ -421,7 +459,7 @@ export function MealsPage() {
       );
 
       if (response.ok) {
-        // Refresh linked entries
+        // Refresh linked entries in the modal
         const linkedResponse = await fetch(
           `${API_BASE_URL}/api/meals/${linkingMeal.id}/entries`,
           {
@@ -432,8 +470,64 @@ export function MealsPage() {
         if (linkedResponse.ok) {
           const linkedData = await linkedResponse.json();
           setLinkedEntries(linkedData);
+
+          // Also update the main meals list to reflect the change
+          setMeals((prevMeals) =>
+            prevMeals.map((meal) =>
+              meal.id === linkingMeal.id
+                ? { ...meal, linkedEntries: linkedData }
+                : meal
+            )
+          );
         }
         setSuccess("Entry unlinked successfully!");
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || "Failed to unlink entry");
+      }
+    } catch (err) {
+      setError("Failed to unlink entry");
+    }
+  };
+
+  // Function to unlink entry directly from the main meal view
+  const unlinkEntryFromMainView = async (mealId: string, entryId: string) => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/meals/${mealId}/unlink-entry`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ entryId })
+        }
+      );
+
+      if (response.ok) {
+        // Refresh linked entries for this specific meal
+        const linkedResponse = await fetch(
+          `${API_BASE_URL}/api/meals/${mealId}/entries`,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+
+        if (linkedResponse.ok) {
+          const linkedData = await linkedResponse.json();
+
+          // Update the main meals list to reflect the change
+          setMeals((prevMeals) =>
+            prevMeals.map((meal) =>
+              meal.id === mealId ? { ...meal, linkedEntries: linkedData } : meal
+            )
+          );
+        }
+        setSuccess("Entry unlinked successfully!");
+
+        // Clear success message after a few seconds
+        setTimeout(() => setSuccess(""), 3000);
       } else {
         const errorData = await response.json();
         setError(errorData.error || "Failed to unlink entry");
@@ -803,13 +897,13 @@ export function MealsPage() {
                 <div className="mt-4">
                   <h5 className="font-semibold text-md mb-2">Linked Entries</h5>
 
-                  {linkedEntries.length === 0 ? (
+                  {!meal.linkedEntries || meal.linkedEntries.length === 0 ? (
                     <p className="text-sm text-gray-500">
                       No entries linked to this meal.
                     </p>
                   ) : (
                     <div className="space-y-2">
-                      {linkedEntries.map((entry) => (
+                      {meal.linkedEntries.map((entry) => (
                         <div
                           key={entry.id}
                           className="p-3 rounded-lg bg-gray-100 flex justify-between items-center"
@@ -827,7 +921,9 @@ export function MealsPage() {
                           </div>
 
                           <button
-                            onClick={() => unlinkEntryFromMeal(entry.id)}
+                            onClick={() =>
+                              unlinkEntryFromMainView(meal.id, entry.id)
+                            }
                             className="text-red-600 hover:text-red-800 text-sm font-medium"
                             disabled={loading}
                           >
