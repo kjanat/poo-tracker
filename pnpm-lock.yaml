@@ -32,6 +32,9 @@ importers:
       prettier-plugin-sql:
         specifier: ^0.19.1
         version: 0.19.1(prettier@3.5.3)
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
 
   backend:
     dependencies:
@@ -135,15 +138,6 @@ importers:
       eslint-plugin-promise:
         specifier: ^7.2.1
         version: 7.2.1(eslint@9.29.0(jiti@2.4.2))
-      prettier:
-        specifier: ^3.5.3
-        version: 3.5.3
-      prettier-plugin-prisma:
-        specifier: ^5.0.0
-        version: 5.0.0(prettier@3.5.3)
-      prettier-plugin-sql:
-        specifier: ^0.19.1
-        version: 0.19.1(prettier@3.5.3)
       prisma:
         specifier: ^6.9.0
         version: 6.9.0(typescript@5.8.3)
@@ -247,9 +241,6 @@ importers:
       postcss:
         specifier: ^8.5.5
         version: 8.5.5
-      prettier:
-        specifier: ^3.5.3
-        version: 3.5.3
       typescript:
         specifier: ^5.8.3
         version: 5.8.3

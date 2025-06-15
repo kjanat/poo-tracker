@@ -4,18 +4,29 @@
   "description": "The brutally honest app for tracking your bowel movements",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"pnpm run dev:backend\" \"pnpm run dev:frontend\"",
-    "dev:frontend": "cd frontend & pnpm run dev",
-    "dev:backend": "cd backend & pnpm run dev",
-    "build": "concurrently \"pnpm run build:frontend\" \"pnpm run build:backend\"",
-    "build:frontend": "cd frontend & pnpm run build",
-    "build:backend": "cd backend & pnpm run build",
-    "lint": "pnpm -r run lint",
-    "test": "pnpm -r run test",
+    "ai:lint": "cd ai-service && uvx ruff check .",
+    "ai:lint:fix": "cd ai-service && uvx ruff format --fix .",
+    "ai:format": "cd ai-service && uvx ruff format --check .",
+    "ai:format:fix": "cd ai-service && uvx ruff format .",
+    "ai:test": "cd ai-service && uv run pytest",
+    "dev": "pnpm --parallel run dev",
+    "dev:frontend": "pnpm --filter @poo-tracker/frontend run dev",
+    "dev:backend": "pnpm --filter @poo-tracker/backend run dev",
+    "dev:ai": "cd ai-service && uv run uvicorn main:app --reload",
+    "dev:full": "concurrently \"pnpm dev\" \"pnpm dev:ai\"",
+    "build": "pnpm --recursive run build",
+    "build:frontend": "pnpm --filter @poo-tracker/frontend run build",
+    "build:backend": "pnpm --filter @poo-tracker/backend run build",
+    "lint": "pnpm --recursive run lint",
+    "lint:fix": "pnpm --recursive run lint:fix",
+    "test": "pnpm --recursive run test",
+    "test:watch": "pnpm --recursive run test:watch",
+    "clean": "pnpm --recursive run clean",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
-    "db:migrate": "cd backend & pnpm run db:migrate",
-    "db:seed": "cd backend & pnpm run db:seed",
+    "db:migrate": "pnpm --filter @poo-tracker/backend run db:migrate",
+    "db:seed": "pnpm --filter @poo-tracker/backend run db:seed",
+    "db:studio": "pnpm --filter @poo-tracker/backend run db:studio",
     "prettier": "prettier --write --ignore-unknown .",
     "prettier:watch": "onchange \"**/*\" -- prettier --write --ignore-unknown {{changed}}",
     "prepare": "husky"
@@ -28,11 +39,12 @@
     "prettier": "^3.5.3",
     "prettier-plugin-prisma": "^5.0.0",
     "prettier-plugin-sh": "^0.17.4",
-    "prettier-plugin-sql": "^0.19.1"
+    "prettier-plugin-sql": "^0.19.1",
+    "typescript": "^5.8.3"
   },
   "engines": {
     "node": ">=18.0.0",
-    "pnpm": ">=3"
+    "pnpm": ">=9.0.0"
   },
   "prettier": {
     "trailingComma": "none",
@@ -47,16 +59,15 @@
   },
   "lint-staged": {
     "backend/**/*.{ts,tsx,js,jsx}": [
-      "pnpm --filter backend run lint:fix",
+      "pnpm --filter @poo-tracker/backend run lint:fix",
       "prettier --write"
     ],
     "frontend/**/*.{ts,tsx,js,jsx}": [
-      "pnpm --filter frontend run lint:fix",
+      "pnpm --filter @poo-tracker/frontend run lint:fix",
       "prettier --write"
     ],
     "ai-service/**/*.py": [
-      "uvx black",
-      "uvx isort",
+      "uvx ruff format",
       "uvx ruff check --fix"
     ],
     "*.{json,md,yml,yaml}": [

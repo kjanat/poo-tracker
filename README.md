@@ -10,7 +10,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
 - [Node.js](https://nodejs.org/) 18+
 - [Docker](https://docs.docker.com/engine/) & [Docker Compose](https://docs.docker.com/compose/)
-- [pnpm](https://pnpm.io/) (because npm is for amateurs)
+- [pnpm](https://pnpm.io/) 9+ (because npm is for amateurs)
 - [uv](https://docs.astral.sh/uv/) for Python (because pip is for the weak)
 
 ### Setup
@@ -25,7 +25,11 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 2. **Install dependencies:**
 
    ```bash
+   # Install Node.js dependencies (frontend + backend)
    pnpm install
+   
+   # Install Python dependencies for AI service
+   cd ai-service && uv sync && cd ..
    ```
 
 3. **Set up environment variables:**
@@ -39,20 +43,23 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
    ```bash
    # Start database and supporting services
-   pnpm run docker:up
+   pnpm docker:up
    
-   # Start the development servers
-   pnpm run dev
+   # Start all development servers (frontend + backend + AI)
+   pnpm dev:full
+   
+   # OR start just frontend + backend
+   pnpm dev
    ```
 
 5. **Set up the database:**
 
    ```bash
    # Run database migrations
-   pnpm run db:migrate
+   pnpm db:migrate
    
    # (Optional) Seed with test data
-   pnpm run db:seed
+   pnpm db:seed
    ```
 
 6. **Open your browser:**
@@ -64,12 +71,13 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
 ## 🏗️ Tech Stack
 
-- **Frontend**: React + Vite + TypeScript + TailwindCSS
-- **Backend**: Node.js + Express + TypeScript + Prisma
+- **Frontend**: React + Vite + TypeScript + TailwindCSS v4
+- **Backend**: Node.js + Express v5 + TypeScript + Prisma
 - **Database**: PostgreSQL
 - **Storage**: MinIO (S3-compatible for photos)
 - **AI Service**: Python + FastAPI + scikit-learn
 - **Infrastructure**: Docker + Docker Compose
+- **Package Management**: pnpm (Node.js) + uv (Python)
 
 ## 📖 What's the fucking point?
 
@@ -84,34 +92,76 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 ### Available Scripts
 
 ```bash
-# Development
-pnpm run dev          # Start frontend + backend
-pnpm run dev:frontend # Start frontend only
-pnpm run dev:backend  # Start backend only
+# Development - All Services
+pnpm dev:full         # Start frontend + backend + AI service
+pnpm dev              # Start frontend + backend only
+pnpm dev:frontend     # Start frontend only
+pnpm dev:backend      # Start backend only  
+pnpm dev:ai           # Start AI service only
 
-# Database
-pnpm run db:migrate # Run Prisma migrations
-pnpm run db:seed    # Seed database
+# Building
+pnpm build            # Build all projects
+pnpm build:frontend   # Build frontend only
+pnpm build:backend    # Build backend only
 
-# Docker
-pnpm run docker:up   # Start all services
-pnpm run docker:down # Stop all services
+# Database Operations
+pnpm db:migrate       # Run Prisma migrations
+pnpm db:seed          # Seed database with test data
+pnpm db:studio        # Open Prisma Studio
 
-# Testing & Linting
-pnpm run test  # Run all tests
-pnpm run lint  # Run linters
-pnpm run build # Build for production
+# Docker Services
+pnpm docker:up        # Start PostgreSQL, Redis, MinIO
+pnpm docker:down      # Stop all Docker services
+
+# Testing & Quality
+pnpm test             # Run all tests (frontend + backend)
+pnpm test:watch       # Run tests in watch mode
+pnpm lint             # Run linters on all projects
+pnpm lint:fix         # Auto-fix linting issues
+pnpm clean            # Clean all build artifacts
+
+# Code Formatting
+pnpm prettier         # Format all files
+pnpm prettier:watch   # Watch and format on changes
 ```
 
 ### Project Structure
 
 ```tree
 poo-tracker/
-├── frontend/          # React frontend (Vite + TypeScript + TailwindCSS)
-├── backend/           # Express.js API (TypeScript + Prisma)
-├── ai-service/        # Python FastAPI AI service
-├── docker-compose.yml # Infrastructure setup
-└── package.json       # Root workspace config
+├── frontend/           # React frontend (Vite + TypeScript + TailwindCSS)
+│   ├── src/
+│   ├── package.json
+│   └── vite.config.ts
+├── backend/            # Express.js API (TypeScript + Prisma)
+│   ├── src/
+│   ├── prisma/
+│   └── package.json
+├── ai-service/         # Python FastAPI AI service
+│   ├── main.py
+│   ├── pyproject.toml
+│   └── uv.lock
+├── docker-compose.yml  # Infrastructure setup
+├── pnpm-workspace.yaml # Workspace configuration
+└── package.json        # Root workspace config
+```
+
+### Workspace Management
+
+This project uses **pnpm workspaces** for efficient monorepo management:
+
+```bash
+# Install dependencies for specific workspace
+pnpm --filter @poo-tracker/frontend add react-router-dom
+pnpm --filter @poo-tracker/backend add express-rate-limit
+
+# Run commands on specific workspaces
+pnpm --filter @poo-tracker/frontend build
+pnpm --filter @poo-tracker/backend test
+
+# Run commands on all workspaces
+pnpm --recursive run build
+pnpm --parallel run dev
 ```
 
 ### API Endpoints
@@ -175,7 +225,7 @@ We encrypt your brown notes and hide them away. Nobody's reading your logs excep
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feat/amazing-feature`)
-3. Follow the coding standards (see copilot instructions)
+3. Follow the coding standards (see [AGENTS.md](AGENTS.md))
 4. Write tests for new features
 5. Commit using conventional commits (`feat: add Bristol chart selector`)
 6. Push and create a Pull Request
@@ -188,6 +238,7 @@ We encrypt your brown notes and hide them away. Nobody's reading your logs excep
 - RESTful API design
 - Comprehensive test coverage
 - ESLint + Prettier (follow the config, don't "fix" it)
+- Use pnpm workspace commands for consistent development
 
 ## 🚀 Deployment
 
@@ -216,7 +267,15 @@ JWT_SECRET="your-super-secret-jwt-key-change-in-production"
 ### Production Build
 
 ```bash
-pnpm run build
+# Build all projects
+pnpm build
+
+# Or build individually
+pnpm build:frontend
+pnpm build:backend
+
+# AI service
+cd ai-service && uv run uvicorn main:app
 ```
 
 ## 📄 License
