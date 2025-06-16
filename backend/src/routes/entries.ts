@@ -79,8 +79,8 @@ router.get(
       }
 
       const entry = await entryService.findById(req.params.id!, req.userId)
-      
-      if (!entry) {
+
+      if (entry == null) {
         res.status(404).json({ error: 'Entry not found' })
         return
       }
@@ -105,22 +105,22 @@ router.post(
       // Validate request body
       const validationResult = createEntrySchema.safeParse(req.body)
       if (!validationResult.success) {
-        res.status(400).json({ 
-          error: 'Validation failed', 
-          details: validationResult.error.errors 
+        res.status(400).json({
+          error: 'Validation failed',
+          details: validationResult.error.errors
         })
         return
       }
 
       const createRequest: CreateEntryRequest = validationResult.data
-      
+
       // Additional validation using factory
       if (!EntryFactory.validateBristolType(createRequest.bristolType)) {
         res.status(400).json({ error: 'Invalid Bristol stool type' })
         return
       }
 
-      if (!EntryFactory.validateRating(createRequest.satisfaction)) {
+      if (createRequest.satisfaction !== undefined && createRequest.satisfaction !== null && !EntryFactory.validateRating(createRequest.satisfaction)) {
         res.status(400).json({ error: 'Invalid satisfaction rating' })
         return
       }
@@ -146,14 +146,14 @@ router.put(
       // Validate request body
       const validationResult = updateEntrySchema.safeParse(req.body)
       if (!validationResult.success) {
-        res.status(400).json({ 
-          error: 'Validation failed', 
-          details: validationResult.error.errors 
+        res.status(400).json({
+          error: 'Validation failed',
+          details: validationResult.error.errors
         })
         return
       }
 
-      const updateRequest: UpdateEntryRequest = validationResult.data
+      const updateRequest = validationResult.data as UpdateEntryRequest
 
       // Additional validation using factory
       if (updateRequest.bristolType && !EntryFactory.validateBristolType(updateRequest.bristolType)) {
@@ -161,14 +161,14 @@ router.put(
         return
       }
 
-      if (!EntryFactory.validateRating(updateRequest.satisfaction)) {
+      if (updateRequest.satisfaction !== undefined && updateRequest.satisfaction !== null && !EntryFactory.validateRating(updateRequest.satisfaction)) {
         res.status(400).json({ error: 'Invalid satisfaction rating' })
         return
       }
 
       const entry = await entryService.update(req.params.id!, updateRequest, req.userId)
-      
-      if (!entry) {
+
+      if (entry == null) {
         res.status(404).json({ error: 'Entry not found' })
         return
       }
@@ -191,7 +191,7 @@ router.delete(
       }
 
       const deleted = await entryService.delete(req.params.id!, req.userId)
-      
+
       if (!deleted) {
         res.status(404).json({ error: 'Entry not found' })
         return

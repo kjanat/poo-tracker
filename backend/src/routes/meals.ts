@@ -2,9 +2,13 @@ import { Router, Response, NextFunction } from 'express'
 import { z } from 'zod'
 import { PrismaClient } from '@prisma/client'
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth'
+import { MealService } from '../domains/meals/MealService'
+import { MealFactory } from '../domains/meals/MealFactory'
+import type { CreateMealRequest, UpdateMealRequest } from '../domains/meals/types'
 
 const router: Router = Router()
 const prisma = new PrismaClient()
+const mealService = new MealService(prisma)
 
 // Apply authentication to all routes
 router.use(authenticateToken)
@@ -36,12 +40,11 @@ router.get(
         return
       }
 
-      const meals = await prisma.meal.findMany({
-        where: { userId: req.userId },
-        orderBy: { mealTime: 'desc' }
-      })
+      const page = parseInt(req.query.page as string) || 1
+      const limit = parseInt(req.query.limit as string) || 20
 
-      res.json(meals)
+      const result = await mealService.findByUserId(req.userId, { page, limit })
+      res.json(result)
     } catch (error) {
       next(error)
     }
@@ -58,34 +61,34 @@ router.post(
         return
       }
 
-      const validatedData = createMealSchema.parse(req.body)
-
-      // Convert undefined values to null for Prisma
-      const mealData = {
-        name: validatedData.name,
-        description: validatedData.description ?? null,
-        mealTime: new Date(validatedData.mealTime),
-        category: validatedData.category ?? null,
-        cuisine: validatedData.cuisine ?? null,
-        spicyLevel: validatedData.spicyLevel ?? null,
-        fiberRich: validatedData.fiberRich,
-        dairy: validatedData.dairy,
-        gluten: validatedData.gluten,
-        notes: validatedData.notes ?? null,
-        photoUrl: validatedData.photoUrl ?? null,
-        userId: req.userId
-      }
-
-      const meal = await prisma.meal.create({
-        data: mealData
-      })
-
-      res.status(201).json(meal)
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: error.errors })
+      const validationResult = createMealSchema.safeParse(req.body)
+      if (!validationResult.success) {
+        res.status(400).json({
+          error: 'Validation failed',
+          details: validationResult.error.errors
+        })
         return
       }
+
+      const createRequest: CreateMealRequest = {
+        ...validationResult.data,
+        mealTime: new Date(validationResult.data.mealTime)
+      }
+
+      // Additional business validation using factory
+      if (!MealFactory.validateMealName(createRequest.name)) {
+        res.status(400).json({ error: 'Invalid meal name' })
+        return
+      }
+
+      if (createRequest.spicyLevel !== undefined && createRequest.spicyLevel !== null && !MealFactory.validateSpicyLevel(createRequest.spicyLevel)) {
+        res.status(400).json({ error: 'Invalid spicy level' })
+        return
+      }
+
+      const meal = await mealService.create(createRequest, req.userId)
+      res.status(201).json(meal)
+    } catch (error) {
       next(error)
     }
   }
@@ -103,14 +106,9 @@ router.get(
         return
       }
 
-      const meal = await prisma.meal.findFirst({
-        where: {
-          id,
-          userId: req.userId
-        }
-      })
+      const meal = await mealService.findById(id, req.userId)
 
-      if (!meal) {
+      if (meal == null) {
         res.status(404).json({ error: 'Meal not found' })
         return
       }
@@ -134,41 +132,40 @@ router.put(
         return
       }
 
-      const validatedData = updateMealSchema.parse(req.body)
+      const validationResult = updateMealSchema.safeParse(req.body)
+      if (!validationResult.success) {
+        res.status(400).json({
+          error: 'Validation failed',
+          details: validationResult.error.errors
+        })
+        return
+      }
 
-      const existingMeal = await prisma.meal.findFirst({
-        where: { id, userId: req.userId }
-      })
+      const updateRequest = {
+        ...validationResult.data,
+        mealTime: validationResult.data.mealTime ? new Date(validationResult.data.mealTime) : undefined
+      } as UpdateMealRequest
 
-      if (!existingMeal) {
+      // Additional business validation using factory
+      if (updateRequest.name !== undefined && !MealFactory.validateMealName(updateRequest.name)) {
+        res.status(400).json({ error: 'Invalid meal name' })
+        return
+      }
+
+      if (updateRequest.spicyLevel !== undefined && updateRequest.spicyLevel !== null && !MealFactory.validateSpicyLevel(updateRequest.spicyLevel)) {
+        res.status(400).json({ error: 'Invalid spicy level' })
+        return
+      }
+
+      const meal = await mealService.update(id, updateRequest, req.userId)
+
+      if (meal == null) {
         res.status(404).json({ error: 'Meal not found' })
         return
       }
 
-      // Convert undefined values to null for Prisma
-      const updateData: any = {}
-      if (validatedData.name !== undefined) updateData.name = validatedData.name
-      if (validatedData.description !== undefined) { updateData.description = validatedData.description ?? null }
-      if (validatedData.mealTime !== undefined) { updateData.mealTime = new Date(validatedData.mealTime) }
-      if (validatedData.category !== undefined) updateData.category = validatedData.category ?? null
-      if (validatedData.cuisine !== undefined) updateData.cuisine = validatedData.cuisine ?? null
-      if (validatedData.spicyLevel !== undefined) { updateData.spicyLevel = validatedData.spicyLevel ?? null }
-      if (validatedData.fiberRich !== undefined) updateData.fiberRich = validatedData.fiberRich
-      if (validatedData.dairy !== undefined) updateData.dairy = validatedData.dairy
-      if (validatedData.gluten !== undefined) updateData.gluten = validatedData.gluten
-      if (validatedData.notes !== undefined) updateData.notes = validatedData.notes ?? null
-
-      const meal = await prisma.meal.update({
-        where: { id },
-        data: updateData
-      })
-
       res.json(meal)
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: error.errors })
-        return
-      }
       next(error)
     }
   }
@@ -186,18 +183,12 @@ router.delete(
         return
       }
 
-      const existingMeal = await prisma.meal.findFirst({
-        where: { id, userId: req.userId }
-      })
+      const success = await mealService.delete(id, req.userId)
 
-      if (!existingMeal) {
+      if (!success) {
         res.status(404).json({ error: 'Meal not found' })
         return
       }
-
-      await prisma.meal.delete({
-        where: { id }
-      })
 
       res.json({ message: 'Meal deleted successfully' })
     } catch (error) {
@@ -219,42 +210,14 @@ router.post(
         return
       }
 
-      // Verify the meal belongs to the user
-      const meal = await prisma.meal.findFirst({
-        where: { id, userId: req.userId }
-      })
+      const success = await mealService.linkEntry(id, entryId, req.userId)
 
-      if (!meal) {
-        res.status(404).json({ error: 'Meal not found' })
+      if (!success) {
+        res.status(400).json({ error: 'Unable to link entry to meal - meal/entry not found or already linked' })
         return
       }
 
-      // Verify the entry belongs to the user
-      const entry = await prisma.entry.findFirst({
-        where: { id: entryId, userId: req.userId }
-      })
-
-      if (!entry) {
-        res.status(404).json({ error: 'Entry not found' })
-        return
-      }
-
-      // Check if the relation already exists
-      const existingRelation = await prisma.mealEntryRelation.findFirst({
-        where: { mealId: id, entryId }
-      })
-
-      if (existingRelation) {
-        res.status(409).json({ error: 'Entry is already linked to this meal' })
-        return
-      }
-
-      // Create the relation
-      const relation = await prisma.mealEntryRelation.create({
-        data: { mealId: id, entryId }
-      })
-
-      res.status(201).json({ message: 'Entry linked to meal successfully', relation })
+      res.status(201).json({ message: 'Entry linked to meal successfully' })
     } catch (error) {
       next(error)
     }
@@ -274,29 +237,12 @@ router.delete(
         return
       }
 
-      // Verify the meal belongs to the user
-      const meal = await prisma.meal.findFirst({
-        where: { id, userId: req.userId }
-      })
+      const success = await mealService.unlinkEntry(id, entryId, req.userId)
 
-      if (!meal) {
-        res.status(404).json({ error: 'Meal not found' })
+      if (!success) {
+        res.status(400).json({ error: 'Unable to unlink entry from meal - meal not found or entry not linked' })
         return
       }
-
-      // Find and delete the relation
-      const relation = await prisma.mealEntryRelation.findFirst({
-        where: { mealId: id, entryId }
-      })
-
-      if (!relation) {
-        res.status(404).json({ error: 'Entry is not linked to this meal' })
-        return
-      }
-
-      await prisma.mealEntryRelation.delete({
-        where: { id: relation.id }
-      })
 
       res.json({ message: 'Entry unlinked from meal successfully' })
     } catch (error) {
@@ -317,26 +263,7 @@ router.get(
         return
       }
 
-      // Verify the meal belongs to the user
-      const meal = await prisma.meal.findFirst({
-        where: { id, userId: req.userId }
-      })
-
-      if (!meal) {
-        res.status(404).json({ error: 'Meal not found' })
-        return
-      }
-
-      // Get all entries linked to this meal
-      const linkedEntries = await prisma.entry.findMany({
-        where: {
-          userId: req.userId,
-          meals: {
-            some: { mealId: id }
-          }
-        },
-        orderBy: { createdAt: 'desc' }
-      })
+      const linkedEntries = await mealService.getLinkedEntries(id, req.userId)
 
       res.json(linkedEntries)
     } catch (error) {

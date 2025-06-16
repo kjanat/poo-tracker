@@ -46,7 +46,7 @@ export class SharpImageProcessingService implements ImageProcessingService {
 
   async processImage (
     buffer: Buffer,
-    originalName: string,
+    _originalName: string,
     config: Partial<ImageProcessingConfig> = {}
   ): Promise<ProcessedImage> {
     const finalConfig = { ...this.defaultConfig, ...config }

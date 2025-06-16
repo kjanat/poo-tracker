@@ -1,7 +1,7 @@
 import type { CreateEntryRequest, Entry } from './types'
 
 export class EntryFactory {
-  static createFromRequest(request: CreateEntryRequest, userId: string): Omit<Entry, 'id' | 'createdAt' | 'updatedAt'> {
+  static createFromRequest (request: CreateEntryRequest, userId: string): Omit<Entry, 'id' | 'createdAt' | 'updatedAt'> {
     return {
       bristolType: request.bristolType,
       volume: request.volume,
@@ -18,11 +18,11 @@ export class EntryFactory {
     }
   }
 
-  static validateBristolType(type: number): boolean {
+  static validateBristolType (type: number): boolean {
     return Number.isInteger(type) && type >= 1 && type <= 7
   }
 
-  static validateRating(rating: number | undefined): boolean {
+  static validateRating (rating: number | undefined): boolean {
     if (rating === undefined) return true
     return Number.isInteger(rating) && rating >= 1 && rating <= 10
   }
@@ -32,7 +32,7 @@ export class EntryFactory {
     return allowedValues.includes(value as T)
   }
 
-  static getDefaultValues(): Partial<CreateEntryRequest> {
+  static getDefaultValues (): Partial<CreateEntryRequest> {
     return {
       bristolType: 4,
       floaters: false,
@@ -40,7 +40,7 @@ export class EntryFactory {
     }
   }
 
-  static sanitizeNotes(notes: string | undefined): string | undefined {
+  static sanitizeNotes (notes: string | undefined): string | undefined {
     if (!notes) return undefined
     return notes.trim().substring(0, 1000) || undefined
   }

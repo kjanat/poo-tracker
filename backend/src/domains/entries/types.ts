@@ -1,16 +1,16 @@
 export interface Entry {
   id: string
   bristolType: number
-  volume?: string
-  color?: string
-  consistency?: string
+  volume?: string | null
+  color?: string | null
+  consistency?: string | null
   floaters: boolean
-  pain?: number
-  strain?: number
-  satisfaction?: number
-  notes?: string
-  smell?: string
-  photoUrl?: string
+  pain?: number | null
+  strain?: number | null
+  satisfaction?: number | null
+  notes?: string | null
+  smell?: string | null
+  photoUrl?: string | null
   createdAt: Date
   updatedAt: Date
   userId: string
@@ -18,16 +18,16 @@ export interface Entry {
 
 export interface CreateEntryRequest {
   bristolType: number
-  volume?: string | undefined
-  color?: string | undefined
-  consistency?: string | undefined
+  volume?: string | null | undefined
+  color?: string | null | undefined
+  consistency?: string | null | undefined
   floaters?: boolean | undefined
-  pain?: number | undefined
-  strain?: number | undefined
-  satisfaction?: number | undefined
-  notes?: string | undefined
-  smell?: string | undefined
-  photoUrl?: string | undefined
+  pain?: number | null | undefined
+  strain?: number | null | undefined
+  satisfaction?: number | null | undefined
+  notes?: string | null | undefined
+  smell?: string | null | undefined
+  photoUrl?: string | null | undefined
 }
 
 export interface UpdateEntryRequest extends Partial<CreateEntryRequest> {}

@@ -3,9 +3,9 @@ import type { Meal, CreateMealRequest, UpdateMealRequest, MealFilters, MealListR
 import { MealFactory } from './MealFactory'
 
 export class MealService {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor (private readonly prisma: PrismaClient) {}
 
-  async findByUserId(userId: string, filters: MealFilters = {}): Promise<MealListResponse> {
+  async findByUserId (userId: string, filters: MealFilters = {}): Promise<MealListResponse> {
     const {
       page = 1,
       limit = 20,
@@ -23,15 +23,15 @@ export class MealService {
 
     // Build where clause
     const where: any = { userId }
-    
+
     if (category) {
       where.category = category
     }
 
-    if (dateFrom || dateTo) {
+    if ((dateFrom != null) || (dateTo != null)) {
       where.mealTime = {}
-      if (dateFrom) where.mealTime.gte = dateFrom
-      if (dateTo) where.mealTime.lte = dateTo
+      if (dateFrom != null) where.mealTime.gte = dateFrom
+      if (dateTo != null) where.mealTime.lte = dateTo
     }
 
     if (fiberRich !== undefined) {
@@ -68,33 +68,33 @@ export class MealService {
     }
   }
 
-  async findById(id: string, userId: string): Promise<Meal | null> {
-    return this.prisma.meal.findFirst({
+  async findById (id: string, userId: string): Promise<Meal | null> {
+    return await this.prisma.meal.findFirst({
       where: { id, userId }
     })
   }
 
-  async create(request: CreateMealRequest, userId: string): Promise<Meal> {
+  async create (request: CreateMealRequest, userId: string): Promise<Meal> {
     const mealData = MealFactory.createFromRequest(request, userId)
-    
-    return this.prisma.meal.create({
+
+    return await this.prisma.meal.create({
       data: {
         ...mealData,
         name: MealFactory.sanitizeName(mealData.name),
-        description: MealFactory.sanitizeDescription(mealData.description),
-        notes: MealFactory.sanitizeNotes(mealData.notes)
+        description: MealFactory.sanitizeDescription(mealData.description) || null,
+        notes: MealFactory.sanitizeNotes(mealData.notes) || null
       }
     })
   }
 
-  async update(id: string, request: UpdateMealRequest, userId: string): Promise<Meal | null> {
+  async update (id: string, request: UpdateMealRequest, userId: string): Promise<Meal | null> {
     const existingMeal = await this.findById(id, userId)
-    if (!existingMeal) {
+    if (existingMeal == null) {
       return null
     }
 
     const updateData: any = {}
-    
+
     // Only update provided fields
     if (request.name !== undefined) updateData.name = MealFactory.sanitizeName(request.name)
     if (request.description !== undefined) updateData.description = MealFactory.sanitizeDescription(request.description)
@@ -108,15 +108,15 @@ export class MealService {
     if (request.notes !== undefined) updateData.notes = MealFactory.sanitizeNotes(request.notes)
     if (request.photoUrl !== undefined) updateData.photoUrl = request.photoUrl
 
-    return this.prisma.meal.update({
+    return await this.prisma.meal.update({
       where: { id },
       data: updateData
     })
   }
 
-  async delete(id: string, userId: string): Promise<boolean> {
+  async delete (id: string, userId: string): Promise<boolean> {
     const existingMeal = await this.findById(id, userId)
-    if (!existingMeal) {
+    if (existingMeal == null) {
       return false
     }
 
@@ -127,7 +127,7 @@ export class MealService {
     return true
   }
 
-  async getAnalytics(userId: string): Promise<{
+  async getAnalytics (userId: string): Promise<{
     totalMeals: number
     mealsByCategory: Array<{ category: string, count: number }>
     averageSpicyLevel: number | null
@@ -140,13 +140,13 @@ export class MealService {
   }> {
     const [totalMeals, categoryStats, spicyAvg, dietaryStats, recentMeals] = await Promise.all([
       this.prisma.meal.count({ where: { userId } }),
-      
+
       this.prisma.meal.groupBy({
         by: ['category'],
         where: { userId },
         _count: { category: true }
       }),
-      
+
       this.prisma.meal.aggregate({
         where: { userId, spicyLevel: { not: null } },
         _avg: { spicyLevel: true }
@@ -157,7 +157,7 @@ export class MealService {
         this.prisma.meal.count({ where: { userId, dairy: true } }),
         this.prisma.meal.count({ where: { userId, gluten: true } })
       ]),
-      
+
       this.prisma.meal.findMany({
         where: { userId },
         orderBy: { mealTime: 'desc' },
@@ -179,5 +179,79 @@ export class MealService {
       },
       recentMeals
     }
+  }
+
+  // Meal-Entry Relationship Management
+
+  async linkEntry (mealId: string, entryId: string, userId: string): Promise<boolean> {
+    // Verify both meal and entry belong to the user
+    const [meal, entry] = await Promise.all([
+      this.prisma.meal.findFirst({ where: { id: mealId, userId } }),
+      this.prisma.entry.findFirst({ where: { id: entryId, userId } })
+    ])
+
+    if ((meal == null) || (entry == null)) {
+      return false
+    }
+
+    // Check if relation already exists
+    const existingRelation = await this.prisma.mealEntryRelation.findFirst({
+      where: { mealId, entryId }
+    })
+
+    if (existingRelation != null) {
+      return false // Already linked
+    }
+
+    // Create the relation
+    await this.prisma.mealEntryRelation.create({
+      data: { mealId, entryId }
+    })
+
+    return true
+  }
+
+  async unlinkEntry (mealId: string, entryId: string, userId: string): Promise<boolean> {
+    // Verify the meal belongs to the user
+    const meal = await this.prisma.meal.findFirst({ where: { id: mealId, userId } })
+    if (meal == null) {
+      return false
+    }
+
+    // Find and delete the relation
+    const relation = await this.prisma.mealEntryRelation.findFirst({
+      where: { mealId, entryId }
+    })
+
+    if (relation == null) {
+      return false // Not linked
+    }
+
+    await this.prisma.mealEntryRelation.delete({
+      where: { id: relation.id }
+    })
+
+    return true
+  }
+
+  async getLinkedEntries (mealId: string, userId: string): Promise<any[]> {
+    // Verify the meal belongs to the user
+    const meal = await this.prisma.meal.findFirst({ where: { id: mealId, userId } })
+    if (meal == null) {
+      return []
+    }
+
+    // Get all entries linked to this meal
+    const linkedEntries = await this.prisma.entry.findMany({
+      where: {
+        userId,
+        meals: {
+          some: { mealId }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    })
+
+    return linkedEntries
   }
 }

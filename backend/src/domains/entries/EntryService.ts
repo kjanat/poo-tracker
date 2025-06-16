@@ -3,9 +3,9 @@ import type { Entry, CreateEntryRequest, UpdateEntryRequest, EntryFilters, Entry
 import { EntryFactory } from './EntryFactory'
 
 export class EntryService {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor (private readonly prisma: PrismaClient) {}
 
-  async findByUserId(userId: string, filters: EntryFilters = {}): Promise<EntryListResponse> {
+  async findByUserId (userId: string, filters: EntryFilters = {}): Promise<EntryListResponse> {
     const {
       page = 1,
       limit = 20,
@@ -20,15 +20,15 @@ export class EntryService {
 
     // Build where clause
     const where: any = { userId }
-    
+
     if (bristolType) {
       where.bristolType = bristolType
     }
 
-    if (dateFrom || dateTo) {
+    if ((dateFrom != null) || (dateTo != null)) {
       where.createdAt = {}
-      if (dateFrom) where.createdAt.gte = dateFrom
-      if (dateTo) where.createdAt.lte = dateTo
+      if (dateFrom != null) where.createdAt.gte = dateFrom
+      if (dateTo != null) where.createdAt.lte = dateTo
     }
 
     // Execute queries in parallel
@@ -53,31 +53,31 @@ export class EntryService {
     }
   }
 
-  async findById(id: string, userId: string): Promise<Entry | null> {
-    return this.prisma.entry.findFirst({
+  async findById (id: string, userId: string): Promise<Entry | null> {
+    return await this.prisma.entry.findFirst({
       where: { id, userId }
     })
   }
 
-  async create(request: CreateEntryRequest, userId: string): Promise<Entry> {
+  async create (request: CreateEntryRequest, userId: string): Promise<Entry> {
     const entryData = EntryFactory.createFromRequest(request, userId)
-    
-    return this.prisma.entry.create({
+
+    return await this.prisma.entry.create({
       data: {
         ...entryData,
-        notes: EntryFactory.sanitizeNotes(entryData.notes)
+        notes: EntryFactory.sanitizeNotes(entryData.notes) || null
       }
     })
   }
 
-  async update(id: string, request: UpdateEntryRequest, userId: string): Promise<Entry | null> {
+  async update (id: string, request: UpdateEntryRequest, userId: string): Promise<Entry | null> {
     const existingEntry = await this.findById(id, userId)
-    if (!existingEntry) {
+    if (existingEntry == null) {
       return null
     }
 
     const updateData: any = {}
-    
+
     // Only update provided fields
     if (request.bristolType !== undefined) updateData.bristolType = request.bristolType
     if (request.volume !== undefined) updateData.volume = request.volume
@@ -91,15 +91,15 @@ export class EntryService {
     if (request.smell !== undefined) updateData.smell = request.smell
     if (request.photoUrl !== undefined) updateData.photoUrl = request.photoUrl
 
-    return this.prisma.entry.update({
+    return await this.prisma.entry.update({
       where: { id },
       data: updateData
     })
   }
 
-  async delete(id: string, userId: string): Promise<boolean> {
+  async delete (id: string, userId: string): Promise<boolean> {
     const existingEntry = await this.findById(id, userId)
-    if (!existingEntry) {
+    if (existingEntry == null) {
       return false
     }
 
@@ -110,7 +110,7 @@ export class EntryService {
     return true
   }
 
-  async getAnalytics(userId: string): Promise<{
+  async getAnalytics (userId: string): Promise<{
     totalEntries: number
     bristolDistribution: Array<{ type: number, count: number }>
     averageSatisfaction: number | null
@@ -118,18 +118,18 @@ export class EntryService {
   }> {
     const [totalEntries, bristolStats, satisfactionAvg, recentEntries] = await Promise.all([
       this.prisma.entry.count({ where: { userId } }),
-      
+
       this.prisma.entry.groupBy({
         by: ['bristolType'],
         where: { userId },
         _count: { bristolType: true }
       }),
-      
+
       this.prisma.entry.aggregate({
         where: { userId, satisfaction: { not: null } },
         _avg: { satisfaction: true }
       }),
-      
+
       this.prisma.entry.findMany({
         where: { userId },
         orderBy: { createdAt: 'desc' },

@@ -244,8 +244,9 @@ describe('Auth Routes Integration Tests', () => {
         .expect(201)
 
       // Verify password was hashed
-      const createCall = mockPrismaClient.user.create.mock.calls[0][0]
-      const hashedPassword = createCall.data.auth.create.password
+      const createCall = mockPrismaClient.user.create.mock.calls[0]?.[0]
+      expect(createCall).toBeDefined()
+      const hashedPassword = createCall?.data.auth.create.password
       expect(hashedPassword).toBeDefined()
       expect(hashedPassword).not.toBe(userData.password)
       expect(typeof hashedPassword).toBe('string')
