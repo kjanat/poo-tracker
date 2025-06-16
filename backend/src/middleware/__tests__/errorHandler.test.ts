@@ -21,6 +21,7 @@ describe('errorHandler middleware', () => {
     mockNext = vi.fn()
 
     // Mock console.error to avoid noise in test output
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     vi.spyOn(console, 'error').mockImplementation(() => {})
 
     // Store original NODE_ENV

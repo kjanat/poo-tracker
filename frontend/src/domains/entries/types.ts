@@ -28,7 +28,7 @@ export interface CreateEntryRequest {
   photoUrl?: string
 }
 
-export interface UpdateEntryRequest extends Partial<CreateEntryRequest> {}
+export type UpdateEntryRequest = Partial<CreateEntryRequest>
 
 export interface EntryListResponse {
   entries: Entry[]

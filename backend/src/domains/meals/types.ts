@@ -30,7 +30,7 @@ export interface CreateMealRequest {
   photoUrl?: string | null | undefined
 }
 
-export interface UpdateMealRequest extends Partial<CreateMealRequest> {}
+export type UpdateMealRequest = Partial<CreateMealRequest>
 
 export interface MealFilters {
   page?: number

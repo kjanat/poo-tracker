@@ -30,7 +30,7 @@ export interface CreateEntryRequest {
   photoUrl?: string | null | undefined
 }
 
-export interface UpdateEntryRequest extends Partial<CreateEntryRequest> {}
+export type UpdateEntryRequest = Partial<CreateEntryRequest>
 
 export interface EntryFilters {
   page?: number

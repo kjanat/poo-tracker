@@ -39,6 +39,7 @@ describe('authenticateToken middleware', () => {
     mockNext = vi.fn()
 
     // Mock console methods to avoid noise in test output
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     vi.spyOn(console, 'log').mockImplementation(() => {})
   })
 

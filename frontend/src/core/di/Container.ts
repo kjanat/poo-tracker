@@ -1,4 +1,4 @@
-type Constructor<T = {}> = new (...args: any[]) => T
+type Constructor<T = Record<string, unknown>> = new (...args: any[]) => T
 type ServiceIdentifier<T> = Constructor<T> | string | symbol
 
 interface ServiceBinding<T> {
