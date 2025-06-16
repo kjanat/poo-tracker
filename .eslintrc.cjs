@@ -2,8 +2,10 @@ module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 2022,
-    sourceType: 'module'
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    project: ['./frontend/tsconfig.json', './backend/tsconfig.json'],
+    tsconfigRootDir: __dirname
   },
   env: {
     browser: true,
@@ -29,5 +31,6 @@ module.exports = {
   rules: {
     'react/react-in-jsx-scope': 'off',
     'import/default': 'off'
-  }
+  },
+  ignorePatterns: ['dist/', 'build/', 'node_modules/', 'coverage/', '**/*.d.ts', 'branding/']
 }
