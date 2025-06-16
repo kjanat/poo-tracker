@@ -1,8 +1,7 @@
-import { expect, vi } from 'vitest'
-import matchers from '@testing-library/jest-dom/matchers'
+import { vi } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 
-// Extend Vitest's expect with jest-dom matchers
-expect.extend(matchers)
+// Note: @testing-library/jest-dom v6+ automatically extends expect when imported with /vitest
 
 // Global mocks
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
