@@ -16,7 +16,7 @@ export class MealFactory {
     }
   }
 
-  static createFromFormData(formData: Record<string, any>): CreateMealRequest {
+  static createFromFormData(formData: Record<string, unknown>): CreateMealRequest {
     return {
       name: formData.name || '',
       category: formData.category || undefined,

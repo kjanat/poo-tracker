@@ -27,7 +27,7 @@ export class EntryFactory {
     }
   }
 
-  static createFromFormData(formData: Record<string, any>): CreateEntryRequest {
+  static createFromFormData(formData: Record<string, unknown>): CreateEntryRequest {
     return {
       bristolType: parseInt(formData.bristolType) || 4,
       volume: formData.volume || undefined,

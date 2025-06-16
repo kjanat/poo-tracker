@@ -1,5 +1,5 @@
 import { container } from './di/Container'
-import { ApiClient, type AuthProvider, type ApiConfig } from '../core/api/ApiClient'
+import { ApiClient, type AuthProvider, type ApiConfig } from './api/ApiClient'
 import { EntryService } from '../domains/entries/EntryService'
 import { MealService } from '../domains/meals/MealService'
 import { AnalyticsService } from '../domains/analytics/AnalyticsService'

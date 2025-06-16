@@ -5,6 +5,7 @@ import { EntryForm } from '../domains/entries/components/EntryForm'
 import { EntryList } from '../domains/entries/components/EntryList'
 import { useEntries } from '../domains/entries/hooks/useEntries'
 import { useEntryForm } from '../domains/entries/hooks/useEntryForm'
+import type { Entry } from '../domains/entries/types'
 
 export function NewEntryPage(): JSX.Element {
   const { token } = useAuthStore()
@@ -20,7 +21,6 @@ export function NewEntryPage(): JSX.Element {
   const {
     formData,
     isEditing,
-    editingEntry,
     updateFormData,
     resetForm,
     startEditing,
@@ -31,12 +31,12 @@ export function NewEntryPage(): JSX.Element {
     try {
       await submitEntry(formData)
       resetForm()
-    } catch (error) {
+    } catch {
       // Error is handled by the hook
     }
   }
 
-  const handleEdit = (entry: any): void => {
+  const handleEdit = (entry: Entry): void => {
     startEditing(entry)
   }
 

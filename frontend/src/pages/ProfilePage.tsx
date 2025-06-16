@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useAuthStore } from '../stores/authStore'
 import Logo from '../components/Logo'
 
@@ -32,11 +32,7 @@ const ProfilePage: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
-  useEffect(() => {
-    fetchUserProfile()
-  }, [])
-
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -67,7 +63,11 @@ const ProfilePage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [token])
+
+  useEffect(() => {
+    fetchUserProfile()
+  }, [fetchUserProfile])
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing)
@@ -113,7 +113,7 @@ const ProfilePage: React.FC = () => {
     try {
       setLoading(true)
 
-      const updateData: any = {
+      const updateData: Record<string, string> = {
         name: editForm.name,
         email: editForm.email
       }

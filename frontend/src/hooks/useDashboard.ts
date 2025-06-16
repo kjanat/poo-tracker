@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuthStore } from '../stores/authStore'
 import { API_BASE_URL, createAuthHeaders, handleApiResponse } from '../utils/api'
 import { getThisWeekCount } from '../utils/date'
@@ -15,21 +15,21 @@ export interface UseDashboardReturn {
   refreshData: () => Promise<void>
 }
 
-export function useDashboard (): UseDashboardReturn {
+export function useDashboard(): UseDashboardReturn {
   const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null)
   const [recentEntries, setRecentEntries] = useState<EntryResponse[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string>('')
-  
+
   const { token } = useAuthStore()
 
-  const fetchAnalytics = async (): Promise<void> => {
+  const fetchAnalytics = useCallback(async (): Promise<void> => {
     if (token == null) {
       setError('Authentication token missing')
       setIsLoading(false)
       return
     }
-    
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/analytics/summary`, {
         headers: createAuthHeaders(token)
@@ -41,9 +41,9 @@ export function useDashboard (): UseDashboardReturn {
       console.error('Failed to fetch analytics:', error)
       setError(error instanceof Error ? error.message : 'Failed to fetch analytics')
     }
-  }
+  }, [token])
 
-  const fetchRecentEntries = async (): Promise<void> => {
+  const fetchRecentEntries = useCallback(async (): Promise<void> => {
     if (token == null) return
 
     try {
@@ -57,31 +57,27 @@ export function useDashboard (): UseDashboardReturn {
       console.error('Failed to fetch recent entries:', error)
       setError(error instanceof Error ? error.message : 'Failed to fetch recent entries')
     }
-  }
+  }, [token])
 
-  const refreshData = async (): Promise<void> => {
+  const refreshData = useCallback(async (): Promise<void> => {
     setIsLoading(true)
     setError('')
-    
+
     try {
-      await Promise.all([
-        fetchAnalytics(),
-        fetchRecentEntries()
-      ])
+      await Promise.all([fetchAnalytics(), fetchRecentEntries()])
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [fetchAnalytics, fetchRecentEntries])
 
   useEffect(() => {
     void refreshData()
-  }, [token])
+  }, [refreshData])
 
   // Computed values
   const thisWeekCount = getThisWeekCount(recentEntries)
-  const averageBristolType = analytics != null 
-    ? getAverageBristolType(analytics.bristolDistribution)
-    : 0
+  const averageBristolType =
+    analytics != null ? getAverageBristolType(analytics.bristolDistribution) : 0
 
   return {
     analytics,

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuthStore } from '../stores/authStore'
 import { API_BASE_URL, createAuthHeaders, handleApiResponse } from '../utils/api'
 import type { Meal, MealFormData } from '../types'
@@ -24,7 +24,7 @@ export function useMeals (): UseMealsReturn {
   
   const token = useAuthStore((state) => state.token)
 
-  const refreshMeals = async (): Promise<void> => {
+  const refreshMeals = useCallback(async (): Promise<void> => {
     if (token == null) return
 
     try {
@@ -65,7 +65,7 @@ export function useMeals (): UseMealsReturn {
     } finally {
       setLoading(false)
     }
-  }
+  }, [token])
 
   const createMeal = async (formData: MealFormData): Promise<void> => {
     if (token == null) throw new Error('No authentication token')
@@ -137,7 +137,7 @@ export function useMeals (): UseMealsReturn {
 
   useEffect(() => {
     void refreshMeals()
-  }, [token])
+  }, [refreshMeals])
 
   return {
     meals,

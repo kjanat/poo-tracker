@@ -25,7 +25,18 @@ export function BristolDistributionChart({ summary }: BristolDistributionChartPr
     color: bristolAnalyzer.getColor(item.type)
   }))
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  interface TooltipProps {
+    active?: boolean
+    payload?: Array<{
+      payload: {
+        type: number
+        description: string
+        count: number
+      }
+    }>
+  }
+
+  const CustomTooltip = ({ active, payload }: TooltipProps) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload
       return (
@@ -56,7 +67,7 @@ export function BristolDistributionChart({ summary }: BristolDistributionChartPr
             <Tooltip content={<CustomTooltip />} />
             <Bar 
               dataKey="count" 
-              fill={(entry: any) => entry.color || '#8B5CF6'}
+              fill={(entry: { color: string }) => entry.color || '#8B5CF6'}
               radius={[4, 4, 0, 0]}
             />
           </BarChart>

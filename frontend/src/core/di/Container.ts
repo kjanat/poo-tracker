@@ -1,4 +1,4 @@
-type Constructor<T = Record<string, unknown>> = new (...args: any[]) => T
+type Constructor<T = Record<string, unknown>> = new (...args: unknown[]) => T
 type ServiceIdentifier<T> = Constructor<T> | string | symbol
 
 interface ServiceBinding<T> {
@@ -8,7 +8,7 @@ interface ServiceBinding<T> {
 }
 
 export class DependencyContainer {
-  private readonly bindings = new Map<ServiceIdentifier<any>, ServiceBinding<any>>()
+  private readonly bindings = new Map<ServiceIdentifier<unknown>, ServiceBinding<unknown>>()
 
   bind<T>(identifier: ServiceIdentifier<T>): ServiceBuilder<T> {
     return new ServiceBuilder<T>(this, identifier)

@@ -21,7 +21,6 @@ export function MealForm ({
   loading,
   editingMeal,
   onCancel,
-  selectedImage,
   imagePreview,
   onImageChange,
   onRemoveImage

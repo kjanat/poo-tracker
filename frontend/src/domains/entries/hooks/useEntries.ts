@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { container } from '../../../core/services'
 import type { Entry, CreateEntryData } from '../types'
 
@@ -20,7 +20,7 @@ export function useEntries(): UseEntriesResult {
 
   const entryService = container.get('entryService')
 
-  const loadEntries = async (): Promise<void> => {
+  const loadEntries = useCallback(async (): Promise<void> => {
     try {
       setIsLoading(true)
       setError(null)
@@ -31,7 +31,7 @@ export function useEntries(): UseEntriesResult {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [entryService])
 
   const submitEntry = async (data: CreateEntryData): Promise<void> => {
     try {
@@ -63,7 +63,7 @@ export function useEntries(): UseEntriesResult {
 
   useEffect(() => {
     loadEntries()
-  }, [])
+  }, [loadEntries])
 
   return {
     entries,

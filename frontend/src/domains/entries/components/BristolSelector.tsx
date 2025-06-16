@@ -1,5 +1,5 @@
 import React, { type ReactElement } from 'react'
-import { BristolAnalyzer, BristolType } from '../../bristol/BristolAnalyzer'
+import { BristolAnalyzer } from '../../bristol/BristolAnalyzer'
 
 interface BristolSelectorProps {
   selectedType: number

@@ -1,5 +1,5 @@
 import type { ApiClient } from '../../core/api/ApiClient'
-import type { Meal, CreateMealRequest, UpdateMealRequest, MealListResponse } from './types'
+import type { Meal, CreateMealRequest, UpdateMealRequest } from './types'
 import type { Entry } from '../entries/types'
 
 export class MealService {
