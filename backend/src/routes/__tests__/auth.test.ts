@@ -97,7 +97,8 @@ describe('Auth Routes Integration Tests', () => {
           name: userData.name,
           auth: {
             create: {
-              password: expect.any(String) // Hashed password
+              passwordHash: expect.any(String), // Hashed password
+              salt: expect.any(String) // Salt
             }
           }
         }
@@ -135,7 +136,8 @@ describe('Auth Routes Integration Tests', () => {
           name: null, // When not provided, it should be null, not undefined
           auth: {
             create: {
-              password: expect.any(String)
+              passwordHash: expect.any(String),
+              salt: expect.any(String)
             }
           }
         }
@@ -238,10 +240,13 @@ describe('Auth Routes Integration Tests', () => {
       // Verify password was hashed
       const createCall = mockPrismaClient.user.create.mock.calls[0]?.[0]
       expect(createCall).toBeDefined()
-      const hashedPassword = createCall?.data.auth.create.password
+      const hashedPassword = createCall?.data.auth.create.passwordHash
+      const salt = createCall?.data.auth.create.salt
       expect(hashedPassword).toBeDefined()
+      expect(salt).toBeDefined()
       expect(hashedPassword).not.toBe(userData.password)
       expect(typeof hashedPassword).toBe('string')
+      expect(typeof salt).toBe('string')
     })
   })
 
@@ -258,7 +263,7 @@ describe('Auth Routes Integration Tests', () => {
         email: loginData.email,
         name: 'Test User',
         auth: {
-          password: 'hashed-password'
+          passwordHash: 'hashed-password'
         }
       }
 
@@ -286,7 +291,7 @@ describe('Auth Routes Integration Tests', () => {
         include: { auth: true }
       })
 
-      expect(bcrypt.compare).toHaveBeenCalledWith(loginData.password, user.auth.password)
+      expect(bcrypt.compare).toHaveBeenCalledWith(loginData.password, user.auth.passwordHash)
       expect(jwt.sign).toHaveBeenCalledWith({ userId: user.id }, config.jwt.secret, {
         expiresIn: config.jwt.expiresIn
       })
@@ -347,7 +352,7 @@ describe('Auth Routes Integration Tests', () => {
         email: loginData.email,
         name: 'Test User',
         auth: {
-          password: 'hashed-password'
+          passwordHash: 'hashed-password'
         }
       }
 
@@ -362,7 +367,7 @@ describe('Auth Routes Integration Tests', () => {
         error: 'Invalid credentials'
       })
 
-      expect(bcrypt.compare).toHaveBeenCalledWith(loginData.password, user.auth.password)
+      expect(bcrypt.compare).toHaveBeenCalledWith(loginData.password, user.auth.passwordHash)
     })
 
     it('should return 400 for invalid email format', async () => {

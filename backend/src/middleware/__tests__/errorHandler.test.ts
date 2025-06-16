@@ -26,6 +26,8 @@ describe('errorHandler middleware', () => {
 
     // Store original NODE_ENV
     originalNodeEnv = process.env.NODE_ENV
+    // Set NODE_ENV to test to ensure no stack traces in response
+    process.env.NODE_ENV = 'test'
   })
 
   afterEach(() => {

@@ -52,8 +52,8 @@
     "clean": "pnpm --recursive run clean",
 
     "format": "concurrently \"pnpm format:all\" \"pnpm format:ai\"",
-    "format:frontend": "pnpm --filter @poo-tracker/frontend run format",
-    "format:backend": "pnpm --filter @poo-tracker/backend run format",
+    "format:frontend": "prettier --write frontend",
+    "format:backend": "prettier --write backend",
     "format:ai": "uv run ruff format ai-service",
     "format:ai:check": "uv run ruff format ai-service --check",
     "format:all": "prettier --write .",
@@ -93,10 +93,12 @@
   },
   "lint-staged": {
     "backend/**/*.{ts,tsx,js,jsx}": [
-      "pnpm lint:fix:backend"
+      "pnpm type-check:backend",
+      "pnpm format:backend"
     ],
     "frontend/**/*.{ts,tsx,js,jsx}": [
-      "pnpm lint:fix:frontend"
+      "pnpm type-check:frontend",
+      "pnpm format:frontend"
     ],
     "ai-service/**/*.py": [
       "pnpm lint:fix:ai",
