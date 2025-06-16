@@ -8,12 +8,13 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     globals: false, // Require explicit imports
+    reporters: ['default', ['junit', { outputFile: './junit.xml' }]],
     coverage: {
       provider: 'v8',
       include: ['src/**/*.{ts,tsx}'],
       exclude: [
-        'src/**/*.d.ts', 
-        'src/main.tsx', 
+        'src/**/*.d.ts',
+        'src/main.tsx',
         'src/vite-env.d.ts',
         'src/test/**/*',
         'src/**/*.test.{ts,tsx}',

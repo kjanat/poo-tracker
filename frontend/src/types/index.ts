@@ -1,7 +1,7 @@
 export interface Meal {
   id: string
   name: string
-  category?: string
+  category?: 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK'
   description?: string
   cuisine?: string
   spicyLevel?: number
@@ -12,9 +12,28 @@ export interface Meal {
   photoUrl?: string
   mealTime: string
   createdAt: string
-  linkedEntries?: Entry[]
+  linkedBowelMovements?: BowelMovement[]
 }
 
+export interface BowelMovement {
+  id: string
+  bristolType: number
+  recordedAt: string
+  volume?: 'SMALL' | 'MEDIUM' | 'LARGE' | 'MASSIVE'
+  color?: 'BROWN' | 'DARK_BROWN' | 'LIGHT_BROWN' | 'YELLOW' | 'GREEN' | 'RED' | 'BLACK'
+  consistency?: 'SOLID' | 'SOFT' | 'LOOSE' | 'WATERY'
+  floaters: boolean
+  pain: number
+  strain: number
+  satisfaction: number
+  smell?: 'NONE' | 'MILD' | 'MODERATE' | 'STRONG' | 'TOXIC'
+  photoUrl?: string
+  notes?: string
+  createdAt: string
+  updatedAt: string
+}
+
+// Legacy interface for backward compatibility
 export interface Entry {
   id: string
   bristolType: number
@@ -27,7 +46,7 @@ export interface Entry {
 
 export interface MealFormData {
   name: string
-  category: string
+  category: 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK'
   description: string
   cuisine: string
   spicyLevel: number
@@ -38,6 +57,26 @@ export interface MealFormData {
   photoUrl?: string
 }
 
+export interface BowelMovementResponse {
+  id: string
+  bristolType: number
+  recordedAt: string
+  volume?: 'SMALL' | 'MEDIUM' | 'LARGE' | 'MASSIVE'
+  color?: 'BROWN' | 'DARK_BROWN' | 'LIGHT_BROWN' | 'YELLOW' | 'GREEN' | 'RED' | 'BLACK'
+  consistency?: 'SOLID' | 'SOFT' | 'LOOSE' | 'WATERY'
+  floaters: boolean
+  pain: number
+  strain: number
+  satisfaction: number
+  smell?: 'NONE' | 'MILD' | 'MODERATE' | 'STRONG' | 'TOXIC'
+  photoUrl?: string
+  notes?: string
+  createdAt: string
+  updatedAt: string
+  userId: string
+}
+
+// Legacy for backward compatibility
 export interface EntryResponse {
   id: string
   bristolType: number
@@ -68,4 +107,39 @@ export interface AnalyticsSummary {
     satisfaction?: number
   }>
   averageSatisfaction?: number
+}
+
+export interface Symptom {
+  id: string
+  userId: string
+  bowelMovementId?: string | null
+  createdAt: string
+  recordedAt: string
+  type: 'BLOATING' | 'CRAMPS' | 'NAUSEA' | 'HEARTBURN' | 'CONSTIPATION' | 'DIARRHEA' | 'GAS' | 'FATIGUE' | 'OTHER'
+  severity: number
+  notes?: string | null
+}
+
+export interface Medication {
+  id: string
+  userId: string
+  createdAt: string
+  updatedAt: string
+  name: string
+  dosage?: string | null
+  frequency?: string | null
+  startDate: string
+  endDate?: string | null
+  notes?: string | null
+}
+
+export interface UserSettings {
+  id: string
+  userId: string
+  timezone: string
+  reminderEnabled: boolean
+  reminderTime: string
+  dataRetentionDays: number
+  createdAt: string
+  updatedAt: string
 }

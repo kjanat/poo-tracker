@@ -73,8 +73,8 @@ router.get(
   '/:id',
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      if (!req.userId) {
-        res.status(401).json({ error: 'User not authenticated' })
+      if (!req.userId || !req.params.id) {
+        res.status(401).json({ error: 'User not authenticated or invalid request' })
         return
       }
 
@@ -110,7 +110,10 @@ router.post(
         return
       }
 
-      const request: CreateBowelMovementRequest = validationResult.data
+      const request: CreateBowelMovementRequest = {
+        ...validationResult.data,
+        recordedAt: validationResult.data.recordedAt ?? new Date()
+      }
       const bowelMovement = await bowelMovementService.create(request, req.userId)
 
       res.status(201).json(bowelMovement)
@@ -125,8 +128,8 @@ router.put(
   '/:id',
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      if (!req.userId) {
-        res.status(401).json({ error: 'User not authenticated' })
+      if (!req.userId || !req.params.id) {
+        res.status(401).json({ error: 'User not authenticated or invalid request' })
         return
       }
 
@@ -139,7 +142,7 @@ router.put(
         return
       }
 
-      const request: UpdateBowelMovementRequest = validationResult.data
+      const request = validationResult.data as UpdateBowelMovementRequest
       const bowelMovement = await bowelMovementService.update(req.params.id, request, req.userId)
 
       if (!bowelMovement) {
@@ -159,8 +162,8 @@ router.delete(
   '/:id',
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      if (!req.userId) {
-        res.status(401).json({ error: 'User not authenticated' })
+      if (!req.userId || !req.params.id) {
+        res.status(401).json({ error: 'User not authenticated or invalid request' })
         return
       }
 

@@ -35,7 +35,13 @@ async function addConstraints() {
   for (const constraint of constraints) {
     try {
       await prisma.$executeRawUnsafe(constraint);
-      console.log('✅ Added constraint:', constraint.split('ADD CONSTRAINT')[1].split('CHECK')[0].trim());
+      const constraintParts = constraint.split('ADD CONSTRAINT');
+      if (constraintParts.length > 1) {
+        const checkParts = constraintParts[1]?.split('CHECK');
+        if (checkParts && checkParts.length > 0) {
+          console.log('✅ Added constraint:', checkParts[0]?.trim());
+        }
+      }
     } catch (error) {
       console.error('❌ Failed to add constraint:', error);
     }

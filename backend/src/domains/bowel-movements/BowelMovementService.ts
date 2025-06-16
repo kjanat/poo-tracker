@@ -82,19 +82,22 @@ export class BowelMovementService {
     const bowelMovementData = BowelMovementFactory.createFromRequest(request, userId)
     
     const result = await this.prisma.bowelMovement.create({
-      data: {
-        ...bowelMovementData,
-        details: request.notes ? {
-          create: {
-            notes: BowelMovementFactory.sanitizeNotes(request.notes)
-          }
-        } : undefined
-      },
+      data: bowelMovementData,
       include: {
         details: true,
         symptoms: true
       }
     })
+
+    // Create details separately if notes exist
+    if (request.notes) {
+      await this.prisma.bowelMovementDetails.create({
+        data: {
+          bowelMovementId: result.id,
+          notes: BowelMovementFactory.sanitizeNotes(request.notes)
+        }
+      })
+    }
 
     return result
   }

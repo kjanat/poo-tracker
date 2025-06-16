@@ -37,7 +37,8 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12)
+    const salt = await bcrypt.genSalt(12)
+    const hashedPassword = await bcrypt.hash(password, salt)
 
     // Create user with separate auth record
     const user = await prisma.user.create({
@@ -46,7 +47,8 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
         name: name ?? null,
         auth: {
           create: {
-            password: hashedPassword
+            passwordHash: hashedPassword,
+            salt
           }
         }
       }
@@ -92,7 +94,7 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction): P
     }
 
     // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.auth.password)
+    const isPasswordValid = await bcrypt.compare(password, user.auth.passwordHash)
     if (!isPasswordValid) {
       res.status(401).json({ error: 'Invalid credentials' })
       return
@@ -206,17 +208,21 @@ router.put(
           return
         }
 
-        const isCurrentPasswordValid = await bcrypt.compare(currentPassword, userAuth.password)
+        const isCurrentPasswordValid = await bcrypt.compare(currentPassword, userAuth.passwordHash)
         if (!isCurrentPasswordValid) {
           res.status(400).json({ error: 'Current password is incorrect' })
           return
         }
 
         // Hash new password and update
-        const hashedNewPassword = await bcrypt.hash(newPassword, 12)
+        const salt = await bcrypt.genSalt(12)
+        const hashedNewPassword = await bcrypt.hash(newPassword, salt)
         await prisma.userAuth.update({
           where: { userId: req.userId },
-          data: { password: hashedNewPassword }
+          data: { 
+            passwordHash: hashedNewPassword,
+            salt: salt
+          }
         })
       }
 

@@ -3,7 +3,7 @@ export interface Meal {
   name: string
   description?: string | null
   mealTime: Date
-  category?: string | null
+  category?: 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK' | null
   cuisine?: string | null
   spicyLevel?: number | null
   fiberRich: boolean
@@ -20,7 +20,7 @@ export interface CreateMealRequest {
   name: string
   description?: string | null | undefined
   mealTime: Date
-  category?: string | null | undefined
+  category?: 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK' | null | undefined
   cuisine?: string | null | undefined
   spicyLevel?: number | null | undefined
   fiberRich?: boolean | undefined
@@ -37,7 +37,7 @@ export interface MealFilters {
   limit?: number
   sortBy?: string
   sortOrder?: 'asc' | 'desc'
-  category?: string
+  category?: 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK'
   dateFrom?: Date
   dateTo?: Date
   fiberRich?: boolean

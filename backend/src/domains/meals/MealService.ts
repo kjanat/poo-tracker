@@ -182,63 +182,63 @@ export class MealService {
     }
   }
 
-  async linkEntry (mealId: string, entryId: string, userId: string): Promise<boolean> {
-    // Verify the meal and entry belong to the user
-    const [meal, entry] = await Promise.all([
+  async linkBowelMovement (mealId: string, bowelMovementId: string, userId: string): Promise<boolean> {
+    // Verify the meal and bowel movement belong to the user
+    const [meal, bowelMovement] = await Promise.all([
       this.findById(mealId, userId),
-      this.prisma.entry.findFirst({ where: { id: entryId, userId } })
+      this.prisma.bowelMovement.findFirst({ where: { id: bowelMovementId, userId } })
     ])
 
-    if (!meal || !entry) {
+    if (!meal || !bowelMovement) {
       return false
     }
 
     // Check if already linked
-    const existing = await this.prisma.mealEntryRelation.findFirst({
-      where: { mealId, entryId }
+    const existing = await this.prisma.mealBowelMovementRelation.findFirst({
+      where: { mealId, bowelMovementId }
     })
 
     if (existing) {
       return false // Already linked
     }
 
-    await this.prisma.mealEntryRelation.create({
+    await this.prisma.mealBowelMovementRelation.create({
       data: {
         mealId,
-        entryId
+        bowelMovementId
       }
     })
     return true
   }
 
-  async unlinkEntry (mealId: string, entryId: string, userId: string): Promise<boolean> {
+  async unlinkBowelMovement (mealId: string, bowelMovementId: string, userId: string): Promise<boolean> {
     // Verify the meal belongs to the user
     const meal = await this.findById(mealId, userId)
     if (!meal) {
       return false
     }
 
-    const result = await this.prisma.mealEntryRelation.deleteMany({
+    const result = await this.prisma.mealBowelMovementRelation.deleteMany({
       where: {
         mealId,
-        entryId
+        bowelMovementId
       }
     })
 
     return result.count > 0
   }
 
-  async getLinkedEntries (mealId: string, userId: string): Promise<Entry[]> {
+  async getLinkedBowelMovements (mealId: string, userId: string): Promise<BowelMovement[]> {
     // Verify the meal belongs to the user
     const meal = await this.findById(mealId, userId)
     if (!meal) {
       return []
     }
 
-    const mealEntries = await this.prisma.mealEntryRelation.findMany({
+    const mealBowelMovements = await this.prisma.mealBowelMovementRelation.findMany({
       where: { mealId },
-      include: { entry: true }
+      include: { bowelMovement: true }
     })
-    return mealEntries.map((me: { entry: Entry }) => me.entry)
+    return mealBowelMovements.map((me: { bowelMovement: BowelMovement }) => me.bowelMovement)
   }
 }

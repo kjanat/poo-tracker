@@ -5,6 +5,13 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/__tests__/**/*.ts', 'src/**/?(*.)+(spec|test).ts'],
+    reporters: [
+      'default',
+      ["html", { outputFile: "./test-report.html" }],
+      ["text", { outputFile: "./test-report.txt" }],
+      ["junit", { outputFile: "./junit.xml" }],
+      ["json", { outputFile: "./test-report.json" }]
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov', 'html'],

@@ -18,7 +18,7 @@ const createMealSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
   mealTime: z.string().datetime(),
-  category: z.enum(['Breakfast', 'Lunch', 'Dinner', 'Snack']).optional(),
+  category: z.enum(['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK']).optional(),
   cuisine: z.string().optional(),
   spicyLevel: z.number().int().min(1).max(10).optional(),
   fiberRich: z.boolean().default(false),
@@ -197,7 +197,82 @@ router.delete(
   }
 )
 
-// POST /api/meals/:id/link-entry - Link an entry to a meal
+// POST /api/meals/:id/link-bowel-movement - Link a bowel movement to a meal
+router.post(
+  '/:id/link-bowel-movement',
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params
+      const { bowelMovementId } = req.body
+
+      if (!req.userId || !id || !bowelMovementId) {
+        res.status(400).json({ error: 'Invalid request - meal ID and bowel movement ID required' })
+        return
+      }
+
+      const success = await mealService.linkBowelMovement(id, bowelMovementId, req.userId)
+
+      if (!success) {
+        res.status(400).json({ error: 'Unable to link bowel movement to meal - meal/bowel movement not found or already linked' })
+        return
+      }
+
+      res.status(201).json({ message: 'Bowel movement linked to meal successfully' })
+    } catch (error) {
+      next(error)
+    }
+  }
+)
+
+// DELETE /api/meals/:id/unlink-bowel-movement - Unlink a bowel movement from a meal
+router.delete(
+  '/:id/unlink-bowel-movement',
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params
+      const { bowelMovementId } = req.body
+
+      if (!req.userId || !id || !bowelMovementId) {
+        res.status(400).json({ error: 'Invalid request - meal ID and bowel movement ID required' })
+        return
+      }
+
+      const success = await mealService.unlinkBowelMovement(id, bowelMovementId, req.userId)
+
+      if (!success) {
+        res.status(400).json({ error: 'Unable to unlink bowel movement from meal - meal not found or bowel movement not linked' })
+        return
+      }
+
+      res.json({ message: 'Bowel movement unlinked from meal successfully' })
+    } catch (error) {
+      next(error)
+    }
+  }
+)
+
+// GET /api/meals/:id/bowel-movements - Get all bowel movements linked to a meal
+router.get(
+  '/:id/bowel-movements',
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params
+
+      if (!req.userId || !id) {
+        res.status(400).json({ error: 'Invalid request - meal ID required' })
+        return
+      }
+
+      const bowelMovements = await mealService.getLinkedBowelMovements(id, req.userId)
+      res.json({ bowelMovements })
+    } catch (error) {
+      next(error)
+    }
+  }
+)
+
+// Legacy endpoints for backward compatibility
+// POST /api/meals/:id/link-entry - Link an entry (redirects to bowel movement)
 router.post(
   '/:id/link-entry',
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
@@ -210,7 +285,7 @@ router.post(
         return
       }
 
-      const success = await mealService.linkEntry(id, entryId, req.userId)
+      const success = await mealService.linkBowelMovement(id, entryId, req.userId)
 
       if (!success) {
         res.status(400).json({ error: 'Unable to link entry to meal - meal/entry not found or already linked' })
@@ -224,7 +299,7 @@ router.post(
   }
 )
 
-// DELETE /api/meals/:id/unlink-entry - Unlink an entry from a meal
+// DELETE /api/meals/:id/unlink-entry - Unlink an entry from a meal (redirects to bowel movement)
 router.delete(
   '/:id/unlink-entry',
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
@@ -237,7 +312,7 @@ router.delete(
         return
       }
 
-      const success = await mealService.unlinkEntry(id, entryId, req.userId)
+      const success = await mealService.unlinkBowelMovement(id, entryId, req.userId)
 
       if (!success) {
         res.status(400).json({ error: 'Unable to unlink entry from meal - meal not found or entry not linked' })
@@ -251,7 +326,7 @@ router.delete(
   }
 )
 
-// GET /api/meals/:id/entries - Get all entries linked to a meal
+// GET /api/meals/:id/entries - Get all entries linked to a meal (redirects to bowel movements)
 router.get(
   '/:id/entries',
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
@@ -263,9 +338,9 @@ router.get(
         return
       }
 
-      const linkedEntries = await mealService.getLinkedEntries(id, req.userId)
+      const linkedBowelMovements = await mealService.getLinkedBowelMovements(id, req.userId)
 
-      res.json(linkedEntries)
+      res.json(linkedBowelMovements)
     } catch (error) {
       next(error)
     }

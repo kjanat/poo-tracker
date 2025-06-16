@@ -9,6 +9,7 @@ import { config } from './config'
 import { errorHandler } from './middleware/errorHandler'
 import { authRoutes } from './routes/auth'
 import entryRoutes from './routes/entries'
+import bowelMovementsRoutes from './routes/bowel-movements'
 import { mealRoutes } from './routes/meals'
 import { uploadRoutes } from './routes/uploads'
 import { analyticsRoutes } from './routes/analytics'
@@ -52,7 +53,8 @@ app.get('/health', (_req, res) => {
 
 // API routes
 app.use('/api/auth', authRoutes)
-app.use('/api/entries', entryRoutes)
+app.use('/api/entries', entryRoutes) // Legacy route (redirects to bowel-movements)
+app.use('/api/bowel-movements', bowelMovementsRoutes)
 app.use('/api/meals', mealRoutes)
 app.use('/api/uploads', uploadRoutes)
 app.use('/api/analytics', analyticsRoutes)

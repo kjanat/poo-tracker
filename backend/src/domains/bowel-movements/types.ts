@@ -18,17 +18,17 @@ export interface BowelMovement {
 
 export interface CreateBowelMovementRequest {
   bristolType: number
-  recordedAt?: Date
-  volume?: 'SMALL' | 'MEDIUM' | 'LARGE' | 'MASSIVE'
-  color?: 'BROWN' | 'DARK_BROWN' | 'LIGHT_BROWN' | 'YELLOW' | 'GREEN' | 'RED' | 'BLACK'
-  consistency?: 'SOLID' | 'SOFT' | 'LOOSE' | 'WATERY'
-  floaters?: boolean
-  pain?: number
-  strain?: number
-  satisfaction?: number
-  photoUrl?: string
-  smell?: 'NONE' | 'MILD' | 'MODERATE' | 'STRONG' | 'TOXIC'
-  notes?: string
+  recordedAt?: Date | undefined
+  volume?: 'SMALL' | 'MEDIUM' | 'LARGE' | 'MASSIVE' | undefined
+  color?: 'BROWN' | 'DARK_BROWN' | 'LIGHT_BROWN' | 'YELLOW' | 'GREEN' | 'RED' | 'BLACK' | undefined
+  consistency?: 'SOLID' | 'SOFT' | 'LOOSE' | 'WATERY' | undefined
+  floaters?: boolean | undefined
+  pain?: number | undefined
+  strain?: number | undefined
+  satisfaction?: number | undefined
+  photoUrl?: string | undefined
+  smell?: 'NONE' | 'MILD' | 'MODERATE' | 'STRONG' | 'TOXIC' | undefined
+  notes?: string | undefined
 }
 
 export type UpdateBowelMovementRequest = Partial<CreateBowelMovementRequest>

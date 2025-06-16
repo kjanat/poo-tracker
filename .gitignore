@@ -531,3 +531,4 @@ docker-compose.override.yml
 **/*-old.*
 prisma-shit.md
 .docs/
+.trunk/
