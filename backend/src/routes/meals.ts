@@ -223,12 +223,10 @@ router.post(
       const success = await mealService.linkBowelMovement(id, bowelMovementId, req.userId)
 
       if (!success) {
-        res
-          .status(400)
-          .json({
-            error:
-              'Unable to link bowel movement to meal - meal/bowel movement not found or already linked'
-          })
+        res.status(400).json({
+          error:
+            'Unable to link bowel movement to meal - meal/bowel movement not found or already linked'
+        })
         return
       }
 
@@ -255,12 +253,10 @@ router.delete(
       const success = await mealService.unlinkBowelMovement(id, bowelMovementId, req.userId)
 
       if (!success) {
-        res
-          .status(400)
-          .json({
-            error:
-              'Unable to unlink bowel movement from meal - meal not found or bowel movement not linked'
-          })
+        res.status(400).json({
+          error:
+            'Unable to unlink bowel movement from meal - meal not found or bowel movement not linked'
+        })
         return
       }
 
