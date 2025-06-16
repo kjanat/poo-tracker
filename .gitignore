@@ -530,3 +530,4 @@ docker-compose.override.yml
 .vscode/
 **/*-old.*
 prisma-shit.md
+.docs/

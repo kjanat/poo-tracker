@@ -1,5 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// Prisma schema
+// Learn more: https://pris.ly/d/prisma-schema
 
 generator client {
     provider = "prisma-client-js"
@@ -15,7 +15,7 @@ datasource db {
  */
 model User {
     id        String   @id @default(cuid())
-    email     String   @unique
+    email     String   @unique // Email format validation is enforced in the application/service layer
     name      String?
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -27,6 +27,7 @@ model User {
     meals          Meal[]
     symptoms       Symptom[]
     medications    Medication[]
+    auditLogs      AuditLog[]
 
     @@index([createdAt]) // For user registration analytics
     @@map("users")
@@ -39,26 +40,25 @@ model UserAuth {
     id               String    @id @default(cuid())
     userId           String    @unique
     passwordHash     String // More explicit naming
-    salt             String // Add salt field
+    salt             String // Salt for hashing
     loginAttempts    Int       @default(0)
     lockedUntil      DateTime?
     lastLogin        DateTime?
     resetToken       String? // For password reset
     resetTokenExpiry DateTime?
     createdAt        DateTime  @default(now())
-    updatedAt        DateTime  @updatedAt // Prisma auto-updates this field on record modification
+    updatedAt        DateTime  @updatedAt // Auto‑updated on modification
 
     // Relations
     user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
     twoFactor UserTwoFactor?
-    // Note: Prisma automatically creates an index on userId (foreign key)
 
     @@index([resetToken])
     @@map("user_auth")
 }
 
 /**
- * Two-Factor Authentication (separated for better security architecture)
+ * Two‑Factor Authentication (separated for better security architecture)
  */
 model UserTwoFactor {
     id          String   @id @default(cuid())
@@ -80,15 +80,14 @@ model UserTwoFactor {
 model UserSettings {
     id                String   @id @default(cuid())
     userId            String   @unique
-    timezone          String   @default("UTC")
+    timezone          String   @default("UTC") // IANA timezone (e.g., "America/New_York")
     reminderEnabled   Boolean  @default(true)
-    reminderTime      String   @default("09:00") // Store as HH:MM format - required if reminders enabled
-    dataRetentionDays Int      @default(365)
+    reminderTime      String   @default("09:00") // HH:MM format (24‑hour) – validated in application layer
+    dataRetentionDays Int      @default(365) // Enforced by scheduled cleanup jobs
     createdAt         DateTime @default(now())
-    updatedAt         DateTime @updatedAt // Prisma auto-updates this field on record modification
+    updatedAt         DateTime @updatedAt
 
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-    // Note: Prisma automatically creates an index on userId (foreign key)
 
     @@map("user_settings")
 }
@@ -97,24 +96,25 @@ model UserSettings {
  * Main Bowel Movement Model
  */
 model BowelMovement {
-    id        String   @id @default(cuid())
-    userId    String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt // Prisma auto-updates this field on record modification
+    id         String   @id @default(cuid())
+    userId     String
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    recordedAt DateTime @default(now()) // User‑specified time in their timezone
 
-    // Bristol Stool Chart (1-7) - required for meaningful health tracking
+    // Bristol Stool Chart (1‑7)
     bristolType Int @db.SmallInt
 
-    // Physical characteristics (using enums for type safety)
+    // Physical characteristics
     volume      Volume?
     color       Color?
     consistency Consistency?
     floaters    Boolean      @default(false)
 
-    // Experience (1-10 scales) - required for comprehensive tracking
-    pain         Int @default(1) @db.SmallInt // 1-10 scale
-    strain       Int @default(1) @db.SmallInt // 1-10 scale  
-    satisfaction Int @default(5) @db.SmallInt // 1-10 scale
+    // Experience (1‑10 scales)
+    pain         Int @default(1) @db.SmallInt // 1‑10 scale
+    strain       Int @default(1) @db.SmallInt // 1‑10 scale
+    satisfaction Int @default(5) @db.SmallInt // 1‑10 scale
 
     // Optional fields
     photoUrl String?
@@ -125,11 +125,14 @@ model BowelMovement {
     details  BowelMovementDetails?
     meals    MealBowelMovementRelation[]
     symptoms Symptom[]
-    // Note: Prisma automatically creates an index on userId (foreign key)
 
-    @@index([userId, createdAt]) // Primary query pattern
-    @@index([createdAt]) // For date-based queries
-    @@index([bristolType]) // For health analytics
+    // Indexes
+    @@index([userId, createdAt])
+    @@index([userId, recordedAt])
+    @@index([createdAt])
+    @@index([bristolType])
+    @@index([pain])
+    @@index([satisfaction])
     @@map("bowel_movements")
 }
 
@@ -162,9 +165,9 @@ model Meal {
     mealTime    DateTime
 
     category MealCategory?
-    cuisine  String? // Italian, Mexican, Fast Food, etc.
+    cuisine  String?
 
-    spicyLevel Int?    @db.SmallInt // 1-10 scale
+    spicyLevel Int?    @db.SmallInt // 1‑10 scale
     fiberRich  Boolean @default(false)
     dairy      Boolean @default(false)
     gluten     Boolean @default(false)
@@ -173,23 +176,23 @@ model Meal {
     notes    String?
 
     // Relations
-    user           User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
-    bowelMovements MealBowelMovementRelation[]
+    user             User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    bowelMovements   MealBowelMovementRelation[]
+    symptomRelations MealSymptomRelation[]
 
-    @@index([userId, mealTime]) // Primary query pattern
-    @@index([mealTime]) // For chronological queries
+    @@index([userId, mealTime])
+    @@index([mealTime])
     @@map("meals")
 }
 
 /**
- * Junction table for many-to-many relationship between meals and bowel movements
+ * Junction table for many‑to‑many relationship between meals and bowel movements
  */
 model MealBowelMovementRelation {
     id              String @id @default(cuid())
     mealId          String
     bowelMovementId String
 
-    // Relations
     meal          Meal          @relation(fields: [mealId], references: [id], onDelete: Cascade)
     bowelMovement BowelMovement @relation(fields: [bowelMovementId], references: [id], onDelete: Cascade)
 
@@ -203,28 +206,33 @@ model MealBowelMovementRelation {
 model Symptom {
     id              String   @id @default(cuid())
     userId          String
-    bowelMovementId String? // Optional link to bowel movement
+    bowelMovementId String?
     createdAt       DateTime @default(now())
+    recordedAt      DateTime @default(now()) // User‑specified time in their timezone
 
     type     SymptomType
-    severity Int         @db.SmallInt // 1-10 scale
+    severity Int         @db.SmallInt // 1‑10 scale
     notes    String?
 
-    user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-    bowelMovement BowelMovement? @relation(fields: [bowelMovementId], references: [id], onDelete: SetNull)
+    user          User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+    bowelMovement BowelMovement?        @relation(fields: [bowelMovementId], references: [id], onDelete: SetNull)
+    meals         MealSymptomRelation[]
 
     @@index([userId, createdAt])
+    @@index([userId, recordedAt])
+    @@index([type])
+    @@index([severity])
     @@map("symptoms")
 }
 
 /**
- * Medication/Supplement Tracking
+ * Medication / Supplement Tracking
  */
 model Medication {
     id        String   @id @default(cuid())
     userId    String
     createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt // Prisma auto-updates this field on record modification
+    updatedAt DateTime @updatedAt
 
     name      String
     dosage    String?
@@ -234,16 +242,60 @@ model Medication {
     notes     String?
 
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-    // Note: Prisma automatically creates an index on userId (foreign key)
 
-    @@index([userId, startDate]) // For chronological queries
-    @@index([userId, endDate]) // For querying active medications by end date
+    @@index([userId, startDate])
+    @@index([userId, endDate])
     @@map("medications")
 }
 
 /**
+ * Junction table for many‑to‑many relationship between meals and symptoms
+ */
+model MealSymptomRelation {
+    id        String @id @default(cuid())
+    mealId    String
+    symptomId String
+
+    meal    Meal    @relation(fields: [mealId], references: [id], onDelete: Cascade)
+    symptom Symptom @relation(fields: [symptomId], references: [id], onDelete: Cascade)
+
+    @@unique([mealId, symptomId])
+    @@map("meal_symptom_relations")
+}
+
+/**
+ * Audit Trail for Record Changes
+ */
+model AuditLog {
+    id        String      @id @default(cuid())
+    userId    String
+    tableName String
+    recordId  String
+    action    AuditAction
+    oldValues Json?
+    newValues Json?
+    timestamp DateTime    @default(now())
+    ipAddress String?
+    userAgent String?
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId, timestamp])
+    @@index([tableName, recordId])
+    @@index([timestamp])
+    @@map("audit_logs")
+}
+
+enum AuditAction {
+    CREATE
+    UPDATE
+    DELETE
+
+    @@map("audit_action_enum")
+}
+
+/**
  * Enums for Data Validation & Type Safety
- * Note: @@map can be added to enums if you need database-level value mapping
  */
 enum Volume {
     SMALL
