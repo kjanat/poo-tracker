@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "audit_action_enum" AS ENUM ('CREATE', 'UPDATE', 'DELETE');
+
+-- CreateEnum
 CREATE TYPE "volume_enum" AS ENUM ('SMALL', 'MEDIUM', 'LARGE', 'MASSIVE');
 
 -- CreateEnum
@@ -77,6 +80,7 @@ CREATE TABLE "bowel_movements" (
     "userId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "recordedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "bristolType" SMALLINT NOT NULL,
     "volume" "volume_enum",
     "color" "color_enum",
@@ -137,6 +141,7 @@ CREATE TABLE "symptoms" (
     "userId" TEXT NOT NULL,
     "bowelMovementId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "recordedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "type" "symptom_type_enum" NOT NULL,
     "severity" SMALLINT NOT NULL,
     "notes" TEXT,
@@ -158,6 +163,31 @@ CREATE TABLE "medications" (
     "notes" TEXT,
 
     CONSTRAINT "medications_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "meal_symptom_relations" (
+    "id" TEXT NOT NULL,
+    "mealId" TEXT NOT NULL,
+    "symptomId" TEXT NOT NULL,
+
+    CONSTRAINT "meal_symptom_relations_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "audit_logs" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "tableName" TEXT NOT NULL,
+    "recordId" TEXT NOT NULL,
+    "action" "audit_action_enum" NOT NULL,
+    "oldValues" JSONB,
+    "newValues" JSONB,
+    "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "ipAddress" TEXT,
+    "userAgent" TEXT,
+
+    CONSTRAINT "audit_logs_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -182,10 +212,19 @@ CREATE UNIQUE INDEX "user_settings_userId_key" ON "user_settings"("userId");
 CREATE INDEX "bowel_movements_userId_createdAt_idx" ON "bowel_movements"("userId", "createdAt");
 
 -- CreateIndex
+CREATE INDEX "bowel_movements_userId_recordedAt_idx" ON "bowel_movements"("userId", "recordedAt");
+
+-- CreateIndex
 CREATE INDEX "bowel_movements_createdAt_idx" ON "bowel_movements"("createdAt");
 
 -- CreateIndex
 CREATE INDEX "bowel_movements_bristolType_idx" ON "bowel_movements"("bristolType");
+
+-- CreateIndex
+CREATE INDEX "bowel_movements_pain_idx" ON "bowel_movements"("pain");
+
+-- CreateIndex
+CREATE INDEX "bowel_movements_satisfaction_idx" ON "bowel_movements"("satisfaction");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "bowel_movement_details_bowelMovementId_key" ON "bowel_movement_details"("bowelMovementId");
@@ -203,10 +242,31 @@ CREATE UNIQUE INDEX "meal_bowel_movement_relations_mealId_bowelMovementId_key" O
 CREATE INDEX "symptoms_userId_createdAt_idx" ON "symptoms"("userId", "createdAt");
 
 -- CreateIndex
+CREATE INDEX "symptoms_userId_recordedAt_idx" ON "symptoms"("userId", "recordedAt");
+
+-- CreateIndex
+CREATE INDEX "symptoms_type_idx" ON "symptoms"("type");
+
+-- CreateIndex
+CREATE INDEX "symptoms_severity_idx" ON "symptoms"("severity");
+
+-- CreateIndex
 CREATE INDEX "medications_userId_startDate_idx" ON "medications"("userId", "startDate");
 
 -- CreateIndex
 CREATE INDEX "medications_userId_endDate_idx" ON "medications"("userId", "endDate");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "meal_symptom_relations_mealId_symptomId_key" ON "meal_symptom_relations"("mealId", "symptomId");
+
+-- CreateIndex
+CREATE INDEX "audit_logs_userId_timestamp_idx" ON "audit_logs"("userId", "timestamp");
+
+-- CreateIndex
+CREATE INDEX "audit_logs_tableName_recordId_idx" ON "audit_logs"("tableName", "recordId");
+
+-- CreateIndex
+CREATE INDEX "audit_logs_timestamp_idx" ON "audit_logs"("timestamp");
 
 -- AddForeignKey
 ALTER TABLE "user_auth" ADD CONSTRAINT "user_auth_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -240,3 +300,12 @@ ALTER TABLE "symptoms" ADD CONSTRAINT "symptoms_bowelMovementId_fkey" FOREIGN KE
 
 -- AddForeignKey
 ALTER TABLE "medications" ADD CONSTRAINT "medications_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "meal_symptom_relations" ADD CONSTRAINT "meal_symptom_relations_mealId_fkey" FOREIGN KEY ("mealId") REFERENCES "meals"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "meal_symptom_relations" ADD CONSTRAINT "meal_symptom_relations_symptomId_fkey" FOREIGN KEY ("symptomId") REFERENCES "symptoms"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "audit_logs" ADD CONSTRAINT "audit_logs_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
