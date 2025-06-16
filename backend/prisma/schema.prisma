@@ -45,15 +45,33 @@ model UserAuth {
     lastLogin        DateTime?
     resetToken       String? // For password reset
     resetTokenExpiry DateTime?
-    twoFactorSecret  String? // For 2FA
-    twoFactorEnabled Boolean   @default(false)
     createdAt        DateTime  @default(now())
-    updatedAt        DateTime  @updatedAt
+    updatedAt        DateTime  @updatedAt // Prisma auto-updates this field on record modification
 
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    // Relations
+    user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+    twoFactor UserTwoFactor?
+    // Note: Prisma automatically creates an index on userId (foreign key)
 
     @@index([resetToken])
     @@map("user_auth")
+}
+
+/**
+ * Two-Factor Authentication (separated for better security architecture)
+ */
+model UserTwoFactor {
+    id          String   @id @default(cuid())
+    userAuthId  String   @unique
+    secret      String // TOTP secret
+    enabled     Boolean  @default(false)
+    backupCodes String[] // Array of backup codes
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    userAuth UserAuth @relation(fields: [userAuthId], references: [id], onDelete: Cascade)
+
+    @@map("user_two_factor")
 }
 
 /**
@@ -64,12 +82,13 @@ model UserSettings {
     userId            String   @unique
     timezone          String   @default("UTC")
     reminderEnabled   Boolean  @default(true)
-    reminderTime      String? // Store as HH:MM format
+    reminderTime      String   @default("09:00") // Store as HH:MM format - required if reminders enabled
     dataRetentionDays Int      @default(365)
     createdAt         DateTime @default(now())
-    updatedAt         DateTime @updatedAt
+    updatedAt         DateTime @updatedAt // Prisma auto-updates this field on record modification
 
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    // Note: Prisma automatically creates an index on userId (foreign key)
 
     @@map("user_settings")
 }
@@ -81,9 +100,9 @@ model Entry {
     id        String   @id @default(cuid())
     userId    String
     createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    updatedAt DateTime @updatedAt // Prisma auto-updates this field on record modification
 
-    // Bristol Stool Chart (1-7)
+    // Bristol Stool Chart (1-7) - required for meaningful health tracking
     bristolType Int @db.SmallInt
 
     // Physical characteristics (using enums for type safety)
@@ -92,10 +111,10 @@ model Entry {
     consistency Consistency?
     floaters    Boolean      @default(false)
 
-    // Experience (1-10 scales)
-    pain         Int? @db.SmallInt
-    strain       Int? @db.SmallInt
-    satisfaction Int? @db.SmallInt
+    // Experience (1-10 scales) - required for comprehensive tracking
+    pain         Int @default(1) @db.SmallInt // 1-10 scale
+    strain       Int @default(1) @db.SmallInt // 1-10 scale  
+    satisfaction Int @default(5) @db.SmallInt // 1-10 scale
 
     // Optional fields
     photoUrl String?
@@ -106,6 +125,7 @@ model Entry {
     details  EntryDetails?
     meals    MealEntryRelation[]
     symptoms Symptom[]
+    // Note: Prisma automatically creates an index on userId (foreign key)
 
     @@index([userId, createdAt]) // Primary query pattern
     @@index([createdAt]) // For date-based queries
@@ -204,7 +224,7 @@ model Medication {
     id        String   @id @default(cuid())
     userId    String
     createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    updatedAt DateTime @updatedAt // Prisma auto-updates this field on record modification
 
     name      String
     dosage    String?
@@ -214,19 +234,24 @@ model Medication {
     notes     String?
 
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    // Note: Prisma automatically creates an index on userId (foreign key)
 
-    @@index([userId, startDate])
+    @@index([userId, startDate]) // For chronological queries
+    @@index([userId, endDate]) // For querying active medications by end date
     @@map("medications")
 }
 
 /**
  * Enums for Data Validation & Type Safety
+ * Note: @@map can be added to enums if you need database-level value mapping
  */
 enum Volume {
     SMALL
     MEDIUM
     LARGE
     MASSIVE
+
+    @@map("volume_enum")
 }
 
 enum Color {
@@ -237,6 +262,8 @@ enum Color {
     GREEN
     RED
     BLACK
+
+    @@map("color_enum")
 }
 
 enum Consistency {
@@ -244,6 +271,8 @@ enum Consistency {
     SOFT
     LOOSE
     WATERY
+
+    @@map("consistency_enum")
 }
 
 enum SmellLevel {
@@ -252,6 +281,8 @@ enum SmellLevel {
     MODERATE
     STRONG
     TOXIC
+
+    @@map("smell_level_enum")
 }
 
 enum MealCategory {
@@ -259,6 +290,8 @@ enum MealCategory {
     LUNCH
     DINNER
     SNACK
+
+    @@map("meal_category_enum")
 }
 
 enum SymptomType {
@@ -271,4 +304,6 @@ enum SymptomType {
     GAS
     FATIGUE
     OTHER
+
+    @@map("symptom_type_enum")
 }
