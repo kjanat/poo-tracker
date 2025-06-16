@@ -99,7 +99,7 @@ pnpm run docker:down # Stop all services
 
 # Testing & Linting
 pnpm run test  # Run all tests
-pnpm run lint  # Run linters
+pnpm run lint  # Run linters using the shared ESLint config
 pnpm run build # Build for production
 ```
 
@@ -117,7 +117,7 @@ poo-tracker/
 ### API Endpoints
 
 | Endpoint                 | Method   | Description                           |
-|--------------------------|----------|---------------------------------------|
+| ------------------------ | -------- | ------------------------------------- |
 | `/api/auth/register`     | `POST`   | Register a new user                   |
 | `/api/auth/login`        | `POST`   | Authenticate user                     |
 | `/api/entries`           | `GET`    | Get bowel movement entries            |
@@ -187,7 +187,7 @@ We encrypt your brown notes and hide them away. Nobody's reading your logs excep
 - TailwindCSS for styling (no CSS modules)
 - RESTful API design
 - Comprehensive test coverage
-- ESLint + Prettier (follow the config, don't "fix" it)
+- Shared ESLint + Prettier configuration at the repo root
 
 ## 🚀 Deployment
 
