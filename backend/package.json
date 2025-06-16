@@ -12,7 +12,7 @@
     "test": "eslint . && vitest run",
     "test:watch": "eslint . && vitest --watch",
     "test:coverage": "eslint . && vitest run --coverage",
-    "clean": "rimraf dist node_modules",
+    "clean": "pnpm --package=rimraf dlx rimraf dist node_modules",
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset",
     "db:seed": "tsx src/utils/seed.ts",

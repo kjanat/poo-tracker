@@ -13,7 +13,7 @@
     "test:watch": "eslint . && vitest --watch",
     "test:coverage": "eslint . && vitest run --coverage",
     "test:ui": "eslint . && vitest --ui",
-    "clean": "rimraf dist node_modules"
+    "clean": "pnpm --package=rimraf dlx rimraf dist node_modules"
   },
   "engines": {
     "node": ">=18.0.0"
