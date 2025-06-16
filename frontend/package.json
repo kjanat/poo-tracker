@@ -7,13 +7,13 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext .ts,.tsx",
-    "lint:fix": "eslint . --ext .ts,.tsx --fix",
-    "test": "eslint . --ext .ts,.tsx && vitest run",
-    "test:watch": "eslint . --ext .ts,.tsx && vitest --watch",
-    "test:coverage": "eslint . --ext .ts,.tsx && vitest run --coverage",
-    "test:ui": "eslint . --ext .ts,.tsx && vitest --ui",
-    "clean": "rm -rf dist node_modules"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "eslint . && vitest run",
+    "test:watch": "eslint . && vitest --watch",
+    "test:coverage": "eslint . && vitest run --coverage",
+    "test:ui": "eslint . && vitest --ui",
+    "clean": "rimraf dist node_modules"
   },
   "engines": {
     "node": ">=18.0.0"

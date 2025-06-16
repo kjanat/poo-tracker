@@ -1,94 +1,96 @@
-const {
-    defineConfig,
-    globalIgnores,
-} = require("eslint/config");
-
 const tsParser = require("@typescript-eslint/parser");
 const globals = require("globals");
 const typescriptEslint = require("@typescript-eslint/eslint-plugin");
 const react = require("eslint-plugin-react");
 const reactHooks = require("eslint-plugin-react-hooks");
 const _import = require("eslint-plugin-import");
+const eslintConfigPrettier = require("eslint-config-prettier");
 
 const {
     fixupPluginRules,
-    fixupConfigRules,
 } = require("@eslint/compat");
 
 const js = require("@eslint/js");
 
-const {
-    FlatCompat,
-} = require("@eslint/eslintrc");
+module.exports = [
+    // Global ignores
+    {
+        ignores: [
+            "**/dist/",
+            "**/build/",
+            "**/node_modules/",
+            "**/coverage/",
+            "**/*.d.ts",
+            "**/branding/",
+            "**/out/",
+            "**/.next/",
+        ],
+    },
 
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
-});
+    // Base config for all files
+    js.configs.recommended,
 
-module.exports = defineConfig([{
-    languageOptions: {
-        parser: tsParser,
-        ecmaVersion: "latest",
-        sourceType: "module",
-
-        parserOptions: {
-            project: ["./frontend/tsconfig.json", "./backend/tsconfig.json"],
-            tsconfigRootDir: __dirname,
+    // TypeScript files
+    {
+        files: [ "**/*.ts", "**/*.tsx" ],
+        languageOptions: {
+            parser: tsParser,
+            ecmaVersion: "latest",
+            sourceType: "module",
+            parserOptions: {
+                project: [ "./frontend/tsconfig.json", "./backend/tsconfig.json" ],
+                tsconfigRootDir: __dirname,
+                ecmaFeatures: {
+                    jsx: true,
+                },
+            },
+            globals: {
+                ...globals.browser,
+                ...globals.node,
+                React: "readonly",
+                JSX: "readonly",
+            },
         },
+        plugins: {
+            "@typescript-eslint": typescriptEslint,
+            react,
+            "react-hooks": fixupPluginRules(reactHooks),
+            import: fixupPluginRules(_import),
+        },
+        rules: {
+            // TypeScript recommended rules
+            ...typescriptEslint.configs.recommended.rules,
 
-        globals: {
-            ...globals.browser,
-            ...globals.node,
+            // React rules
+            ...react.configs.recommended.rules,
+            "react/react-in-jsx-scope": "off",
+
+            // React hooks rules
+            ...reactHooks.configs.recommended.rules,
+
+            // Import rules
+            "import/default": "off",
+            "import/no-unresolved": "error",
+            "import/named": "error",
+            "import/namespace": "error",
+            "import/no-absolute-path": "error",
+            "import/no-dynamic-require": "error",
+            "import/no-self-import": "error",
+            "import/no-cycle": "error",
+            "import/no-useless-path-segments": "error",
+        },
+        settings: {
+            react: {
+                version: "detect",
+            },
+            "import/resolver": {
+                typescript: {
+                    project: [ "./frontend/tsconfig.json", "./backend/tsconfig.json" ],
+                },
+            },
         },
     },
 
-    plugins: {
-        "@typescript-eslint": typescriptEslint,
-        react,
-        "react-hooks": fixupPluginRules(reactHooks),
-        import: fixupPluginRules(_import),
-    },
-
-    extends: fixupConfigRules(compat.extends(
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:react/recommended",
-        "plugin:react-hooks/recommended",
-        "plugin:import/recommended",
-        "plugin:import/typescript",
-        "prettier",
-    )),
-
-    settings: {
-        react: {
-            version: "detect",
-        },
-
-        "import/resolver": {
-            typescript: {},
-        },
-    },
-
-    rules: {
-        "react/react-in-jsx-scope": "off",
-        "import/default": "off",
-    },
-}, globalIgnores([
-    "**/dist/",
-    "**/build/",
-    "**/node_modules/",
-    "**/coverage/",
-    "**/*.d.ts",
-    "**/branding/",
-]), globalIgnores([
-    "**/node_modules",
-    "**/branding",
-    "**/dist",
-    "**/build",
-    "**/coverage",
-    "**/out",
-    "**/.next",
-    "**/*.js",
-])]);
+    // Prettier config (must be last to override other configs)
+    eslintConfigPrettier,
+];
