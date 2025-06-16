@@ -1,84 +1,186 @@
-import json
-import os
-from datetime import datetime, timedelta
+"""
+Enhanced FastAPI application for Poo Tracker AI Service.
+
+This is the main entry point for the AI service that provides intelligent
+analysis of bowel movement patterns, meal correlations, and health insights.
+"""
+
+import time
+from contextlib import asynccontextmanager
+from datetime import datetime
 from typing import Any
 
-import numpy as np
-import pandas as pd
 import redis
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
 
+from .config.logging import setup_logging, get_logger
+from .config.settings import get_settings
+from .models.requests import (
+    AnalysisRequest,
+    BowelMovementEntry,
+    MealEntry,
+    SymptomEntry,
+)
+from .models.responses import AnalysisResponse, HealthResponse, ErrorResponse
+from .models.database import BowelMovementData, MealData, SymptomData
+from .services.analyzer import AnalyzerService
+from .services.health_assessor import HealthAssessorService
+from .services.recommender import RecommenderService
+from .utils.cache import CacheManager
+from .utils.validators import DataValidator
+
+# Initialize logging
+setup_logging()
+logger = get_logger("main")
+
+# Get settings
+settings = get_settings()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan manager."""
+    logger.info("🚀 Starting Poo Tracker AI Service")
+
+    # Initialize services
+    app.state.cache_manager = CacheManager()
+    app.state.analyzer = AnalyzerService()
+    app.state.health_assessor = HealthAssessorService()
+    app.state.recommender = RecommenderService()
+    app.state.validator = DataValidator()
+
+    # Test Redis connection
+    try:
+        await app.state.cache_manager.ping()
+        logger.info("✅ Redis connection established")
+    except Exception as e:
+        logger.warning(f"⚠️ Redis connection failed: {e}")
+
+    logger.info("🎉 AI Service startup complete")
+    yield
+
+    # Cleanup
+    logger.info("🛑 Shutting down AI Service")
+    if hasattr(app.state, "cache_manager"):
+        await app.state.cache_manager.close()
+
+
+# Create FastAPI app
 app = FastAPI(
-    title="Poo Tracker AI Service",
+    title=settings.app_name,
     description="AI-powered analysis for bowel movement patterns and correlations",
-    version="1.0.0",
+    version=settings.app_version,
+    docs_url="/docs" if not settings.is_production else None,
+    redoc_url="/redoc" if not settings.is_production else None,
+    lifespan=lifespan,
 )
 
-# Redis connection with timeout and error handling
-redis_client = redis.from_url(
-    os.getenv("REDIS_URL", "redis://localhost:6379"),
-    socket_connect_timeout=5,
-    socket_timeout=5,
-    retry_on_timeout=True,
-    health_check_interval=30,
+# Add middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"] if settings.is_development else [settings.backend_url],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-
-class EntryData(BaseModel):
-    id: str
-    userId: str
-    bristolType: int
-    volume: str | None = None
-    color: str | None = None
-    consistency: str | None = None
-    floaters: bool = False
-    pain: int | None = None
-    strain: int | None = None
-    satisfaction: int | None = None
-    createdAt: str
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 
-class MealData(BaseModel):
-    id: str
-    userId: str
-    name: str
-    mealTime: str
-    category: str | None = None
-    spicyLevel: int | None = None
-    fiberRich: bool = False
-    dairy: bool = False
-    gluten: bool = False
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    """Add processing time to response headers."""
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
 
 
-class AnalysisRequest(BaseModel):
-    entries: list[EntryData]
-    meals: list[MealData]
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """Custom HTTP exception handler."""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=ErrorResponse(
+            error=exc.detail,
+            timestamp=datetime.now(),
+            request_id=getattr(request.state, "request_id", None),
+        ).dict(),
+    )
 
 
-class AnalysisResponse(BaseModel):
-    patterns: dict[str, Any]
-    correlations: dict[str, Any]
-    recommendations: list[str]
-    risk_factors: list[str]
-    bristol_trends: dict[str, Any]
+@app.exception_handler(Exception)
+async def general_exception_handler(request: Request, exc: Exception):
+    """General exception handler."""
+    logger.error(f"Unhandled exception: {exc}", exc_info=True)
+
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content=ErrorResponse(
+            error="Internal server error",
+            detail=str(exc) if settings.is_development else None,
+            timestamp=datetime.now(),
+        ).dict(),
+    )
 
 
-@app.get("/health")
+@app.get("/health", response_model=HealthResponse)
 async def health_check():
-    """Health check endpoint"""
-    # Check Redis connection without failing if Redis is unavailable
+    """
+    Health check endpoint.
+
+    Returns the current health status of the AI service including:
+    - Service status
+    - Redis connectivity
+    - ML model availability
+    - Performance metrics
+    """
+    start_time = time.time()
+
+    # Check Redis connection
     redis_connected = False
     try:
-        redis_connected = redis_client.ping()
-    except Exception:
-        # Redis connection failed, but service can still function
-        pass
+        redis_connected = await app.state.cache_manager.ping()
+    except Exception as e:
+        logger.warning(f"Redis health check failed: {e}")
 
+    # Check ML models (placeholder for now)
+    ml_models_loaded = True  # Would check actual model loading status
+
+    # Calculate response time
+    response_time_ms = (time.time() - start_time) * 1000
+
+    # Determine overall status
+    if redis_connected and ml_models_loaded:
+        status_val = "healthy"
+    elif ml_models_loaded:
+        status_val = "degraded"  # Service works but caching is unavailable
+    else:
+        status_val = "unhealthy"
+
+    return HealthResponse(
+        status=status_val,
+        redis_connected=redis_connected,
+        ml_models_loaded=ml_models_loaded,
+        response_time_ms=response_time_ms,
+        version=settings.app_version,
+    )
+
+
+@app.get("/")
+async def root():
+    """Root endpoint with service information."""
     return {
-        "status": "healthy",
-        "timestamp": datetime.now().isoformat(),
-        "redis_connected": redis_connected,
+        "service": settings.app_name,
+        "version": settings.app_version,
+        "status": "running",
+        "docs": "/docs",
+        "health": "/health",
+        "analysis": "/analyze",
     }
 
 
@@ -86,310 +188,184 @@ async def health_check():
 async def analyze_patterns(request: AnalysisRequest):
     """
     Analyze bowel movement patterns and correlations with meals.
-    This is where the AI magic happens, you magnificent bastard.
+
+    This endpoint performs comprehensive analysis including:
+    - Bristol Stool Chart pattern analysis
+    - Timing and frequency patterns
+    - Meal correlation analysis
+    - Health risk assessment
+    - Personalized recommendations
+
+    The analysis considers digestion time windows (6-48 hours) when
+    correlating meals with bowel movements.
     """
+    logger.info(f"Starting analysis for {len(request.entries)} entries")
+
     try:
-        if not request.entries:
+        # Validate input data
+        validation_result = app.state.validator.validate_analysis_request(request)
+        if not validation_result.is_valid:
             raise HTTPException(
-                status_code=400, detail="No entries provided for analysis"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Validation failed: {validation_result.errors}",
             )
 
-        # Convert to DataFrames for analysis
-        entries_df = pd.DataFrame([entry.dict() for entry in request.entries])
-        entries_df["createdAt"] = pd.to_datetime(entries_df["createdAt"])
+        # Check cache first
+        cache_key = await app.state.cache_manager.generate_analysis_cache_key(request)
+        cached_result = await app.state.cache_manager.get_analysis_result(cache_key)
 
-        meals_df = pd.DataFrame([meal.dict() for meal in request.meals])
-        if not meals_df.empty:
-            meals_df["mealTime"] = pd.to_datetime(meals_df["mealTime"])
+        if cached_result:
+            logger.info("Returning cached analysis result")
+            return AnalysisResponse(**cached_result)
 
-        # Perform analysis
-        analysis_result = perform_comprehensive_analysis(entries_df, meals_df)
-
-        # Cache results
-        cache_key = (
-            f"analysis:{request.entries[0].userId}:{datetime.now().strftime('%Y%m%d')}"
-        )
-        redis_client.setex(
-            cache_key, 3600, json.dumps(analysis_result)
-        )  # Cache for 1 hour
-
-        return AnalysisResponse(**analysis_result)
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}") from e
-
-
-def perform_comprehensive_analysis(
-    entries_df: pd.DataFrame, meals_df: pd.DataFrame
-) -> dict[str, Any]:
-    """
-    Perform comprehensive analysis of bowel movements and correlations.
-    """
-
-    # Bristol Stool Chart analysis
-    bristol_analysis = analyze_bristol_patterns(entries_df)
-
-    # Timing patterns
-    timing_patterns = analyze_timing_patterns(entries_df)
-
-    # Meal correlations (if meal data available)
-    meal_correlations = {}
-    if not meals_df.empty:
-        meal_correlations = analyze_meal_correlations(entries_df, meals_df)
-
-    # Generate recommendations
-    recommendations = generate_recommendations(entries_df, meals_df)
-
-    # Identify risk factors
-    risk_factors = identify_risk_factors(entries_df)
-
-    return {
-        "patterns": {
-            "timing": timing_patterns,
-            "frequency": calculate_frequency_stats(entries_df),
-            "consistency_trends": analyze_consistency_trends(entries_df),
-        },
-        "correlations": meal_correlations,
-        "recommendations": recommendations,
-        "risk_factors": risk_factors,
-        "bristol_trends": bristol_analysis,
-    }
-
-
-def analyze_bristol_patterns(df: pd.DataFrame) -> dict[str, Any]:
-    """Analyze Bristol Stool Chart patterns"""
-    bristol_counts = df["bristolType"].value_counts().sort_index()
-
-    # Bristol type descriptions
-    bristol_descriptions = {
-        1: "Severe constipation (hard lumps)",
-        2: "Mild constipation (lumpy sausage)",
-        3: "Normal (cracked sausage)",
-        4: "Ideal (smooth sausage)",
-        5: "Lacking fiber (soft blobs)",
-        6: "Mild diarrhea (fluffy pieces)",
-        7: "Severe diarrhea (watery)",
-    }
-
-    # Calculate percentages
-    total_entries = len(df)
-    bristol_percentages = (bristol_counts / total_entries * 100).round(2)
-
-    # Determine dominant pattern
-    most_common_type = bristol_counts.idxmax()
-
-    return {
-        "distribution": bristol_counts.to_dict(),
-        "percentages": bristol_percentages.to_dict(),
-        "most_common": {
-            "type": int(most_common_type),
-            "description": bristol_descriptions.get(
-                int(most_common_type), "Unknown type"
-            ),
-            "percentage": float(bristol_percentages[most_common_type]),
-        },
-        "health_indicator": assess_bristol_health(bristol_percentages),
-    }
-
-
-def analyze_timing_patterns(df: pd.DataFrame) -> dict[str, Any]:
-    """Analyze timing patterns of bowel movements"""
-    df["hour"] = df["createdAt"].dt.hour
-    df["day_of_week"] = df["createdAt"].dt.day_name()
-
-    hourly_distribution = df["hour"].value_counts().sort_index()
-    daily_distribution = df["day_of_week"].value_counts()
-
-    return {
-        "hourly_distribution": hourly_distribution.to_dict(),
-        "daily_distribution": daily_distribution.to_dict(),
-        "peak_hour": int(hourly_distribution.idxmax()),
-        "most_active_day": daily_distribution.idxmax(),
-    }
-
-
-def analyze_meal_correlations(
-    entries_df: pd.DataFrame, meals_df: pd.DataFrame
-) -> dict[str, Any]:
-    """Analyze correlations between meals and bowel movements"""
-    correlations: dict[str, Any] = {}
-
-    # Look for patterns within 24 hours of meals
-    for _, meal in meals_df.iterrows():
-        meal_time = meal["mealTime"]
-
-        # Find entries within 6-48 hours after meal (digestion time)
-        time_window_start = meal_time + timedelta(hours=6)
-        time_window_end = meal_time + timedelta(hours=48)
-
-        related_entries = entries_df[
-            (entries_df["createdAt"] >= time_window_start)
-            & (entries_df["createdAt"] <= time_window_end)
+        # Convert request models to internal data models
+        bowel_movements = [
+            BowelMovementData(
+                id=entry.id,
+                user_id=entry.user_id,
+                bristol_type=entry.bristol_type,
+                volume=entry.volume,
+                color=entry.color,
+                consistency=entry.consistency,
+                floaters=entry.floaters,
+                pain=entry.pain,
+                strain=entry.strain,
+                satisfaction=entry.satisfaction,
+                created_at=entry.created_at,
+                recorded_at=entry.recorded_at,
+            )
+            for entry in request.entries
         ]
 
-        if not related_entries.empty:
-            # Analyze bristol types following this meal type
-            if meal["category"] not in correlations:
-                correlations[meal["category"]] = {
-                    "bristol_avg": [],
-                    "satisfaction_avg": [],
-                    "pain_avg": [],
-                }
-
-            correlations[meal["category"]]["bristol_avg"].extend(
-                related_entries["bristolType"].tolist()
+        meals = [
+            MealData(
+                id=meal.id,
+                user_id=meal.user_id,
+                name=meal.name,
+                meal_time=meal.meal_time,
+                category=meal.category,
+                cuisine=meal.cuisine,
+                spicy_level=meal.spicy_level,
+                fiber_rich=meal.fiber_rich,
+                dairy=meal.dairy,
+                gluten=meal.gluten,
+                created_at=meal.created_at,
             )
-            if "satisfaction" in related_entries.columns:
-                correlations[meal["category"]]["satisfaction_avg"].extend(
-                    related_entries["satisfaction"].dropna().tolist()
-                )
-            if "pain" in related_entries.columns:
-                correlations[meal["category"]]["pain_avg"].extend(
-                    related_entries["pain"].dropna().tolist()
-                )
+            for meal in request.meals
+        ]
 
-    # Calculate averages
-    for category in correlations:
-        if correlations[category]["bristol_avg"]:
-            correlations[category]["avg_bristol"] = np.mean(
-                correlations[category]["bristol_avg"]
+        symptoms = [
+            SymptomData(
+                id=symptom.id,
+                user_id=symptom.user_id,
+                bowel_movement_id=symptom.bowel_movement_id,
+                type=symptom.type,
+                severity=symptom.severity,
+                notes=symptom.notes,
+                created_at=symptom.created_at,
+                recorded_at=symptom.recorded_at,
             )
-        if correlations[category]["satisfaction_avg"]:
-            correlations[category]["avg_satisfaction"] = np.mean(
-                correlations[category]["satisfaction_avg"]
-            )
-        if correlations[category]["pain_avg"]:
-            correlations[category]["avg_pain"] = np.mean(
-                correlations[category]["pain_avg"]
-            )
+            for symptom in request.symptoms
+        ]
 
-    return correlations
-
-
-def calculate_frequency_stats(df: pd.DataFrame) -> dict[str, Any]:
-    """Calculate frequency statistics"""
-    df["date"] = df["createdAt"].dt.date
-    daily_counts = df.groupby("date").size()
-
-    return {
-        "avg_daily": float(daily_counts.mean()),
-        "max_daily": int(daily_counts.max()),
-        "min_daily": int(daily_counts.min()),
-        "total_days": len(daily_counts),
-        "total_entries": len(df),
-    }
-
-
-def analyze_consistency_trends(df: pd.DataFrame) -> dict[str, Any]:
-    """Analyze consistency trends over time"""
-    if "consistency" not in df.columns:
-        return {}
-
-    consistency_counts = df["consistency"].value_counts()
-    return {
-        "distribution": consistency_counts.to_dict(),
-        "most_common": (
-            consistency_counts.idxmax() if not consistency_counts.empty else None
-        ),
-    }
-
-
-def generate_recommendations(
-    entries_df: pd.DataFrame, meals_df: pd.DataFrame
-) -> list[str]:
-    """Generate personalized recommendations based on patterns"""
-    recommendations = []
-
-    # Bristol type recommendations
-    avg_bristol = entries_df["bristolType"].mean()
-
-    if avg_bristol < 3:
-        recommendations.extend(
-            [
-                "Consider increasing fiber intake - you might be constipated",
-                "Try drinking more water throughout the day",
-                "Consider adding prunes or other natural laxatives to your diet",
-            ]
-        )
-    elif avg_bristol > 5:
-        recommendations.extend(
-            [
-                "Your stool is quite loose - consider reducing dairy or high-fat foods",
-                "You might want to increase binding foods like bananas and rice",
-                "Consider keeping a detailed food diary to identify triggers",
-            ]
-        )
-    else:
-        recommendations.append(
-            "Your Bristol scores look healthy overall! Keep doing what you're doing."
+        # Perform core analysis
+        analysis_result = await app.state.analyzer.analyze_comprehensive_patterns(
+            bowel_movements=bowel_movements,
+            meals=meals if meals else None,
+            symptoms=symptoms if symptoms else None,
+            user_id=bowel_movements[0].user_id if bowel_movements else None,
         )
 
-    # Frequency recommendations
-    daily_avg = len(entries_df) / max(
-        1, (entries_df["createdAt"].max() - entries_df["createdAt"].min()).days + 1
-    )
-
-    if daily_avg < 0.5:
-        recommendations.append(
-            "You're not pooping very often - increase fiber and water intake"
-        )
-    elif daily_avg > 3:
-        recommendations.append(
-            "You're pooping quite frequently - monitor for any digestive issues"
-        )
-
-    # Pain recommendations
-    if "pain" in entries_df.columns and entries_df["pain"].notna().any():
-        avg_pain = entries_df["pain"].dropna().mean()
-        if avg_pain > 5:
-            recommendations.append(
-                "You're experiencing significant pain - consider consulting a healthcare provider"
+        # Generate health assessment
+        health_score = None
+        if request.include_predictions:
+            health_score = await app.state.health_assessor.calculate_health_score(
+                bowel_movements=bowel_movements,
+                symptoms=symptoms if symptoms else None,
             )
 
-    return recommendations
+        # Generate recommendations
+        recommendations = []
+        risk_factors = []
+        if request.include_recommendations:
+            recommendations = await app.state.recommender.generate_recommendations(
+                analysis_result=analysis_result,
+                bowel_movements=bowel_movements,
+                meals=meals if meals else None,
+            )
 
+            risk_factors = await app.state.recommender.identify_risk_factors(
+                bowel_movements=bowel_movements,
+                analysis_result=analysis_result,
+            )
 
-def identify_risk_factors(df: pd.DataFrame) -> list[str]:
-    """Identify potential risk factors based on patterns"""
-    risk_factors = []
-
-    # Check for extreme Bristol types
-    extreme_bristol = df[df["bristolType"].isin([1, 2, 6, 7])]
-    if len(extreme_bristol) / len(df) > 0.3:
-        risk_factors.append(
-            "High frequency of extreme Bristol types (chronic constipation or diarrhea)"
+        # Create response
+        response = AnalysisResponse(
+            patterns=analysis_result["patterns"],
+            correlations=analysis_result["correlations"],
+            bristol_trends=analysis_result["bristol_analysis"],
+            recommendations=recommendations,
+            risk_factors=risk_factors,
+            health_score=health_score,
+            predictions=None,  # Would be populated by ML models
+            analysis_metadata=analysis_result["metadata"],
         )
 
-    # Check for high pain scores
-    if "pain" in df.columns and df["pain"].notna().any():
-        high_pain_entries = df[df["pain"] > 7]
-        if len(high_pain_entries) / len(df.dropna(subset=["pain"])) > 0.2:
-            risk_factors.append("Frequent high pain scores during bowel movements")
+        # Cache the result
+        await app.state.cache_manager.cache_analysis_result(
+            cache_key, response.dict(), ttl=settings.cache_ttl
+        )
 
-    # Check for very low satisfaction
-    if "satisfaction" in df.columns and df["satisfaction"].notna().any():
-        low_satisfaction = df[df["satisfaction"] < 3]
-        if len(low_satisfaction) / len(df.dropna(subset=["satisfaction"])) > 0.4:
-            risk_factors.append("Consistently low satisfaction with bowel movements")
+        logger.info("Analysis completed successfully")
+        return response
 
-    return risk_factors
+    except ValueError as e:
+        logger.error(f"Validation error: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except Exception as e:
+        logger.error(f"Analysis failed: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Analysis failed: {str(e)}",
+        )
 
 
-def assess_bristol_health(percentages: pd.Series) -> str:
-    """Assess overall digestive health based on Bristol distribution"""
-    healthy_range = percentages.get(3, 0) + percentages.get(4, 0)  # Types 3-4 are ideal
+@app.get("/metrics")
+async def get_metrics():
+    """Get service metrics (for monitoring)."""
+    if not settings.is_development:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Metrics endpoint not available in production",
+        )
 
-    if healthy_range > 70:
-        return "Excellent - Your bowel movements are consistently healthy"
-    elif healthy_range > 50:
-        return "Good - Mostly healthy with some room for improvement"
-    elif healthy_range > 30:
-        return "Fair - Consider dietary adjustments for better digestive health"
-    else:
-        return "Poor - Significant digestive issues detected, consider medical consultation"
+    try:
+        cache_stats = await app.state.cache_manager.get_cache_stats()
+
+        return {
+            "service_name": settings.app_name,
+            "version": settings.app_version,
+            "uptime": time.time(),  # Would calculate actual uptime
+            "cache_stats": cache_stats,
+            "settings": {
+                "environment": settings.environment,
+                "debug": settings.debug,
+                "ml_enabled": settings.enable_ml_features,
+            },
+        }
+    except Exception as e:
+        logger.error(f"Metrics retrieval failed: {e}")
+        return {"error": "Metrics unavailable"}
 
 
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(
+        "ai_service.main:app",
+        host=settings.host,
+        port=settings.port,
+        reload=settings.is_development,
+        log_level=settings.log_level.lower(),
+        workers=1 if settings.is_development else settings.workers,
+    )

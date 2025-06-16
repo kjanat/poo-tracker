@@ -14,6 +14,7 @@ dependencies = [
     "numpy==2.3.0",
     "pandas==2.3.0",
     "pydantic==2.11.7",
+    "pydantic-settings==2.6.1",
     "python-dotenv==1.1.0",
     "python-multipart==0.0.20",
     "redis==6.2.0",
@@ -33,7 +34,7 @@ dev = [
 ]
 
 [project.scripts]
-ai-service = "ai_service:main"
+ai-service = "ai_service.main:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -109,8 +110,3 @@ testpaths = [
     ".",
 ]
 asyncio_mode = "auto"
-
-# [tool.uv.workspace]
-# members = [
-#     "ai-service",
-# ]
