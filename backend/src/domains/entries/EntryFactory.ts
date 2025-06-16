@@ -19,24 +19,24 @@ export class EntryFactory {
       smell: request.smell ?? null,
       photoUrl: request.photoUrl ?? null,
       userId
-    };
+    }
   }
 
   validateBristolType (type: number): boolean {
-    return Number.isInteger(type) && type >= 1 && type <= 7;
+    return Number.isInteger(type) && type >= 1 && type <= 7
   }
 
   validateRating (rating: number | null | undefined): boolean {
-    if (rating == null) return true;
-    return Number.isInteger(rating) && rating >= 1 && rating <= 10;
+    if (rating == null) return true
+    return Number.isInteger(rating) && rating >= 1 && rating <= 10
   }
 
   validateEnumValue<T extends string> (
     value: string | undefined,
     allowedValues: readonly T[]
   ): value is T | undefined {
-    if (value === undefined) return true;
-    return allowedValues.includes(value as T);
+    if (value === undefined) return true
+    return allowedValues.includes(value as T)
   }
 
   getDefaultValues (): Partial<CreateEntryRequest> {
@@ -44,14 +44,14 @@ export class EntryFactory {
       bristolType: 4,
       floaters: false,
       notes: ''
-    };
+    }
   }
 
   sanitizeNotes (notes: string | null | undefined): string | undefined {
-    if (!notes) return undefined;
-    const sanitized = notes.trim().substring(0, 1000);
-    return sanitized.length > 0 ? sanitized : undefined;
+    if (!notes) return undefined
+    const sanitized = notes.trim().substring(0, 1000)
+    return sanitized.length > 0 ? sanitized : undefined
   }
 }
 
-export default EntryFactory;
+export default EntryFactory
