@@ -4,16 +4,8 @@ export class EntryFactory {
   static createEmpty(): CreateEntryRequest {
     return {
       bristolType: 4,
-      volume: undefined,
-      color: undefined,
-      consistency: undefined,
       notes: '',
-      satisfaction: undefined,
-      pain: undefined,
-      strain: undefined,
       floaters: false,
-      smell: undefined,
-      photoUrl: undefined
     }
   }
 
@@ -23,7 +15,8 @@ export class EntryFactory {
       volume: '',
       color: '',
       notes: '',
-      photo: undefined
+      photo: null,
+      floaters: false,
     }
   }
 
@@ -42,38 +35,76 @@ export class EntryFactory {
       return undefined
     }
 
-    return {
+    const result: CreateEntryRequest = {
       bristolType: getNumberValue('bristolType') ?? 4,
-      volume: getValue('volume'),
-      color: getValue('color'),
-      consistency: getValue('consistency'),
       notes: getValue('notes') ?? '',
-      satisfaction: getNumberValue('satisfaction'),
-      pain: getNumberValue('pain'),
-      strain: getNumberValue('strain'),
       floaters: Boolean(formData.floaters),
-      smell: getValue('smell'),
-      photoUrl: getValue('photoUrl')
     }
+
+    // Only add optional properties if they have values
+    const volume = getValue('volume')
+    if (volume) result.volume = volume
+
+    const color = getValue('color')
+    if (color) result.color = color
+
+    const consistency = getValue('consistency')
+    if (consistency) result.consistency = consistency
+
+    const satisfaction = getNumberValue('satisfaction')
+    if (satisfaction !== undefined) result.satisfaction = satisfaction
+
+    const pain = getNumberValue('pain')
+    if (pain !== undefined) result.pain = pain
+
+    const strain = getNumberValue('strain')
+    if (strain !== undefined) result.strain = strain
+
+    const smell = getValue('smell')
+    if (smell) result.smell = smell
+
+    const photoUrl = getValue('photoUrl')
+    if (photoUrl) result.photoUrl = photoUrl
+
+    return result
   }
 
   static createUpdatePayload(
     current: Entry,
     updates: Partial<CreateEntryRequest>
   ): CreateEntryRequest {
-    return {
+    const result: CreateEntryRequest = {
       bristolType: updates.bristolType ?? current.bristolType,
-      volume: updates.volume ?? current.volume,
-      color: updates.color ?? current.color,
-      consistency: updates.consistency ?? current.consistency,
-      notes: updates.notes ?? current.notes,
-      satisfaction: updates.satisfaction ?? current.satisfaction,
-      pain: updates.pain ?? current.pain,
-      strain: updates.strain ?? current.strain,
-      floaters: updates.floaters ?? current.floaters,
-      smell: updates.smell ?? current.smell,
-      photoUrl: updates.photoUrl ?? current.photoUrl
+      notes: updates.notes ?? current.notes ?? '',
+      floaters: updates.floaters ?? current.floaters ?? false,
     }
+
+    // Only add optional properties if they have values
+    const volume = updates.volume ?? current.volume
+    if (volume) result.volume = volume
+
+    const color = updates.color ?? current.color
+    if (color) result.color = color
+
+    const consistency = updates.consistency ?? current.consistency
+    if (consistency) result.consistency = consistency
+
+    const satisfaction = updates.satisfaction ?? current.satisfaction
+    if (satisfaction !== undefined) result.satisfaction = satisfaction
+
+    const pain = updates.pain ?? current.pain
+    if (pain !== undefined) result.pain = pain
+
+    const strain = updates.strain ?? current.strain
+    if (strain !== undefined) result.strain = strain
+
+    const smell = updates.smell ?? current.smell
+    if (smell) result.smell = smell
+
+    const photoUrl = updates.photoUrl ?? current.photoUrl
+    if (photoUrl) result.photoUrl = photoUrl
+
+    return result
   }
 
   static validateBristolType(type: number): boolean {

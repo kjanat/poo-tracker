@@ -4,11 +4,11 @@ interface EntryDetailsFormProps {
   volume: string
   color: string
   notes: string
-  photo?: File
+  photo: File | null
   onVolumeChange: (volume: string) => void
   onColorChange: (color: string) => void
   onNotesChange: (notes: string) => void
-  onPhotoChange: (photo: File | undefined) => void
+  onPhotoChange: (photo: File | null) => void
   disabled?: boolean
 }
 
@@ -24,7 +24,7 @@ export function EntryDetailsForm({
   disabled = false
 }: EntryDetailsFormProps): ReactElement {
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0] || null
     onPhotoChange(file)
   }
 

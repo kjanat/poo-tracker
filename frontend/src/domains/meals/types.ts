@@ -1,7 +1,7 @@
 export interface Meal {
   id: string
   name: string
-  category?: string
+  category?: 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK'
   description?: string
   cuisine?: string
   spicyLevel?: number
@@ -17,10 +17,10 @@ export interface Meal {
 
 export interface CreateMealRequest {
   name: string
-  category?: string
+  category: 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK'
   description?: string
   cuisine?: string
-  spicyLevel?: number
+  spicyLevel: number
   fiberRich: boolean
   dairy: boolean
   gluten: boolean

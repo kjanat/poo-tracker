@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { container } from '../../../core/services'
-import type { Entry, CreateEntryData } from '../types'
+import type { Entry, CreateEntryData, CreateEntryRequest } from '../types'
 import type { EntryService } from '../EntryService'
 
 export interface UseEntriesResult {
@@ -38,7 +38,23 @@ export function useEntries(): UseEntriesResult {
     try {
       setIsSubmitting(true)
       setError(null)
-      await entryService.createEntry(data)
+      
+      // Convert CreateEntryData to CreateEntryRequest
+      const requestData: CreateEntryRequest = {
+        bristolType: data.bristolType,
+        notes: data.notes,
+        floaters: data.floaters ?? false,
+      }
+
+      // Only add optional properties if they have values
+      if (data.volume && data.volume.trim()) requestData.volume = data.volume
+      if (data.color && data.color.trim()) requestData.color = data.color
+      if (data.satisfaction !== undefined) requestData.satisfaction = data.satisfaction
+      if (data.pain !== undefined) requestData.pain = data.pain
+      if (data.strain !== undefined) requestData.strain = data.strain
+      if (data.smell) requestData.smell = data.smell
+      
+      await entryService.createEntry(requestData)
       await loadEntries() // Refresh the list
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create entry')

@@ -19,11 +19,11 @@ export interface CreateEntryRequest {
   volume?: string
   color?: string
   consistency?: string
-  notes?: string
+  notes: string
   satisfaction?: number
   pain?: number
   strain?: number
-  floaters?: boolean
+  floaters: boolean
   smell?: string
   photoUrl?: string
 }
@@ -52,8 +52,13 @@ export interface EntryFilters {
 
 export interface CreateEntryData {
   bristolType: number
-  volume?: string
-  color?: string
-  notes?: string
-  photo?: File
+  volume: string
+  color: string
+  notes: string
+  photo: File | null
+  floaters?: boolean
+  satisfaction?: number
+  pain?: number
+  strain?: number
+  smell?: string
 }

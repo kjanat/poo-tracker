@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { BrowserRouter } from 'react-router-dom'
-import App from './App'
+import App from '@/App'
 
 // Wrapper for tests that need routing
 const AppWithRouter = () => (

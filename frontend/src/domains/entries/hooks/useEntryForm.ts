@@ -27,13 +27,22 @@ export function useEntryForm(): UseEntryFormResult {
 
   const startEditing = (entry: Entry): void => {
     setEditingEntry(entry)
-    setFormData({
+    const newFormData: CreateEntryData = {
       bristolType: entry.bristolType,
       volume: entry.volume || '',
       color: entry.color || '',
       notes: entry.notes || '',
-      photo: undefined // Photo editing not supported in this version
-    })
+      photo: null, // Photo editing not supported in this version
+      floaters: entry.floaters ?? false,
+    }
+
+    // Only add optional properties if they have values
+    if (entry.satisfaction !== undefined) newFormData.satisfaction = entry.satisfaction
+    if (entry.pain !== undefined) newFormData.pain = entry.pain
+    if (entry.strain !== undefined) newFormData.strain = entry.strain
+    if (entry.smell) newFormData.smell = entry.smell
+
+    setFormData(newFormData)
   }
 
   const cancelEditing = (): void => {

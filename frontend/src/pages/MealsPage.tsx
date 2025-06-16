@@ -18,7 +18,8 @@ export function MealsPage(): ReactElement {
     fiberRich: false,
     dairy: false,
     gluten: false,
-    notes: ''
+    notes: '',
+    photoUrl: ''
   })
   const [editingMeal, setEditingMeal] = useState<Meal | null>(null)
   const [linkingMeal, setLinkingMeal] = useState<Meal | null>(null)
@@ -58,7 +59,8 @@ export function MealsPage(): ReactElement {
       fiberRich: false,
       dairy: false,
       gluten: false,
-      notes: ''
+      notes: '',
+      photoUrl: ''
     })
     removeImage()
     setEditingMeal(null)
@@ -72,7 +74,7 @@ export function MealsPage(): ReactElement {
     try {
       // Upload image if selected
       const photoUrl = await uploadImage()
-      const finalFormData = { ...formData, photoUrl: photoUrl ?? undefined }
+      const finalFormData = { ...formData, photoUrl: photoUrl ?? '' }
 
       if (editingMeal != null) {
         await updateMeal(editingMeal.id, finalFormData)
@@ -90,7 +92,7 @@ export function MealsPage(): ReactElement {
   const startEdit = (meal: Meal): void => {
     setFormData({
       name: meal.name,
-      category: meal.category ?? '',
+      category: (meal.category ?? '') as 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK' | '',
       description: meal.description ?? '',
       cuisine: meal.cuisine ?? '',
       spicyLevel: meal.spicyLevel ?? 1,
@@ -98,7 +100,7 @@ export function MealsPage(): ReactElement {
       dairy: meal.dairy,
       gluten: meal.gluten,
       notes: meal.notes ?? '',
-      photoUrl: meal.photoUrl
+      photoUrl: meal.photoUrl ?? ''
     })
     setEditingMeal(meal)
 

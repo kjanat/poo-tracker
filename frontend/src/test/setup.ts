@@ -1,21 +1,22 @@
-import '@testing-library/jest-dom'
-import { vi } from 'vitest'
+import { expect, vi } from 'vitest'
+import matchers from '@testing-library/jest-dom/matchers'
 
-// Global test utilities for your health app
+// Extend Vitest's expect with jest-dom matchers
+expect.extend(matchers)
+
+// Global mocks
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn()
 }))
 
-// Mock IntersectionObserver for chart components
 global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn()
 }))
 
-// Mock window.matchMedia for responsive components
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation((query) => ({
@@ -30,5 +31,4 @@ Object.defineProperty(window, 'matchMedia', {
   }))
 })
 
-// Export commonly used test utilities
 export { vi }

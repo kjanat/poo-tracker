@@ -65,7 +65,7 @@ export function NewEntryPage() {
           formData={formData}
           onUpdate={updateFormData}
           onSubmit={handleSubmit}
-          onCancel={isEditing ? cancelEditing : undefined}
+          onCancel={isEditing ? cancelEditing : null}
           isSubmitting={isSubmitting}
           isEditing={isEditing}
         />

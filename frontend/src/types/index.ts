@@ -13,6 +13,7 @@ export interface Meal {
   mealTime: string
   createdAt: string
   linkedBowelMovements?: BowelMovement[]
+  linkedEntries?: Array<{ id: string; bristolType: number; createdAt: string }>
 }
 
 export interface BowelMovement {
@@ -46,7 +47,7 @@ export interface Entry {
 
 export interface MealFormData {
   name: string
-  category: 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK'
+  category: 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK' | ''
   description: string
   cuisine: string
   spicyLevel: number
@@ -54,7 +55,7 @@ export interface MealFormData {
   dairy: boolean
   gluten: boolean
   notes: string
-  photoUrl?: string
+  photoUrl: string
 }
 
 export interface BowelMovementResponse {

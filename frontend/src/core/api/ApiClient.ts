@@ -73,7 +73,7 @@ export class ApiClient {
     const fetchOptions: RequestInit = {
       method: 'POST',
       headers: this.createHeaders(),
-      body: body != null ? JSON.stringify(body) : undefined,
+      body: body != null ? JSON.stringify(body) : null,
       ...options
     }
     const response = await fetch(`${this.config.baseUrl}${endpoint}`, fetchOptions)
@@ -85,7 +85,7 @@ export class ApiClient {
     const fetchOptions: RequestInit = {
       method: 'PUT',
       headers: this.createHeaders(),
-      body: body != null ? JSON.stringify(body) : undefined,
+      body: body != null ? JSON.stringify(body) : null,
       ...options
     }
     const response = await fetch(`${this.config.baseUrl}${endpoint}`, fetchOptions)

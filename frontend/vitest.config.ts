@@ -7,7 +7,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
-    globals: false, // Require explicit imports
+    globals: true,
     reporters: ['default', ['junit', { outputFile: './junit.xml' }]],
     coverage: {
       provider: 'v8',

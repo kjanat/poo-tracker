@@ -7,7 +7,7 @@ interface EntryFormProps {
   formData: CreateEntryData
   onUpdate: (updates: Partial<CreateEntryData>) => void
   onSubmit: () => void
-  onCancel?: () => void
+  onCancel: (() => void) | null
   isSubmitting: boolean
   isEditing?: boolean
 }
@@ -37,9 +37,9 @@ export function EntryForm({
         />
 
         <EntryDetailsForm
-          volume={formData.volume || ''}
-          color={formData.color || ''}
-          notes={formData.notes || ''}
+          volume={formData.volume}
+          color={formData.color}
+          notes={formData.notes}
           photo={formData.photo}
           onVolumeChange={(volume) => onUpdate({ volume })}
           onColorChange={(color) => onUpdate({ color })}
