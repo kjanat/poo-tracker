@@ -303,3 +303,10 @@ See the [LICENSE](LICENSE) file for full license details.
 **Golden Rule:** If your code stinks, it won't get merged. And yes, we'll know. 💩
 
 Ready to track some legendary logs? Get started above!
+
+<!--
+  markdownlint-configure-file {
+    "no-inline-html": false,
+    "no-alt-text": false,
+  }
+-->
