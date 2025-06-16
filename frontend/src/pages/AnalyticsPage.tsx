@@ -7,6 +7,7 @@ import { HealthInsights } from '../domains/analytics/components/HealthInsights'
 import { RecentEntriesTable } from '../domains/analytics/components/RecentEntriesTable'
 import { useAnalytics } from '../domains/analytics/hooks/useAnalytics'
 import { container } from '../core/services'
+import type { AnalyticsService } from '../domains/analytics/AnalyticsService'
 
 export function AnalyticsPage() {
   const { token } = useAuthStore()
@@ -84,7 +85,7 @@ export function AnalyticsPage() {
 
   // Generate recommendations if we have health metrics
   const recommendations = healthMetrics 
-    ? container.get('analyticsService').generateRecommendations(healthMetrics, summary.recentEntries)
+    ? container.get<AnalyticsService>('analyticsService').generateRecommendations(healthMetrics, summary.recentEntries)
     : []
 
   return (

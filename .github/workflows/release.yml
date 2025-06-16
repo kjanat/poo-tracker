@@ -47,8 +47,32 @@ jobs:
 
       - name: 📦 Install dependencies
         run: |
-          pnpm install --frozen-lockfile
-          cd ai-service && uv pip install -r requirements.txt
+          command -v pnpm >/dev/null || { echo "❌ pnpm not found"; exit 1; }
+          command -v uv >/dev/null || { echo "❌ uv not found"; exit 1; }
+
+          pnpm install || { echo "❌ Failed to run pnpm install"; exit 1; }
+
+          [[ -d ai-service ]] || { echo "❌ Directory 'ai-service' not found"; exit 1; }
+          cd ai-service || exit 1
+
+          if [[ -f pyproject.toml ]]; then
+            uv sync 2>/dev/null || uv pip install -e . --system 2>/dev/null
+            status=$?
+          else
+            echo "⚠️  No pyproject.toml found — skipping uv sync and editable install"
+            status=1
+          fi
+
+          if [[ $status -ne 0 ]]; then
+            if [[ -f requirements.txt ]]; then
+              uv pip install -r requirements.txt --system || { echo "❌ uv install from requirements.txt failed"; exit 1; }
+            else
+              echo "❌ No valid pyproject.toml or requirements.txt found to install from"
+              exit 1
+            fi
+          fi
+
+          echo "✅ All done."
 
       - name: 🧪 Run tests
         run: |

@@ -55,6 +55,22 @@ export function initializeServices(): void {
     const apiClient = container.get<ApiClient>(SERVICE_IDENTIFIERS.API_CLIENT)
     return new AnalyticsService(apiClient)
   }).asSingleton()
+
+  // Legacy string-based bindings for backward compatibility
+  container.bind('entryService').toFactory(() => {
+    const apiClient = container.get<ApiClient>(SERVICE_IDENTIFIERS.API_CLIENT)
+    return new EntryService(apiClient)
+  }).asSingleton()
+
+  container.bind('mealService').toFactory(() => {
+    const apiClient = container.get<ApiClient>(SERVICE_IDENTIFIERS.API_CLIENT)
+    return new MealService(apiClient)
+  }).asSingleton()
+
+  container.bind('analyticsService').toFactory(() => {
+    const apiClient = container.get<ApiClient>(SERVICE_IDENTIFIERS.API_CLIENT)
+    return new AnalyticsService(apiClient)
+  }).asSingleton()
 }
 
 // Convenience getters

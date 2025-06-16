@@ -39,7 +39,11 @@ export class AnalyticsService {
     const groupedByDate = entries.reduce((acc, entry) => {
       const date = new Date(entry.createdAt).toISOString().split('T')[0]
       
-      if (!date || !(date in acc)) {
+      if (!date) {
+        return acc
+      }
+      
+      if (!(date in acc)) {
         acc[date] = {
           date,
           bristolTypes: [],
@@ -48,11 +52,14 @@ export class AnalyticsService {
         }
       }
       
-      acc[date].bristolTypes.push(entry.bristolType)
-      if (entry.satisfaction != null) {
-        acc[date].satisfactions.push(entry.satisfaction)
+      const dateGroup = acc[date]
+      if (dateGroup) {
+        dateGroup.bristolTypes.push(entry.bristolType)
+        if (entry.satisfaction != null) {
+          dateGroup.satisfactions.push(entry.satisfaction)
+        }
+        dateGroup.count++
       }
-      acc[date].count++
       
       return acc
     }, {} as Record<string, { date: string, bristolTypes: number[], satisfactions: number[], count: number }>)

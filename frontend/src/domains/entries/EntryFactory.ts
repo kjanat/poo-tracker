@@ -28,18 +28,32 @@ export class EntryFactory {
   }
 
   static createFromFormData(formData: Record<string, unknown>): CreateEntryRequest {
+    const getValue = (key: string): string | undefined => {
+      const value = formData[key]
+      return typeof value === 'string' && value.trim() !== '' ? value : undefined
+    }
+
+    const getNumberValue = (key: string): number | undefined => {
+      const value = formData[key]
+      if (typeof value === 'string' && value.trim() !== '') {
+        const parsed = parseInt(value, 10)
+        return isNaN(parsed) ? undefined : parsed
+      }
+      return undefined
+    }
+
     return {
-      bristolType: parseInt(formData.bristolType) || 4,
-      volume: formData.volume || undefined,
-      color: formData.color || undefined,
-      consistency: formData.consistency || undefined,
-      notes: formData.notes || '',
-      satisfaction: formData.satisfaction ? parseInt(formData.satisfaction) : undefined,
-      pain: formData.pain ? parseInt(formData.pain) : undefined,
-      strain: formData.strain ? parseInt(formData.strain) : undefined,
+      bristolType: getNumberValue('bristolType') ?? 4,
+      volume: getValue('volume'),
+      color: getValue('color'),
+      consistency: getValue('consistency'),
+      notes: getValue('notes') ?? '',
+      satisfaction: getNumberValue('satisfaction'),
+      pain: getNumberValue('pain'),
+      strain: getNumberValue('strain'),
       floaters: Boolean(formData.floaters),
-      smell: formData.smell || undefined,
-      photoUrl: formData.photoUrl || undefined
+      smell: getValue('smell'),
+      photoUrl: getValue('photoUrl')
     }
   }
 

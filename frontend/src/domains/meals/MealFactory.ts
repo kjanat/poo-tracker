@@ -17,17 +17,36 @@ export class MealFactory {
   }
 
   static createFromFormData(formData: Record<string, unknown>): CreateMealRequest {
+    const getValue = (key: string): string | undefined => {
+      const value = formData[key]
+      return typeof value === 'string' && value.trim() !== '' ? value : undefined
+    }
+
+    const getNumberValue = (key: string): number | undefined => {
+      const value = formData[key]
+      if (typeof value === 'string' && value.trim() !== '') {
+        const parsed = parseInt(value, 10)
+        return isNaN(parsed) ? undefined : parsed
+      }
+      return undefined
+    }
+
+    const nameValue = getValue('name')
+    if (!nameValue) {
+      throw new Error('Meal name is required')
+    }
+
     return {
-      name: formData.name || '',
-      category: formData.category || undefined,
-      description: formData.description || undefined,
-      cuisine: formData.cuisine || undefined,
-      spicyLevel: parseInt(formData.spicyLevel) || 1,
+      name: nameValue,
+      category: getValue('category'),
+      description: getValue('description'),
+      cuisine: getValue('cuisine'),
+      spicyLevel: getNumberValue('spicyLevel') ?? 1,
       fiberRich: Boolean(formData.fiberRich),
       dairy: Boolean(formData.dairy),
       gluten: Boolean(formData.gluten),
-      notes: formData.notes || undefined,
-      photoUrl: formData.photoUrl || undefined
+      notes: getValue('notes'),
+      photoUrl: getValue('photoUrl')
     }
   }
 

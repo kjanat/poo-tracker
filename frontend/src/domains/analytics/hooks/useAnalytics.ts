@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { container } from '../../../core/services'
 import type { AnalyticsSummary, TrendData, HealthMetrics } from '../types'
+import type { AnalyticsService } from '../AnalyticsService'
 
 export interface UseAnalyticsResult {
   summary: AnalyticsSummary | null
@@ -18,7 +19,7 @@ export function useAnalytics(): UseAnalyticsResult {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const analyticsService = container.get('analyticsService')
+  const analyticsService = container.get<AnalyticsService>('analyticsService')
 
   const loadData = useCallback(async (): Promise<void> => {
     try {

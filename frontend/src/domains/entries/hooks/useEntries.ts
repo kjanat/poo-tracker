@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { container } from '../../../core/services'
 import type { Entry, CreateEntryData } from '../types'
+import type { EntryService } from '../EntryService'
 
 export interface UseEntriesResult {
   entries: Entry[]
@@ -18,7 +19,7 @@ export function useEntries(): UseEntriesResult {
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const entryService = container.get('entryService')
+  const entryService = container.get<EntryService>('entryService')
 
   const loadEntries = useCallback(async (): Promise<void> => {
     try {
