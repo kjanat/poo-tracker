@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'
 import type { Meal, CreateMealRequest, UpdateMealRequest, MealFilters, MealListResponse } from './types'
 import { MealFactory } from './MealFactory'
 
@@ -22,7 +22,7 @@ export class MealService {
     const skip = (page - 1) * limit
 
     // Build where clause
-    const where: any = { userId }
+    const where: Prisma.MealWhereInput = { userId }
 
     if (category !== null && category !== undefined) {
       where.category = category
@@ -93,7 +93,7 @@ export class MealService {
       return null
     }
 
-    const updateData: any = {}
+    const updateData: Prisma.MealUpdateInput = {}
 
     // Only update provided fields
     if (request.name !== undefined) updateData.name = MealFactory.sanitizeName(request.name)

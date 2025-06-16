@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { z } from 'zod'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'
 import { config } from '../config'
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth'
 
@@ -221,7 +221,7 @@ router.put(
       }
 
       // Update user profile
-      const updateData: any = {}
+      const updateData: Prisma.UserUpdateInput = {}
       if (name !== undefined) updateData.name = name
       if (email !== undefined) updateData.email = email
 

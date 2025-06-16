@@ -213,7 +213,7 @@ describe('SharpImageProcessingService', () => {
       mockFs.unlink.mockRejectedValue(new Error('ENOENT: no such file or directory'))
 
       // Spy on console.warn
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
+       
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
       // Execute (should not throw)

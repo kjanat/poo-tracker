@@ -38,7 +38,7 @@ module.exports = [
             ecmaVersion: "latest",
             sourceType: "module",
             parserOptions: {
-                project: [ "./frontend/tsconfig.json", "./backend/tsconfig.json" ],
+                projectService: true,
                 tsconfigRootDir: __dirname,
                 ecmaFeatures: {
                     jsx: true,
@@ -87,6 +87,42 @@ module.exports = [
                 typescript: {
                     project: [ "./frontend/tsconfig.json", "./backend/tsconfig.json" ],
                 },
+            },
+        },
+    },
+
+    // Test files configuration
+    {
+        files: [ "**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx" ],
+        languageOptions: {
+            globals: {
+                ...globals.node,
+                describe: "readonly",
+                it: "readonly",
+                expect: "readonly",
+                beforeEach: "readonly",
+                afterEach: "readonly",
+                beforeAll: "readonly",
+                afterAll: "readonly",
+                jest: "readonly",
+                test: "readonly",
+            },
+        },
+    },
+
+    // Node.js configuration files
+    {
+        files: [ "**/*.js", "**/*.cjs", "**/*.mjs" ],
+        languageOptions: {
+            globals: {
+                ...globals.node,
+                require: "readonly",
+                module: "readonly",
+                exports: "readonly",
+                console: "readonly",
+                process: "readonly",
+                __dirname: "readonly",
+                __filename: "readonly",
             },
         },
     },

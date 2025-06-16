@@ -9,6 +9,7 @@ export const errorHandler = (
   _req: Request,
   res: Response,
   // Next function is required by Express but not used
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _next: NextFunction
 ): void => {
   const statusCode = err.statusCode ?? 500

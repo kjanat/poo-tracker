@@ -15,7 +15,7 @@ const upload = multer({
   },
   fileFilter: (_req, file, cb) => {
     // Only allow specified image types
-    if (config.uploads.allowedTypes.includes(file.mimetype as any)) {
+    if (config.uploads.allowedTypes.includes(file.mimetype)) {
       cb(null, true)
     } else {
       cb(new Error(`Only these image types are allowed: ${config.uploads.allowedTypes.join(', ')}`))
@@ -29,7 +29,7 @@ router.use(authenticateToken)
 // POST /api/uploads/photo - Upload and process photo
 router.post(
   '/photo',
-  upload.single('photo') as any,
+  upload.single('photo'),
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       if (req.file == null) {

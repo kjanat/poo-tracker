@@ -19,7 +19,7 @@ export class EntryService {
     const skip = (page - 1) * limit
 
     // Build where clause
-    const where: any = { userId }
+    const where: { userId: string; bristolType?: number; createdAt?: { gte?: Date; lte?: Date } } = { userId }
 
     if (bristolType) {
       where.bristolType = bristolType
@@ -76,7 +76,7 @@ export class EntryService {
       return null
     }
 
-    const updateData: any = {}
+    const updateData: Partial<Omit<Entry, 'id' | 'createdAt' | 'updatedAt' | 'userId'>> = {}
 
     // Only update provided fields
     if (request.bristolType !== undefined) updateData.bristolType = request.bristolType
