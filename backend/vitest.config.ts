@@ -18,7 +18,7 @@ export default defineConfig({
       include: ['src/**/*.ts'],
       exclude: ['src/**/*.d.ts', 'src/index.ts', 'src/**/__tests__/**']
     },
-    globals: true // This enables Jest-like globals (describe, it, expect)
+    globals: true
   },
   resolve: {
     alias: {
