@@ -14,3 +14,6 @@ registry=https://registry.npmjs.org/
 # Hoisting settings for monorepo
 hoist=true
 hoist-pattern[]=*eslint*
+
+# Enable strict peer dependencies to ensure compatibility
+strict-peer-dependencies=true

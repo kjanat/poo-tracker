@@ -2,122 +2,273 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
+/**
+ * Core User Model
+ */
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+    id        String   @id @default(cuid())
+    email     String   @unique
+    name      String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
-  // Relations
-  auth    UserAuth?
-  entries Entry[]
-  meals   Meal[]
+    // Relations
+    auth        UserAuth?
+    settings    UserSettings?
+    entries     Entry[]
+    meals       Meal[]
+    symptoms    Symptom[]
+    medications Medication[]
 
-  @@map("users")
+    @@index([createdAt]) // For user registration analytics
+    @@map("users")
 }
 
+/**
+ * Security & Authentication
+ */
 model UserAuth {
-  id            String    @id @default(cuid())
-  userId        String    @unique
-  password      String // Hashed password
-  loginAttempts Int       @default(0)
-  lockedUntil   DateTime?
-  lastLogin     DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+    id               String    @id @default(cuid())
+    userId           String    @unique
+    passwordHash     String // More explicit naming
+    salt             String // Add salt field
+    loginAttempts    Int       @default(0)
+    lockedUntil      DateTime?
+    lastLogin        DateTime?
+    resetToken       String? // For password reset
+    resetTokenExpiry DateTime?
+    twoFactorSecret  String? // For 2FA
+    twoFactorEnabled Boolean   @default(false)
+    createdAt        DateTime  @default(now())
+    updatedAt        DateTime  @updatedAt
 
-  // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("user_auth")
+    @@index([resetToken])
+    @@map("user_auth")
 }
 
+/**
+ * User Preferences
+ */
+model UserSettings {
+    id                String   @id @default(cuid())
+    userId            String   @unique
+    timezone          String   @default("UTC")
+    reminderEnabled   Boolean  @default(true)
+    reminderTime      String? // Store as HH:MM format
+    dataRetentionDays Int      @default(365)
+    createdAt         DateTime @default(now())
+    updatedAt         DateTime @updatedAt
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("user_settings")
+}
+
+/**
+ * Main Entry Model
+ */
 model Entry {
-  id        String   @id @default(cuid())
-  userId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+    id        String   @id @default(cuid())
+    userId    String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
-  // Bristol Stool Chart (1-7)
-  bristolType Int @db.SmallInt
+    // Bristol Stool Chart (1-7)
+    bristolType Int @db.SmallInt
 
-  // Physical characteristics
-  volume      String? // Small, Medium, Large, Massive
-  color       String? // Brown, Dark Brown, Light Brown, Yellow, Green, Red, Black
-  consistency String? // Solid, Soft, Loose, Watery
-  floaters    Boolean @default(false)
+    // Physical characteristics (using enums for type safety)
+    volume      Volume?
+    color       Color?
+    consistency Consistency?
+    floaters    Boolean      @default(false)
 
-  // Experience
-  pain         Int? @db.SmallInt // 1-10 scale
-  strain       Int? @db.SmallInt // 1-10 scale
-  satisfaction Int? @db.SmallInt // 1-10 scale
+    // Experience (1-10 scales)
+    pain         Int? @db.SmallInt
+    strain       Int? @db.SmallInt
+    satisfaction Int? @db.SmallInt
 
-  // Optional fields
-  notes    String?
-  photoUrl String?
-  smell    String? // None, Mild, Moderate, Strong, Toxic
+    // Optional fields
+    photoUrl String?
+    smell    SmellLevel?
 
-  // AI Analysis (populated by AI service)
-  aiAnalysis Json?
+    // Relations
+    user     User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+    details  EntryDetails?
+    meals    MealEntryRelation[]
+    symptoms Symptom[]
 
-  // Relations
-  user  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  meals MealEntryRelation[]
-
-  @@map("entries")
+    @@index([userId, createdAt]) // Primary query pattern
+    @@index([createdAt]) // For date-based queries
+    @@index([bristolType]) // For health analytics
+    @@map("entries")
 }
 
+/**
+ * Separate large fields for performance
+ */
+model EntryDetails {
+    id      String @id @default(cuid())
+    entryId String @unique
+
+    notes      String?
+    aiAnalysis Json?
+
+    entry Entry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+
+    @@map("entry_details")
+}
+
+/**
+ * Meal Tracking
+ */
 model Meal {
-  id        String   @id @default(cuid())
-  userId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+    id        String   @id @default(cuid())
+    userId    String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
-  // Meal details
-  name        String
-  description String?
-  mealTime    DateTime
+    name        String
+    description String?
+    mealTime    DateTime
 
-  // Categories
-  category String? // Breakfast, Lunch, Dinner, Snack
-  cuisine  String? // Italian, Mexican, Fast Food, etc.
+    category MealCategory?
+    cuisine  String? // Italian, Mexican, Fast Food, etc.
 
-  // Health factors
-  spicyLevel Int?    @db.SmallInt // 1-10 scale
-  fiberRich  Boolean @default(false)
-  dairy      Boolean @default(false)
-  gluten     Boolean @default(false)
+    spicyLevel Int?    @db.SmallInt // 1-10 scale
+    fiberRich  Boolean @default(false)
+    dairy      Boolean @default(false)
+    gluten     Boolean @default(false)
 
-  // Optional
-  photoUrl String?
-  notes    String?
+    photoUrl String?
+    notes    String?
 
-  // Relations
-  user    User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  entries MealEntryRelation[]
+    // Relations
+    user    User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+    entries MealEntryRelation[]
 
-  @@map("meals")
+    @@index([userId, mealTime]) // Primary query pattern
+    @@index([mealTime]) // For chronological queries
+    @@map("meals")
 }
 
-// Junction table for many-to-many relationship between meals and entries
+/**
+ * Junction table for many-to-many relationship between meals and entries
+ */
 model MealEntryRelation {
-  id      String @id @default(cuid())
-  mealId  String
-  entryId String
+    id      String @id @default(cuid())
+    mealId  String
+    entryId String
 
-  // Relations
-  meal  Meal  @relation(fields: [mealId], references: [id], onDelete: Cascade)
-  entry Entry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+    // Relations
+    meal  Meal  @relation(fields: [mealId], references: [id], onDelete: Cascade)
+    entry Entry @relation(fields: [entryId], references: [id], onDelete: Cascade)
 
-  @@unique([mealId, entryId])
-  @@map("meal_entry_relations")
+    @@unique([mealId, entryId])
+    @@map("meal_entry_relations")
+}
+
+/**
+ * Symptom Tracking
+ */
+model Symptom {
+    id        String   @id @default(cuid())
+    userId    String
+    entryId   String? // Optional link to entry
+    createdAt DateTime @default(now())
+
+    type     SymptomType
+    severity Int         @db.SmallInt // 1-10 scale
+    notes    String?
+
+    user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    entry Entry? @relation(fields: [entryId], references: [id], onDelete: SetNull)
+
+    @@index([userId, createdAt])
+    @@map("symptoms")
+}
+
+/**
+ * Medication/Supplement Tracking
+ */
+model Medication {
+    id        String   @id @default(cuid())
+    userId    String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    name      String
+    dosage    String?
+    frequency String?
+    startDate DateTime
+    endDate   DateTime?
+    notes     String?
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId, startDate])
+    @@map("medications")
+}
+
+/**
+ * Enums for Data Validation & Type Safety
+ */
+enum Volume {
+    SMALL
+    MEDIUM
+    LARGE
+    MASSIVE
+}
+
+enum Color {
+    BROWN
+    DARK_BROWN
+    LIGHT_BROWN
+    YELLOW
+    GREEN
+    RED
+    BLACK
+}
+
+enum Consistency {
+    SOLID
+    SOFT
+    LOOSE
+    WATERY
+}
+
+enum SmellLevel {
+    NONE
+    MILD
+    MODERATE
+    STRONG
+    TOXIC
+}
+
+enum MealCategory {
+    BREAKFAST
+    LUNCH
+    DINNER
+    SNACK
+}
+
+enum SymptomType {
+    BLOATING
+    CRAMPS
+    NAUSEA
+    HEARTBURN
+    CONSTIPATION
+    DIARRHEA
+    GAS
+    FATIGUE
+    OTHER
 }

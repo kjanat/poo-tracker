@@ -13,11 +13,11 @@
     "test:watch": "eslint . && vitest --watch",
     "test:coverage": "eslint . && vitest run --coverage",
     "clean": "pnpm --package=rimraf dlx rimraf dist node_modules",
+    "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:reset": "prisma migrate reset",
     "db:seed": "tsx src/utils/seed.ts",
     "db:studio": "prisma studio",
-    "db:generate": "prisma generate",
+    "db:reset": "prisma migrate reset",
     "type-check": "tsc --noEmit"
   },
   "engines": {
