@@ -10,9 +10,9 @@
     "start": "node dist/index.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "eslint . && vitest run",
-    "test:watch": "eslint . && vitest --watch",
-    "test:coverage": "eslint . && vitest run --coverage",
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest run --coverage",
     "clean": "pnpm --package=rimraf dlx rimraf dist node_modules",
     
     "db:generate": "prisma generate",
