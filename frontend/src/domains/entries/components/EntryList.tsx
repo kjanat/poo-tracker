@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { BristolAnalyzer } from '../../bristol/BristolAnalyzer'
 import type { Entry } from '../types'
 
@@ -9,9 +9,7 @@ interface EntryListProps {
   isSubmitting: boolean
 }
 
-const bristolAnalyzer = new BristolAnalyzer()
-
-export function EntryList({ entries, onEdit, onDelete, isSubmitting }: EntryListProps): JSX.Element {
+export function EntryList({ entries, onEdit, onDelete, isSubmitting }: EntryListProps) {
   if (entries.length === 0) {
     return (
       <div className="text-center py-8">
@@ -42,7 +40,7 @@ interface EntryCardProps {
   isSubmitting: boolean
 }
 
-function EntryCard({ entry, onEdit, onDelete, isSubmitting }: EntryCardProps): JSX.Element {
+function EntryCard({ entry, onEdit, onDelete, isSubmitting }: EntryCardProps) {
   const handleEdit = (): void => {
     onEdit(entry)
   }
@@ -69,7 +67,7 @@ function EntryCard({ entry, onEdit, onDelete, isSubmitting }: EntryCardProps): J
             </span>
           </div>
           <p className="text-sm text-gray-600 mt-1">
-            {bristolAnalyzer.getDescription(entry.bristolType)}
+            {BristolAnalyzer.getDescription(entry.bristolType)}
           </p>
         </div>
         <div className="flex space-x-2 ml-4">

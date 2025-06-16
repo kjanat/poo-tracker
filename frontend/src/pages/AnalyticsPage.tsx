@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { useAuthStore } from '../stores/authStore'
 import Logo from '../components/Logo'
 import { StatsOverview } from '../domains/analytics/components/StatsOverview'
@@ -8,7 +8,7 @@ import { RecentEntriesTable } from '../domains/analytics/components/RecentEntrie
 import { useAnalytics } from '../domains/analytics/hooks/useAnalytics'
 import { container } from '../core/services'
 
-export function AnalyticsPage(): JSX.Element {
+export function AnalyticsPage() {
   const { token } = useAuthStore()
   const { summary, healthMetrics, isLoading, error } = useAnalytics()
 

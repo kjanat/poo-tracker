@@ -1,11 +1,11 @@
-import React from 'react'
+
 import type { AnalyticsSummary } from '../types'
 
 interface StatsOverviewProps {
   summary: AnalyticsSummary
 }
 
-export function StatsOverview({ summary }: StatsOverviewProps): JSX.Element {
+export function StatsOverview({ summary }: StatsOverviewProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">

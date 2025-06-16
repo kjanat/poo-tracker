@@ -1,4 +1,4 @@
-import React, { type ReactNode, type ReactElement } from 'react'
+import { type ReactNode, type ReactElement } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 

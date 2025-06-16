@@ -24,10 +24,10 @@ export class DependencyContainer {
       if (binding.instance == null) {
         binding.instance = binding.factory()
       }
-      return binding.instance
+      return binding.instance as T
     }
 
-    return binding.factory()
+    return binding.factory() as T
   }
 
   internal_register<T>(identifier: ServiceIdentifier<T>, binding: ServiceBinding<T>): void {

@@ -1,4 +1,4 @@
-import React from 'react'
+
 import {
   BarChart,
   Bar,
@@ -15,14 +15,12 @@ interface BristolDistributionChartProps {
   summary: AnalyticsSummary
 }
 
-export function BristolDistributionChart({ summary }: BristolDistributionChartProps): JSX.Element {
-  const bristolAnalyzer = new BristolAnalyzer()
-  
+export function BristolDistributionChart({ summary }: BristolDistributionChartProps) {
   const chartData = summary.bristolDistribution.map(item => ({
     type: item.type,
     count: item.count,
-    description: bristolAnalyzer.getDescription(item.type),
-    color: bristolAnalyzer.getColor(item.type)
+    description: BristolAnalyzer.getDescription(item.type),
+    color: BristolAnalyzer.getColor(item.type)
   }))
 
   interface TooltipProps {

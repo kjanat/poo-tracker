@@ -1,5 +1,5 @@
-import React, { type ReactElement } from 'react'
-import type { MealFormData, Meal } from '../types'
+import { type ReactElement } from 'react'
+import type { MealFormData, Meal } from '../../types'
 
 interface MealFormProps {
   formData: MealFormData

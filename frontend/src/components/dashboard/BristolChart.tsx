@@ -1,4 +1,4 @@
-import React, { type ReactElement } from 'react'
+import { type ReactElement } from 'react'
 import { getBristolTypeDescription, getBristolTypeCategory } from '../../utils/bristol'
 
 interface BristolChartProps {

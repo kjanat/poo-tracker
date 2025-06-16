@@ -1,4 +1,3 @@
-import React from 'react'
 import { BristolAnalyzer } from '../../bristol/BristolAnalyzer'
 import type { AnalyticsSummary } from '../types'
 
@@ -6,10 +5,8 @@ interface RecentEntriesTableProps {
   summary: AnalyticsSummary
 }
 
-export function RecentEntriesTable({ summary }: RecentEntriesTableProps): JSX.Element {
-  const bristolAnalyzer = new BristolAnalyzer()
-
-  if (summary.recentEntries.length === 0) {
+export function RecentEntriesTable({ summary }: RecentEntriesTableProps) {
+  if (!summary.recentEntries.length) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h3 className="text-lg font-semibold mb-4">Recent Entries</h3>
@@ -55,7 +52,7 @@ export function RecentEntriesTable({ summary }: RecentEntriesTableProps): JSX.El
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-600">
-                  {bristolAnalyzer.getDescription(entry.bristolType)}
+                  {BristolAnalyzer.getDescription(entry.bristolType)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {entry.satisfaction ? `${entry.satisfaction}/10` : 'N/A'}

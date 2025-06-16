@@ -1,4 +1,4 @@
-import React from 'react'
+
 import type { HealthMetrics } from '../types'
 
 interface HealthInsightsProps {
@@ -6,7 +6,7 @@ interface HealthInsightsProps {
   recommendations: string[]
 }
 
-export function HealthInsights({ healthMetrics, recommendations }: HealthInsightsProps): JSX.Element {
+export function HealthInsights({ healthMetrics, recommendations }: HealthInsightsProps) {
   const getTrendIcon = (trend: HealthMetrics['healthTrend']) => {
     switch (trend) {
       case 'improving':

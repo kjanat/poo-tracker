@@ -1,4 +1,4 @@
-import React, { type ReactElement } from 'react'
+import { type ReactElement } from 'react'
 import Logo from '../components/Logo'
 import { DashboardStats } from '../components/dashboard/DashboardStats'
 import { BristolChart } from '../components/dashboard/BristolChart'

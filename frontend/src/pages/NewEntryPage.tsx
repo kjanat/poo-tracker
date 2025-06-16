@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { useAuthStore } from '../stores/authStore'
 import Logo from '../components/Logo'
 import { EntryForm } from '../domains/entries/components/EntryForm'
@@ -7,7 +7,7 @@ import { useEntries } from '../domains/entries/hooks/useEntries'
 import { useEntryForm } from '../domains/entries/hooks/useEntryForm'
 import type { Entry } from '../domains/entries/types'
 
-export function NewEntryPage(): JSX.Element {
+export function NewEntryPage() {
   const { token } = useAuthStore()
   const {
     entries,

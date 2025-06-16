@@ -66,23 +66,25 @@ export class ApiClient {
   }
 
   async post<T>(endpoint: string, body?: unknown, options?: RequestInit): Promise<ApiResponse<T>> {
-    const response = await fetch(`${this.config.baseUrl}${endpoint}`, {
+    const fetchOptions: RequestInit = {
       method: 'POST',
       headers: this.createHeaders(),
       body: body != null ? JSON.stringify(body) : undefined,
       ...options
-    })
+    }
+    const response = await fetch(`${this.config.baseUrl}${endpoint}`, fetchOptions)
 
     return await this.handleResponse<T>(response)
   }
 
   async put<T>(endpoint: string, body?: unknown, options?: RequestInit): Promise<ApiResponse<T>> {
-    const response = await fetch(`${this.config.baseUrl}${endpoint}`, {
+    const fetchOptions: RequestInit = {
       method: 'PUT',
       headers: this.createHeaders(),
       body: body != null ? JSON.stringify(body) : undefined,
       ...options
-    })
+    }
+    const response = await fetch(`${this.config.baseUrl}${endpoint}`, fetchOptions)
 
     return await this.handleResponse<T>(response)
   }

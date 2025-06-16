@@ -19,7 +19,7 @@ export function EntryForm({
   onCancel,
   isSubmitting,
   isEditing = false
-}: EntryFormProps): JSX.Element {
+}: EntryFormProps) {
   const handleSubmit = (e: React.FormEvent): void => {
     e.preventDefault()
     onSubmit()
