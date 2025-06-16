@@ -91,6 +91,16 @@ module.exports = [
         },
     },
 
+    // Backend-specific configuration (no React)
+    {
+        files: [ "backend/**/*.ts", "backend/**/*.tsx" ],
+        settings: {
+            react: {
+                version: "999.999.999", // Disable React detection for backend
+            },
+        },
+    },
+
     // Test files configuration
     {
         files: [ "**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx" ],
@@ -107,6 +117,10 @@ module.exports = [
                 jest: "readonly",
                 test: "readonly",
             },
+        },
+        rules: {
+            // Allow any types in test files for mocking
+            "@typescript-eslint/no-explicit-any": "off",
         },
     },
 
