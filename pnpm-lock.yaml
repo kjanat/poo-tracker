@@ -23,6 +23,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^8.34.0
         version: 8.34.0(eslint@9.29.0(jiti@2.4.2))(typescript@5.8.3)
+      '@vitest/coverage-v8':
+        specifier: 3.2.3
+        version: 3.2.3(vitest@3.2.3(@types/node@24.0.1)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.30.1)(tsx@4.20.3)(yaml@2.8.0))
       concurrently:
         specifier: ^9.1.2
         version: 9.1.2
@@ -62,6 +65,9 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
+      vitest:
+        specifier: ^3.2.3
+        version: 3.2.3(@types/node@24.0.1)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.30.1)(tsx@4.20.3)(yaml@2.8.0)
 
   backend:
     dependencies:
@@ -141,9 +147,6 @@ importers:
       '@types/uuid':
         specifier: ^10.0.0
         version: 10.0.0
-      '@vitest/coverage-v8':
-        specifier: 3.2.3
-        version: 3.2.3(vitest@3.2.3(@types/node@24.0.1)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.30.1)(tsx@4.20.3)(yaml@2.8.0))
       prisma:
         specifier: ^6.9.0
         version: 6.9.0(typescript@5.8.3)
@@ -153,12 +156,6 @@ importers:
       tsx:
         specifier: ^4.20.3
         version: 4.20.3
-      typescript:
-        specifier: ^5.8.3
-        version: 5.8.3
-      vitest:
-        specifier: ^3.2.3
-        version: 3.2.3(@types/node@24.0.1)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.30.1)(tsx@4.20.3)(yaml@2.8.0)
 
   frontend:
     dependencies:
@@ -220,9 +217,6 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^4.5.2
         version: 4.5.2(vite@6.3.5(@types/node@24.0.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.3)(yaml@2.8.0))
-      '@vitest/coverage-v8':
-        specifier: 3.2.3
-        version: 3.2.3(vitest@3.2.3(@types/node@24.0.1)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.30.1)(tsx@4.20.3)(yaml@2.8.0))
       autoprefixer:
         specifier: ^10.4.21
         version: 10.4.21(postcss@8.5.5)
@@ -232,15 +226,9 @@ importers:
       postcss:
         specifier: ^8.5.5
         version: 8.5.5
-      typescript:
-        specifier: ^5.8.3
-        version: 5.8.3
       vite:
         specifier: ^6.3.5
         version: 6.3.5(@types/node@24.0.1)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.20.3)(yaml@2.8.0)
-      vitest:
-        specifier: ^3.2.3
-        version: 3.2.3(@types/node@24.0.1)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.30.1)(tsx@4.20.3)(yaml@2.8.0)
 
 packages:
 
