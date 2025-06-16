@@ -1,71 +1,71 @@
-import { useState, useEffect } from "react";
-import { useAuthStore } from "../stores/authStore";
-import Logo from "../components/Logo";
+import React, { useState, useEffect } from 'react'
+import { useAuthStore } from '../stores/authStore'
+import Logo from '../components/Logo'
 
 interface StoolEntry {
-  bristolType: number;
-  volume?: string;
-  color?: string;
-  notes?: string;
-  photoUrl?: string;
+  bristolType: number
+  volume?: string
+  color?: string
+  notes?: string
+  photoUrl?: string
 }
 
 interface EntryResponse {
-  id: string;
-  bristolType: number;
-  volume?: string;
-  color?: string;
-  notes?: string;
-  photoUrl?: string;
-  createdAt: string;
-  userId: string;
+  id: string
+  bristolType: number
+  volume?: string
+  color?: string
+  notes?: string
+  photoUrl?: string
+  createdAt: string
+  userId: string
 }
 
 interface EntriesApiResponse {
-  entries: EntryResponse[];
+  entries: EntryResponse[]
   pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    pages: number;
-  };
+    page: number
+    limit: number
+    total: number
+    pages: number
+  }
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3002";
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002'
 
 const getBristolTypeDescription = (type: number): string => {
   const descriptions = {
-    1: "Hard lumps (Severe constipation)",
-    2: "Lumpy sausage (Mild constipation)",
-    3: "Cracked sausage (Normal)",
-    4: "Smooth sausage (Ideal)",
-    5: "Soft blobs (Lacking fiber)",
-    6: "Fluffy pieces (Mild diarrhea)",
-    7: "Watery (Severe diarrhea)"
-  };
-  return descriptions[type as keyof typeof descriptions] || "Unknown";
-};
+    1: 'Hard lumps (Severe constipation)',
+    2: 'Lumpy sausage (Mild constipation)',
+    3: 'Cracked sausage (Normal)',
+    4: 'Smooth sausage (Ideal)',
+    5: 'Soft blobs (Lacking fiber)',
+    6: 'Fluffy pieces (Mild diarrhea)',
+    7: 'Watery (Severe diarrhea)'
+  }
+  return descriptions[type as keyof typeof descriptions] || 'Unknown'
+}
 
 export function NewEntryPage() {
-  const { token } = useAuthStore();
+  const { token } = useAuthStore()
 
   const [formData, setFormData] = useState<StoolEntry>({
     bristolType: 0,
-    volume: "",
-    color: "",
-    notes: ""
-  });
+    volume: '',
+    color: '',
+    notes: ''
+  })
 
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<
-    "idle" | "success" | "error"
-  >("idle");
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [entries, setEntries] = useState<EntryResponse[]>([]);
-  const [isLoadingEntries, setIsLoadingEntries] = useState(true);
-  const [editingEntry, setEditingEntry] = useState<EntryResponse | null>(null);
+    'idle' | 'success' | 'error'
+  >('idle')
+  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [entries, setEntries] = useState<EntryResponse[]>([])
+  const [isLoadingEntries, setIsLoadingEntries] = useState(true)
+  const [editingEntry, setEditingEntry] = useState<EntryResponse | null>(null)
 
   const fetchEntries = async () => {
     try {
@@ -76,26 +76,26 @@ export function NewEntryPage() {
             Authorization: `Bearer ${token}`
           }
         }
-      );
+      )
 
       if (!response.ok) {
-        throw new Error("Failed to fetch entries");
+        throw new Error('Failed to fetch entries')
       }
 
-      const data: EntriesApiResponse = await response.json();
-      setEntries(data.entries);
+      const data: EntriesApiResponse = await response.json()
+      setEntries(data.entries)
     } catch (error) {
-      console.error("Error fetching entries:", error);
+      console.error('Error fetching entries:', error)
     } finally {
-      setIsLoadingEntries(false);
+      setIsLoadingEntries(false)
     }
-  };
+  }
 
   useEffect(() => {
     if (token) {
-      fetchEntries();
+      fetchEntries()
     }
-  }, [token]);
+  }, [token])
 
   const handleInputChange = (
     field: keyof StoolEntry,
@@ -104,149 +104,149 @@ export function NewEntryPage() {
     setFormData((prev) => ({
       ...prev,
       [field]: value
-    }));
-  };
+    }))
+  }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
       // Validate file type
-      if (!file.type.startsWith("image/")) {
-        setErrorMessage("Please select a valid image file");
-        setSubmitStatus("error");
-        return;
+      if (!file.type.startsWith('image/')) {
+        setErrorMessage('Please select a valid image file')
+        setSubmitStatus('error')
+        return
       }
 
       // Validate file size (5MB limit)
       if (file.size > 5 * 1024 * 1024) {
-        setErrorMessage("Image size must be less than 5MB");
-        setSubmitStatus("error");
-        return;
+        setErrorMessage('Image size must be less than 5MB')
+        setSubmitStatus('error')
+        return
       }
 
-      setSelectedImage(file);
+      setSelectedImage(file)
 
       // Create preview
-      const reader = new FileReader();
+      const reader = new FileReader()
       reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+        setImagePreview(e.target?.result as string)
+      }
+      reader.readAsDataURL(file)
 
       // Clear any previous errors
-      setSubmitStatus("idle");
-      setErrorMessage("");
+      setSubmitStatus('idle')
+      setErrorMessage('')
     }
-  };
+  }
 
   const removeImage = () => {
-    setSelectedImage(null);
-    setImagePreview(null);
-  };
+    setSelectedImage(null)
+    setImagePreview(null)
+  }
 
   const uploadImage = async (): Promise<string | null> => {
-    if (!selectedImage) return null;
+    if (!selectedImage) return null
 
-    const uploadFormData = new FormData();
-    uploadFormData.append("image", selectedImage);
+    const uploadFormData = new FormData()
+    uploadFormData.append('image', selectedImage)
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/uploads`, {
-        method: "POST",
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`
         },
         body: uploadFormData
-      });
+      })
 
       if (!response.ok) {
-        throw new Error("Failed to upload image");
+        throw new Error('Failed to upload image')
       }
 
-      const data = await response.json();
-      return data.imageUrl;
+      const data = await response.json()
+      return data.imageUrl
     } catch (error) {
-      console.error("Error uploading image:", error);
-      throw error;
+      console.error('Error uploading image:', error)
+      throw error
     }
-  };
+  }
 
   const startEdit = (entry: EntryResponse) => {
-    setEditingEntry(entry);
+    setEditingEntry(entry)
     setFormData({
       bristolType: entry.bristolType,
-      volume: entry.volume || "",
-      color: entry.color || "",
-      notes: entry.notes || "",
+      volume: entry.volume || '',
+      color: entry.color || '',
+      notes: entry.notes || '',
       photoUrl: entry.photoUrl
-    });
+    })
     // Reset image states when editing (user can upload new image if desired)
-    setSelectedImage(null);
-    setImagePreview(null);
+    setSelectedImage(null)
+    setImagePreview(null)
     // Scroll to form
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   const cancelEdit = () => {
-    setEditingEntry(null);
+    setEditingEntry(null)
     setFormData({
       bristolType: 0,
-      volume: "",
-      color: "",
-      notes: ""
-    });
-    setSelectedImage(null);
-    setImagePreview(null);
-    setSubmitStatus("idle");
-    setErrorMessage("");
-  };
+      volume: '',
+      color: '',
+      notes: ''
+    })
+    setSelectedImage(null)
+    setImagePreview(null)
+    setSubmitStatus('idle')
+    setErrorMessage('')
+  }
 
   const deleteEntry = async (entryId: string) => {
-    if (!confirm("Are you sure you want to delete this entry?")) return;
+    if (!confirm('Are you sure you want to delete this entry?')) return
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/entries/${entryId}`, {
-        method: "DELETE",
+        method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`
         }
-      });
+      })
 
       if (!response.ok) {
-        throw new Error("Failed to delete entry");
+        throw new Error('Failed to delete entry')
       }
 
       // Remove from local state
-      setEntries((prev) => prev.filter((entry) => entry.id !== entryId));
+      setEntries((prev) => prev.filter((entry) => entry.id !== entryId))
     } catch (error) {
-      console.error("Error deleting entry:", error);
+      console.error('Error deleting entry:', error)
       setErrorMessage(
-        error instanceof Error ? error.message : "Failed to delete entry"
-      );
-      setSubmitStatus("error");
+        error instanceof Error ? error.message : 'Failed to delete entry'
+      )
+      setSubmitStatus('error')
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (formData.bristolType === 0) {
-      setErrorMessage("Please select a Bristol Type");
-      setSubmitStatus("error");
-      return;
+      setErrorMessage('Please select a Bristol Type')
+      setSubmitStatus('error')
+      return
     }
 
-    setIsSubmitting(true);
-    setSubmitStatus("idle");
-    setErrorMessage("");
+    setIsSubmitting(true)
+    setSubmitStatus('idle')
+    setErrorMessage('')
 
     try {
       // Upload image if selected
-      let photoUrl = formData.photoUrl;
+      let photoUrl = formData.photoUrl
       if (selectedImage) {
-        const uploadedUrl = await uploadImage();
+        const uploadedUrl = await uploadImage()
         if (uploadedUrl) {
-          photoUrl = uploadedUrl;
+          photoUrl = uploadedUrl
         }
       }
 
@@ -256,37 +256,37 @@ export function NewEntryPage() {
         color: formData.color || undefined,
         notes: formData.notes || undefined,
         photoUrl: photoUrl || undefined
-      };
+      }
 
-      const isEditing = editingEntry !== null;
+      const isEditing = editingEntry !== null
       const url = isEditing
         ? `${API_BASE_URL}/api/entries/${editingEntry.id}`
-        : `${API_BASE_URL}/api/entries`;
-      const method = isEditing ? "PUT" : "POST";
+        : `${API_BASE_URL}/api/entries`
+      const method = isEditing ? 'PUT' : 'POST'
 
       const response = await fetch(url, {
         method,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(submitData)
-      });
+      })
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await response.json()
         throw new Error(
-          error.error || `Failed to ${isEditing ? "update" : "save"} entry`
-        );
+          error.error || `Failed to ${isEditing ? 'update' : 'save'} entry`
+        )
       }
 
-      const savedEntry: EntryResponse = await response.json();
+      const savedEntry: EntryResponse = await response.json()
       console.log(
-        `Entry ${isEditing ? "updated" : "saved"} successfully:`,
+        `Entry ${isEditing ? 'updated' : 'saved'} successfully:`,
         savedEntry
-      );
+      )
 
-      setSubmitStatus("success");
+      setSubmitStatus('success')
 
       if (isEditing) {
         // Update the entry in the list
@@ -294,58 +294,58 @@ export function NewEntryPage() {
           prev.map((entry) =>
             entry.id === editingEntry.id ? savedEntry : entry
           )
-        );
-        setEditingEntry(null);
+        )
+        setEditingEntry(null)
       } else {
         // Add new entry to the list
-        setEntries((prev) => [savedEntry, ...prev]);
+        setEntries((prev) => [savedEntry, ...prev])
       }
 
       // Reset form
       setFormData({
         bristolType: 0,
-        volume: "",
-        color: "",
-        notes: ""
-      });
-      setSelectedImage(null);
-      setImagePreview(null);
+        volume: '',
+        color: '',
+        notes: ''
+      })
+      setSelectedImage(null)
+      setImagePreview(null)
     } catch (error) {
       console.error(
-        `Error ${editingEntry ? "updating" : "saving"} entry:`,
+        `Error ${editingEntry ? 'updating' : 'saving'} entry:`,
         error
-      );
+      )
       setErrorMessage(
-        error instanceof Error ? error.message : "An error occurred"
-      );
-      setSubmitStatus("error");
+        error instanceof Error ? error.message : 'An error occurred'
+      )
+      setSubmitStatus('error')
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <div className="max-w-2xl mx-auto">
       <h1 className="text-3xl font-bold mb-8">
-        {editingEntry ? "Edit Entry" : "Log New Entry"}
+        {editingEntry ? 'Edit Entry' : 'Log New Entry'}
       </h1>
 
       <div className="card">
         <p className="text-center text-gray-600 mb-8 flex items-center justify-center gap-2">
           {editingEntry
-            ? "Update your masterpiece!"
-            : "Time to document another masterpiece!"}{" "}
+            ? 'Update your masterpiece!'
+            : 'Time to document another masterpiece!'}{' '}
           <Logo size={24} />
         </p>
 
-        {submitStatus === "success" && (
+        {submitStatus === 'success' && (
           <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-            Entry {editingEntry ? "updated" : "saved"} successfully! Keep
+            Entry {editingEntry ? 'updated' : 'saved'} successfully! Keep
             tracking your progress.
           </div>
         )}
 
-        {submitStatus === "error" && (
+        {submitStatus === 'error' && (
           <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
             {errorMessage}
           </div>
@@ -360,7 +360,7 @@ export function NewEntryPage() {
               className="input-field"
               value={formData.bristolType}
               onChange={(e) =>
-                handleInputChange("bristolType", parseInt(e.target.value) || 0)
+                handleInputChange('bristolType', parseInt(e.target.value) || 0)
               }
               required
             >
@@ -387,7 +387,7 @@ export function NewEntryPage() {
               <select
                 className="input-field"
                 value={formData.volume}
-                onChange={(e) => handleInputChange("volume", e.target.value)}
+                onChange={(e) => handleInputChange('volume', e.target.value)}
               >
                 <option value="">Select volume</option>
                 <option value="Small">Small</option>
@@ -404,7 +404,7 @@ export function NewEntryPage() {
               <select
                 className="input-field"
                 value={formData.color}
-                onChange={(e) => handleInputChange("color", e.target.value)}
+                onChange={(e) => handleInputChange('color', e.target.value)}
               >
                 <option value="">Select color</option>
                 <option value="Brown">Brown</option>
@@ -427,7 +427,7 @@ export function NewEntryPage() {
               rows={3}
               placeholder="Any additional observations..."
               value={formData.notes}
-              onChange={(e) => handleInputChange("notes", e.target.value)}
+              onChange={(e) => handleInputChange('notes', e.target.value)}
             />
           </div>
 
@@ -489,11 +489,11 @@ export function NewEntryPage() {
             >
               {isSubmitting
                 ? editingEntry
-                  ? "Updating..."
-                  : "Saving..."
+                  ? 'Updating...'
+                  : 'Saving...'
                 : editingEntry
-                  ? "Update Entry"
-                  : "Save Entry"}
+                  ? 'Update Entry'
+                  : 'Save Entry'}
             </button>
 
             {editingEntry && (
@@ -538,10 +538,10 @@ export function NewEntryPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-500">
-                      {new Date(entry.createdAt).toLocaleDateString()} at{" "}
+                      {new Date(entry.createdAt).toLocaleDateString()} at{' '}
                       {new Date(entry.createdAt).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit"
+                        hour: '2-digit',
+                        minute: '2-digit'
                       })}
                     </span>
                     <div className="flex gap-1">
@@ -566,7 +566,7 @@ export function NewEntryPage() {
                 <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
                   {entry.volume && (
                     <div>
-                      <span className="font-medium">Volume:</span>{" "}
+                      <span className="font-medium">Volume:</span>{' '}
                       {entry.volume}
                     </div>
                   )}
@@ -598,5 +598,5 @@ export function NewEntryPage() {
         )}
       </div>
     </div>
-  );
+  )
 }

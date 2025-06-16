@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { useAuthStore } from "../stores/authStore";
-import Logo from "../components/Logo";
+import { useState, useEffect } from 'react'
+import { useAuthStore } from '../stores/authStore'
+import Logo from '../components/Logo'
 import {
   BarChart,
   Bar,
@@ -15,82 +15,80 @@ import {
   LineChart,
   Line,
   Legend
-} from "recharts";
+} from 'recharts'
 
 interface AnalyticsData {
-  totalEntries: number;
+  totalEntries: number
   bristolDistribution: Array<{
-    type: number;
-    count: number;
-  }>;
+    type: number
+    count: number
+  }>
   recentEntries: Array<{
-    id: string;
-    bristolType: number;
-    createdAt: string;
-    satisfaction?: number;
-  }>;
-  averageSatisfaction: number | null;
+    id: string
+    bristolType: number
+    createdAt: string
+    satisfaction?: number
+  }>
+  averageSatisfaction: number | null
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3002";
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002'
 
 const bristolTypeDescriptions = {
-  1: "Hard lumps",
-  2: "Lumpy sausage",
-  3: "Cracked sausage",
-  4: "Smooth sausage",
-  5: "Soft blobs",
-  6: "Fluffy pieces",
-  7: "Watery"
-};
+  1: 'Hard lumps',
+  2: 'Lumpy sausage',
+  3: 'Cracked sausage',
+  4: 'Smooth sausage',
+  5: 'Soft blobs',
+  6: 'Fluffy pieces',
+  7: 'Watery'
+}
 
 const bristolColors = [
-  "#8B5CF6",
-  "#EC4899",
-  "#F59E0B",
-  "#10B981",
-  "#3B82F6",
-  "#EF4444",
-  "#6B7280"
-];
+  '#8B5CF6',
+  '#EC4899',
+  '#F59E0B',
+  '#10B981',
+  '#3B82F6',
+  '#EF4444',
+  '#6B7280'
+]
 
 export function AnalyticsPage() {
-  const { token } = useAuthStore();
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(
-    null
-  );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>("");
+  const { token } = useAuthStore()
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string>('')
 
   useEffect(() => {
     const fetchAnalytics = async () => {
-      if (!token) return;
+      if (!token) return
 
       try {
         const response = await fetch(`${API_BASE_URL}/api/analytics/summary`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
-        });
+        })
 
         if (!response.ok) {
-          throw new Error("Failed to fetch analytics data");
+          throw new Error('Failed to fetch analytics data')
         }
 
-        const data = await response.json();
-        setAnalyticsData(data);
+        const data = await response.json()
+        setAnalyticsData(data)
       } catch (err) {
-        console.error("Error fetching analytics:", err);
+        console.error('Error fetching analytics:', err)
         setError(
-          err instanceof Error ? err.message : "Failed to load analytics"
-        );
+          err instanceof Error ? err.message : 'Failed to load analytics'
+        )
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchAnalytics();
-  }, [token]);
+    fetchAnalytics()
+  }, [token])
 
   // Prepare chart data
   const bristolChartData =
@@ -102,23 +100,23 @@ export function AnalyticsPage() {
         ],
       count: item.count,
       percentage: Math.round((item.count / analyticsData.totalEntries) * 100)
-    })) || [];
+    })) || []
 
   // Get frequency data from recent entries (group by day)
   const frequencyData =
     analyticsData?.recentEntries.reduce(
       (acc, entry) => {
-        const date = new Date(entry.createdAt).toLocaleDateString();
-        const existing = acc.find((item) => item.date === date);
+        const date = new Date(entry.createdAt).toLocaleDateString()
+        const existing = acc.find((item) => item.date === date)
         if (existing) {
-          existing.count += 1;
+          existing.count += 1
         } else {
-          acc.push({ date, count: 1 });
+          acc.push({ date, count: 1 })
         }
-        return acc;
+        return acc
       },
       [] as Array<{ date: string; count: number }>
-    ) || [];
+    ) || []
 
   if (loading) {
     return (
@@ -130,7 +128,7 @@ export function AnalyticsPage() {
           <p className="text-gray-600">Loading analytics data...</p>
         </div>
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -143,7 +141,7 @@ export function AnalyticsPage() {
           <p className="text-red-600">{error}</p>
         </div>
       </div>
-    );
+    )
   }
 
   if (!analyticsData || analyticsData.totalEntries === 0) {
@@ -154,12 +152,12 @@ export function AnalyticsPage() {
         </h1>
         <div className="card text-center py-8">
           <p className="text-gray-600 flex items-center justify-center gap-2">
-            No data to analyze yet. Start logging your entries!{" "}
+            No data to analyze yet. Start logging your entries!{' '}
             <Logo size={24} />
           </p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -189,7 +187,7 @@ export function AnalyticsPage() {
           <h3 className="text-2xl font-bold text-purple-600">
             {analyticsData.averageSatisfaction
               ? `${analyticsData.averageSatisfaction.toFixed(1)}/10`
-              : "N/A"}
+              : 'N/A'}
           </h3>
           <p className="text-gray-600">Avg Satisfaction</p>
         </div>
@@ -208,10 +206,10 @@ export function AnalyticsPage() {
                 <XAxis dataKey="type" />
                 <YAxis />
                 <Tooltip
-                  formatter={(value) => [value, "Count"]}
+                  formatter={(value) => [value, 'Count']}
                   labelFormatter={(label) => {
-                    const item = bristolChartData.find((d) => d.type === label);
-                    return item ? `${label}: ${item.description}` : label;
+                    const item = bristolChartData.find((d) => d.type === label)
+                    return item ? `${label}: ${item.description}` : label
                   }}
                 />
                 <Bar dataKey="count" fill="#3B82F6" />
@@ -247,11 +245,11 @@ export function AnalyticsPage() {
                     />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value) => [value, "Count"]} />
+                <Tooltip formatter={(value) => [value, 'Count']} />
                 <Legend
                   formatter={(value) => {
-                    const item = bristolChartData.find((d) => d.type === value);
-                    return item ? `${value}: ${item.description}` : value;
+                    const item = bristolChartData.find((d) => d.type === value)
+                    return item ? `${value}: ${item.description}` : value
                   }}
                 />
               </PieChart>
@@ -301,7 +299,7 @@ export function AnalyticsPage() {
                   Ideal Movements (Type 4)
                 </span>
                 <span className="text-sm text-gray-600">
-                  {bristolChartData.find((d) => d.type === "Type 4")
+                  {bristolChartData.find((d) => d.type === 'Type 4')
                     ?.percentage || 0}
                   %
                 </span>
@@ -310,7 +308,7 @@ export function AnalyticsPage() {
                 <div
                   className="bg-green-600 h-2 rounded-full"
                   style={{
-                    width: `${bristolChartData.find((d) => d.type === "Type 4")?.percentage || 0}%`
+                    width: `${bristolChartData.find((d) => d.type === 'Type 4')?.percentage || 0}%`
                   }}
                 />
               </div>
@@ -323,9 +321,9 @@ export function AnalyticsPage() {
                   Constipation Risk (Types 1-2)
                 </span>
                 <span className="text-sm text-gray-600">
-                  {(bristolChartData.find((d) => d.type === "Type 1")
+                  {(bristolChartData.find((d) => d.type === 'Type 1')
                     ?.percentage || 0) +
-                    (bristolChartData.find((d) => d.type === "Type 2")
+                    (bristolChartData.find((d) => d.type === 'Type 2')
                       ?.percentage || 0)}
                   %
                 </span>
@@ -335,9 +333,9 @@ export function AnalyticsPage() {
                   className="bg-red-600 h-2 rounded-full"
                   style={{
                     width: `${
-                      (bristolChartData.find((d) => d.type === "Type 1")
+                      (bristolChartData.find((d) => d.type === 'Type 1')
                         ?.percentage || 0) +
-                      (bristolChartData.find((d) => d.type === "Type 2")
+                      (bristolChartData.find((d) => d.type === 'Type 2')
                         ?.percentage || 0)
                     }%`
                   }}
@@ -352,9 +350,9 @@ export function AnalyticsPage() {
                   Diarrhea Risk (Types 6-7)
                 </span>
                 <span className="text-sm text-gray-600">
-                  {(bristolChartData.find((d) => d.type === "Type 6")
+                  {(bristolChartData.find((d) => d.type === 'Type 6')
                     ?.percentage || 0) +
-                    (bristolChartData.find((d) => d.type === "Type 7")
+                    (bristolChartData.find((d) => d.type === 'Type 7')
                       ?.percentage || 0)}
                   %
                 </span>
@@ -364,9 +362,9 @@ export function AnalyticsPage() {
                   className="bg-orange-600 h-2 rounded-full"
                   style={{
                     width: `${
-                      (bristolChartData.find((d) => d.type === "Type 6")
+                      (bristolChartData.find((d) => d.type === 'Type 6')
                         ?.percentage || 0) +
-                      (bristolChartData.find((d) => d.type === "Type 7")
+                      (bristolChartData.find((d) => d.type === 'Type 7')
                         ?.percentage || 0)
                     }%`
                   }}
@@ -425,7 +423,7 @@ export function AnalyticsPage() {
                       }
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {entry.satisfaction ? `${entry.satisfaction}/10` : "N/A"}
+                      {entry.satisfaction ? `${entry.satisfaction}/10` : 'N/A'}
                     </td>
                   </tr>
                 ))}
@@ -439,5 +437,5 @@ export function AnalyticsPage() {
         )}
       </div>
     </div>
-  );
+  )
 }

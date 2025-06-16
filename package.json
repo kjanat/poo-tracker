@@ -2,6 +2,7 @@
   "name": "poo-tracker",
   "version": "1.0.0",
   "description": "The brutally honest app for tracking your bowel movements",
+  "type": "module",
   "private": true,
   "scripts": {
     "ai:lint": "cd ai-service && uvx ruff check .",
@@ -17,8 +18,8 @@
     "build": "pnpm --recursive run build",
     "build:frontend": "pnpm --filter @poo-tracker/frontend run build",
     "build:backend": "pnpm --filter @poo-tracker/backend run build",
-    "lint": "pnpm --recursive run lint",
-    "lint:fix": "pnpm --recursive run lint:fix",
+    "lint": "eslint backend/src frontend/src",
+    "lint:fix": "eslint backend/src frontend/src --fix",
     "test": "pnpm --recursive run test",
     "test:watch": "pnpm --recursive run test:watch",
     "clean": "pnpm --recursive run clean",
@@ -32,7 +33,13 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "@eslint/js": "^9.29.0",
+    "@typescript-eslint/eslint-plugin": "^8.34.0",
+    "@typescript-eslint/parser": "^8.34.0",
     "concurrently": "^9.1.2",
+    "eslint": "^9.29.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
     "onchange": "^7.1.0",
@@ -49,8 +56,8 @@
   "prettier": {
     "trailingComma": "none",
     "tabWidth": 2,
-    "semi": true,
-    "singleQuote": false,
+    "semi": false,
+    "singleQuote": true,
     "plugins": [
       "prettier-plugin-sql",
       "prettier-plugin-prisma",

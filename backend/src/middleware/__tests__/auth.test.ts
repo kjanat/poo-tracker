@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { Request, Response, NextFunction } from 'express'
+import { Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import { authenticateToken, AuthenticatedRequest } from '../auth'
 import { config } from '../../config'

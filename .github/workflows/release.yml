@@ -3,11 +3,11 @@ name: 🚀 Release
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
   workflow_dispatch:
     inputs:
       version:
-        description: "Version to release (e.g., v1.0.0)"
+        description: 'Version to release (e.g., v1.0.0)'
         required: true
         type: string
 
@@ -162,7 +162,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.version.outputs.version }}
-          release_name: "💩 Poo Tracker ${{ steps.version.outputs.version }}"
+          release_name: '💩 Poo Tracker ${{ steps.version.outputs.version }}'
           body: |
             # Poo Tracker Release ${{ steps.version.outputs.version }}
 

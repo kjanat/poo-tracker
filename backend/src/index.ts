@@ -61,7 +61,7 @@ app.use('/api/analytics', analyticsRoutes)
 app.use('/uploads', express.static(config.uploads.directory))
 
 // 404 handler
-app.use((_req, res, next) => {
+app.use((_req, res) => {
   res.status(404).json({ error: 'Not found' })
 })
 

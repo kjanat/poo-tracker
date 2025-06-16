@@ -1,37 +1,37 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Logo from "../components/Logo";
-import { getLogoProps } from "../utils/branding";
-import { useAuthStore } from "../stores/authStore";
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Logo from '../components/Logo'
+import { getLogoProps } from '../utils/branding'
+import { useAuthStore } from '../stores/authStore'
 
 export function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const navigate = useNavigate()
+  const login = useAuthStore((state) => state.login)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+    e.preventDefault()
+    setLoading(true)
+    setError('')
 
     try {
-      await login(email, password);
-      navigate("/dashboard");
+      await login(email, password)
+      navigate('/dashboard')
     } catch (err: any) {
-      setError(err.message || "Login failed");
+      setError(err.message || 'Login failed')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="max-w-md mx-auto">
       <div className="card">
         <div className="text-center mb-6">
-          <Logo {...getLogoProps("login")} className="mx-auto mb-4" />
+          <Logo {...getLogoProps('login')} className="mx-auto mb-4" />
           <h1 className="text-2xl font-bold">Welcome Back</h1>
         </div>
         <p className="text-center text-gray-600 mb-8">
@@ -80,7 +80,7 @@ export function LoginPage() {
             className="btn-primary w-full"
             disabled={loading}
           >
-            {loading ? "Signing In..." : "Sign In"}
+            {loading ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
 
@@ -104,5 +104,5 @@ export function LoginPage() {
         </p>
       </div>
     </div>
-  );
+  )
 }

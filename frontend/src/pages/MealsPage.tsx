@@ -1,90 +1,90 @@
-import { useState, useEffect } from "react";
-import { useAuthStore } from "../stores/authStore";
-import Logo from "../components/Logo";
+import React, { useState, useEffect } from 'react'
+import { useAuthStore } from '../stores/authStore'
+import Logo from '../components/Logo'
 
 interface Meal {
-  id: string;
-  name: string;
-  category?: string;
-  description?: string;
-  cuisine?: string;
-  spicyLevel?: number;
-  fiberRich: boolean;
-  dairy: boolean;
-  gluten: boolean;
-  notes?: string;
-  photoUrl?: string;
-  mealTime: string;
-  createdAt: string;
-  linkedEntries?: Entry[];
+  id: string
+  name: string
+  category?: string
+  description?: string
+  cuisine?: string
+  spicyLevel?: number
+  fiberRich: boolean
+  dairy: boolean
+  gluten: boolean
+  notes?: string
+  photoUrl?: string
+  mealTime: string
+  createdAt: string
+  linkedEntries?: Entry[]
 }
 
 interface Entry {
-  id: string;
-  bristolType: number;
-  volume?: string;
-  color?: string;
-  consistency?: string;
-  notes?: string;
-  createdAt: string;
+  id: string
+  bristolType: number
+  volume?: string
+  color?: string
+  consistency?: string
+  notes?: string
+  createdAt: string
 }
 
 interface MealFormData {
-  name: string;
-  category: string;
-  description: string;
-  cuisine: string;
-  spicyLevel: number;
-  fiberRich: boolean;
-  dairy: boolean;
-  gluten: boolean;
-  notes: string;
-  photoUrl?: string;
+  name: string
+  category: string
+  description: string
+  cuisine: string
+  spicyLevel: number
+  fiberRich: boolean
+  dairy: boolean
+  gluten: boolean
+  notes: string
+  photoUrl?: string
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3002";
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002'
 
 export function MealsPage() {
   const [formData, setFormData] = useState<MealFormData>({
-    name: "",
-    category: "",
-    description: "",
-    cuisine: "",
+    name: '',
+    category: '',
+    description: '',
+    cuisine: '',
     spicyLevel: 1,
     fiberRich: false,
     dairy: false,
     gluten: false,
-    notes: ""
-  });
-  const [meals, setMeals] = useState<Meal[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [loadingMeals, setLoadingMeals] = useState(true);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [editingMeal, setEditingMeal] = useState<Meal | null>(null);
-  const [linkingMeal, setLinkingMeal] = useState<Meal | null>(null);
-  const [availableEntries, setAvailableEntries] = useState<Entry[]>([]);
-  const [linkedEntries, setLinkedEntries] = useState<Entry[]>([]);
-  const [showLinkingModal, setShowLinkingModal] = useState(false);
+    notes: ''
+  })
+  const [meals, setMeals] = useState<Meal[]>([])
+  const [loading, setLoading] = useState(false)
+  const [loadingMeals, setLoadingMeals] = useState(true)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [selectedImage, setSelectedImage] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [editingMeal, setEditingMeal] = useState<Meal | null>(null)
+  const [linkingMeal, setLinkingMeal] = useState<Meal | null>(null)
+  const [availableEntries, setAvailableEntries] = useState<Entry[]>([])
+  const [linkedEntries, setLinkedEntries] = useState<Entry[]>([])
+  const [showLinkingModal, setShowLinkingModal] = useState(false)
 
-  const token = useAuthStore((state) => state.token);
+  const token = useAuthStore((state) => state.token)
 
   // Fetch existing meals
   useEffect(() => {
     const fetchMeals = async () => {
-      if (!token) return;
+      if (!token) return
 
       try {
         const response = await fetch(`${API_BASE_URL}/api/meals`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
-        });
+        })
 
         if (response.ok) {
-          const mealsData = await response.json();
+          const mealsData = await response.json()
 
           // Fetch linked entries for each meal
           const mealsWithLinkedEntries = await Promise.all(
@@ -95,180 +95,178 @@ export function MealsPage() {
                   {
                     headers: { Authorization: `Bearer ${token}` }
                   }
-                );
+                )
 
                 if (linkedResponse.ok) {
-                  const linkedData = await linkedResponse.json();
-                  return { ...meal, linkedEntries: linkedData };
+                  const linkedData = await linkedResponse.json()
+                  return { ...meal, linkedEntries: linkedData }
                 } else {
-                  return { ...meal, linkedEntries: [] };
+                  return { ...meal, linkedEntries: [] }
                 }
               } catch (err) {
                 console.error(
                   `Failed to fetch linked entries for meal ${meal.id}:`,
                   err
-                );
-                return { ...meal, linkedEntries: [] };
+                )
+                return { ...meal, linkedEntries: [] }
               }
             })
-          );
+          )
 
-          setMeals(mealsWithLinkedEntries);
+          setMeals(mealsWithLinkedEntries)
         }
       } catch (err) {
-        console.error("Failed to fetch meals:", err);
+        console.error('Failed to fetch meals:', err)
       } finally {
-        setLoadingMeals(false);
+        setLoadingMeals(false)
       }
-    };
+    }
 
-    fetchMeals();
-  }, [token]);
+    fetchMeals()
+  }, [token])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
       // Validate file type
-      if (!file.type.startsWith("image/")) {
-        setError("Please select a valid image file");
-        return;
+      if (!file.type.startsWith('image/')) {
+        setError('Please select a valid image file')
+        return
       }
 
       // Validate file size (5MB limit)
       if (file.size > 5 * 1024 * 1024) {
-        setError("Image size must be less than 5MB");
-        return;
+        setError('Image size must be less than 5MB')
+        return
       }
 
-      setSelectedImage(file);
+      setSelectedImage(file)
 
       // Create preview
-      const reader = new FileReader();
+      const reader = new FileReader()
       reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+        setImagePreview(e.target?.result as string)
+      }
+      reader.readAsDataURL(file)
 
       // Clear any previous errors
-      setError("");
+      setError('')
     }
-  };
+  }
 
   const removeImage = () => {
-    setSelectedImage(null);
-    setImagePreview(null);
-  };
+    setSelectedImage(null)
+    setImagePreview(null)
+  }
 
   const uploadImage = async (): Promise<string | null> => {
-    if (!selectedImage) return null;
+    if (!selectedImage) return null
 
-    const uploadFormData = new FormData();
-    uploadFormData.append("image", selectedImage);
+    const uploadFormData = new FormData()
+    uploadFormData.append('image', selectedImage)
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/uploads`, {
-        method: "POST",
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`
         },
         body: uploadFormData
-      });
+      })
 
       if (!response.ok) {
-        throw new Error("Failed to upload image");
+        throw new Error('Failed to upload image')
       }
 
-      const data = await response.json();
-      return data.imageUrl;
+      const data = await response.json()
+      return data.imageUrl
     } catch (error) {
-      console.error("Error uploading image:", error);
-      throw error;
+      console.error('Error uploading image:', error)
+      throw error
     }
-  };
+  }
 
   const startEdit = (meal: Meal) => {
-    setEditingMeal(meal);
+    setEditingMeal(meal)
     setFormData({
       name: meal.name,
-      category: meal.category || "",
-      description: meal.description || "",
-      cuisine: meal.cuisine || "",
+      category: meal.category || '',
+      description: meal.description || '',
+      cuisine: meal.cuisine || '',
       spicyLevel: meal.spicyLevel || 1,
       fiberRich: meal.fiberRich,
       dairy: meal.dairy,
       gluten: meal.gluten,
-      notes: meal.notes || "",
+      notes: meal.notes || '',
       photoUrl: meal.photoUrl
-    });
+    })
     // Reset image states when editing
-    setSelectedImage(null);
-    setImagePreview(null);
+    setSelectedImage(null)
+    setImagePreview(null)
     // Scroll to form
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   const cancelEdit = () => {
-    setEditingMeal(null);
+    setEditingMeal(null)
     setFormData({
-      name: "",
-      category: "",
-      description: "",
-      cuisine: "",
+      name: '',
+      category: '',
+      description: '',
+      cuisine: '',
       spicyLevel: 1,
       fiberRich: false,
       dairy: false,
       gluten: false,
-      notes: ""
-    });
-    setSelectedImage(null);
-    setImagePreview(null);
-    setError("");
-    setSuccess("");
-  };
+      notes: ''
+    })
+    setSelectedImage(null)
+    setImagePreview(null)
+    setError('')
+    setSuccess('')
+  }
 
   const deleteMeal = async (mealId: string) => {
-    if (!confirm("Are you sure you want to delete this meal?")) return;
+    if (!confirm('Are you sure you want to delete this meal?')) return
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/meals/${mealId}`, {
-        method: "DELETE",
+        method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`
         }
-      });
+      })
 
       if (!response.ok) {
-        throw new Error("Failed to delete meal");
+        throw new Error('Failed to delete meal')
       }
 
       // Remove from local state
-      setMeals((prev) => prev.filter((meal) => meal.id !== mealId));
-      setSuccess("Meal deleted successfully!");
+      setMeals((prev) => prev.filter((meal) => meal.id !== mealId))
+      setSuccess('Meal deleted successfully!')
     } catch (error) {
-      console.error("Error deleting meal:", error);
-      setError(
-        error instanceof Error ? error.message : "Failed to delete meal"
-      );
+      console.error('Error deleting meal:', error)
+      setError(error instanceof Error ? error.message : 'Failed to delete meal')
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    setSuccess("");
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    setSuccess('')
 
     try {
       if (!token) {
-        throw new Error("Not authenticated");
+        throw new Error('Not authenticated')
       }
 
       // Upload image if selected
-      let photoUrl = formData.photoUrl;
+      let photoUrl = formData.photoUrl
       if (selectedImage) {
-        const uploadedUrl = await uploadImage();
+        const uploadedUrl = await uploadImage()
         if (uploadedUrl) {
-          photoUrl = uploadedUrl;
+          photoUrl = uploadedUrl
         }
       }
 
@@ -282,99 +280,99 @@ export function MealsPage() {
         description: formData.description || undefined,
         cuisine: formData.cuisine || undefined,
         notes: formData.notes || undefined
-      };
+      }
 
-      const isEditing = editingMeal !== null;
+      const isEditing = editingMeal !== null
       const url = isEditing
         ? `${API_BASE_URL}/api/meals/${editingMeal.id}`
-        : `${API_BASE_URL}/api/meals`;
-      const method = isEditing ? "PUT" : "POST";
+        : `${API_BASE_URL}/api/meals`
+      const method = isEditing ? 'PUT' : 'POST'
 
       const response = await fetch(url, {
         method,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(mealData)
-      });
+      })
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json()
         throw new Error(
-          errorData.error || `Failed to ${isEditing ? "update" : "save"} meal`
-        );
+          errorData.error || `Failed to ${isEditing ? 'update' : 'save'} meal`
+        )
       }
 
-      const savedMeal = await response.json();
+      const savedMeal = await response.json()
 
       if (isEditing) {
         // Update the meal in the list
         setMeals((prev) =>
           prev.map((meal) => (meal.id === editingMeal.id ? savedMeal : meal))
-        );
-        setSuccess("🎉 Meal updated successfully!");
-        setEditingMeal(null);
+        )
+        setSuccess('🎉 Meal updated successfully!')
+        setEditingMeal(null)
       } else {
         // Add new meal to top of list
-        setMeals((prev) => [savedMeal, ...prev]);
-        setSuccess("🎉 Meal saved successfully!");
+        setMeals((prev) => [savedMeal, ...prev])
+        setSuccess('🎉 Meal saved successfully!')
       }
 
       // Reset form
       setFormData({
-        name: "",
-        category: "",
-        description: "",
-        cuisine: "",
+        name: '',
+        category: '',
+        description: '',
+        cuisine: '',
         spicyLevel: 1,
         fiberRich: false,
         dairy: false,
         gluten: false,
-        notes: ""
-      });
-      setSelectedImage(null);
-      setImagePreview(null);
+        notes: ''
+      })
+      setSelectedImage(null)
+      setImagePreview(null)
     } catch (err: any) {
       setError(
-        err.message || `Failed to ${editingMeal ? "update" : "save"} meal`
-      );
+        err.message || `Failed to ${editingMeal ? 'update' : 'save'} meal`
+      )
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    const { name, value, type } = e.target;
+    const { name, value, type } = e.target
 
-    if (type === "checkbox") {
-      const checked = (e.target as HTMLInputElement).checked;
-      setFormData((prev) => ({ ...prev, [name]: checked }));
-    } else if (type === "number") {
-      setFormData((prev) => ({ ...prev, [name]: parseInt(value) || 1 }));
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked
+      setFormData((prev) => ({ ...prev, [name]: checked }))
+    } else if (type === 'number') {
+      setFormData((prev) => ({ ...prev, [name]: parseInt(value) || 1 }))
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }))
     }
-  };
+  }
 
   // Functions for linking entries to meals
   const openLinkingModal = async (meal: Meal) => {
-    setLinkingMeal(meal);
-    setShowLinkingModal(true);
+    setLinkingMeal(meal)
+    setShowLinkingModal(true)
 
     try {
       // Fetch available entries
       const entriesResponse = await fetch(`${API_BASE_URL}/api/entries`, {
         headers: { Authorization: `Bearer ${token}` }
-      });
+      })
 
       if (entriesResponse.ok) {
-        const entriesData = await entriesResponse.json();
-        setAvailableEntries(entriesData.entries || []);
+        const entriesData = await entriesResponse.json()
+        setAvailableEntries(entriesData.entries || [])
       }
 
       // Fetch already linked entries
@@ -383,32 +381,32 @@ export function MealsPage() {
         {
           headers: { Authorization: `Bearer ${token}` }
         }
-      );
+      )
 
       if (linkedResponse.ok) {
-        const linkedData = await linkedResponse.json();
-        setLinkedEntries(linkedData);
+        const linkedData = await linkedResponse.json()
+        setLinkedEntries(linkedData)
       }
     } catch (err) {
-      console.error("Failed to fetch entries:", err);
+      console.error('Failed to fetch entries:', err)
     }
-  };
+  }
 
   const linkEntryToMeal = async (entryId: string) => {
-    if (!linkingMeal) return;
+    if (!linkingMeal) return
 
     try {
       const response = await fetch(
         `${API_BASE_URL}/api/meals/${linkingMeal.id}/link-entry`,
         {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
           },
           body: JSON.stringify({ entryId })
         }
-      );
+      )
 
       if (response.ok) {
         // Refresh linked entries in the modal
@@ -417,11 +415,11 @@ export function MealsPage() {
           {
             headers: { Authorization: `Bearer ${token}` }
           }
-        );
+        )
 
         if (linkedResponse.ok) {
-          const linkedData = await linkedResponse.json();
-          setLinkedEntries(linkedData);
+          const linkedData = await linkedResponse.json()
+          setLinkedEntries(linkedData)
 
           // Also update the main meals list to reflect the change
           setMeals((prevMeals) =>
@@ -430,33 +428,33 @@ export function MealsPage() {
                 ? { ...meal, linkedEntries: linkedData }
                 : meal
             )
-          );
+          )
         }
-        setSuccess("Entry linked successfully!");
+        setSuccess('Entry linked successfully!')
       } else {
-        const errorData = await response.json();
-        setError(errorData.error || "Failed to link entry");
+        const errorData = await response.json()
+        setError(errorData.error || 'Failed to link entry')
       }
-    } catch (err) {
-      setError("Failed to link entry");
+    } catch {
+      setError('Failed to link entry')
     }
-  };
+  }
 
   const unlinkEntryFromMeal = async (entryId: string) => {
-    if (!linkingMeal) return;
+    if (!linkingMeal) return
 
     try {
       const response = await fetch(
         `${API_BASE_URL}/api/meals/${linkingMeal.id}/unlink-entry`,
         {
-          method: "DELETE",
+          method: 'DELETE',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
           },
           body: JSON.stringify({ entryId })
         }
-      );
+      )
 
       if (response.ok) {
         // Refresh linked entries in the modal
@@ -465,11 +463,11 @@ export function MealsPage() {
           {
             headers: { Authorization: `Bearer ${token}` }
           }
-        );
+        )
 
         if (linkedResponse.ok) {
-          const linkedData = await linkedResponse.json();
-          setLinkedEntries(linkedData);
+          const linkedData = await linkedResponse.json()
+          setLinkedEntries(linkedData)
 
           // Also update the main meals list to reflect the change
           setMeals((prevMeals) =>
@@ -478,17 +476,17 @@ export function MealsPage() {
                 ? { ...meal, linkedEntries: linkedData }
                 : meal
             )
-          );
+          )
         }
-        setSuccess("Entry unlinked successfully!");
+        setSuccess('Entry unlinked successfully!')
       } else {
-        const errorData = await response.json();
-        setError(errorData.error || "Failed to unlink entry");
+        const errorData = await response.json()
+        setError(errorData.error || 'Failed to unlink entry')
       }
-    } catch (err) {
-      setError("Failed to unlink entry");
+    } catch {
+      setError('Failed to unlink entry')
     }
-  };
+  }
 
   // Function to unlink entry directly from the main meal view
   const unlinkEntryFromMainView = async (mealId: string, entryId: string) => {
@@ -496,14 +494,14 @@ export function MealsPage() {
       const response = await fetch(
         `${API_BASE_URL}/api/meals/${mealId}/unlink-entry`,
         {
-          method: "DELETE",
+          method: 'DELETE',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
           },
           body: JSON.stringify({ entryId })
         }
-      );
+      )
 
       if (response.ok) {
         // Refresh linked entries for this specific meal
@@ -512,43 +510,43 @@ export function MealsPage() {
           {
             headers: { Authorization: `Bearer ${token}` }
           }
-        );
+        )
 
         if (linkedResponse.ok) {
-          const linkedData = await linkedResponse.json();
+          const linkedData = await linkedResponse.json()
 
           // Update the main meals list to reflect the change
           setMeals((prevMeals) =>
             prevMeals.map((meal) =>
               meal.id === mealId ? { ...meal, linkedEntries: linkedData } : meal
             )
-          );
+          )
         }
-        setSuccess("Entry unlinked successfully!");
+        setSuccess('Entry unlinked successfully!')
 
         // Clear success message after a few seconds
-        setTimeout(() => setSuccess(""), 3000);
+        setTimeout(() => setSuccess(''), 3000)
       } else {
-        const errorData = await response.json();
-        setError(errorData.error || "Failed to unlink entry");
+        const errorData = await response.json()
+        setError(errorData.error || 'Failed to unlink entry')
       }
-    } catch (err) {
-      setError("Failed to unlink entry");
+    } catch {
+      setError('Failed to unlink entry')
     }
-  };
+  }
 
   const formatBristolType = (type: number) => {
     const types = [
-      "Separate hard lumps",
-      "Lumpy sausage",
-      "Cracked sausage",
-      "Smooth snake",
-      "Soft blobs",
-      "Mushy stool",
-      "Liquid stool"
-    ];
-    return `Type ${type} - ${types[type - 1]}`;
-  };
+      'Separate hard lumps',
+      'Lumpy sausage',
+      'Cracked sausage',
+      'Smooth snake',
+      'Soft blobs',
+      'Mushy stool',
+      'Liquid stool'
+    ]
+    return `Type ${type} - ${types[type - 1]}`
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -558,7 +556,7 @@ export function MealsPage() {
 
       <div className="card mb-6">
         <h3 className="text-lg font-semibold mb-4">
-          {editingMeal ? "Edit Meal" : "Log New Meal"}
+          {editingMeal ? 'Edit Meal' : 'Log New Meal'}
         </h3>
 
         {error && (
@@ -761,11 +759,11 @@ export function MealsPage() {
             >
               {loading
                 ? editingMeal
-                  ? "Updating..."
-                  : "Saving..."
+                  ? 'Updating...'
+                  : 'Saving...'
                 : editingMeal
-                  ? "Update Meal"
-                  : "Save Meal"}
+                  ? 'Update Meal'
+                  : 'Save Meal'}
             </button>
 
             {editingMeal && (
@@ -802,7 +800,7 @@ export function MealsPage() {
                   <h4 className="font-semibold text-lg">{meal.name}</h4>
                   <div className="flex items-center gap-2">
                     <div className="text-sm text-gray-500">
-                      {new Date(meal.mealTime).toLocaleDateString()}{" "}
+                      {new Date(meal.mealTime).toLocaleDateString()}{' '}
                       {new Date(meal.mealTime).toLocaleTimeString()}
                     </div>
                     <div className="flex gap-1">
@@ -910,7 +908,7 @@ export function MealsPage() {
                         >
                           <div className="text-sm">
                             <p>
-                              <strong>Bristol Type:</strong>{" "}
+                              <strong>Bristol Type:</strong>{' '}
                               {formatBristolType(entry.bristolType)}
                             </p>
                             {entry.notes && (
@@ -989,7 +987,7 @@ export function MealsPage() {
                           {formatBristolType(entry.bristolType)}
                         </p>
                         <p className="text-gray-600">
-                          {new Date(entry.createdAt).toLocaleDateString()}{" "}
+                          {new Date(entry.createdAt).toLocaleDateString()}{' '}
                           {new Date(entry.createdAt).toLocaleTimeString()}
                         </p>
                         {entry.volume && (
@@ -1038,7 +1036,7 @@ export function MealsPage() {
                             {formatBristolType(entry.bristolType)}
                           </p>
                           <p className="text-gray-600">
-                            {new Date(entry.createdAt).toLocaleDateString()}{" "}
+                            {new Date(entry.createdAt).toLocaleDateString()}{' '}
                             {new Date(entry.createdAt).toLocaleTimeString()}
                           </p>
                           {entry.volume && (
@@ -1069,10 +1067,10 @@ export function MealsPage() {
             <div className="flex justify-end gap-3 pt-4 border-t">
               <button
                 onClick={() => {
-                  setShowLinkingModal(false);
-                  setLinkingMeal(null);
-                  setError("");
-                  setSuccess("");
+                  setShowLinkingModal(false)
+                  setLinkingMeal(null)
+                  setError('')
+                  setSuccess('')
                 }}
                 className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
                 disabled={loading}
@@ -1084,5 +1082,5 @@ export function MealsPage() {
         </div>
       )}
     </div>
-  );
+  )
 }

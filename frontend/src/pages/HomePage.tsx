@@ -1,18 +1,18 @@
-import { Link } from "react-router-dom";
-import { useAuthStore } from "../stores/authStore";
-import { BarChart3, Camera, Utensils, Brain } from "lucide-react";
-import Logo from "../components/Logo";
-import { getLogoProps } from "../utils/branding";
+import { Link } from 'react-router-dom'
+import { useAuthStore } from '../stores/authStore'
+import { BarChart3, Camera, Utensils, Brain } from 'lucide-react'
+import Logo from '../components/Logo'
+import { getLogoProps } from '../utils/branding'
 
 export function HomePage() {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAuthStore()
 
   return (
     <div className="max-w-6xl mx-auto">
       {/* Hero Section */}
       <div className="text-center py-16">
         <h1 className="text-6xl font-bold mb-4 flex items-center justify-center">
-          <Logo {...getLogoProps("hero")} className="mr-4" />
+          <Logo {...getLogoProps('hero')} className="mr-4" />
           Poo Tracker
         </h1>
         <p className="text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
@@ -146,5 +146,5 @@ export function HomePage() {
         </p>
       </section>
     </div>
-  );
+  )
 }

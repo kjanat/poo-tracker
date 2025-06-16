@@ -1,171 +1,171 @@
-import React, { useState, useEffect } from "react";
-import { useAuthStore } from "../stores/authStore";
-import Logo from "../components/Logo";
+import React, { useState, useEffect } from 'react'
+import { useAuthStore } from '../stores/authStore'
+import Logo from '../components/Logo'
 
 interface UserProfile {
-  id: string;
-  email: string;
-  name?: string;
-  createdAt: string;
-  updatedAt: string;
+  id: string
+  email: string
+  name?: string
+  createdAt: string
+  updatedAt: string
 }
 
 interface UserAuth {
-  lastLogin?: string;
-  createdAt: string;
-  updatedAt: string;
+  lastLogin?: string
+  createdAt: string
+  updatedAt: string
 }
 
 const ProfilePage: React.FC = () => {
-  const { token, logout } = useAuthStore();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [userAuth, setUserAuth] = useState<UserAuth | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const { token, logout } = useAuthStore()
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [userAuth, setUserAuth] = useState<UserAuth | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState({
-    name: "",
-    email: "",
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: ""
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+    name: '',
+    email: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchUserProfile();
-  }, []);
+    fetchUserProfile()
+  }, [])
 
   const fetchUserProfile = async () => {
     try {
-      setLoading(true);
-      setError(null);
+      setLoading(true)
+      setError(null)
 
-      const response = await fetch("/api/auth/profile", {
+      const response = await fetch('/api/auth/profile', {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json'
         }
-      });
+      })
 
       if (!response.ok) {
-        throw new Error("Failed to fetch profile");
+        throw new Error('Failed to fetch profile')
       }
 
-      const data = await response.json();
-      setProfile(data.user);
-      setUserAuth(data.auth);
+      const data = await response.json()
+      setProfile(data.user)
+      setUserAuth(data.auth)
       setEditForm({
-        name: data.user.name || "",
+        name: data.user.name || '',
         email: data.user.email,
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: ""
-      });
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      })
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load profile");
+      setError(err instanceof Error ? err.message : 'Failed to load profile')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleEditToggle = () => {
-    setIsEditing(!isEditing);
-    setError(null);
-    setSuccess(null);
+    setIsEditing(!isEditing)
+    setError(null)
+    setSuccess(null)
     if (!isEditing && profile) {
       setEditForm({
-        name: profile.name || "",
+        name: profile.name || '',
         email: profile.email,
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: ""
-      });
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      })
     }
-  };
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setEditForm((prev) => ({ ...prev, [name]: value }));
-  };
+    const { name, value } = e.target
+    setEditForm((prev) => ({ ...prev, [name]: value }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(null);
+    e.preventDefault()
+    setError(null)
+    setSuccess(null)
 
     // Validate password change if attempting to change password
     if (editForm.newPassword || editForm.confirmPassword) {
       if (!editForm.currentPassword) {
-        setError("Current password is required to change password");
-        return;
+        setError('Current password is required to change password')
+        return
       }
       if (editForm.newPassword !== editForm.confirmPassword) {
-        setError("New passwords do not match");
-        return;
+        setError('New passwords do not match')
+        return
       }
       if (editForm.newPassword.length < 6) {
-        setError("New password must be at least 6 characters long");
-        return;
+        setError('New password must be at least 6 characters long')
+        return
       }
     }
 
     try {
-      setLoading(true);
+      setLoading(true)
 
       const updateData: any = {
         name: editForm.name,
         email: editForm.email
-      };
+      }
 
       if (editForm.newPassword) {
-        updateData.currentPassword = editForm.currentPassword;
-        updateData.newPassword = editForm.newPassword;
+        updateData.currentPassword = editForm.currentPassword
+        updateData.newPassword = editForm.newPassword
       }
 
-      const response = await fetch("/api/auth/profile", {
-        method: "PUT",
+      const response = await fetch('/api/auth/profile', {
+        method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(updateData)
-      });
+      })
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update profile");
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to update profile')
       }
 
-      const data = await response.json();
-      setProfile(data.user);
-      setUserAuth(data.auth);
-      setIsEditing(false);
-      setSuccess("Profile updated successfully!");
+      const data = await response.json()
+      setProfile(data.user)
+      setUserAuth(data.auth)
+      setIsEditing(false)
+      setSuccess('Profile updated successfully!')
 
       // Clear password fields
       setEditForm((prev) => ({
         ...prev,
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: ""
-      }));
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      }))
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update profile");
+      setError(err instanceof Error ? err.message : 'Failed to update profile')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    });
-  };
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
 
   if (loading && !profile) {
     return (
@@ -186,7 +186,7 @@ const ProfilePage: React.FC = () => {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -239,11 +239,11 @@ const ProfilePage: React.FC = () => {
                     onClick={handleEditToggle}
                     className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                       isEditing
-                        ? "bg-gray-500 hover:bg-gray-600 text-white"
-                        : "bg-amber-500 hover:bg-amber-600 text-white"
+                        ? 'bg-gray-500 hover:bg-gray-600 text-white'
+                        : 'bg-amber-500 hover:bg-amber-600 text-white'
                     }`}
                   >
-                    {isEditing ? "Cancel" : "Edit Profile"}
+                    {isEditing ? 'Cancel' : 'Edit Profile'}
                   </button>
                 </div>
 
@@ -254,7 +254,7 @@ const ProfilePage: React.FC = () => {
                         Name
                       </label>
                       <p className="text-gray-900">
-                        {profile?.name || "Not set"}
+                        {profile?.name || 'Not set'}
                       </p>
                     </div>
                     <div className="bg-gray-50 p-4 rounded-lg">
@@ -354,7 +354,7 @@ const ProfilePage: React.FC = () => {
                         disabled={loading}
                         className="flex-1 bg-amber-500 hover:bg-amber-600 text-white py-2 px-4 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {loading ? "Saving..." : "Save Changes"}
+                        {loading ? 'Saving...' : 'Save Changes'}
                       </button>
                     </div>
                   </form>
@@ -412,7 +412,7 @@ const ProfilePage: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ProfilePage;
+export default ProfilePage

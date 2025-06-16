@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
-async function main() {
+async function main(): Promise<void> {
   console.log('🌱 Starting database seed...')
 
   // Clean existing data
@@ -55,19 +55,7 @@ async function main() {
     }
   })
 
-  const user4 = await prisma.user.create({
-    data: {
-      email: 'kjanat@test.com',
-      name: 'kjanat',
-      auth: {
-        create: {
-          password: hashedPassword
-        }
-      }
-    }
-  })
-
-  console.log(`✅ Created ${4} users with separate auth records - password: ${defaultPassword}`)
+  console.log(`✅ Created ${3} users with separate auth records - password: ${defaultPassword}`)
 
   // Create sample meals for user1
   console.log('🍽️  Creating sample meals...')
@@ -347,7 +335,7 @@ async function main() {
   const entryCount = await prisma.entry.count()
 
   console.log('\n🎉 Database seeding completed!')
-  console.log(`📊 Summary:`)
+  console.log('📊 Summary:')
   console.log(`   👤 Users: ${userCount}`)
   console.log(`   🍽️  Meals: ${mealCount}`)
   console.log(`   💩 Entries: ${entryCount}`)

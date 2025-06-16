@@ -1,91 +1,91 @@
-import { useState, useEffect } from "react";
-import { useAuthStore } from "../stores/authStore";
-import Logo from "../components/Logo";
+import { useState, useEffect } from 'react'
+import { useAuthStore } from '../stores/authStore'
+import Logo from '../components/Logo'
 
 interface AnalyticsSummary {
-  totalEntries: number;
-  bristolDistribution: { type: number; count: number }[];
+  totalEntries: number
+  bristolDistribution: { type: number; count: number }[]
   recentEntries: {
-    id: string;
-    bristolType: number;
-    createdAt: string;
-    satisfaction?: number;
-  }[];
-  averageSatisfaction?: number;
+    id: string
+    bristolType: number
+    createdAt: string
+    satisfaction?: number
+  }[]
+  averageSatisfaction?: number
 }
 
 interface EntryResponse {
-  id: string;
-  bristolType: number;
-  volume?: string;
-  color?: string;
-  notes?: string;
-  createdAt: string;
-  userId: string;
+  id: string
+  bristolType: number
+  volume?: string
+  color?: string
+  notes?: string
+  createdAt: string
+  userId: string
 }
 
 interface EntriesApiResponse {
-  entries: EntryResponse[];
+  entries: EntryResponse[]
   pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    pages: number;
-  };
+    page: number
+    limit: number
+    total: number
+    pages: number
+  }
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3002";
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002'
 
 const getBristolTypeDescription = (type: number): string => {
   const descriptions = {
-    1: "Hard lumps",
-    2: "Lumpy sausage",
-    3: "Cracked sausage",
-    4: "Smooth sausage",
-    5: "Soft blobs",
-    6: "Fluffy pieces",
-    7: "Watery"
-  };
-  return descriptions[type as keyof typeof descriptions] || "Unknown";
-};
+    1: 'Hard lumps',
+    2: 'Lumpy sausage',
+    3: 'Cracked sausage',
+    4: 'Smooth sausage',
+    5: 'Soft blobs',
+    6: 'Fluffy pieces',
+    7: 'Watery'
+  }
+  return descriptions[type as keyof typeof descriptions] || 'Unknown'
+}
 
 const getBristolTypeCategory = (type: number): string => {
-  if (type <= 2) return "Constipated";
-  if (type <= 4) return "Normal";
-  return "Loose";
-};
+  if (type <= 2) return 'Constipated'
+  if (type <= 4) return 'Normal'
+  return 'Loose'
+}
 
 const getThisWeekCount = (entries: EntryResponse[]): number => {
-  const oneWeekAgo = new Date();
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  const oneWeekAgo = new Date()
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
 
   return entries.filter((entry) => new Date(entry.createdAt) >= oneWeekAgo)
-    .length;
-};
+    .length
+}
 
 const getAverageBristolType = (
   bristolDistribution: { type: number; count: number }[]
 ): number => {
-  if (bristolDistribution.length === 0) return 0;
+  if (bristolDistribution.length === 0) return 0
 
   const totalCount = bristolDistribution.reduce(
     (sum, item) => sum + item.count,
     0
-  );
+  )
   const weightedSum = bristolDistribution.reduce(
     (sum, item) => sum + item.type * item.count,
     0
-  );
+  )
 
-  return totalCount > 0 ? Number((weightedSum / totalCount).toFixed(1)) : 0;
-};
+  return totalCount > 0 ? Number((weightedSum / totalCount).toFixed(1)) : 0
+}
 
 export function DashboardPage() {
-  const { token } = useAuthStore();
-  const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
-  const [recentEntries, setRecentEntries] = useState<EntryResponse[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string>("");
+  const { token } = useAuthStore()
+  const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null)
+  const [recentEntries, setRecentEntries] = useState<EntryResponse[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string>('')
 
   const fetchAnalytics = async () => {
     try {
@@ -93,21 +93,21 @@ export function DashboardPage() {
         headers: {
           Authorization: `Bearer ${token}`
         }
-      });
+      })
 
       if (!response.ok) {
-        throw new Error("Failed to fetch analytics");
+        throw new Error('Failed to fetch analytics')
       }
 
-      const data: AnalyticsSummary = await response.json();
-      setAnalytics(data);
+      const data: AnalyticsSummary = await response.json()
+      setAnalytics(data)
     } catch (error) {
-      console.error("Error fetching analytics:", error);
+      console.error('Error fetching analytics:', error)
       setError(
-        error instanceof Error ? error.message : "Failed to load analytics"
-      );
+        error instanceof Error ? error.message : 'Failed to load analytics'
+      )
     }
-  };
+  }
 
   const fetchRecentEntries = async () => {
     try {
@@ -118,36 +118,36 @@ export function DashboardPage() {
             Authorization: `Bearer ${token}`
           }
         }
-      );
+      )
 
       if (!response.ok) {
-        throw new Error("Failed to fetch entries");
+        throw new Error('Failed to fetch entries')
       }
 
-      const data: EntriesApiResponse = await response.json();
-      setRecentEntries(data.entries);
+      const data: EntriesApiResponse = await response.json()
+      setRecentEntries(data.entries)
     } catch (error) {
-      console.error("Error fetching recent entries:", error);
+      console.error('Error fetching recent entries:', error)
       setError(
-        error instanceof Error ? error.message : "Failed to load recent entries"
-      );
+        error instanceof Error ? error.message : 'Failed to load recent entries'
+      )
     }
-  };
+  }
 
   useEffect(() => {
     const loadDashboardData = async () => {
-      setIsLoading(true);
-      setError("");
+      setIsLoading(true)
+      setError('')
 
       if (token) {
-        await Promise.all([fetchAnalytics(), fetchRecentEntries()]);
+        await Promise.all([fetchAnalytics(), fetchRecentEntries()])
       }
 
-      setIsLoading(false);
-    };
+      setIsLoading(false)
+    }
 
-    loadDashboardData();
-  }, [token]);
+    loadDashboardData()
+  }, [token])
 
   if (isLoading) {
     return (
@@ -160,7 +160,7 @@ export function DashboardPage() {
           <p className="text-gray-600">Loading your poo data...</p>
         </div>
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -174,13 +174,13 @@ export function DashboardPage() {
           <p className="text-red-600">Error: {error}</p>
         </div>
       </div>
-    );
+    )
   }
 
   const averageBristol = analytics
     ? getAverageBristolType(analytics.bristolDistribution)
-    : 0;
-  const thisWeekCount = getThisWeekCount(recentEntries);
+    : 0
+  const thisWeekCount = getThisWeekCount(recentEntries)
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -200,7 +200,7 @@ export function DashboardPage() {
         <div className="card">
           <h3 className="text-lg font-semibold mb-2">Avg Bristol Score</h3>
           <p className="text-3xl font-bold text-poo-brown-600">
-            {averageBristol || "N/A"}
+            {averageBristol || 'N/A'}
           </p>
           {averageBristol > 0 && (
             <p className="text-sm text-gray-600 mt-1">
@@ -250,8 +250,8 @@ export function DashboardPage() {
                     </div>
                     <div className="text-xs text-gray-500">
                       {new Date(entry.createdAt).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit"
+                        hour: '2-digit',
+                        minute: '2-digit'
                       })}
                     </div>
                   </div>
@@ -310,10 +310,10 @@ export function DashboardPage() {
                 <h4 className="font-medium mb-2">Health Trend</h4>
                 <div className="text-sm text-gray-600">
                   {averageBristol >= 3 && averageBristol <= 4
-                    ? "🟢 Your bowel movements are in the normal range!"
+                    ? '🟢 Your bowel movements are in the normal range!'
                     : averageBristol < 3
-                      ? "🟡 You might be experiencing constipation. Consider more fiber."
-                      : "🟡 Your stools are on the loose side. Monitor your diet."}
+                      ? '🟡 You might be experiencing constipation. Consider more fiber.'
+                      : '🟡 Your stools are on the loose side. Monitor your diet.'}
                 </div>
               </div>
             </div>
@@ -325,5 +325,5 @@ export function DashboardPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }
