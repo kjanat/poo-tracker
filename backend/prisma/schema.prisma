@@ -21,12 +21,12 @@ model User {
     updatedAt DateTime @updatedAt
 
     // Relations
-    auth        UserAuth?
-    settings    UserSettings?
-    entries     Entry[]
-    meals       Meal[]
-    symptoms    Symptom[]
-    medications Medication[]
+    auth           UserAuth?
+    settings       UserSettings?
+    bowelMovements BowelMovement[]
+    meals          Meal[]
+    symptoms       Symptom[]
+    medications    Medication[]
 
     @@index([createdAt]) // For user registration analytics
     @@map("users")
@@ -94,9 +94,9 @@ model UserSettings {
 }
 
 /**
- * Main Entry Model
+ * Main Bowel Movement Model
  */
-model Entry {
+model BowelMovement {
     id        String   @id @default(cuid())
     userId    String
     createdAt DateTime @default(now())
@@ -121,31 +121,31 @@ model Entry {
     smell    SmellLevel?
 
     // Relations
-    user     User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-    details  EntryDetails?
-    meals    MealEntryRelation[]
+    user     User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    details  BowelMovementDetails?
+    meals    MealBowelMovementRelation[]
     symptoms Symptom[]
     // Note: Prisma automatically creates an index on userId (foreign key)
 
     @@index([userId, createdAt]) // Primary query pattern
     @@index([createdAt]) // For date-based queries
     @@index([bristolType]) // For health analytics
-    @@map("entries")
+    @@map("bowel_movements")
 }
 
 /**
  * Separate large fields for performance
  */
-model EntryDetails {
-    id      String @id @default(cuid())
-    entryId String @unique
+model BowelMovementDetails {
+    id              String @id @default(cuid())
+    bowelMovementId String @unique
 
     notes      String?
     aiAnalysis Json?
 
-    entry Entry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+    bowelMovement BowelMovement @relation(fields: [bowelMovementId], references: [id], onDelete: Cascade)
 
-    @@map("entry_details")
+    @@map("bowel_movement_details")
 }
 
 /**
@@ -173,8 +173,8 @@ model Meal {
     notes    String?
 
     // Relations
-    user    User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-    entries MealEntryRelation[]
+    user           User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    bowelMovements MealBowelMovementRelation[]
 
     @@index([userId, mealTime]) // Primary query pattern
     @@index([mealTime]) // For chronological queries
@@ -182,36 +182,36 @@ model Meal {
 }
 
 /**
- * Junction table for many-to-many relationship between meals and entries
+ * Junction table for many-to-many relationship between meals and bowel movements
  */
-model MealEntryRelation {
-    id      String @id @default(cuid())
-    mealId  String
-    entryId String
+model MealBowelMovementRelation {
+    id              String @id @default(cuid())
+    mealId          String
+    bowelMovementId String
 
     // Relations
-    meal  Meal  @relation(fields: [mealId], references: [id], onDelete: Cascade)
-    entry Entry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+    meal          Meal          @relation(fields: [mealId], references: [id], onDelete: Cascade)
+    bowelMovement BowelMovement @relation(fields: [bowelMovementId], references: [id], onDelete: Cascade)
 
-    @@unique([mealId, entryId])
-    @@map("meal_entry_relations")
+    @@unique([mealId, bowelMovementId])
+    @@map("meal_bowel_movement_relations")
 }
 
 /**
  * Symptom Tracking
  */
 model Symptom {
-    id        String   @id @default(cuid())
-    userId    String
-    entryId   String? // Optional link to entry
-    createdAt DateTime @default(now())
+    id              String   @id @default(cuid())
+    userId          String
+    bowelMovementId String? // Optional link to bowel movement
+    createdAt       DateTime @default(now())
 
     type     SymptomType
     severity Int         @db.SmallInt // 1-10 scale
     notes    String?
 
-    user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    entry Entry? @relation(fields: [entryId], references: [id], onDelete: SetNull)
+    user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+    bowelMovement BowelMovement? @relation(fields: [bowelMovementId], references: [id], onDelete: SetNull)
 
     @@index([userId, createdAt])
     @@map("symptoms")
