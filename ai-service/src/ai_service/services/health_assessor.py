@@ -1,7 +1,6 @@
 """Health assessment service for calculating health scores and trends."""
 
-from typing import Any, Dict, List
-from datetime import datetime, timedelta
+from typing import Any
 
 from ..config.logging import get_logger
 from ..models.database import BowelMovementData, SymptomData
@@ -19,8 +18,8 @@ class HealthAssessorService:
 
     async def calculate_health_score(
         self,
-        bowel_movements: List[BowelMovementData],
-        symptoms: List[SymptomData] | None = None,
+        bowel_movements: list[BowelMovementData],
+        symptoms: list[SymptomData] | None = None,
     ) -> HealthScore:
         """
         Calculate comprehensive health score.
@@ -76,9 +75,9 @@ class HealthAssessorService:
 
     async def assess_digestive_health(
         self,
-        bowel_movements: List[BowelMovementData],
-        symptoms: List[SymptomData] | None = None,
-    ) -> Dict[str, Any]:
+        bowel_movements: list[BowelMovementData],
+        symptoms: list[SymptomData] | None = None,
+    ) -> dict[str, Any]:
         """
         Perform comprehensive digestive health assessment.
 
@@ -118,8 +117,8 @@ class HealthAssessorService:
         return assessment
 
     def _calculate_daily_frequencies(
-        self, bowel_movements: List[BowelMovementData]
-    ) -> List[float]:
+        self, bowel_movements: list[BowelMovementData]
+    ) -> list[float]:
         """Calculate daily frequencies from bowel movement data."""
         if not bowel_movements:
             return []
@@ -132,7 +131,7 @@ class HealthAssessorService:
 
         return list(daily_counts.values())
 
-    async def _calculate_trend(self, bowel_movements: List[BowelMovementData]) -> str:
+    async def _calculate_trend(self, bowel_movements: list[BowelMovementData]) -> str:
         """Calculate health trend from recent vs historical data."""
         if len(bowel_movements) < 14:  # Need at least 2 weeks of data
             return "stable"
@@ -186,7 +185,7 @@ class HealthAssessorService:
             return "stable"
 
     def _assess_pain_trend(
-        self, historical_pain: List[int], recent_pain: List[int]
+        self, historical_pain: list[int], recent_pain: list[int]
     ) -> str:
         """Assess trend based on pain scores."""
         if not historical_pain or not recent_pain:

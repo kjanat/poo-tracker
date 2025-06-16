@@ -1,19 +1,17 @@
 """Core analysis service for bowel movement pattern analysis."""
 
+import uuid
 from datetime import datetime, timedelta
 from typing import Any
-import uuid
 
-import numpy as np
 import pandas as pd
 
 from ..config.logging import get_logger
-from ..models.database import BowelMovementData, MealData, SymptomData, AnalysisMetadata
+from ..models.database import AnalysisMetadata, BowelMovementData, MealData, SymptomData
 from ..models.responses import (
     BristolAnalysis,
-    TimingPattern,
     FrequencyStats,
-    MealCorrelation,
+    TimingPattern,
 )
 from ..utils.data_processing import DataProcessor
 from ..utils.health_metrics import HealthMetricsCalculator

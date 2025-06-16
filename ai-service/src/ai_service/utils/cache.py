@@ -1,8 +1,8 @@
 """Cache management utilities using Redis."""
 
-import json
 import hashlib
-from typing import Any, Dict
+import json
+from typing import Any
 
 import redis.asyncio as redis
 
@@ -87,18 +87,18 @@ class CacheManager:
 
         return f"{settings.cache_prefix}:analysis:{hash_digest}"
 
-    async def get_analysis_result(self, cache_key: str) -> Dict[str, Any] | None:
+    async def get_analysis_result(self, cache_key: str) -> dict[str, Any] | None:
         """Get cached analysis result."""
         return await self.get(cache_key)
 
     async def cache_analysis_result(
-        self, cache_key: str, result: Dict[str, Any], ttl: int = None
+        self, cache_key: str, result: dict[str, Any], ttl: int = None
     ) -> bool:
         """Cache analysis result."""
         cache_ttl = ttl or settings.cache_ttl
         return await self.set(cache_key, result, cache_ttl)
 
-    async def get_cache_stats(self) -> Dict[str, Any]:
+    async def get_cache_stats(self) -> dict[str, Any]:
         """Get cache statistics."""
         if not self.redis_client:
             return {"connected": False}

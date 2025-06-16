@@ -1,10 +1,8 @@
 """Health metrics calculation utilities."""
 
-import math
 from typing import Any
 
 import numpy as np
-import pandas as pd
 
 from ..config.logging import get_logger
 

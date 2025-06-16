@@ -1,10 +1,9 @@
 """Pattern detection service for identifying digestive health patterns."""
 
-from datetime import datetime, timedelta
-from typing import Any, Dict, List
+from datetime import timedelta
+from typing import Any
 
 import numpy as np
-import pandas as pd
 
 from ..config.logging import get_logger
 from ..models.database import BowelMovementData, MealData, SymptomData
@@ -21,11 +20,11 @@ class PatternDetectorService:
 
     async def detect_all_patterns(
         self,
-        bowel_movements: List[BowelMovementData],
-        meals: List[MealData] | None = None,
-        symptoms: List[SymptomData] | None = None,
+        bowel_movements: list[BowelMovementData],
+        meals: list[MealData] | None = None,
+        symptoms: list[SymptomData] | None = None,
         confidence_threshold: float = 0.7,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Detect all types of patterns in the data.
 
@@ -79,8 +78,8 @@ class PatternDetectorService:
         return patterns
 
     async def _detect_timing_patterns(
-        self, bowel_movements: List[BowelMovementData]
-    ) -> Dict[str, Any] | None:
+        self, bowel_movements: list[BowelMovementData]
+    ) -> dict[str, Any] | None:
         """Detect timing-based patterns."""
         if len(bowel_movements) < 7:  # Need at least a week of data
             return None
@@ -123,8 +122,8 @@ class PatternDetectorService:
         }
 
     async def _detect_frequency_patterns(
-        self, bowel_movements: List[BowelMovementData]
-    ) -> Dict[str, Any] | None:
+        self, bowel_movements: list[BowelMovementData]
+    ) -> dict[str, Any] | None:
         """Detect frequency-based patterns."""
         if len(bowel_movements) < 14:  # Need at least 2 weeks
             return None
@@ -180,8 +179,8 @@ class PatternDetectorService:
         }
 
     async def _detect_bristol_patterns(
-        self, bowel_movements: List[BowelMovementData]
-    ) -> Dict[str, Any] | None:
+        self, bowel_movements: list[BowelMovementData]
+    ) -> dict[str, Any] | None:
         """Detect Bristol stool type patterns."""
         if not bowel_movements:
             return None
@@ -248,8 +247,8 @@ class PatternDetectorService:
         }
 
     async def _detect_meal_patterns(
-        self, bowel_movements: List[BowelMovementData], meals: List[MealData]
-    ) -> Dict[str, Any] | None:
+        self, bowel_movements: list[BowelMovementData], meals: list[MealData]
+    ) -> dict[str, Any] | None:
         """Detect meal correlation patterns."""
         if not meals or len(bowel_movements) < 5:
             return None
@@ -335,8 +334,8 @@ class PatternDetectorService:
         }
 
     async def _detect_symptom_patterns(
-        self, bowel_movements: List[BowelMovementData], symptoms: List[SymptomData]
-    ) -> Dict[str, Any] | None:
+        self, bowel_movements: list[BowelMovementData], symptoms: list[SymptomData]
+    ) -> dict[str, Any] | None:
         """Detect symptom correlation patterns."""
         if not symptoms:
             return None
@@ -390,8 +389,8 @@ class PatternDetectorService:
         }
 
     async def _detect_cyclical_patterns(
-        self, bowel_movements: List[BowelMovementData]
-    ) -> Dict[str, Any] | None:
+        self, bowel_movements: list[BowelMovementData]
+    ) -> dict[str, Any] | None:
         """Detect weekly/cyclical patterns."""
         if len(bowel_movements) < 21:  # Need at least 3 weeks
             return None
@@ -463,7 +462,7 @@ class PatternDetectorService:
                     "weekday_frequency": weekday_freq,
                     "weekend_frequency": weekend_freq,
                     "confidence": 0.7,
-                    "description": f"Different patterns between weekdays and weekends",
+                    "description": "Different patterns between weekdays and weekends",
                 }
             )
 

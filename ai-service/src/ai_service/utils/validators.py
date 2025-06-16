@@ -1,9 +1,9 @@
 """Data validation utilities."""
 
 from datetime import datetime, timedelta
-from typing import Any, List
+from typing import Any
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 
 from ..config.logging import get_logger
 from ..models.requests import AnalysisRequest
@@ -15,8 +15,8 @@ class ValidationResult(BaseModel):
     """Result of data validation."""
 
     is_valid: bool
-    errors: List[str] = []
-    warnings: List[str] = []
+    errors: list[str] = []
+    warnings: list[str] = []
 
 
 class DataValidator:
@@ -87,7 +87,7 @@ class DataValidator:
             warnings=warnings,
         )
 
-    def _validate_time_range(self, entries: List[Any]) -> ValidationResult:
+    def _validate_time_range(self, entries: list[Any]) -> ValidationResult:
         """Validate time range of entries."""
         errors = []
         warnings = []
@@ -124,7 +124,7 @@ class DataValidator:
             warnings=warnings,
         )
 
-    def _validate_bristol_types(self, entries: List[Any]) -> ValidationResult:
+    def _validate_bristol_types(self, entries: list[Any]) -> ValidationResult:
         """Validate Bristol stool types."""
         errors = []
         warnings = []
@@ -154,7 +154,7 @@ class DataValidator:
             warnings=warnings,
         )
 
-    def _validate_scores(self, entries: List[Any]) -> ValidationResult:
+    def _validate_scores(self, entries: list[Any]) -> ValidationResult:
         """Validate pain, strain, and satisfaction scores."""
         errors = []
         warnings = []
@@ -189,7 +189,7 @@ class DataValidator:
             warnings=warnings,
         )
 
-    def _validate_meals(self, meals: List[Any]) -> ValidationResult:
+    def _validate_meals(self, meals: list[Any]) -> ValidationResult:
         """Validate meal data."""
         errors = []
         warnings = []
@@ -225,7 +225,7 @@ class DataValidator:
             warnings=warnings,
         )
 
-    def _validate_symptoms(self, symptoms: List[Any]) -> ValidationResult:
+    def _validate_symptoms(self, symptoms: list[Any]) -> ValidationResult:
         """Validate symptom data."""
         errors = []
         warnings = []
@@ -265,7 +265,7 @@ class DataValidator:
             warnings=warnings,
         )
 
-    def _check_data_quality(self, request: AnalysisRequest) -> List[str]:
+    def _check_data_quality(self, request: AnalysisRequest) -> list[str]:
         """Check overall data quality and provide warnings."""
         warnings = []
 

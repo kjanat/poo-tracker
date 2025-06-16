@@ -1,7 +1,7 @@
 """Recommendation engine for generating personalized health advice."""
 
 import uuid
-from typing import Any, Dict, List
+from typing import Any
 
 from ..config.logging import get_logger
 from ..models.database import BowelMovementData, MealData
@@ -68,10 +68,10 @@ class RecommenderService:
 
     async def generate_recommendations(
         self,
-        analysis_result: Dict[str, Any],
-        bowel_movements: List[BowelMovementData],
-        meals: List[MealData] | None = None,
-    ) -> List[Recommendation]:
+        analysis_result: dict[str, Any],
+        bowel_movements: list[BowelMovementData],
+        meals: list[MealData] | None = None,
+    ) -> list[Recommendation]:
         """
         Generate personalized recommendations based on analysis.
 
@@ -118,9 +118,9 @@ class RecommenderService:
 
     async def identify_risk_factors(
         self,
-        bowel_movements: List[BowelMovementData],
-        analysis_result: Dict[str, Any],
-    ) -> List[RiskFactor]:
+        bowel_movements: list[BowelMovementData],
+        analysis_result: dict[str, Any],
+    ) -> list[RiskFactor]:
         """
         Identify potential health risk factors.
 
@@ -154,8 +154,8 @@ class RecommenderService:
         return risk_factors
 
     async def _generate_bristol_recommendations(
-        self, bowel_movements: List[BowelMovementData]
-    ) -> List[Recommendation]:
+        self, bowel_movements: list[BowelMovementData]
+    ) -> list[Recommendation]:
         """Generate recommendations based on Bristol stool types."""
         recommendations = []
 
@@ -204,8 +204,8 @@ class RecommenderService:
         return recommendations
 
     async def _generate_frequency_recommendations(
-        self, analysis_result: Dict[str, Any]
-    ) -> List[Recommendation]:
+        self, analysis_result: dict[str, Any]
+    ) -> list[Recommendation]:
         """Generate recommendations based on frequency patterns."""
         recommendations = []
 
@@ -243,8 +243,8 @@ class RecommenderService:
         return recommendations
 
     async def _generate_pain_recommendations(
-        self, bowel_movements: List[BowelMovementData]
-    ) -> List[Recommendation]:
+        self, bowel_movements: list[BowelMovementData]
+    ) -> list[Recommendation]:
         """Generate recommendations based on pain patterns."""
         recommendations = []
 
@@ -285,8 +285,8 @@ class RecommenderService:
         return recommendations
 
     async def _generate_meal_recommendations(
-        self, analysis_result: Dict[str, Any], meals: List[MealData]
-    ) -> List[Recommendation]:
+        self, analysis_result: dict[str, Any], meals: list[MealData]
+    ) -> list[Recommendation]:
         """Generate recommendations based on meal correlations."""
         recommendations = []
 
@@ -321,15 +321,15 @@ class RecommenderService:
                     description=f"Consider adding more {beneficial['type']} foods to your diet",
                     priority="low",
                     confidence=0.6,
-                    evidence=[f"Associated with healthy Bristol types"],
+                    evidence=["Associated with healthy Bristol types"],
                 )
             )
 
         return recommendations
 
     async def _generate_timing_recommendations(
-        self, analysis_result: Dict[str, Any]
-    ) -> List[Recommendation]:
+        self, analysis_result: dict[str, Any]
+    ) -> list[Recommendation]:
         """Generate recommendations based on timing patterns."""
         recommendations = []
 
@@ -354,8 +354,8 @@ class RecommenderService:
         return recommendations
 
     async def _identify_bristol_risks(
-        self, bowel_movements: List[BowelMovementData]
-    ) -> List[RiskFactor]:
+        self, bowel_movements: list[BowelMovementData]
+    ) -> list[RiskFactor]:
         """Identify risk factors based on Bristol patterns."""
         risk_factors = []
 
@@ -395,8 +395,8 @@ class RecommenderService:
         return risk_factors
 
     async def _identify_frequency_risks(
-        self, analysis_result: Dict[str, Any]
-    ) -> List[RiskFactor]:
+        self, analysis_result: dict[str, Any]
+    ) -> list[RiskFactor]:
         """Identify risk factors based on frequency patterns."""
         risk_factors = []
 
@@ -430,8 +430,8 @@ class RecommenderService:
         return risk_factors
 
     async def _identify_pain_risks(
-        self, bowel_movements: List[BowelMovementData]
-    ) -> List[RiskFactor]:
+        self, bowel_movements: list[BowelMovementData]
+    ) -> list[RiskFactor]:
         """Identify risk factors based on pain patterns."""
         risk_factors = []
 
@@ -456,8 +456,8 @@ class RecommenderService:
         return risk_factors
 
     async def _identify_pattern_risks(
-        self, analysis_result: Dict[str, Any]
-    ) -> List[RiskFactor]:
+        self, analysis_result: dict[str, Any]
+    ) -> list[RiskFactor]:
         """Identify risk factors based on overall patterns."""
         risk_factors = []
 

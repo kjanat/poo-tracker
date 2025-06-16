@@ -1,6 +1,6 @@
 """Data processing utilities for the AI service."""
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Any
 
 import numpy as np

@@ -8,24 +8,19 @@ analysis of bowel movement patterns, meal correlations, and health insights.
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import Any
 
-import redis
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 
-from .config.logging import setup_logging, get_logger
+from .config.logging import get_logger, setup_logging
 from .config.settings import get_settings
+from .models.database import BowelMovementData, MealData, SymptomData
 from .models.requests import (
     AnalysisRequest,
-    BowelMovementEntry,
-    MealEntry,
-    SymptomEntry,
 )
-from .models.responses import AnalysisResponse, HealthResponse, ErrorResponse
-from .models.database import BowelMovementData, MealData, SymptomData
+from .models.responses import AnalysisResponse, ErrorResponse, HealthResponse
 from .services.analyzer import AnalyzerService
 from .services.health_assessor import HealthAssessorService
 from .services.recommender import RecommenderService
