@@ -198,7 +198,6 @@ class AnalyzerService:
         self, bm_df: pd.DataFrame, meal_df: pd.DataFrame
     ) -> dict[str, Any]:
         """Analyze correlations between meals and bowel movements."""
-        correlations = {}
         category_correlations = {}
         trigger_foods = []
         beneficial_foods = []
@@ -373,9 +372,9 @@ class AnalyzerService:
         # Group by food characteristics
         food_groups = {
             "spicy": meal_df[meal_df["spicy_level"].fillna(0) > 5],
-            "dairy": meal_df[meal_df["dairy"] == True],
-            "gluten": meal_df[meal_df["gluten"] == True],
-            "fiber_rich": meal_df[meal_df["fiber_rich"] == True],
+            "dairy": meal_df[meal_df["dairy"]],
+            "gluten": meal_df[meal_df["gluten"]],
+            "fiber_rich": meal_df[meal_df["fiber_rich"]],
         }
 
         for food_type, food_meals in food_groups.items():
@@ -396,9 +395,9 @@ class AnalyzerService:
                             "type": food_type,
                             "avg_bristol": avg_bristol,
                             "avg_pain": avg_pain,
-                            "severity": "high"
-                            if avg_pain and avg_pain > 7
-                            else "medium",
+                            "severity": (
+                                "high" if avg_pain and avg_pain > 7 else "medium"
+                            ),
                         }
                     )
 
@@ -409,9 +408,9 @@ class AnalyzerService:
                             "type": food_type,
                             "avg_bristol": avg_bristol,
                             "avg_pain": avg_pain,
-                            "benefit_level": "high"
-                            if 3.5 <= avg_bristol <= 4
-                            else "medium",
+                            "benefit_level": (
+                                "high" if 3.5 <= avg_bristol <= 4 else "medium"
+                            ),
                         }
                     )
 
@@ -500,9 +499,9 @@ class AnalyzerService:
         consistency_counts = df["consistency"].value_counts()
         return {
             "distribution": consistency_counts.to_dict(),
-            "most_common": consistency_counts.idxmax()
-            if not consistency_counts.empty
-            else None,
+            "most_common": (
+                consistency_counts.idxmax() if not consistency_counts.empty else None
+            ),
         }
 
     def _create_analysis_metadata(

@@ -73,13 +73,9 @@ class DataProcessor:
 
         # Create meal characteristic features
         df["is_problematic"] = (
-            (df["spicy_level"].fillna(0) > 7)
-            | (df["dairy"] == True)
-            | (df["gluten"] == True)
+            (df["spicy_level"].fillna(0) > 7) | df["dairy"] | df["gluten"]
         )
-        df["is_healthy"] = (df["fiber_rich"] == True) & (
-            df["spicy_level"].fillna(0) <= 3
-        )
+        df["is_healthy"] = df["fiber_rich"] & (df["spicy_level"].fillna(0) <= 3)
 
         return df
 
@@ -157,9 +153,12 @@ class DataProcessor:
         self,
         bm_df: pd.DataFrame,
         meal_df: pd.DataFrame,
-        lag_hours: list[int] = [6, 12, 24, 48],
+        lag_hours: list[int] | None = None,
     ) -> dict[str, float]:
         """Calculate time-lagged correlations between meals and bowel movements."""
+        if lag_hours is None:
+            lag_hours = [6, 12, 24, 48]
+
         correlations = {}
 
         if bm_df.empty or meal_df.empty:
@@ -307,8 +306,8 @@ class DataProcessor:
             "peak_hours": hourly_freq.nlargest(3).index.tolist(),
             "low_hours": hourly_freq.nsmallest(3).index.tolist(),
             "hourly_distribution": hourly_freq.to_dict(),
-            "morning_frequency": len(df[df["is_morning"] == True]),
-            "evening_frequency": len(df[df["is_evening"] == True]),
+            "morning_frequency": len(df[df["is_morning"]]),
+            "evening_frequency": len(df[df["is_evening"]]),
         }
 
     def _detect_weekly_patterns(self, df: pd.DataFrame) -> dict[str, Any]:
@@ -331,8 +330,8 @@ class DataProcessor:
             "busiest_days": [day_names[i] for i in daily_freq.nlargest(3).index],
             "quietest_days": [day_names[i] for i in daily_freq.nsmallest(3).index],
             "weekend_vs_weekday": {
-                "weekend": len(df[df["is_weekend"] == True]),
-                "weekday": len(df[df["is_weekend"] == False]),
+                "weekend": len(df[df["is_weekend"]]),
+                "weekday": len(df[~df["is_weekend"]]),
             },
         }
 

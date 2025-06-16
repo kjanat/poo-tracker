@@ -163,7 +163,6 @@ class RecommenderService:
             return recommendations
 
         bristol_types = [bm.bristol_type for bm in bowel_movements]
-        avg_bristol = sum(bristol_types) / len(bristol_types)
 
         # Recommendations for constipation (types 1-2)
         constipation_ratio = sum(1 for bt in bristol_types if bt <= 2) / len(

@@ -74,20 +74,18 @@ jobs:
 
       - name: 🎨 Format TypeScript/JavaScript
         run: |
-          pnpm run --filter frontend lint:fix || true
-          pnpm run --filter backend lint:fix || true
+          pnpm lint:fix:frontend || true
+          pnpm lint:fix:backend || true
 
       - name: 🎨 Format Python
         run: |
-          cd ai-service
-          uvx black .
-          uvx isort .
+          uvx black ai-service
+          uvx isort ai-service
 
       - name: 🦀 Format with Ruff
         run: |
-          cd ai-service
-          uvx ruff check --fix .
-          uvx ruff format .
+          pnpm format:ai
+          pnpm lint:fix:ai
 
       - name: 📝 Check for changes
         id: verify-changed-files
@@ -176,15 +174,14 @@ jobs:
           echo "✅ All done."
 
       - name: 🧹 Lint Frontend
-        run: pnpm run --filter frontend lint
+        run: pnpm lint:frontend
 
       - name: 🧹 Lint Backend
-        run: pnpm run --filter backend lint
+        run: pnpm lint:backend
 
       - name: 🧹 Lint Python
         run: |
-          cd ai-service
-          uvx ruff check .
-          uvx ruff format --check .
-          uvx black --check .
-          uvx isort --check-only .
+          uvx ruff check ai-service
+          uvx ruff format ai-service --check
+          uvx black ai-service --check
+          uvx isort ai-service --check-only

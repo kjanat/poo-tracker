@@ -1,5 +1,6 @@
 """Health metrics calculation utilities."""
 
+from datetime import datetime
 from typing import Any
 
 import numpy as np
@@ -374,11 +375,9 @@ class HealthMetricsCalculator:
             "bmi": round(bmi, 1),
             "category": category,
             "digestive_impact": digestive_impact,
-            "health_risk": "low"
-            if 18.5 <= bmi < 25
-            else "medium"
-            if 25 <= bmi < 30
-            else "high",
+            "health_risk": (
+                "low" if 18.5 <= bmi < 25 else "medium" if 25 <= bmi < 30 else "high"
+            ),
         }
 
     def _calculate_consistency_penalty(self, values: list[float]) -> float:

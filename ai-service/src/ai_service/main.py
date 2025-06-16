@@ -316,13 +316,15 @@ async def analyze_patterns(request: AnalysisRequest):
 
     except ValueError as e:
         logger.error(f"Validation error: {e}")
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from e
     except Exception as e:
         logger.error(f"Analysis failed: {e}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Analysis failed: {str(e)}",
-        )
+        ) from e
 
 
 @app.get("/metrics")

@@ -448,7 +448,6 @@ class PatternDetectorService:
         weekend_freq = weekend_count / total if total > 0 else 0
 
         expected_weekday = 5 / 7
-        expected_weekend = 2 / 7
 
         if abs(weekday_freq - expected_weekday) > 0.15:  # Significant difference
             pattern_type = (
