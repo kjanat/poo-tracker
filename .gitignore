@@ -528,3 +528,5 @@ docker-compose.override.yml
 .pnpm-store/
 
 .vscode/
+**/*-old.*
+prisma-shit.md

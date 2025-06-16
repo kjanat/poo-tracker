@@ -2,9 +2,13 @@ import { Router, Response, NextFunction } from 'express'
 import { z } from 'zod'
 import { PrismaClient } from '@prisma/client'
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth'
+import { EntryService } from '../domains/entries/EntryService'
+import { EntryFactory } from '../domains/entries/EntryFactory'
+import type { CreateEntryRequest, UpdateEntryRequest, EntryFilters } from '../domains/entries/types'
 
 const router: Router = Router()
 const prisma = new PrismaClient()
+const entryService = new EntryService(prisma)
 
 // Apply authentication to all routes
 router.use(authenticateToken)
@@ -33,73 +37,49 @@ router.get(
   '/',
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { page = '1', limit = '20', sortBy = 'createdAt', sortOrder = 'desc' } = req.query
-
-      const pageNum = parseInt(page as string)
-      const limitNum = parseInt(limit as string)
-      const skip = (pageNum - 1) * limitNum
-
-      // Ensure userId is defined
       if (!req.userId) {
         res.status(401).json({ error: 'User not authenticated' })
         return
       }
 
-      const entries = await prisma.entry.findMany({
-        where: { userId: req.userId },
-        orderBy: { [sortBy as string]: sortOrder },
-        skip,
-        take: limitNum,
-        include: {
-          user: {
-            select: { name: true, email: true }
-          }
-        }
-      })
+      const filters: EntryFilters = {
+        page: req.query.page ? parseInt(req.query.page as string) : 1,
+        limit: req.query.limit ? parseInt(req.query.limit as string) : 20,
+        sortBy: (req.query.sortBy as string) || 'createdAt',
+        sortOrder: (req.query.sortOrder as 'asc' | 'desc') || 'desc'
+      }
 
-      const total = await prisma.entry.count({
-        where: { userId: req.userId }
-      })
+      // Add optional filters
+      if (req.query.bristolType) {
+        filters.bristolType = parseInt(req.query.bristolType as string)
+      }
+      if (req.query.dateFrom) {
+        filters.dateFrom = new Date(req.query.dateFrom as string)
+      }
+      if (req.query.dateTo) {
+        filters.dateTo = new Date(req.query.dateTo as string)
+      }
 
-      res.json({
-        entries,
-        pagination: {
-          page: pageNum,
-          limit: limitNum,
-          total,
-          pages: Math.ceil(total / limitNum)
-        }
-      })
+      const result = await entryService.findByUserId(req.userId, filters)
+      res.json(result)
     } catch (error) {
       next(error)
     }
   }
 )
 
-// GET /api/entries/:id - Get specific entry
+// GET /api/entries/:id - Get single entry
 router.get(
   '/:id',
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { id } = req.params
-
-      if (!req.userId || !id) {
-        res.status(400).json({ error: 'Invalid request' })
+      if (!req.userId) {
+        res.status(401).json({ error: 'User not authenticated' })
         return
       }
 
-      const entry = await prisma.entry.findFirst({
-        where: {
-          id,
-          userId: req.userId
-        },
-        include: {
-          user: {
-            select: { name: true, email: true }
-          }
-        }
-      })
-
+      const entry = await entryService.findById(req.params.id!, req.userId)
+      
       if (!entry) {
         res.status(404).json({ error: 'Entry not found' })
         return
@@ -122,38 +102,32 @@ router.post(
         return
       }
 
-      console.log('Creating entry for userId:', req.userId)
-
-      const validatedData = createEntrySchema.parse(req.body)
-
-      // Convert undefined values to null for Prisma
-      const entryData = {
-        userId: req.userId,
-        bristolType: validatedData.bristolType,
-        floaters: validatedData.floaters,
-        volume: validatedData.volume ?? null,
-        color: validatedData.color ?? null,
-        consistency: validatedData.consistency ?? null,
-        pain: validatedData.pain ?? null,
-        strain: validatedData.strain ?? null,
-        satisfaction: validatedData.satisfaction ?? null,
-        notes: validatedData.notes ?? null,
-        smell: validatedData.smell ?? null,
-        photoUrl: validatedData.photoUrl ?? null
-      }
-
-      console.log('Entry data to be created:', entryData)
-
-      const entry = await prisma.entry.create({
-        data: entryData
-      })
-
-      res.status(201).json(entry)
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: error.errors })
+      // Validate request body
+      const validationResult = createEntrySchema.safeParse(req.body)
+      if (!validationResult.success) {
+        res.status(400).json({ 
+          error: 'Validation failed', 
+          details: validationResult.error.errors 
+        })
         return
       }
+
+      const createRequest: CreateEntryRequest = validationResult.data
+      
+      // Additional validation using factory
+      if (!EntryFactory.validateBristolType(createRequest.bristolType)) {
+        res.status(400).json({ error: 'Invalid Bristol stool type' })
+        return
+      }
+
+      if (!EntryFactory.validateRating(createRequest.satisfaction)) {
+        res.status(400).json({ error: 'Invalid satisfaction rating' })
+        return
+      }
+
+      const entry = await entryService.create(createRequest, req.userId)
+      res.status(201).json(entry)
+    } catch (error) {
       next(error)
     }
   }
@@ -164,49 +138,43 @@ router.put(
   '/:id',
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { id } = req.params
-
-      if (!req.userId || !id) {
-        res.status(400).json({ error: 'Invalid request' })
+      if (!req.userId) {
+        res.status(401).json({ error: 'User not authenticated' })
         return
       }
 
-      const validatedData = updateEntrySchema.parse(req.body)
+      // Validate request body
+      const validationResult = updateEntrySchema.safeParse(req.body)
+      if (!validationResult.success) {
+        res.status(400).json({ 
+          error: 'Validation failed', 
+          details: validationResult.error.errors 
+        })
+        return
+      }
 
-      const existingEntry = await prisma.entry.findFirst({
-        where: { id, userId: req.userId }
-      })
+      const updateRequest: UpdateEntryRequest = validationResult.data
 
-      if (!existingEntry) {
+      // Additional validation using factory
+      if (updateRequest.bristolType && !EntryFactory.validateBristolType(updateRequest.bristolType)) {
+        res.status(400).json({ error: 'Invalid Bristol stool type' })
+        return
+      }
+
+      if (!EntryFactory.validateRating(updateRequest.satisfaction)) {
+        res.status(400).json({ error: 'Invalid satisfaction rating' })
+        return
+      }
+
+      const entry = await entryService.update(req.params.id!, updateRequest, req.userId)
+      
+      if (!entry) {
         res.status(404).json({ error: 'Entry not found' })
         return
       }
 
-      // Convert undefined values to null for Prisma
-      const updateData: any = {}
-      if (validatedData.bristolType !== undefined) { updateData.bristolType = validatedData.bristolType }
-      if (validatedData.volume !== undefined) updateData.volume = validatedData.volume ?? null
-      if (validatedData.color !== undefined) updateData.color = validatedData.color ?? null
-      if (validatedData.consistency !== undefined) { updateData.consistency = validatedData.consistency ?? null }
-      if (validatedData.floaters !== undefined) updateData.floaters = validatedData.floaters
-      if (validatedData.pain !== undefined) updateData.pain = validatedData.pain ?? null
-      if (validatedData.strain !== undefined) updateData.strain = validatedData.strain ?? null
-      if (validatedData.satisfaction !== undefined) { updateData.satisfaction = validatedData.satisfaction ?? null }
-      if (validatedData.notes !== undefined) updateData.notes = validatedData.notes ?? null
-      if (validatedData.smell !== undefined) updateData.smell = validatedData.smell ?? null
-      if (validatedData.photoUrl !== undefined) updateData.photoUrl = validatedData.photoUrl ?? null
-
-      const entry = await prisma.entry.update({
-        where: { id },
-        data: updateData
-      })
-
       res.json(entry)
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: error.errors })
-        return
-      }
       next(error)
     }
   }
@@ -217,25 +185,17 @@ router.delete(
   '/:id',
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { id } = req.params
-
-      if (!req.userId || !id) {
-        res.status(400).json({ error: 'Invalid request' })
+      if (!req.userId) {
+        res.status(401).json({ error: 'User not authenticated' })
         return
       }
 
-      const existingEntry = await prisma.entry.findFirst({
-        where: { id, userId: req.userId }
-      })
-
-      if (!existingEntry) {
+      const deleted = await entryService.delete(req.params.id!, req.userId)
+      
+      if (!deleted) {
         res.status(404).json({ error: 'Entry not found' })
         return
       }
-
-      await prisma.entry.delete({
-        where: { id }
-      })
 
       res.status(204).send()
     } catch (error) {
@@ -244,44 +204,22 @@ router.delete(
   }
 )
 
-// GET /api/entries/:id/meals - Get all meals linked to an entry
+// GET /api/entries/analytics - Get analytics data
 router.get(
-  '/:id/meals',
+  '/analytics',
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { id } = req.params
-
-      if (!req.userId || !id) {
-        res.status(400).json({ error: 'Invalid request' })
+      if (!req.userId) {
+        res.status(401).json({ error: 'User not authenticated' })
         return
       }
 
-      // Verify the entry belongs to the user
-      const entry = await prisma.entry.findFirst({
-        where: { id, userId: req.userId }
-      })
-
-      if (!entry) {
-        res.status(404).json({ error: 'Entry not found' })
-        return
-      }
-
-      // Get all meals linked to this entry
-      const linkedMeals = await prisma.meal.findMany({
-        where: {
-          userId: req.userId,
-          entries: {
-            some: { entryId: id }
-          }
-        },
-        orderBy: { mealTime: 'desc' }
-      })
-
-      res.json(linkedMeals)
+      const analytics = await entryService.getAnalytics(req.userId)
+      res.json(analytics)
     } catch (error) {
       next(error)
     }
   }
 )
 
-export { router as entryRoutes }
+export default router
