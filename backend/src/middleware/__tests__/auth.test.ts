@@ -39,7 +39,7 @@ describe('authenticateToken middleware', () => {
     mockNext = vi.fn()
 
     // Mock console methods to avoid noise in test output
-     
+
     vi.spyOn(console, 'log').mockImplementation(() => {})
   })
 

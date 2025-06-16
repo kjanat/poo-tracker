@@ -1,7 +1,7 @@
 import type { CreateMealRequest, Meal } from './types'
 
 export class MealFactory {
-  static createFromRequest (
+  static createFromRequest(
     request: CreateMealRequest,
     userId: string
   ): Omit<Meal, 'id' | 'createdAt' | 'updatedAt'> {
@@ -21,27 +21,27 @@ export class MealFactory {
     }
   }
 
-  static validateMealName (name: string): boolean {
+  static validateMealName(name: string): boolean {
     return typeof name === 'string' && name.trim().length > 0 && name.trim().length <= 200
   }
 
-  static validateSpicyLevel (level: number | undefined): boolean {
+  static validateSpicyLevel(level: number | undefined): boolean {
     if (level === undefined) return true
     return Number.isInteger(level) && level >= 1 && level <= 10
   }
 
-  static validateMealTime (mealTime: Date): boolean {
+  static validateMealTime(mealTime: Date): boolean {
     return mealTime instanceof Date && !isNaN(mealTime.getTime())
   }
 
-  static validateCategory (
+  static validateCategory(
     category: string | undefined
   ): category is 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack' | undefined {
     if (category === undefined) return true
     return ['Breakfast', 'Lunch', 'Dinner', 'Snack'].includes(category)
   }
 
-  static getDefaultValues (): Partial<CreateMealRequest> {
+  static getDefaultValues(): Partial<CreateMealRequest> {
     return {
       fiberRich: false,
       dairy: false,
@@ -50,19 +50,17 @@ export class MealFactory {
     }
   }
 
-  static sanitizeNotes (notes: string | null | undefined): string | null {
+  static sanitizeNotes(notes: string | null | undefined): string | null {
     if (!notes) return null
     const sanitized = notes.trim().substring(0, 1000)
     return sanitized.length > 0 ? sanitized : null
   }
 
-  static sanitizeName (name: string): string {
+  static sanitizeName(name: string): string {
     return name.trim().substring(0, 200)
   }
 
-  static sanitizeDescription (
-    description: string | null | undefined
-  ): string | null {
+  static sanitizeDescription(description: string | null | undefined): string | null {
     if (!description) return null
     const sanitized = description.trim().substring(0, 500)
     return sanitized.length > 0 ? sanitized : null

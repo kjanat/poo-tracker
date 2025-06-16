@@ -81,7 +81,11 @@ router.post(
         return
       }
 
-      if (createRequest.spicyLevel !== undefined && createRequest.spicyLevel !== null && !MealFactory.validateSpicyLevel(createRequest.spicyLevel)) {
+      if (
+        createRequest.spicyLevel !== undefined &&
+        createRequest.spicyLevel !== null &&
+        !MealFactory.validateSpicyLevel(createRequest.spicyLevel)
+      ) {
         res.status(400).json({ error: 'Invalid spicy level' })
         return
       }
@@ -143,7 +147,9 @@ router.put(
 
       const updateRequest = {
         ...validationResult.data,
-        mealTime: validationResult.data.mealTime ? new Date(validationResult.data.mealTime) : undefined
+        mealTime: validationResult.data.mealTime
+          ? new Date(validationResult.data.mealTime)
+          : undefined
       } as UpdateMealRequest
 
       // Additional business validation using factory
@@ -152,7 +158,11 @@ router.put(
         return
       }
 
-      if (updateRequest.spicyLevel !== undefined && updateRequest.spicyLevel !== null && !MealFactory.validateSpicyLevel(updateRequest.spicyLevel)) {
+      if (
+        updateRequest.spicyLevel !== undefined &&
+        updateRequest.spicyLevel !== null &&
+        !MealFactory.validateSpicyLevel(updateRequest.spicyLevel)
+      ) {
         res.status(400).json({ error: 'Invalid spicy level' })
         return
       }
@@ -213,7 +223,12 @@ router.post(
       const success = await mealService.linkBowelMovement(id, bowelMovementId, req.userId)
 
       if (!success) {
-        res.status(400).json({ error: 'Unable to link bowel movement to meal - meal/bowel movement not found or already linked' })
+        res
+          .status(400)
+          .json({
+            error:
+              'Unable to link bowel movement to meal - meal/bowel movement not found or already linked'
+          })
         return
       }
 
@@ -240,7 +255,12 @@ router.delete(
       const success = await mealService.unlinkBowelMovement(id, bowelMovementId, req.userId)
 
       if (!success) {
-        res.status(400).json({ error: 'Unable to unlink bowel movement from meal - meal not found or bowel movement not linked' })
+        res
+          .status(400)
+          .json({
+            error:
+              'Unable to unlink bowel movement from meal - meal not found or bowel movement not linked'
+          })
         return
       }
 
@@ -288,7 +308,9 @@ router.post(
       const success = await mealService.linkBowelMovement(id, entryId, req.userId)
 
       if (!success) {
-        res.status(400).json({ error: 'Unable to link entry to meal - meal/entry not found or already linked' })
+        res
+          .status(400)
+          .json({ error: 'Unable to link entry to meal - meal/entry not found or already linked' })
         return
       }
 
@@ -315,7 +337,9 @@ router.delete(
       const success = await mealService.unlinkBowelMovement(id, entryId, req.userId)
 
       if (!success) {
-        res.status(400).json({ error: 'Unable to unlink entry from meal - meal not found or entry not linked' })
+        res
+          .status(400)
+          .json({ error: 'Unable to unlink entry from meal - meal not found or entry not linked' })
         return
       }
 

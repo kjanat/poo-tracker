@@ -3,7 +3,7 @@ import type { Meal, CreateMealRequest, UpdateMealRequest } from './types'
 import type { Entry } from '../entries/types'
 
 export class MealService {
-  constructor (private readonly apiClient: ApiClient) {}
+  constructor(private readonly apiClient: ApiClient) {}
 
   async getMeals(): Promise<Meal[]> {
     const response = await this.apiClient.get<Meal[]>('/api/meals')

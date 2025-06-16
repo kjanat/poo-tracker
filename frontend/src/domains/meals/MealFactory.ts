@@ -50,7 +50,10 @@ export class MealFactory {
     }
   }
 
-  static createUpdatePayload(current: Meal, updates: Partial<CreateMealRequest>): CreateMealRequest {
+  static createUpdatePayload(
+    current: Meal,
+    updates: Partial<CreateMealRequest>
+  ): CreateMealRequest {
     return {
       name: updates.name ?? current.name,
       category: updates.category ?? current.category,

@@ -36,7 +36,7 @@ export class DependencyContainer {
 }
 
 class ServiceBuilder<T> {
-  constructor (
+  constructor(
     private readonly container: DependencyContainer,
     private readonly identifier: ServiceIdentifier<T>
   ) {}
@@ -60,7 +60,7 @@ class ServiceBuilder<T> {
 }
 
 class ServiceLifecycleBuilder<T> {
-  constructor (
+  constructor(
     private readonly container: DependencyContainer,
     private readonly identifier: ServiceIdentifier<T>,
     private readonly factory: () => T

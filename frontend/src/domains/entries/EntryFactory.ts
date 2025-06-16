@@ -57,7 +57,10 @@ export class EntryFactory {
     }
   }
 
-  static createUpdatePayload(current: Entry, updates: Partial<CreateEntryRequest>): CreateEntryRequest {
+  static createUpdatePayload(
+    current: Entry,
+    updates: Partial<CreateEntryRequest>
+  ): CreateEntryRequest {
     return {
       bristolType: updates.bristolType ?? current.bristolType,
       volume: updates.volume ?? current.volume,

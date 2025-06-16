@@ -1,4 +1,3 @@
-
 import type { HealthMetrics } from '../types'
 
 interface HealthInsightsProps {
@@ -38,7 +37,7 @@ export function HealthInsights({ healthMetrics, recommendations }: HealthInsight
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <h3 className="text-lg font-semibold mb-4">Health Insights</h3>
-      
+
       <div className="space-y-4">
         <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
           <span className="text-sm font-medium">Average Bristol Type:</span>
@@ -49,7 +48,9 @@ export function HealthInsights({ healthMetrics, recommendations }: HealthInsight
 
         <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
           <span className="text-sm font-medium">Consistency Score:</span>
-          <span className={`text-lg font-semibold ${getConsistencyColor(healthMetrics.consistencyScore)}`}>
+          <span
+            className={`text-lg font-semibold ${getConsistencyColor(healthMetrics.consistencyScore)}`}
+          >
             {healthMetrics.consistencyScore.toFixed(1)}%
           </span>
         </div>
@@ -78,7 +79,8 @@ export function HealthInsights({ healthMetrics, recommendations }: HealthInsight
         {healthMetrics.recommendationsNeeded && (
           <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
             <p className="text-sm text-yellow-800">
-              <strong>Note:</strong> Consider tracking patterns more closely or consulting a healthcare provider.
+              <strong>Note:</strong> Consider tracking patterns more closely or consulting a
+              healthcare provider.
             </p>
           </div>
         )}

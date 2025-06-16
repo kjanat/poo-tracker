@@ -6,11 +6,11 @@ interface ProtectedRouteProps {
   children: ReactNode
 }
 
-export function ProtectedRoute ({ children }: ProtectedRouteProps): ReactElement {
+export function ProtectedRoute({ children }: ProtectedRouteProps): ReactElement {
   const { isAuthenticated } = useAuthStore()
 
   if (!isAuthenticated) {
-    return <Navigate to='/login' replace />
+    return <Navigate to="/login" replace />
   }
 
   return <>{children}</>

@@ -1,12 +1,18 @@
 import type { ApiClient } from '../../core/api/ApiClient'
-import type { Entry, CreateEntryRequest, UpdateEntryRequest, EntryListResponse, EntryFilters } from './types'
+import type {
+  Entry,
+  CreateEntryRequest,
+  UpdateEntryRequest,
+  EntryListResponse,
+  EntryFilters
+} from './types'
 
 export class EntryService {
-  constructor (private readonly apiClient: ApiClient) {}
+  constructor(private readonly apiClient: ApiClient) {}
 
   async getEntries(filters: EntryFilters = {}): Promise<EntryListResponse> {
     const params = new URLSearchParams()
-    
+
     if (filters.page != null) params.append('page', filters.page.toString())
     if (filters.limit != null) params.append('limit', filters.limit.toString())
     if (filters.sortBy != null) params.append('sortBy', filters.sortBy)
@@ -17,7 +23,7 @@ export class EntryService {
 
     const queryString = params.toString()
     const endpoint = queryString !== '' ? `/api/entries?${queryString}` : '/api/entries'
-    
+
     const response = await this.apiClient.get<EntryListResponse>(endpoint)
     return response.data
   }

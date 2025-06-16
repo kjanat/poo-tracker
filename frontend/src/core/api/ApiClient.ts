@@ -8,7 +8,11 @@ export interface AuthProvider {
 }
 
 export class ApiError extends Error {
-  constructor (public status: number, message: string, public data?: unknown) {
+  constructor(
+    public status: number,
+    message: string,
+    public data?: unknown
+  ) {
     super(message)
     this.name = 'ApiError'
   }
@@ -21,12 +25,12 @@ export interface ApiResponse<T> {
 }
 
 export class ApiClient {
-  constructor (
+  constructor(
     private readonly config: ApiConfig,
     private readonly authProvider: AuthProvider
   ) {}
 
-  private createHeaders (includeAuth = true): HeadersInit {
+  private createHeaders(includeAuth = true): HeadersInit {
     const headers: HeadersInit = {
       'Content-Type': 'application/json'
     }
@@ -47,7 +51,7 @@ export class ApiClient {
       throw new ApiError(response.status, errorData.error ?? 'Request failed', errorData)
     }
 
-    const data = await response.json() as T
+    const data = (await response.json()) as T
     return {
       data,
       status: response.status,

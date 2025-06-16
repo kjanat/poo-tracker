@@ -8,7 +8,8 @@ export const config = {
   corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
 
   // Database
-  databaseUrl: process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/poo_tracker',
+  databaseUrl:
+    process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/poo_tracker',
 
   // Storage
   minio: {

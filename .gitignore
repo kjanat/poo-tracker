@@ -527,8 +527,12 @@ docker-compose.override.yml
 
 .pnpm-store/
 
+# .trunk/
 .vscode/
 **/*-old.*
 prisma-shit.md
 .docs/
-.trunk/
+**/junit.xml
+**/test-report.json
+**/test-report.txt
+**/test-report.html

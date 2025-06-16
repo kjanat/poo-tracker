@@ -1,13 +1,4 @@
-
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer
-} from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { BristolAnalyzer } from '../../bristol/BristolAnalyzer'
 import type { AnalyticsSummary } from '../types'
 
@@ -16,7 +7,7 @@ interface BristolDistributionChartProps {
 }
 
 export function BristolDistributionChart({ summary }: BristolDistributionChartProps) {
-  const chartData = summary.bristolDistribution.map(item => ({
+  const chartData = summary.bristolDistribution.map((item) => ({
     type: item.type,
     count: item.count,
     description: BristolAnalyzer.getDescription(item.type),
@@ -38,7 +29,7 @@ export function BristolDistributionChart({ summary }: BristolDistributionChartPr
     if (active && payload && payload.length) {
       const data = payload[0]?.payload
       if (!data) return null
-      
+
       return (
         <div className="bg-white p-3 border border-gray-200 rounded shadow">
           <p className="font-medium">{`Type ${data.type}`}</p>
@@ -57,19 +48,13 @@ export function BristolDistributionChart({ summary }: BristolDistributionChartPr
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="type" 
+            <XAxis
+              dataKey="type"
               label={{ value: 'Bristol Type', position: 'insideBottom', offset: -5 }}
             />
-            <YAxis 
-              label={{ value: 'Count', angle: -90, position: 'insideLeft' }}
-            />
+            <YAxis label={{ value: 'Count', angle: -90, position: 'insideLeft' }} />
             <Tooltip content={<CustomTooltip />} />
-            <Bar 
-              dataKey="count" 
-              fill="#8B5CF6"
-              radius={[4, 4, 0, 0]}
-            />
+            <Bar dataKey="count" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

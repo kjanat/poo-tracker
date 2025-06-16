@@ -39,12 +39,12 @@ export class SharpImageProcessingService implements ImageProcessingService {
     format: 'webp'
   }
 
-  constructor (uploadDir: string, baseUrl: string) {
+  constructor(uploadDir: string, baseUrl: string) {
     this.uploadDir = uploadDir
     this.baseUrl = baseUrl
   }
 
-  async processImage (
+  async processImage(
     buffer: Buffer,
     _originalName: string,
     config: Partial<ImageProcessingConfig> = {}
@@ -85,7 +85,7 @@ export class SharpImageProcessingService implements ImageProcessingService {
     }
   }
 
-  async deleteImage (filename: string): Promise<void> {
+  async deleteImage(filename: string): Promise<void> {
     const safeFilename = sanitizeFilename(filename)
     if (!safeFilename) {
       throw new Error(`Invalid filename: ${filename}`)
@@ -104,11 +104,11 @@ export class SharpImageProcessingService implements ImageProcessingService {
 export class ImageProcessingFactory {
   private static instance: ImageProcessingService
 
-  static configure (uploadDir: string, baseUrl: string): void {
+  static configure(uploadDir: string, baseUrl: string): void {
     this.instance = new SharpImageProcessingService(uploadDir, baseUrl)
   }
 
-  static getInstance (): ImageProcessingService {
+  static getInstance(): ImageProcessingService {
     if (!this.instance) {
       throw new Error('ImageProcessingFactory not configured. Call configure() first.')
     }
@@ -116,7 +116,7 @@ export class ImageProcessingFactory {
   }
 
   // For testing - allows injection of mock service
-  static setInstance (service: ImageProcessingService): void {
+  static setInstance(service: ImageProcessingService): void {
     this.instance = service
   }
 }

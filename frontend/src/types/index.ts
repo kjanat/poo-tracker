@@ -99,7 +99,7 @@ export interface EntriesApiResponse {
 
 export interface AnalyticsSummary {
   totalEntries: number
-  bristolDistribution: Array<{ type: number, count: number }>
+  bristolDistribution: Array<{ type: number; count: number }>
   recentEntries: Array<{
     id: string
     bristolType: number
@@ -115,7 +115,16 @@ export interface Symptom {
   bowelMovementId?: string | null
   createdAt: string
   recordedAt: string
-  type: 'BLOATING' | 'CRAMPS' | 'NAUSEA' | 'HEARTBURN' | 'CONSTIPATION' | 'DIARRHEA' | 'GAS' | 'FATIGUE' | 'OTHER'
+  type:
+    | 'BLOATING'
+    | 'CRAMPS'
+    | 'NAUSEA'
+    | 'HEARTBURN'
+    | 'CONSTIPATION'
+    | 'DIARRHEA'
+    | 'GAS'
+    | 'FATIGUE'
+    | 'OTHER'
   severity: number
   notes?: string | null
 }

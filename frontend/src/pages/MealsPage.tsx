@@ -8,7 +8,7 @@ import { useImageUpload } from '../hooks/useImageUpload'
 import { useEntryLinking } from '../hooks/useEntryLinking'
 import type { Meal, MealFormData } from '../types'
 
-export function MealsPage (): ReactElement {
+export function MealsPage(): ReactElement {
   const [formData, setFormData] = useState<MealFormData>({
     name: '',
     category: '',
@@ -36,13 +36,8 @@ export function MealsPage (): ReactElement {
     deleteMeal
   } = useMeals()
 
-  const {
-    selectedImage,
-    imagePreview,
-    handleImageChange,
-    removeImage,
-    uploadImage
-  } = useImageUpload()
+  const { selectedImage, imagePreview, handleImageChange, removeImage, uploadImage } =
+    useImageUpload()
 
   const {
     availableEntries,
@@ -106,7 +101,7 @@ export function MealsPage (): ReactElement {
       photoUrl: meal.photoUrl
     })
     setEditingMeal(meal)
-    
+
     // Set image preview if meal has photo
     if (meal.photoUrl != null) {
       // Note: This won't work perfectly for existing images, but it's better than nothing

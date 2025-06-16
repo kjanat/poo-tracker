@@ -67,7 +67,16 @@ export interface Symptom {
   bowelMovementId?: string | null
   createdAt: Date
   recordedAt: Date
-  type: 'BLOATING' | 'CRAMPS' | 'NAUSEA' | 'HEARTBURN' | 'CONSTIPATION' | 'DIARRHEA' | 'GAS' | 'FATIGUE' | 'OTHER'
+  type:
+    | 'BLOATING'
+    | 'CRAMPS'
+    | 'NAUSEA'
+    | 'HEARTBURN'
+    | 'CONSTIPATION'
+    | 'DIARRHEA'
+    | 'GAS'
+    | 'FATIGUE'
+    | 'OTHER'
   severity: number
   notes?: string | null
 }

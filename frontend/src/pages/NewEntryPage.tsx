@@ -1,4 +1,3 @@
-
 import { useAuthStore } from '../stores/authStore'
 import Logo from '../components/Logo'
 import { EntryForm } from '../domains/entries/components/EntryForm'
@@ -9,23 +8,10 @@ import type { Entry } from '../domains/entries/types'
 
 export function NewEntryPage() {
   const { token } = useAuthStore()
-  const {
-    entries,
-    isLoading,
-    error,
-    isSubmitting,
-    submitEntry,
-    deleteEntry
-  } = useEntries()
+  const { entries, isLoading, error, isSubmitting, submitEntry, deleteEntry } = useEntries()
 
-  const {
-    formData,
-    isEditing,
-    updateFormData,
-    resetForm,
-    startEditing,
-    cancelEditing
-  } = useEntryForm()
+  const { formData, isEditing, updateFormData, resetForm, startEditing, cancelEditing } =
+    useEntryForm()
 
   const handleSubmit = async (): Promise<void> => {
     try {
@@ -87,7 +73,7 @@ export function NewEntryPage() {
         {/* Recent Entries */}
         <div className="mt-8">
           <h2 className="text-xl font-semibold mb-4">Recent Entries</h2>
-          
+
           {isLoading ? (
             <div className="text-center py-8">
               <p className="text-gray-500">Loading entries...</p>

@@ -95,7 +95,7 @@ export class BristolAnalyzer {
     return this.typeInfo[type]?.color ?? '#6b7280'
   }
 
-  static calculateAverage(distribution: Array<{ type: number, count: number }>): number {
+  static calculateAverage(distribution: Array<{ type: number; count: number }>): number {
     if (distribution.length === 0) return 0
 
     const totalCount = distribution.reduce((sum, item) => sum + item.count, 0)

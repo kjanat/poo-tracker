@@ -14,12 +14,12 @@ export interface UseEntryLinkingReturn {
   unlinkEntry: (mealId: string, entryId: string) => Promise<void>
 }
 
-export function useEntryLinking (): UseEntryLinkingReturn {
+export function useEntryLinking(): UseEntryLinkingReturn {
   const [availableEntries, setAvailableEntries] = useState<Entry[]>([])
   const [linkedEntries, setLinkedEntries] = useState<Entry[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
-  
+
   const token = useAuthStore((state) => state.token)
 
   // Fetch all available entries
@@ -72,11 +72,11 @@ export function useEntryLinking (): UseEntryLinkingReturn {
       })
 
       await handleApiResponse(response)
-      
+
       // Update local state
-      const entryToLink = availableEntries.find(entry => entry.id === entryId)
+      const entryToLink = availableEntries.find((entry) => entry.id === entryId)
       if (entryToLink != null) {
-        setLinkedEntries(prev => [...prev, entryToLink])
+        setLinkedEntries((prev) => [...prev, entryToLink])
       }
     } catch (error) {
       console.error('Failed to link entry:', error)
@@ -94,9 +94,9 @@ export function useEntryLinking (): UseEntryLinkingReturn {
       })
 
       await handleApiResponse(response)
-      
+
       // Update local state
-      setLinkedEntries(prev => prev.filter(entry => entry.id !== entryId))
+      setLinkedEntries((prev) => prev.filter((entry) => entry.id !== entryId))
     } catch (error) {
       console.error('Failed to unlink entry:', error)
       setError(error instanceof Error ? error.message : 'Failed to unlink entry')

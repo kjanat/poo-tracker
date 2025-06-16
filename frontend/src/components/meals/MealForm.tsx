@@ -14,7 +14,7 @@ interface MealFormProps {
   onRemoveImage: () => void
 }
 
-export function MealForm ({
+export function MealForm({
   formData,
   setFormData,
   onSubmit,
@@ -34,9 +34,7 @@ export function MealForm ({
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Meal Name *
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Meal Name *</label>
             <input
               type="text"
               value={formData.name}
@@ -47,9 +45,7 @@ export function MealForm ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Category
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
             <select
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
@@ -65,9 +61,7 @@ export function MealForm ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Cuisine
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Cuisine</label>
             <input
               type="text"
               value={formData.cuisine}
@@ -78,9 +72,7 @@ export function MealForm ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Spicy Level
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Spicy Level</label>
             <select
               value={formData.spicyLevel}
               onChange={(e) => setFormData({ ...formData, spicyLevel: parseInt(e.target.value) })}
@@ -96,9 +88,7 @@ export function MealForm ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
           <textarea
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -141,9 +131,7 @@ export function MealForm ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Photo
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Photo</label>
           <input
             type="file"
             accept="image/*"
@@ -152,11 +140,7 @@ export function MealForm ({
           />
           {imagePreview != null && (
             <div className="mt-2 relative inline-block">
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="h-32 w-32 object-cover rounded-md"
-              />
+              <img src={imagePreview} alt="Preview" className="h-32 w-32 object-cover rounded-md" />
               <button
                 type="button"
                 onClick={onRemoveImage}
@@ -169,9 +153,7 @@ export function MealForm ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Notes
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
           <textarea
             value={formData.notes}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -189,7 +171,7 @@ export function MealForm ({
           >
             {loading ? 'Saving...' : editingMeal != null ? 'Update Meal' : 'Add Meal'}
           </button>
-          
+
           {editingMeal != null && onCancel != null && (
             <button
               type="button"

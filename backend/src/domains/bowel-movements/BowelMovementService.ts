@@ -1,17 +1,20 @@
 import { PrismaClient } from '@prisma/client'
-import type { 
-  BowelMovement, 
-  CreateBowelMovementRequest, 
-  UpdateBowelMovementRequest, 
-  BowelMovementFilters, 
+import type {
+  BowelMovement,
+  CreateBowelMovementRequest,
+  UpdateBowelMovementRequest,
+  BowelMovementFilters,
   BowelMovementListResponse
 } from './types'
 import { BowelMovementFactory } from './BowelMovementFactory'
 
 export class BowelMovementService {
-  constructor (private readonly prisma: PrismaClient) {}
+  constructor(private readonly prisma: PrismaClient) {}
 
-  async findByUserId (userId: string, filters: BowelMovementFilters = {}): Promise<BowelMovementListResponse> {
+  async findByUserId(
+    userId: string,
+    filters: BowelMovementFilters = {}
+  ): Promise<BowelMovementListResponse> {
     const {
       page = 1,
       limit = 20,
@@ -25,13 +28,14 @@ export class BowelMovementService {
     const skip = (page - 1) * limit
 
     // Build where clause
-    const where: { userId: string; bristolType?: number; createdAt?: { gte?: Date; lte?: Date } } = { userId }
+    const where: { userId: string; bristolType?: number; createdAt?: { gte?: Date; lte?: Date } } =
+      { userId }
 
     if (bristolType) {
       where.bristolType = bristolType
     }
 
-    if ((dateFrom != null) || (dateTo != null)) {
+    if (dateFrom != null || dateTo != null) {
       where.createdAt = {}
       if (dateFrom != null) where.createdAt.gte = dateFrom
       if (dateTo != null) where.createdAt.lte = dateTo
@@ -63,7 +67,7 @@ export class BowelMovementService {
     }
   }
 
-  async findById (id: string, userId: string): Promise<BowelMovement | null> {
+  async findById(id: string, userId: string): Promise<BowelMovement | null> {
     return await this.prisma.bowelMovement.findFirst({
       where: { id, userId },
       include: {
@@ -78,9 +82,9 @@ export class BowelMovementService {
     })
   }
 
-  async create (request: CreateBowelMovementRequest, userId: string): Promise<BowelMovement> {
+  async create(request: CreateBowelMovementRequest, userId: string): Promise<BowelMovement> {
     const bowelMovementData = BowelMovementFactory.createFromRequest(request, userId)
-    
+
     const result = await this.prisma.bowelMovement.create({
       data: bowelMovementData,
       include: {
@@ -102,7 +106,11 @@ export class BowelMovementService {
     return result
   }
 
-  async update (id: string, request: UpdateBowelMovementRequest, userId: string): Promise<BowelMovement | null> {
+  async update(
+    id: string,
+    request: UpdateBowelMovementRequest,
+    userId: string
+  ): Promise<BowelMovement | null> {
     const existingBowelMovement = await this.findById(id, userId)
     if (existingBowelMovement == null) {
       return null
@@ -148,7 +156,7 @@ export class BowelMovementService {
     return result
   }
 
-  async delete (id: string, userId: string): Promise<boolean> {
+  async delete(id: string, userId: string): Promise<boolean> {
     const existingBowelMovement = await this.findById(id, userId)
     if (existingBowelMovement == null) {
       return false
@@ -161,45 +169,46 @@ export class BowelMovementService {
     return true
   }
 
-  async getAnalytics (userId: string): Promise<{
+  async getAnalytics(userId: string): Promise<{
     totalBowelMovements: number
-    bristolDistribution: Array<{ type: number, count: number }>
+    bristolDistribution: Array<{ type: number; count: number }>
     averageSatisfaction: number | null
     averagePain: number | null
     recentBowelMovements: BowelMovement[]
   }> {
-    const [totalBowelMovements, bristolStats, satisfactionAvg, painAvg, recentBowelMovements] = await Promise.all([
-      this.prisma.bowelMovement.count({ where: { userId } }),
+    const [totalBowelMovements, bristolStats, satisfactionAvg, painAvg, recentBowelMovements] =
+      await Promise.all([
+        this.prisma.bowelMovement.count({ where: { userId } }),
 
-      this.prisma.bowelMovement.groupBy({
-        by: ['bristolType'],
-        where: { userId },
-        _count: { bristolType: true }
-      }),
+        this.prisma.bowelMovement.groupBy({
+          by: ['bristolType'],
+          where: { userId },
+          _count: { bristolType: true }
+        }),
 
-      this.prisma.bowelMovement.aggregate({
-        where: { userId },
-        _avg: { satisfaction: true }
-      }),
+        this.prisma.bowelMovement.aggregate({
+          where: { userId },
+          _avg: { satisfaction: true }
+        }),
 
-      this.prisma.bowelMovement.aggregate({
-        where: { userId },
-        _avg: { pain: true }
-      }),
+        this.prisma.bowelMovement.aggregate({
+          where: { userId },
+          _avg: { pain: true }
+        }),
 
-      this.prisma.bowelMovement.findMany({
-        where: { userId },
-        orderBy: { createdAt: 'desc' },
-        take: 10,
-        include: {
-          details: true
-        }
-      })
-    ])
+        this.prisma.bowelMovement.findMany({
+          where: { userId },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+          include: {
+            details: true
+          }
+        })
+      ])
 
     return {
       totalBowelMovements,
-      bristolDistribution: bristolStats.map(stat => ({
+      bristolDistribution: bristolStats.map((stat) => ({
         type: stat.bristolType,
         count: stat._count.bristolType
       })),

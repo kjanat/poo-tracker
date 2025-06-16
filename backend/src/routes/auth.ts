@@ -88,7 +88,7 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction): P
       include: { auth: true }
     })
 
-    if ((user == null) || (user.auth == null)) {
+    if (user == null || user.auth == null) {
       res.status(401).json({ error: 'Invalid credentials' })
       return
     }
@@ -219,7 +219,7 @@ router.put(
         const hashedNewPassword = await bcrypt.hash(newPassword, salt)
         await prisma.userAuth.update({
           where: { userId: req.userId },
-          data: { 
+          data: {
             passwordHash: hashedNewPassword,
             salt: salt
           }

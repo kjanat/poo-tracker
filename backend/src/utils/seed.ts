@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 
 async function main(): Promise<void> {
   console.log('🧹 Cleaning up existing data...')
-  
+
   // Clean up data in correct order to avoid foreign key constraint issues
   await prisma.mealBowelMovementRelation.deleteMany()
   await prisma.bowelMovementDetails.deleteMany()
@@ -20,7 +20,7 @@ async function main(): Promise<void> {
   console.log('👤 Creating sample users...')
   const salt = await bcrypt.genSalt(12)
   const hashedPassword = await bcrypt.hash('password123', salt)
-  
+
   const user1 = await prisma.user.create({
     data: {
       email: 'john.doe@example.com',
@@ -165,7 +165,7 @@ async function main(): Promise<void> {
         userId: user1.id
       }
     })
-    
+
     // Add details separately if notes exist
     if (notes) {
       await prisma.bowelMovementDetails.create({

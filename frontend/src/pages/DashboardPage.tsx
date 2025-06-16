@@ -5,7 +5,7 @@ import { BristolChart } from '../components/dashboard/BristolChart'
 import { RecentEntries } from '../components/dashboard/RecentEntries'
 import { useDashboard } from '../hooks/useDashboard'
 
-export function DashboardPage (): ReactElement {
+export function DashboardPage(): ReactElement {
   const {
     analytics,
     recentEntries,
@@ -43,32 +43,39 @@ export function DashboardPage (): ReactElement {
           </div>
         )}
 
-        <DashboardStats 
+        <DashboardStats
           analytics={analytics}
           thisWeekCount={thisWeekCount}
           averageBristolType={averageBristolType}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <BristolChart 
-            bristolDistribution={analytics?.bristolDistribution ?? []}
-          />
-          
-          <RecentEntries 
-            entries={recentEntries}
-            loading={isLoading}
-          />
+          <BristolChart bristolDistribution={analytics?.bristolDistribution ?? []} />
+
+          <RecentEntries entries={recentEntries} loading={isLoading} />
         </div>
 
         {analytics?.totalEntries === 0 && !isLoading && (
           <div className="text-center py-12">
             <div className="text-gray-500 mb-4">
-              <svg className="mx-auto h-24 w-24 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              <svg
+                className="mx-auto h-24 w-24 text-gray-300"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1}
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
               </svg>
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">No data yet</h3>
-            <p className="text-gray-500 mb-6">Start tracking your bowel movements to see insights here.</p>
+            <p className="text-gray-500 mb-6">
+              Start tracking your bowel movements to see insights here.
+            </p>
             <a
               href="/new-entry"
               className="bg-amber-600 text-white px-6 py-3 rounded-md hover:bg-amber-700 transition-colors"

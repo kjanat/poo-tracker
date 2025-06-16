@@ -1,6 +1,6 @@
 export interface AnalyticsSummary {
   totalEntries: number
-  bristolDistribution: Array<{ type: number, count: number }>
+  bristolDistribution: Array<{ type: number; count: number }>
   recentEntries: Array<{
     id: string
     bristolType: number

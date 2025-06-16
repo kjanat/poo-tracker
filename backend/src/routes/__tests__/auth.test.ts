@@ -75,10 +75,7 @@ describe('Auth Routes Integration Tests', () => {
       vi.spyOn(jwt, 'sign').mockReturnValue(mockToken as any)
 
       // Execute
-      const response = await request(app)
-        .post('/auth/register')
-        .send(userData)
-        .expect(201)
+      const response = await request(app).post('/auth/register').send(userData).expect(201)
 
       // Verify
       expect(response.body).toEqual({
@@ -106,11 +103,9 @@ describe('Auth Routes Integration Tests', () => {
         }
       })
 
-      expect(jwt.sign).toHaveBeenCalledWith(
-        { userId: createdUser.id },
-        config.jwt.secret,
-        { expiresIn: config.jwt.expiresIn }
-      )
+      expect(jwt.sign).toHaveBeenCalledWith({ userId: createdUser.id }, config.jwt.secret, {
+        expiresIn: config.jwt.expiresIn
+      })
     })
 
     it('should register user without name', async () => {
@@ -131,10 +126,7 @@ describe('Auth Routes Integration Tests', () => {
       vi.spyOn(jwt, 'sign').mockReturnValue('mock-token' as any)
 
       // Execute
-      const response = await request(app)
-        .post('/auth/register')
-        .send(userData)
-        .expect(201)
+      const response = await request(app).post('/auth/register').send(userData).expect(201)
 
       // Verify
       expect(mockPrismaClient.user.create).toHaveBeenCalledWith({
@@ -162,10 +154,7 @@ describe('Auth Routes Integration Tests', () => {
       mockPrismaClient.user.findUnique.mockResolvedValue({ id: 'existing-user' })
 
       // Execute
-      const response = await request(app)
-        .post('/auth/register')
-        .send(userData)
-        .expect(400)
+      const response = await request(app).post('/auth/register').send(userData).expect(400)
 
       // Verify
       expect(response.body).toEqual({
@@ -183,10 +172,7 @@ describe('Auth Routes Integration Tests', () => {
       }
 
       // Execute
-      const response = await request(app)
-        .post('/auth/register')
-        .send(userData)
-        .expect(400)
+      const response = await request(app).post('/auth/register').send(userData).expect(400)
 
       // Verify
       expect(response.body.error).toBeDefined()
@@ -202,10 +188,7 @@ describe('Auth Routes Integration Tests', () => {
       }
 
       // Execute
-      const response = await request(app)
-        .post('/auth/register')
-        .send(userData)
-        .expect(400)
+      const response = await request(app).post('/auth/register').send(userData).expect(400)
 
       // Verify
       expect(response.body.error).toBeDefined()
@@ -222,8 +205,16 @@ describe('Auth Routes Integration Tests', () => {
       // Verify
       expect(response.body.error).toBeDefined()
       expect(response.body.error).toHaveLength(2) // email, password required
-      expect(response.body.error.some((err: any) => err.path[0] === 'email' && err.message === 'Required')).toBe(true)
-      expect(response.body.error.some((err: any) => err.path[0] === 'password' && err.message === 'Required')).toBe(true)
+      expect(
+        response.body.error.some(
+          (err: any) => err.path[0] === 'email' && err.message === 'Required'
+        )
+      ).toBe(true)
+      expect(
+        response.body.error.some(
+          (err: any) => err.path[0] === 'password' && err.message === 'Required'
+        )
+      ).toBe(true)
     })
 
     it('should hash password before storing', async () => {
@@ -234,14 +225,15 @@ describe('Auth Routes Integration Tests', () => {
       }
 
       mockPrismaClient.user.findUnique.mockResolvedValue(null)
-      mockPrismaClient.user.create.mockResolvedValue({ id: 'user-123', email: userData.email, name: null })
+      mockPrismaClient.user.create.mockResolvedValue({
+        id: 'user-123',
+        email: userData.email,
+        name: null
+      })
       vi.spyOn(jwt, 'sign').mockReturnValue('mock-token' as any)
 
       // Execute
-      await request(app)
-        .post('/auth/register')
-        .send(userData)
-        .expect(201)
+      await request(app).post('/auth/register').send(userData).expect(201)
 
       // Verify password was hashed
       const createCall = mockPrismaClient.user.create.mock.calls[0]?.[0]
@@ -276,10 +268,7 @@ describe('Auth Routes Integration Tests', () => {
       vi.spyOn(jwt, 'sign').mockReturnValue('login-token' as any)
 
       // Execute
-      const response = await request(app)
-        .post('/auth/login')
-        .send(loginData)
-        .expect(200)
+      const response = await request(app).post('/auth/login').send(loginData).expect(200)
 
       // Verify
       expect(response.body).toEqual({
@@ -298,11 +287,9 @@ describe('Auth Routes Integration Tests', () => {
       })
 
       expect(bcrypt.compare).toHaveBeenCalledWith(loginData.password, user.auth.password)
-      expect(jwt.sign).toHaveBeenCalledWith(
-        { userId: user.id },
-        config.jwt.secret,
-        { expiresIn: config.jwt.expiresIn }
-      )
+      expect(jwt.sign).toHaveBeenCalledWith({ userId: user.id }, config.jwt.secret, {
+        expiresIn: config.jwt.expiresIn
+      })
     })
 
     it('should return 401 for non-existent user', async () => {
@@ -315,10 +302,7 @@ describe('Auth Routes Integration Tests', () => {
       mockPrismaClient.user.findUnique.mockResolvedValue(null)
 
       // Execute
-      const response = await request(app)
-        .post('/auth/login')
-        .send(loginData)
-        .expect(401)
+      const response = await request(app).post('/auth/login').send(loginData).expect(401)
 
       // Verify
       expect(response.body).toEqual({
@@ -343,10 +327,7 @@ describe('Auth Routes Integration Tests', () => {
       mockPrismaClient.user.findUnique.mockResolvedValue(userWithoutAuth)
 
       // Execute
-      const response = await request(app)
-        .post('/auth/login')
-        .send(loginData)
-        .expect(401)
+      const response = await request(app).post('/auth/login').send(loginData).expect(401)
 
       // Verify
       expect(response.body).toEqual({
@@ -374,10 +355,7 @@ describe('Auth Routes Integration Tests', () => {
       vi.spyOn(bcrypt, 'compare').mockResolvedValue(false as any)
 
       // Execute
-      const response = await request(app)
-        .post('/auth/login')
-        .send(loginData)
-        .expect(401)
+      const response = await request(app).post('/auth/login').send(loginData).expect(401)
 
       // Verify
       expect(response.body).toEqual({
@@ -395,10 +373,7 @@ describe('Auth Routes Integration Tests', () => {
       }
 
       // Execute
-      const response = await request(app)
-        .post('/auth/login')
-        .send(loginData)
-        .expect(400)
+      const response = await request(app).post('/auth/login').send(loginData).expect(400)
 
       // Verify
       expect(response.body.error).toBeDefined()
@@ -413,10 +388,7 @@ describe('Auth Routes Integration Tests', () => {
       }
 
       // Execute
-      const response = await request(app)
-        .post('/auth/login')
-        .send(loginData)
-        .expect(400)
+      const response = await request(app).post('/auth/login').send(loginData).expect(400)
 
       // Verify
       expect(response.body.error[0].message).toBe('Required')
@@ -435,10 +407,7 @@ describe('Auth Routes Integration Tests', () => {
       mockPrismaClient.user.findUnique.mockRejectedValue(new Error('Database error'))
 
       // Execute - should return 500 due to error handler middleware
-      const response = await request(app)
-        .post('/auth/register')
-        .send(userData)
-        .expect(500)
+      const response = await request(app).post('/auth/register').send(userData).expect(500)
 
       // Verify error response structure
       expect(response.body.error).toBe('Database error')
@@ -454,10 +423,7 @@ describe('Auth Routes Integration Tests', () => {
       mockPrismaClient.user.findUnique.mockRejectedValue(new Error('Database connection failed'))
 
       // Execute
-      const response = await request(app)
-        .post('/auth/login')
-        .send(loginData)
-        .expect(500)
+      const response = await request(app).post('/auth/login').send(loginData).expect(500)
 
       // Verify
       expect(response.body.error).toBe('Database connection failed')

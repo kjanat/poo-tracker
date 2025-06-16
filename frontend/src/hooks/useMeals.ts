@@ -16,12 +16,12 @@ export interface UseMealsReturn {
   deleteMeal: (id: string) => Promise<void>
 }
 
-export function useMeals (): UseMealsReturn {
+export function useMeals(): UseMealsReturn {
   const [meals, setMeals] = useState<Meal[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
   const [success, setSuccess] = useState<string>('')
-  
+
   const token = useAuthStore((state) => state.token)
 
   const refreshMeals = useCallback(async (): Promise<void> => {
@@ -39,12 +39,9 @@ export function useMeals (): UseMealsReturn {
       const mealsWithLinkedEntries = await Promise.all(
         mealsData.map(async (meal: Meal) => {
           try {
-            const linkedResponse = await fetch(
-              `${API_BASE_URL}/api/meals/${meal.id}/entries`,
-              {
-                headers: createAuthHeaders(token)
-              }
-            )
+            const linkedResponse = await fetch(`${API_BASE_URL}/api/meals/${meal.id}/entries`, {
+              headers: createAuthHeaders(token)
+            })
 
             if (linkedResponse.ok) {
               const linkedData = await linkedResponse.json()

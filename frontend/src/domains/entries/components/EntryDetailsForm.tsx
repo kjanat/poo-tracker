@@ -32,9 +32,7 @@ export function EntryDetailsForm({
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Volume
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Volume</label>
           <select
             value={volume}
             onChange={(e) => onVolumeChange(e.target.value)}
@@ -49,9 +47,7 @@ export function EntryDetailsForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Color
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
           <select
             value={color}
             onChange={(e) => onColorChange(e.target.value)}
@@ -72,9 +68,7 @@ export function EntryDetailsForm({
 
       {/* Photo Upload */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Photo (optional)
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Photo (optional)</label>
         <input
           type="file"
           accept="image/*"
@@ -91,9 +85,7 @@ export function EntryDetailsForm({
 
       {/* Notes */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Notes
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
         <textarea
           value={notes}
           onChange={(e) => onNotesChange(e.target.value)}

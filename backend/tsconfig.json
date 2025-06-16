@@ -48,13 +48,7 @@
       "@/db/*": ["src/db/*"]
     }
   },
-  "include": [
-    "src/**/*",
-    "prisma/**/*",
-    "**/*.test.ts",
-    "**/*.spec.ts",
-    "**/*.d.ts"
-  ],
+  "include": ["src/**/*", "prisma/**/*", "**/*.test.ts", "**/*.spec.ts", "**/*.d.ts"],
   "exclude": ["node_modules", "dist", "build", "coverage"],
   "ts-node": {
     "esm": false,

@@ -14,7 +14,10 @@ export const authenticateToken = (
   const authHeader = req.headers.authorization
   const token = authHeader?.split(' ')[1] // Bearer TOKEN
 
-  console.log('🔐 Auth middleware - Headers:', typeof authHeader === 'string' ? 'Present' : 'Missing')
+  console.log(
+    '🔐 Auth middleware - Headers:',
+    typeof authHeader === 'string' ? 'Present' : 'Missing'
+  )
 
   if (token === undefined || token === '') {
     console.log('❌ Auth middleware - No token provided')

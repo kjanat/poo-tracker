@@ -7,7 +7,11 @@ interface DashboardStatsProps {
   averageBristolType: number
 }
 
-export function DashboardStats ({ analytics, thisWeekCount, averageBristolType }: DashboardStatsProps): ReactElement {
+export function DashboardStats({
+  analytics,
+  thisWeekCount,
+  averageBristolType
+}: DashboardStatsProps): ReactElement {
   if (analytics == null) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -41,10 +45,7 @@ export function DashboardStats ({ analytics, thisWeekCount, averageBristolType }
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-sm font-medium text-gray-500 mb-2">Avg Satisfaction</h3>
         <p className="text-3xl font-bold text-purple-600">
-          {analytics.averageSatisfaction != null 
-            ? analytics.averageSatisfaction.toFixed(1) 
-            : 'N/A'
-          }
+          {analytics.averageSatisfaction != null ? analytics.averageSatisfaction.toFixed(1) : 'N/A'}
         </p>
       </div>
     </div>

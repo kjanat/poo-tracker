@@ -1,12 +1,18 @@
 import { PrismaClient, Prisma } from '@prisma/client'
-import type { Meal, CreateMealRequest, UpdateMealRequest, MealFilters, MealListResponse } from './types'
+import type {
+  Meal,
+  CreateMealRequest,
+  UpdateMealRequest,
+  MealFilters,
+  MealListResponse
+} from './types'
 import type { BowelMovement } from '../bowel-movements/types'
 import { MealFactory } from './MealFactory'
 
 export class MealService {
-  constructor (private readonly prisma: PrismaClient) {}
+  constructor(private readonly prisma: PrismaClient) {}
 
-  async findByUserId (userId: string, filters: MealFilters = {}): Promise<MealListResponse> {
+  async findByUserId(userId: string, filters: MealFilters = {}): Promise<MealListResponse> {
     const {
       page = 1,
       limit = 20,
@@ -29,7 +35,10 @@ export class MealService {
       where.category = category
     }
 
-    if ((dateFrom !== null && dateFrom !== undefined) || (dateTo !== null && dateTo !== undefined)) {
+    if (
+      (dateFrom !== null && dateFrom !== undefined) ||
+      (dateTo !== null && dateTo !== undefined)
+    ) {
       where.mealTime = {}
       if (dateFrom !== null && dateFrom !== undefined) where.mealTime.gte = dateFrom
       if (dateTo !== null && dateTo !== undefined) where.mealTime.lte = dateTo
@@ -69,13 +78,13 @@ export class MealService {
     }
   }
 
-  async findById (id: string, userId: string): Promise<Meal | null> {
+  async findById(id: string, userId: string): Promise<Meal | null> {
     return await this.prisma.meal.findFirst({
       where: { id, userId }
     })
   }
 
-  async create (request: CreateMealRequest, userId: string): Promise<Meal> {
+  async create(request: CreateMealRequest, userId: string): Promise<Meal> {
     const mealData = MealFactory.createFromRequest(request, userId)
 
     return await this.prisma.meal.create({
@@ -88,7 +97,7 @@ export class MealService {
     })
   }
 
-  async update (id: string, request: UpdateMealRequest, userId: string): Promise<Meal | null> {
+  async update(id: string, request: UpdateMealRequest, userId: string): Promise<Meal | null> {
     const existingMeal = await this.findById(id, userId)
     if (existingMeal == null) {
       return null
@@ -98,7 +107,8 @@ export class MealService {
 
     // Only update provided fields
     if (request.name !== undefined) updateData.name = MealFactory.sanitizeName(request.name)
-    if (request.description !== undefined) updateData.description = MealFactory.sanitizeDescription(request.description)
+    if (request.description !== undefined)
+      updateData.description = MealFactory.sanitizeDescription(request.description)
     if (request.mealTime !== undefined) updateData.mealTime = request.mealTime
     if (request.category !== undefined) updateData.category = request.category
     if (request.cuisine !== undefined) updateData.cuisine = request.cuisine?.trim() || null
@@ -115,7 +125,7 @@ export class MealService {
     })
   }
 
-  async delete (id: string, userId: string): Promise<boolean> {
+  async delete(id: string, userId: string): Promise<boolean> {
     const existingMeal = await this.findById(id, userId)
     if (existingMeal == null) {
       return false
@@ -128,9 +138,9 @@ export class MealService {
     return true
   }
 
-  async getAnalytics (userId: string): Promise<{
+  async getAnalytics(userId: string): Promise<{
     totalMeals: number
-    mealsByCategory: Array<{ category: string, count: number }>
+    mealsByCategory: Array<{ category: string; count: number }>
     averageSpicyLevel: number | null
     dietaryDistribution: {
       fiberRich: number
@@ -168,7 +178,7 @@ export class MealService {
 
     return {
       totalMeals,
-      mealsByCategory: categoryStats.map(stat => ({
+      mealsByCategory: categoryStats.map((stat) => ({
         category: stat.category || 'Uncategorized',
         count: stat._count.category
       })),
@@ -182,7 +192,11 @@ export class MealService {
     }
   }
 
-  async linkBowelMovement (mealId: string, bowelMovementId: string, userId: string): Promise<boolean> {
+  async linkBowelMovement(
+    mealId: string,
+    bowelMovementId: string,
+    userId: string
+  ): Promise<boolean> {
     // Verify the meal and bowel movement belong to the user
     const [meal, bowelMovement] = await Promise.all([
       this.findById(mealId, userId),
@@ -211,7 +225,11 @@ export class MealService {
     return true
   }
 
-  async unlinkBowelMovement (mealId: string, bowelMovementId: string, userId: string): Promise<boolean> {
+  async unlinkBowelMovement(
+    mealId: string,
+    bowelMovementId: string,
+    userId: string
+  ): Promise<boolean> {
     // Verify the meal belongs to the user
     const meal = await this.findById(mealId, userId)
     if (!meal) {
@@ -228,7 +246,7 @@ export class MealService {
     return result.count > 0
   }
 
-  async getLinkedBowelMovements (mealId: string, userId: string): Promise<BowelMovement[]> {
+  async getLinkedBowelMovements(mealId: string, userId: string): Promise<BowelMovement[]> {
     // Verify the meal belongs to the user
     const meal = await this.findById(mealId, userId)
     if (!meal) {

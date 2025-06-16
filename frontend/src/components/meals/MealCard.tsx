@@ -9,7 +9,7 @@ interface MealCardProps {
   onLink: (meal: Meal) => void
 }
 
-export function MealCard ({ meal, onEdit, onDelete, onLink }: MealCardProps): ReactElement {
+export function MealCard({ meal, onEdit, onDelete, onLink }: MealCardProps): ReactElement {
   return (
     <div className="bg-white p-4 rounded-lg shadow-md">
       <div className="flex justify-between items-start mb-2">
@@ -50,7 +50,7 @@ export function MealCard ({ meal, onEdit, onDelete, onLink }: MealCardProps): Re
             <span className="font-medium">Category:</span> {meal.category}
           </div>
         )}
-        
+
         {meal.cuisine != null && (
           <div>
             <span className="font-medium">Cuisine:</span> {meal.cuisine}
@@ -76,9 +76,7 @@ export function MealCard ({ meal, onEdit, onDelete, onLink }: MealCardProps): Re
             </span>
           )}
           {meal.dairy && (
-            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-              Dairy
-            </span>
+            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Dairy</span>
           )}
           {meal.gluten && (
             <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs">
@@ -99,9 +97,7 @@ export function MealCard ({ meal, onEdit, onDelete, onLink }: MealCardProps): Re
           </div>
         )}
 
-        <div className="text-xs text-gray-500 mt-2">
-          Added: {formatDate(meal.createdAt)}
-        </div>
+        <div className="text-xs text-gray-500 mt-2">Added: {formatDate(meal.createdAt)}</div>
       </div>
     </div>
   )

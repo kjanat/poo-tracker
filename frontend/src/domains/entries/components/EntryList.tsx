@@ -1,4 +1,3 @@
-
 import { BristolAnalyzer } from '../../bristol/BristolAnalyzer'
 import type { Entry } from '../types'
 
@@ -54,9 +53,7 @@ function EntryCard({ entry, onEdit, onDelete, isSubmitting }: EntryCardProps) {
       <div className="flex justify-between items-start mb-3">
         <div className="flex-1">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900">
-              Type {entry.bristolType}
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900">Type {entry.bristolType}</h3>
             <span className="text-sm text-gray-500">
               {new Date(entry.createdAt).toLocaleDateString('en-US', {
                 month: 'short',

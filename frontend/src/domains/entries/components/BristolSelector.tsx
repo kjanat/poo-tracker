@@ -7,7 +7,11 @@ interface BristolSelectorProps {
   disabled?: boolean
 }
 
-export function BristolSelector ({ selectedType, onTypeSelect, disabled = false }: BristolSelectorProps): ReactElement {
+export function BristolSelector({
+  selectedType,
+  onTypeSelect,
+  disabled = false
+}: BristolSelectorProps): ReactElement {
   const bristolTypes = BristolAnalyzer.getAllTypes()
 
   return (
@@ -27,17 +31,12 @@ export function BristolSelector ({ selectedType, onTypeSelect, disabled = false 
             } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <div className="flex items-center gap-3">
-              <div 
-                className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: typeInfo.color }}
-              />
+              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: typeInfo.color }} />
               <div>
                 <div className="font-medium">
                   Type {typeInfo.type}: {typeInfo.description}
                 </div>
-                <div className="text-sm text-gray-600">
-                  {typeInfo.severity}
-                </div>
+                <div className="text-sm text-gray-600">{typeInfo.severity}</div>
               </div>
             </div>
           </button>

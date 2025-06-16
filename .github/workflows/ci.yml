@@ -272,11 +272,24 @@ jobs:
           cd ai-service
           if [ -n "$(find . -name 'test_*.py' -o -name '*_test.py' | head -1)" ]; then
             echo "Running tests..."
-            uv run pytest --tb=short -v
+            uv run pytest --tb=short -v --junit-xml=junit.xml
           else
             echo "No test files found (test_*.py or *_test.py), skipping tests"
             echo "✅ Test step completed (no tests to run)"
           fi
+
+      - name: Upload results to Trunk
+        # Run this step even if the test step ahead fails
+        if: success() || failure()
+        uses: trunk-io/analytics-uploader@main
+        with:
+          # Path to your test results.
+          junit-paths: "**/junit.xml"
+          # Provide your Trunk organization slug.
+          org-slug: ${{ vars.TRUNK_ORG_SLUG }}
+          # Provide your Trunk API token as a GitHub secret.
+          token: ${{ secrets.TRUNK_API_TOKEN }}
+        continue-on-error: true
 
   docker-build:
     name: 🐳 Docker Build Test

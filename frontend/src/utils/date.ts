@@ -4,8 +4,7 @@ export const getThisWeekCount = (entries: EntryResponse[]): number => {
   const oneWeekAgo = new Date()
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
 
-  return entries.filter((entry) => new Date(entry.createdAt) >= oneWeekAgo)
-    .length
+  return entries.filter((entry) => new Date(entry.createdAt) >= oneWeekAgo).length
 }
 
 export const formatDate = (dateString: string): string => {

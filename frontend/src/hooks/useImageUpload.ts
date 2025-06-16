@@ -10,10 +10,10 @@ export interface UseImageUploadReturn {
   uploadImage: () => Promise<string | null>
 }
 
-export function useImageUpload (): UseImageUploadReturn {
+export function useImageUpload(): UseImageUploadReturn {
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  
+
   const token = useAuthStore((state) => state.token)
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>): void => {

@@ -4,7 +4,7 @@ import type { Entry } from '../entries/types'
 import { BristolAnalyzer } from '../bristol/BristolAnalyzer'
 
 export class AnalyticsService {
-  constructor (private readonly apiClient: ApiClient) {}
+  constructor(private readonly apiClient: ApiClient) {}
 
   async getSummary(): Promise<AnalyticsSummary> {
     const response = await this.apiClient.get<AnalyticsSummary>('/api/analytics/summary')
@@ -36,42 +36,52 @@ export class AnalyticsService {
   }
 
   generateTrendData(entries: Entry[]): TrendData[] {
-    const groupedByDate = entries.reduce((acc, entry) => {
-      const date = new Date(entry.createdAt).toISOString().split('T')[0]
-      
-      if (!date) {
-        return acc
-      }
-      
-      if (!(date in acc)) {
-        acc[date] = {
-          date,
-          bristolTypes: [],
-          satisfactions: [],
-          count: 0
-        }
-      }
-      
-      const dateGroup = acc[date]
-      if (dateGroup) {
-        dateGroup.bristolTypes.push(entry.bristolType)
-        if (entry.satisfaction != null) {
-          dateGroup.satisfactions.push(entry.satisfaction)
-        }
-        dateGroup.count++
-      }
-      
-      return acc
-    }, {} as Record<string, { date: string, bristolTypes: number[], satisfactions: number[], count: number }>)
+    const groupedByDate = entries.reduce(
+      (acc, entry) => {
+        const date = new Date(entry.createdAt).toISOString().split('T')[0]
 
-    return Object.values(groupedByDate).map(group => ({
-      date: group.date,
-      bristolType: group.bristolTypes.reduce((sum, type) => sum + type, 0) / group.bristolTypes.length,
-      satisfaction: group.satisfactions.length > 0 
-        ? group.satisfactions.reduce((sum, sat) => sum + sat, 0) / group.satisfactions.length 
-        : 5, // Default satisfaction if none provided
-      count: group.count
-    })).sort((a, b) => a.date.localeCompare(b.date))
+        if (!date) {
+          return acc
+        }
+
+        if (!(date in acc)) {
+          acc[date] = {
+            date,
+            bristolTypes: [],
+            satisfactions: [],
+            count: 0
+          }
+        }
+
+        const dateGroup = acc[date]
+        if (dateGroup) {
+          dateGroup.bristolTypes.push(entry.bristolType)
+          if (entry.satisfaction != null) {
+            dateGroup.satisfactions.push(entry.satisfaction)
+          }
+          dateGroup.count++
+        }
+
+        return acc
+      },
+      {} as Record<
+        string,
+        { date: string; bristolTypes: number[]; satisfactions: number[]; count: number }
+      >
+    )
+
+    return Object.values(groupedByDate)
+      .map((group) => ({
+        date: group.date,
+        bristolType:
+          group.bristolTypes.reduce((sum, type) => sum + type, 0) / group.bristolTypes.length,
+        satisfaction:
+          group.satisfactions.length > 0
+            ? group.satisfactions.reduce((sum, sat) => sum + sat, 0) / group.satisfactions.length
+            : 5, // Default satisfaction if none provided
+        count: group.count
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date))
   }
 
   calculateHealthMetrics(entries: Entry[]): HealthMetrics {
@@ -87,25 +97,31 @@ export class AnalyticsService {
     const recentEntries = entries.slice(0, 10)
     const olderEntries = entries.slice(10, 20)
 
-    const averageBristolType = recentEntries.reduce((sum, entry) => sum + entry.bristolType, 0) / recentEntries.length
-    
+    const averageBristolType =
+      recentEntries.reduce((sum, entry) => sum + entry.bristolType, 0) / recentEntries.length
+
     // Calculate consistency score (how close to ideal range 3-4)
-    const idealCount = recentEntries.filter(entry => entry.bristolType === 3 || entry.bristolType === 4).length
+    const idealCount = recentEntries.filter(
+      (entry) => entry.bristolType === 3 || entry.bristolType === 4
+    ).length
     const consistencyScore = (idealCount / recentEntries.length) * 100
 
     // Calculate trend
     let healthTrend: 'improving' | 'stable' | 'declining' = 'stable'
     if (olderEntries.length > 0) {
       const recentAvg = averageBristolType
-      const olderAvg = olderEntries.reduce((sum, entry) => sum + entry.bristolType, 0) / olderEntries.length
-      
+      const olderAvg =
+        olderEntries.reduce((sum, entry) => sum + entry.bristolType, 0) / olderEntries.length
+
       const difference = Math.abs(recentAvg - 3.5) - Math.abs(olderAvg - 3.5)
       if (difference < -0.3) healthTrend = 'improving'
       else if (difference > 0.3) healthTrend = 'declining'
     }
 
     // Check if recommendations needed
-    const extremeCount = recentEntries.filter(entry => entry.bristolType === 1 || entry.bristolType === 7).length
+    const extremeCount = recentEntries.filter(
+      (entry) => entry.bristolType === 1 || entry.bristolType === 7
+    ).length
     const recommendationsNeeded = extremeCount > recentEntries.length * 0.3 || consistencyScore < 50
 
     return {
@@ -132,7 +148,7 @@ export class AnalyticsService {
       recommendations.push('Consider consulting a healthcare provider')
     }
 
-    const hasExtremes = entries.some(entry => BristolAnalyzer.needsAttention(entry.bristolType))
+    const hasExtremes = entries.some((entry) => BristolAnalyzer.needsAttention(entry.bristolType))
     if (hasExtremes) {
       recommendations.push('Monitor extreme types and consider medical advice if persistent')
     }

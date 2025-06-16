@@ -12,7 +12,7 @@ export interface Meal {
   photoUrl?: string
   mealTime: string
   createdAt: string
-  linkedEntries?: Array<{ id: string, bristolType: number, createdAt: string }>
+  linkedEntries?: Array<{ id: string; bristolType: number; createdAt: string }>
 }
 
 export interface CreateMealRequest {

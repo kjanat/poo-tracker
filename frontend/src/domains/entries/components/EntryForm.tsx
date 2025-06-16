@@ -12,10 +12,10 @@ interface EntryFormProps {
   isEditing?: boolean
 }
 
-export function EntryForm({ 
-  formData, 
-  onUpdate, 
-  onSubmit, 
+export function EntryForm({
+  formData,
+  onUpdate,
+  onSubmit,
   onCancel,
   isSubmitting,
   isEditing = false
@@ -28,9 +28,7 @@ export function EntryForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-xl font-semibold mb-6">
-          {isEditing ? 'Edit Entry' : 'New Entry'}
-        </h2>
+        <h2 className="text-xl font-semibold mb-6">{isEditing ? 'Edit Entry' : 'New Entry'}</h2>
 
         <BristolSelector
           selectedType={formData.bristolType}

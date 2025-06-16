@@ -3,7 +3,11 @@ import { z } from 'zod'
 import { PrismaClient } from '@prisma/client'
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth'
 import { BowelMovementService } from '../domains/bowel-movements/BowelMovementService'
-import type { CreateBowelMovementRequest, UpdateBowelMovementRequest, BowelMovementFilters } from '../domains/bowel-movements/types'
+import type {
+  CreateBowelMovementRequest,
+  UpdateBowelMovementRequest,
+  BowelMovementFilters
+} from '../domains/bowel-movements/types'
 
 const router: Router = Router()
 const prisma = new PrismaClient()
@@ -15,7 +19,11 @@ router.use(authenticateToken)
 // Validation schemas
 const createBowelMovementSchema = z.object({
   bristolType: z.number().int().min(1).max(7),
-  recordedAt: z.string().datetime().optional().transform(val => val ? new Date(val) : undefined),
+  recordedAt: z
+    .string()
+    .datetime()
+    .optional()
+    .transform((val) => (val ? new Date(val) : undefined)),
   volume: z.enum(['SMALL', 'MEDIUM', 'LARGE', 'MASSIVE']).optional(),
   color: z
     .enum(['BROWN', 'DARK_BROWN', 'LIGHT_BROWN', 'YELLOW', 'GREEN', 'RED', 'BLACK'])

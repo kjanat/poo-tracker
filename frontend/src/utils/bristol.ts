@@ -18,18 +18,12 @@ export const getBristolTypeCategory = (type: number): string => {
 }
 
 export const getAverageBristolType = (
-  bristolDistribution: Array<{ type: number, count: number }>
+  bristolDistribution: Array<{ type: number; count: number }>
 ): number => {
   if (bristolDistribution.length === 0) return 0
 
-  const totalCount = bristolDistribution.reduce(
-    (sum, item) => sum + item.count,
-    0
-  )
-  const weightedSum = bristolDistribution.reduce(
-    (sum, item) => sum + item.type * item.count,
-    0
-  )
+  const totalCount = bristolDistribution.reduce((sum, item) => sum + item.count, 0)
+  const weightedSum = bristolDistribution.reduce((sum, item) => sum + item.type * item.count, 0)
 
   return totalCount > 0 ? Number((weightedSum / totalCount).toFixed(1)) : 0
 }

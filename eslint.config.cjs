@@ -96,7 +96,7 @@ module.exports = [
     languageOptions: {
       globals: {
         ...globals.node,
-        ...globals.es2024, // Backend also gets ES2024 globals
+        ...globals.es2024 // Backend also gets ES2024 globals
       }
     },
     settings: {
@@ -117,7 +117,7 @@ module.exports = [
     languageOptions: {
       globals: {
         ...globals.browser,
-        ...globals.es2024, // Frontend gets ES2024 globals
+        ...globals.es2024 // Frontend gets ES2024 globals
       }
     }
   },
@@ -125,9 +125,9 @@ module.exports = [
   // Test files configuration (Vitest + Jest compatibility)
   {
     files: [
-      '**/*.test.ts', 
-      '**/*.test.tsx', 
-      '**/*.spec.ts', 
+      '**/*.test.ts',
+      '**/*.test.tsx',
+      '**/*.spec.ts',
       '**/*.spec.tsx',
       '**/test/**/*.ts',
       '**/test/**/*.tsx'
@@ -136,7 +136,7 @@ module.exports = [
       globals: {
         ...globals.node,
         ...globals.es2024,
-        
+
         // Vitest globals
         vi: 'readonly',
         describe: 'readonly',
@@ -147,7 +147,7 @@ module.exports = [
         afterEach: 'readonly',
         beforeAll: 'readonly',
         afterAll: 'readonly',
-        
+
         // Jest compatibility (in case some tests still use Jest)
         jest: 'readonly'
       }

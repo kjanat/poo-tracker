@@ -17,7 +17,7 @@ export function useEntryForm(): UseEntryFormResult {
   const [editingEntry, setEditingEntry] = useState<Entry | null>(null)
 
   const updateFormData = (updates: Partial<CreateEntryData>): void => {
-    setFormData(prev => ({ ...prev, ...updates }))
+    setFormData((prev) => ({ ...prev, ...updates }))
   }
 
   const resetForm = (): void => {

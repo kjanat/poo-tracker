@@ -1,4 +1,3 @@
-
 import { useAuthStore } from '../stores/authStore'
 import Logo from '../components/Logo'
 import { StatsOverview } from '../domains/analytics/components/StatsOverview'
@@ -84,8 +83,10 @@ export function AnalyticsPage() {
   }
 
   // Generate recommendations if we have health metrics
-  const recommendations = healthMetrics 
-    ? container.get<AnalyticsService>('analyticsService').generateRecommendations(healthMetrics, summary.recentEntries)
+  const recommendations = healthMetrics
+    ? container
+        .get<AnalyticsService>('analyticsService')
+        .generateRecommendations(healthMetrics, summary.recentEntries)
     : []
 
   return (
@@ -95,9 +96,7 @@ export function AnalyticsPage() {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
             <Logo size="40" />
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              📊 Analytics Dashboard
-            </h1>
+            <h1 className="text-3xl font-bold flex items-center gap-2">📊 Analytics Dashboard</h1>
           </div>
         </div>
 
@@ -107,12 +106,9 @@ export function AnalyticsPage() {
         {/* Charts and Insights */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <BristolDistributionChart summary={summary} />
-          
+
           {healthMetrics && (
-            <HealthInsights 
-              healthMetrics={healthMetrics} 
-              recommendations={recommendations}
-            />
+            <HealthInsights healthMetrics={healthMetrics} recommendations={recommendations} />
           )}
         </div>
 

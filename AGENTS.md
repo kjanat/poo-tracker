@@ -274,7 +274,7 @@ chore: update dependencies
 
 - **Trigger**: SVG file changes in `branding/` directory
 - **Action**: Convert SVGs to ICO, PNG, React, React Native formats
-- **Tool**: [`kjanat/svg-converter-action`](https://github.com/kjanat/svg-converter-action "GitHub: kjanat/svg-converter-action"), a custom GitHub Action
+- **Tool**: [`kjanat/svg-converter-action`](https://github.com/kjanat/svg-converter-action 'GitHub: kjanat/svg-converter-action'), a custom GitHub Action
 - **Output**: Auto-commit generated assets
 
 ### 🔧 Dependency Update Agent
