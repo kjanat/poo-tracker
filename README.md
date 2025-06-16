@@ -127,7 +127,7 @@ pnpm prettier:watch   # Watch and format on changes
 
 ### Project Structure
 
-```tree
+```graphql
 poo-tracker/
 ├── frontend/           # React frontend (Vite + TypeScript + TailwindCSS)
 │   ├── src/
