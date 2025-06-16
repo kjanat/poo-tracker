@@ -15,7 +15,7 @@ const upload = multer({
   },
   fileFilter: (_req, file, cb) => {
     // Only allow specified image types
-    if (config.uploads.allowedTypes.includes(file.mimetype)) {
+    if (config.uploads.allowedTypes.includes(file.mimetype as typeof config.uploads.allowedTypes[number])) {
       cb(null, true)
     } else {
       cb(new Error(`Only these image types are allowed: ${config.uploads.allowedTypes.join(', ')}`))

@@ -36,7 +36,7 @@ export const config = {
     directory: process.env.UPLOAD_DIR ?? './uploads',
     baseUrl: process.env.UPLOAD_BASE_URL ?? 'http://localhost:3002',
     maxFileSize: parseInt(process.env.MAX_FILE_SIZE ?? '5242880'), // 5MB
-    allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+    allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'] as const
   }
 } as const
 

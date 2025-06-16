@@ -2,7 +2,7 @@ import type { CreateEntryRequest, Entry } from './types'
 
 export class EntryFactory {
 
-  createFromRequest (
+  static createFromRequest (
     request: CreateEntryRequest,
     userId: string
   ): Omit<Entry, 'id' | 'createdAt' | 'updatedAt'> {
@@ -22,16 +22,16 @@ export class EntryFactory {
     }
   }
 
-  validateBristolType (type: number): boolean {
+  static validateBristolType (type: number): boolean {
     return Number.isInteger(type) && type >= 1 && type <= 7
   }
 
-  validateRating (rating: number | null | undefined): boolean {
+  static validateRating (rating: number | null | undefined): boolean {
     if (rating == null) return true
     return Number.isInteger(rating) && rating >= 1 && rating <= 10
   }
 
-  validateEnumValue<T extends string> (
+  static validateEnumValue<T extends string> (
     value: string | undefined,
     allowedValues: readonly T[]
   ): value is T | undefined {
@@ -39,7 +39,7 @@ export class EntryFactory {
     return allowedValues.includes(value as T)
   }
 
-  getDefaultValues (): Partial<CreateEntryRequest> {
+  static getDefaultValues (): Partial<CreateEntryRequest> {
     return {
       bristolType: 4,
       floaters: false,
@@ -47,10 +47,10 @@ export class EntryFactory {
     }
   }
 
-  sanitizeNotes (notes: string | null | undefined): string | undefined {
-    if (!notes) return undefined
+  static sanitizeNotes (notes: string | null | undefined): string | null {
+    if (!notes) return null
     const sanitized = notes.trim().substring(0, 1000)
-    return sanitized.length > 0 ? sanitized : undefined
+    return sanitized.length > 0 ? sanitized : null
   }
 }
 
