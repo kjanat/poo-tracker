@@ -1,8 +1,0 @@
-node_modules
-branding
-**/dist
-**/build
-**/coverage
-**/out
-**/.next
-**/*.js
