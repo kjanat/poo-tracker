@@ -157,25 +157,18 @@ jobs:
       - name: 📦 Install dependencies
         run: |
           cd ai-service
-          uv pip install -r requirements.txt
-          uv pip install pytest pytest-asyncio httpx
-
-      - name: 🧹 Lint with flake8
-        run: |
-          cd ai-service
-          uvx flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          uvx flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          uv sync --all-groups
 
       - name: 🧹 Format check with black
         run: |
           cd ai-service
-          uvx black --check .
+          uv run black --check .
 
       - name: 🦀 Lint with Ruff
         run: |
           cd ai-service
-          uvx ruff check .
-          uvx ruff format --check .
+          uv run ruff check .
+          uv run ruff format --check .
 
       - name: 🧪 Test with pytest
         env:
@@ -184,7 +177,7 @@ jobs:
           cd ai-service
           if [ -n "$(find . -name 'test_*.py' -o -name '*_test.py' | head -1)" ]; then
             echo "Running tests..."
-            pytest --tb=short -v
+            uv run pytest --tb=short -v
           else
             echo "No test files found (test_*.py or *_test.py), skipping tests"
             echo "✅ Test step completed (no tests to run)"

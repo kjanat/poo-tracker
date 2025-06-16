@@ -1,7 +1,7 @@
 import json
 import os
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -23,13 +23,13 @@ class EntryData(BaseModel):
     id: str
     userId: str
     bristolType: int
-    volume: Optional[str] = None
-    color: Optional[str] = None
-    consistency: Optional[str] = None
+    volume: str | None = None
+    color: str | None = None
+    consistency: str | None = None
     floaters: bool = False
-    pain: Optional[int] = None
-    strain: Optional[int] = None
-    satisfaction: Optional[int] = None
+    pain: int | None = None
+    strain: int | None = None
+    satisfaction: int | None = None
     createdAt: str
 
 
@@ -38,8 +38,8 @@ class MealData(BaseModel):
     userId: str
     name: str
     mealTime: str
-    category: Optional[str] = None
-    spicyLevel: Optional[int] = None
+    category: str | None = None
+    spicyLevel: int | None = None
     fiberRich: bool = False
     dairy: bool = False
     gluten: bool = False

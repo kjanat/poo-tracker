@@ -1,0 +1,16 @@
+# Allow build scripts for essential packages
+# These are trusted dependencies that need to run build scripts
+ignore-scripts=false
+
+# Automatically approve build scripts for common packages
+enable-pre-post-scripts=true
+
+# Store location
+store-dir=~/.pnpm-store
+
+# Registry settings
+registry=https://registry.npmjs.org/
+
+# Hoisting settings for monorepo
+hoist=true
+hoist-pattern[]=*eslint*
