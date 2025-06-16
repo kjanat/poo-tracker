@@ -32,7 +32,7 @@ router.post(
   upload.single('photo') as any,
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-      if (!req.file) {
+      if (req.file == null) {
         res.status(400).json({ error: 'No file uploaded' })
         return
       }

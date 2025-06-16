@@ -11,12 +11,12 @@ export const authenticateToken = (
   res: Response,
   next: NextFunction
 ): void => {
-  console.log('🔐 Auth middleware - Headers:', req.headers.authorization ? 'Present' : 'Missing')
-
   const authHeader = req.headers.authorization
   const token = authHeader?.split(' ')[1] // Bearer TOKEN
 
-  if (!token) {
+  console.log('🔐 Auth middleware - Headers:', typeof authHeader === 'string' ? 'Present' : 'Missing')
+
+  if (token === undefined || token === '') {
     console.log('❌ Auth middleware - No token provided')
     res.status(401).json({ error: 'Access token required' })
     return

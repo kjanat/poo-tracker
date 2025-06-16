@@ -1,6 +1,6 @@
 import path from 'path'
 
-export function sanitizeFilename(filename: string): string | null {
+export function sanitizeFilename (filename: string): string | null {
   const base = path.basename(filename)
   // reject if path has directory components or invalid characters
   if (base !== filename) return null

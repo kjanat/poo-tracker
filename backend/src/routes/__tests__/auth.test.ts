@@ -90,7 +90,7 @@ describe('Auth Routes Integration Tests', () => {
           name: createdUser.name
         }
       })
-      
+
       expect(mockPrismaClient.user.findUnique).toHaveBeenCalledWith({
         where: { email: userData.email }
       })

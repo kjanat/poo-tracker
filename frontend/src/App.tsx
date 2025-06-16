@@ -9,18 +9,18 @@ import { MealsPage } from './pages/MealsPage'
 import ProfilePage from './pages/ProfilePage'
 import { ProtectedRoute } from './components/ProtectedRoute'
 
-function App() {
+function App () {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50">
+    <div className='min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50'>
       <Navbar />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className='container mx-auto px-4 py-8'>
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route path='/' element={<HomePage />} />
+          <Route path='/login' element={<LoginPage />} />
 
           <Route
-            path="/dashboard"
+            path='/dashboard'
             element={
               <ProtectedRoute>
                 <DashboardPage />
@@ -29,7 +29,7 @@ function App() {
           />
 
           <Route
-            path="/new-entry"
+            path='/new-entry'
             element={
               <ProtectedRoute>
                 <NewEntryPage />
@@ -38,7 +38,7 @@ function App() {
           />
 
           <Route
-            path="/analytics"
+            path='/analytics'
             element={
               <ProtectedRoute>
                 <AnalyticsPage />
@@ -47,7 +47,7 @@ function App() {
           />
 
           <Route
-            path="/meals"
+            path='/meals'
             element={
               <ProtectedRoute>
                 <MealsPage />
@@ -56,7 +56,7 @@ function App() {
           />
 
           <Route
-            path="/profile"
+            path='/profile'
             element={
               <ProtectedRoute>
                 <ProfilePage />

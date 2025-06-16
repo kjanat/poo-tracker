@@ -7,12 +7,12 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "cd .. && eslint frontend/src",
-    "lint:fix": "cd .. && eslint frontend/src --fix",
-    "test": "vitest run",
-    "test:watch": "vitest --watch",
-    "test:coverage": "vitest run --coverage",
-    "test:ui": "vitest --ui",
+    "lint": "ts-standard",
+    "lint:fix": "ts-standard --fix",
+    "test": "ts-standard && vitest run",
+    "test:watch": "ts-standard vitest --watch",
+    "test:coverage": "ts-standard vitest run --coverage",
+    "test:ui": "ts-standard vitest --ui",
     "clean": "rm -rf dist node_modules"
   },
   "engines": {
@@ -44,6 +44,7 @@
     "autoprefixer": "^10.4.21",
     "jsdom": "^26.1.0",
     "postcss": "^8.5.5",
+    "ts-standard": "^12.0.2",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
     "vitest": "^3.2.3"

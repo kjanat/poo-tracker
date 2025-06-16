@@ -42,9 +42,9 @@ interface MealFormData {
   photoUrl?: string
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002'
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3002'
 
-export function MealsPage() {
+export function MealsPage (): JSX.Element {
   const [formData, setFormData] = useState<MealFormData>({
     name: '',
     category: '',
@@ -57,24 +57,24 @@ export function MealsPage() {
     notes: ''
   })
   const [meals, setMeals] = useState<Meal[]>([])
-  const [loading, setLoading] = useState(false)
-  const [loadingMeals, setLoadingMeals] = useState(true)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const [loading, setLoading] = useState<boolean>(false)
+  const [loadingMeals, setLoadingMeals] = useState<boolean>(true)
+  const [error, setError] = useState<string>('')
+  const [success, setSuccess] = useState<string>('')
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [editingMeal, setEditingMeal] = useState<Meal | null>(null)
   const [linkingMeal, setLinkingMeal] = useState<Meal | null>(null)
   const [availableEntries, setAvailableEntries] = useState<Entry[]>([])
   const [linkedEntries, setLinkedEntries] = useState<Entry[]>([])
-  const [showLinkingModal, setShowLinkingModal] = useState(false)
+  const [showLinkingModal, setShowLinkingModal] = useState<boolean>(false)
 
   const token = useAuthStore((state) => state.token)
 
   // Fetch existing meals
   useEffect(() => {
-    const fetchMeals = async () => {
-      if (!token) return
+    const fetchMeals = async (): Promise<void> => {
+      if (token === null) return
 
       try {
         const response = await fetch(`${API_BASE_URL}/api/meals`, {
@@ -127,7 +127,7 @@ export function MealsPage() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
+      if (file) {
       // Validate file type
       if (!file.type.startsWith('image/')) {
         setError('Please select a valid image file')
@@ -160,7 +160,7 @@ export function MealsPage() {
   }
 
   const uploadImage = async (): Promise<string | null> => {
-    if (!selectedImage) return null
+      if (!selectedImage) return null
 
     const uploadFormData = new FormData()
     uploadFormData.append('image', selectedImage)
@@ -246,7 +246,9 @@ export function MealsPage() {
       setSuccess('Meal deleted successfully!')
     } catch (error) {
       console.error('Error deleting meal:', error)
-      setError(error instanceof Error ? error.message : 'Failed to delete meal')
+        setError(
+            error instanceof Error ? error.message : 'Failed to delete meal'
+        )
     }
   }
 
@@ -263,7 +265,7 @@ export function MealsPage() {
 
       // Upload image if selected
       let photoUrl = formData.photoUrl
-      if (selectedImage) {
+        if (selectedImage) {
         const uploadedUrl = await uploadImage()
         if (uploadedUrl) {
           photoUrl = uploadedUrl
@@ -273,7 +275,7 @@ export function MealsPage() {
       const mealData = {
         ...formData,
         photoUrl: photoUrl || undefined,
-        mealTime: editingMeal ? editingMeal.mealTime : new Date().toISOString(),
+          mealTime: editingMeal ? editingMeal.mealTime : new Date().toISOString(),
         spicyLevel: formData.spicyLevel || null,
         // Convert empty strings to undefined for optional fields
         category: formData.category || undefined,
@@ -335,7 +337,7 @@ export function MealsPage() {
       setImagePreview(null)
     } catch (err: any) {
       setError(
-        err.message || `Failed to ${editingMeal ? 'update' : 'save'} meal`
+          err.message || `Failed to ${editingMeal ? 'update' : 'save'} meal`
       )
     } finally {
       setLoading(false)
@@ -344,7 +346,7 @@ export function MealsPage() {
 
   const handleInputChange = (
     e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
     const { name, value, type } = e.target
@@ -393,7 +395,7 @@ export function MealsPage() {
   }
 
   const linkEntryToMeal = async (entryId: string) => {
-    if (!linkingMeal) return
+      if (!linkingMeal) return
 
     try {
       const response = await fetch(
@@ -441,7 +443,7 @@ export function MealsPage() {
   }
 
   const unlinkEntryFromMeal = async (entryId: string) => {
-    if (!linkingMeal) return
+      if (!linkingMeal) return
 
     try {
       const response = await fetch(
@@ -549,147 +551,147 @@ export function MealsPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">
+      <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">
         <Logo size={32} /> Meals
       </h1>
 
-      <div className="card mb-6">
-        <h3 className="text-lg font-semibold mb-4">
-          {editingMeal ? 'Edit Meal' : 'Log New Meal'}
+          <div className="card mb-6">
+              <h3 className="text-lg font-semibold mb-4">
+                  {editingMeal ? 'Edit Meal' : 'Log New Meal'}
         </h3>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
             {success}
           </div>
         )}
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="grid md:grid-cols-2 gap-4">
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                  <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
                 Meal Name *
               </label>
               <input
-                type="text"
-                name="name"
+                              type="text"
+                              name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className="input-field"
-                placeholder="e.g., Spicy Tacos"
+                              className="input-field"
+                              placeholder="e.g., Spicy Tacos"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
                 Category
               </label>
               <select
-                name="category"
+                              name="category"
                 value={formData.category}
                 onChange={handleInputChange}
-                className="input-field"
+                              className="input-field"
               >
-                <option value="">Select category</option>
-                <option value="Breakfast">Breakfast</option>
-                <option value="Lunch">Lunch</option>
-                <option value="Dinner">Dinner</option>
-                <option value="Snack">Snack</option>
+                              <option value="">Select category</option>
+                              <option value="Breakfast">Breakfast</option>
+                              <option value="Lunch">Lunch</option>
+                              <option value="Dinner">Dinner</option>
+                              <option value="Snack">Snack</option>
               </select>
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
                 Cuisine
               </label>
               <input
-                type="text"
-                name="cuisine"
+                              type="text"
+                              name="cuisine"
                 value={formData.cuisine}
                 onChange={handleInputChange}
-                className="input-field"
-                placeholder="e.g., Mexican, Italian, Thai"
+                              className="input-field"
+                              placeholder="e.g., Mexican, Italian, Thai"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
                 Spicy Level (1-10)
               </label>
               <input
-                type="number"
-                name="spicyLevel"
+                              type="number"
+                              name="spicyLevel"
                 value={formData.spicyLevel}
                 onChange={handleInputChange}
-                className="input-field"
-                min="1"
-                max="10"
+                              className="input-field"
+                              min="1"
+                              max="10"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
               Description
             </label>
             <textarea
-              name="description"
+                          name="description"
               value={formData.description}
               onChange={handleInputChange}
-              className="input-field"
+                          className="input-field"
               rows={2}
-              placeholder="Describe the meal..."
+                          placeholder="Describe the meal..."
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
               Additional Notes
             </label>
             <textarea
-              name="notes"
+                          name="notes"
               value={formData.notes}
               onChange={handleInputChange}
-              className="input-field"
+                          className="input-field"
               rows={2}
-              placeholder="Any additional notes..."
+                          placeholder="Any additional notes..."
             />
           </div>
 
           {/* Image Upload Section */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
               Photo (Optional)
             </label>
-            <div className="space-y-3">
+                      <div className="space-y-3">
               <input
-                type="file"
-                accept="image/*"
+                              type="file"
+                              accept="image/*"
                 onChange={handleImageChange}
-                className="input-field"
+                              className="input-field"
               />
 
               {imagePreview && (
-                <div className="relative">
+                              <div className="relative">
                   <img
                     src={imagePreview}
-                    alt="Preview"
-                    className="max-w-xs max-h-48 object-cover rounded border"
+                                      alt="Preview"
+                                      className="max-w-xs max-h-48 object-cover rounded border"
                   />
                   <button
-                    type="button"
+                                      type="button"
                     onClick={removeImage}
-                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
                   >
                     ×
                   </button>
@@ -697,80 +699,80 @@ export function MealsPage() {
               )}
 
               {editingMeal?.photoUrl && !imagePreview && (
-                <div className="text-sm text-gray-600">
+                              <div className="text-sm text-gray-600">
                   Current photo:
                   <img
                     src={`${API_BASE_URL}${editingMeal.photoUrl}`}
-                    alt="Current meal photo"
-                    className="mt-2 max-w-xs max-h-48 object-cover rounded border"
+                                      alt="Current meal photo"
+                                      className="mt-2 max-w-xs max-h-48 object-cover rounded border"
                   />
-                  <p className="mt-1 text-xs">
+                                  <p className="mt-1 text-xs">
                     Upload a new image to replace it
                   </p>
                 </div>
               )}
 
-              <p className="text-xs text-gray-500">
+                          <p className="text-xs text-gray-500">
                 Max file size: 5MB. Accepted formats: JPG, PNG, GIF, WebP
               </p>
             </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-4">
-            <label className="flex items-center space-x-2">
+                  <div className="grid md:grid-cols-3 gap-4">
+                      <label className="flex items-center space-x-2">
               <input
-                type="checkbox"
-                name="fiberRich"
+                              type="checkbox"
+                              name="fiberRich"
                 checked={formData.fiberRich}
                 onChange={handleInputChange}
-                className="rounded"
+                              className="rounded"
               />
-              <span className="text-sm">High Fiber</span>
+                          <span className="text-sm">High Fiber</span>
             </label>
 
-            <label className="flex items-center space-x-2">
+                      <label className="flex items-center space-x-2">
               <input
-                type="checkbox"
-                name="dairy"
+                              type="checkbox"
+                              name="dairy"
                 checked={formData.dairy}
                 onChange={handleInputChange}
-                className="rounded"
+                              className="rounded"
               />
-              <span className="text-sm">Contains Dairy</span>
+                          <span className="text-sm">Contains Dairy</span>
             </label>
 
-            <label className="flex items-center space-x-2">
+                      <label className="flex items-center space-x-2">
               <input
-                type="checkbox"
-                name="gluten"
+                              type="checkbox"
+                              name="gluten"
                 checked={formData.gluten}
                 onChange={handleInputChange}
-                className="rounded"
+                              className="rounded"
               />
-              <span className="text-sm">Contains Gluten</span>
+                          <span className="text-sm">Contains Gluten</span>
             </label>
           </div>
 
-          <div className="flex gap-3">
+                  <div className="flex gap-3">
             <button
-              type="submit"
-              className="btn-primary flex-1"
+                          type="submit"
+                          className="btn-primary flex-1"
               disabled={loading}
             >
               {loading
-                ? editingMeal
-                  ? 'Updating...'
-                  : 'Saving...'
-                : editingMeal
-                  ? 'Update Meal'
-                  : 'Save Meal'}
+                              ? editingMeal
+                                  ? 'Updating...'
+                                  : 'Saving...'
+                              : editingMeal
+                                  ? 'Update Meal'
+                                  : 'Save Meal'}
             </button>
 
-            {editingMeal && (
+                      {editingMeal && (
               <button
-                type="button"
+                              type="button"
                 onClick={cancelEdit}
-                className="btn-secondary"
+                              className="btn-secondary"
                 disabled={loading}
               >
                 Cancel
@@ -781,46 +783,46 @@ export function MealsPage() {
       </div>
 
       {/* Existing Meals List */}
-      <div className="card">
-        <h3 className="text-lg font-semibold mb-4">Your Recent Meals</h3>
+          <div className="card">
+              <h3 className="text-lg font-semibold mb-4">Your Recent Meals</h3>
 
         {loadingMeals ? (
-          <div className="text-center py-4">Loading meals...</div>
+                  <div className="text-center py-4">Loading meals...</div>
         ) : meals.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <p className="flex items-center justify-center gap-2">
+                      <div className="text-center py-8 text-gray-500">
+                          <p className="flex items-center justify-center gap-2">
               No meals logged yet. Add your first meal above! <Logo size={24} />
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+                          <div className="space-y-4">
             {meals.map((meal) => (
-              <div key={meal.id} className="border rounded-lg p-4 bg-gray-50">
-                <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-semibold text-lg">{meal.name}</h4>
-                  <div className="flex items-center gap-2">
-                    <div className="text-sm text-gray-500">
+                <div key={meal.id} className="border rounded-lg p-4 bg-gray-50">
+                    <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-semibold text-lg">{meal.name}</h4>
+                        <div className="flex items-center gap-2">
+                            <div className="text-sm text-gray-500">
                       {new Date(meal.mealTime).toLocaleDateString()}{' '}
                       {new Date(meal.mealTime).toLocaleTimeString()}
                     </div>
-                    <div className="flex gap-1">
+                            <div className="flex gap-1">
                       <button
                         onClick={() => startEdit(meal)}
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                         disabled={loading}
                       >
                         Edit
                       </button>
                       <button
-                        onClick={() => openLinkingModal(meal)}
-                        className="text-green-600 hover:text-green-800 text-sm font-medium"
+                                    onClick={() => openLinkingModal(meal)}
+                                    className="text-green-600 hover:text-green-800 text-sm font-medium"
                         disabled={loading}
                       >
                         Link Entries
                       </button>
                       <button
-                        onClick={() => deleteMeal(meal.id)}
-                        className="text-red-600 hover:text-red-800 text-sm font-medium"
+                                    onClick={() => deleteMeal(meal.id)}
+                                    className="text-red-600 hover:text-red-800 text-sm font-medium"
                         disabled={loading}
                       >
                         Delete
@@ -829,7 +831,7 @@ export function MealsPage() {
                   </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4 text-sm">
+                    <div className="grid md:grid-cols-2 gap-4 text-sm">
                   <div>
                     {meal.category && (
                       <p>
@@ -862,29 +864,29 @@ export function MealsPage() {
                 </div>
 
                 {meal.photoUrl && (
-                  <div className="mt-3">
+                        <div className="mt-3">
                     <img
                       src={`${API_BASE_URL}${meal.photoUrl}`}
-                      alt="Meal photo"
-                      className="max-w-xs max-h-48 object-cover rounded border"
+                                alt="Meal photo"
+                                className="max-w-xs max-h-48 object-cover rounded border"
                     />
                   </div>
                 )}
 
                 {(meal.fiberRich || meal.dairy || meal.gluten) && (
-                  <div className="mt-2 flex flex-wrap gap-2">
+                        <div className="mt-2 flex flex-wrap gap-2">
                     {meal.fiberRich && (
-                      <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                                <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
                         High Fiber
                       </span>
                     )}
                     {meal.dairy && (
-                      <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                                <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
                         Dairy
                       </span>
                     )}
                     {meal.gluten && (
-                      <span className="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
+                                <span className="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
                         Gluten
                       </span>
                     )}
@@ -892,49 +894,49 @@ export function MealsPage() {
                 )}
 
                 {/* Linked Entries Section */}
-                <div className="mt-4">
-                  <h5 className="font-semibold text-md mb-2">Linked Entries</h5>
+                    <div className="mt-4">
+                        <h5 className="font-semibold text-md mb-2">Linked Entries</h5>
 
-                  {!meal.linkedEntries || meal.linkedEntries.length === 0 ? (
-                    <p className="text-sm text-gray-500">
-                      No entries linked to this meal.
-                    </p>
-                  ) : (
-                    <div className="space-y-2">
-                      {meal.linkedEntries.map((entry) => (
-                        <div
-                          key={entry.id}
-                          className="p-3 rounded-lg bg-gray-100 flex justify-between items-center"
-                        >
-                          <div className="text-sm">
-                            <p>
-                              <strong>Bristol Type:</strong>{' '}
-                              {formatBristolType(entry.bristolType)}
+                        {!meal.linkedEntries || meal.linkedEntries.length === 0 ? (
+                            <p className="text-sm text-gray-500">
+                                No entries linked to this meal.
                             </p>
-                            {entry.notes && (
-                              <p>
-                                <strong>Notes:</strong> {entry.notes}
-                              </p>
-                            )}
-                          </div>
-
-                          <button
-                            onClick={() =>
-                              unlinkEntryFromMainView(meal.id, entry.id)
-                            }
-                            className="text-red-600 hover:text-red-800 text-sm font-medium"
-                            disabled={loading}
+                        ) : (
+                            <div className="space-y-2">
+                                {meal.linkedEntries.map((entry) => (
+                                    <div
+                                        key={entry.id}
+                              className="p-3 rounded-lg bg-gray-100 flex justify-between items-center"
                           >
-                            Unlink
-                          </button>
-                        </div>
+                              <div className="text-sm">
+                                  <p>
+                                      <strong>Bristol Type:</strong>{' '}
+                                      {formatBristolType(entry.bristolType)}
+                                  </p>
+                                  {entry.notes && (
+                                      <p>
+                                          <strong>Notes:</strong> {entry.notes}
+                                      </p>
+                                  )}
+                              </div>
+
+                              <button
+                                  onClick={() =>
+                                      unlinkEntryFromMainView(meal.id, entry.id)
+                                  }
+                                  className="text-red-600 hover:text-red-800 text-sm font-medium"
+                                  disabled={loading}
+                              >
+                                  Unlink
+                              </button>
+                          </div>
                       ))}
-                    </div>
-                  )}
+                            </div>
+                        )}
 
                   <button
-                    onClick={() => openLinkingModal(meal)}
-                    className="mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                            onClick={() => openLinkingModal(meal)}
+                            className="mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
                     disabled={loading}
                   >
                     Link Entries
@@ -947,124 +949,124 @@ export function MealsPage() {
       </div>
 
       {/* Linking Modal */}
-      {showLinkingModal && linkingMeal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-4">
+          {showLinkingModal && linkingMeal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                      <h3 className="text-lg font-semibold mb-4">
               Link Entries to "{linkingMeal.name}"
             </h3>
 
             {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                 {error}
               </div>
             )}
 
             {success && (
-              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
                 {success}
               </div>
             )}
 
             {/* Already Linked Entries */}
-            <div className="mb-6">
-              <h4 className="font-medium mb-2">
+                      <div className="mb-6">
+                          <h4 className="font-medium mb-2">
                 Already Linked Entries ({linkedEntries.length})
               </h4>
-              {linkedEntries.length === 0 ? (
-                <p className="text-sm text-gray-500 bg-gray-50 p-3 rounded">
-                  No entries linked to this meal yet.
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {linkedEntries.map((entry) => (
-                    <div
-                      key={entry.id}
-                      className="p-3 rounded-lg bg-blue-50 border border-blue-200 flex justify-between items-center"
-                    >
-                      <div className="text-sm">
-                        <p className="font-medium">
-                          {formatBristolType(entry.bristolType)}
-                        </p>
-                        <p className="text-gray-600">
-                          {new Date(entry.createdAt).toLocaleDateString()}{' '}
-                          {new Date(entry.createdAt).toLocaleTimeString()}
-                        </p>
-                        {entry.volume && (
-                          <p className="text-gray-600">
-                            Volume: {entry.volume}
-                          </p>
-                        )}
-                        {entry.notes && (
-                          <p className="text-gray-600">Notes: {entry.notes}</p>
-                        )}
-                      </div>
-                      <button
-                        onClick={() => unlinkEntryFromMeal(entry.id)}
-                        className="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded"
-                        disabled={loading}
+                          {linkedEntries.length === 0 ? (
+                              <p className="text-sm text-gray-500 bg-gray-50 p-3 rounded">
+                                  No entries linked to this meal yet.
+                              </p>
+                          ) : (
+                              <div className="space-y-2">
+                                  {linkedEntries.map((entry) => (
+                                      <div
+                                          key={entry.id}
+                          className="p-3 rounded-lg bg-blue-50 border border-blue-200 flex justify-between items-center"
                       >
-                        Unlink
-                      </button>
-                    </div>
+                          <div className="text-sm">
+                              <p className="font-medium">
+                                  {formatBristolType(entry.bristolType)}
+                              </p>
+                              <p className="text-gray-600">
+                                  {new Date(entry.createdAt).toLocaleDateString()}{' '}
+                                  {new Date(entry.createdAt).toLocaleTimeString()}
+                              </p>
+                              {entry.volume && (
+                                  <p className="text-gray-600">
+                                      Volume: {entry.volume}
+                                  </p>
+                              )}
+                              {entry.notes && (
+                                  <p className="text-gray-600">Notes: {entry.notes}</p>
+                              )}
+                          </div>
+                          <button
+                              onClick={() => unlinkEntryFromMeal(entry.id)}
+                              className="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded"
+                              disabled={loading}
+                          >
+                              Unlink
+                          </button>
+                      </div>
                   ))}
-                </div>
-              )}
+                              </div>
+                          )}
             </div>
 
             {/* Available Entries to Link */}
-            <div className="mb-6">
-              <h4 className="font-medium mb-2">Available Entries to Link</h4>
-              {availableEntries.length === 0 ? (
-                <p className="text-sm text-gray-500 bg-gray-50 p-3 rounded">
-                  No available entries to link. Create some stool entries first!
-                </p>
-              ) : (
-                <div className="space-y-2 max-h-60 overflow-y-auto">
-                  {availableEntries
-                    .filter(
-                      (entry) =>
-                        !linkedEntries.some((linked) => linked.id === entry.id)
-                    )
-                    .map((entry) => (
-                      <div
-                        key={entry.id}
-                        className="p-3 rounded-lg bg-green-50 border border-green-200 flex justify-between items-center"
-                      >
-                        <div className="text-sm">
-                          <p className="font-medium">
-                            {formatBristolType(entry.bristolType)}
-                          </p>
-                          <p className="text-gray-600">
-                            {new Date(entry.createdAt).toLocaleDateString()}{' '}
-                            {new Date(entry.createdAt).toLocaleTimeString()}
-                          </p>
-                          {entry.volume && (
-                            <p className="text-gray-600">
-                              Volume: {entry.volume}
-                            </p>
-                          )}
-                          {entry.notes && (
-                            <p className="text-gray-600">
-                              Notes: {entry.notes}
-                            </p>
-                          )}
-                        </div>
-                        <button
-                          onClick={() => linkEntryToMeal(entry.id)}
-                          className="text-green-600 hover:text-green-800 text-sm font-medium px-2 py-1 rounded bg-green-100 hover:bg-green-200"
-                          disabled={loading}
+                      <div className="mb-6">
+                          <h4 className="font-medium mb-2">Available Entries to Link</h4>
+                          {availableEntries.length === 0 ? (
+                              <p className="text-sm text-gray-500 bg-gray-50 p-3 rounded">
+                                  No available entries to link. Create some stool entries first!
+                              </p>
+                          ) : (
+                              <div className="space-y-2 max-h-60 overflow-y-auto">
+                                  {availableEntries
+                                      .filter(
+                                          (entry) =>
+                                              !linkedEntries.some((linked) => linked.id === entry.id)
+                                      )
+                                      .map((entry) => (
+                                          <div
+                                              key={entry.id}
+                            className="p-3 rounded-lg bg-green-50 border border-green-200 flex justify-between items-center"
                         >
-                          Link
-                        </button>
-                      </div>
+                            <div className="text-sm">
+                                <p className="font-medium">
+                                    {formatBristolType(entry.bristolType)}
+                                </p>
+                                <p className="text-gray-600">
+                                    {new Date(entry.createdAt).toLocaleDateString()}{' '}
+                                    {new Date(entry.createdAt).toLocaleTimeString()}
+                                </p>
+                                {entry.volume && (
+                                    <p className="text-gray-600">
+                                        Volume: {entry.volume}
+                                    </p>
+                                )}
+                                {entry.notes && (
+                                    <p className="text-gray-600">
+                                        Notes: {entry.notes}
+                                    </p>
+                                )}
+                            </div>
+                            <button
+                                onClick={() => linkEntryToMeal(entry.id)}
+                                className="text-green-600 hover:text-green-800 text-sm font-medium px-2 py-1 rounded bg-green-100 hover:bg-green-200"
+                                disabled={loading}
+                            >
+                                Link
+                            </button>
+                        </div>
                     ))}
-                </div>
-              )}
+                              </div>
+                          )}
             </div>
 
             {/* Modal Footer */}
-            <div className="flex justify-end gap-3 pt-4 border-t">
+                      <div className="flex justify-end gap-3 pt-4 border-t">
               <button
                 onClick={() => {
                   setShowLinkingModal(false)
@@ -1072,7 +1074,7 @@ export function MealsPage() {
                   setError('')
                   setSuccess('')
                 }}
-                className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+                              className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
                 disabled={loading}
               >
                 Close

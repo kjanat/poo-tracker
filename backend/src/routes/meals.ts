@@ -148,14 +148,11 @@ router.put(
       // Convert undefined values to null for Prisma
       const updateData: any = {}
       if (validatedData.name !== undefined) updateData.name = validatedData.name
-      if (validatedData.description !== undefined)
-        updateData.description = validatedData.description ?? null
-      if (validatedData.mealTime !== undefined)
-        updateData.mealTime = new Date(validatedData.mealTime)
+      if (validatedData.description !== undefined) { updateData.description = validatedData.description ?? null }
+      if (validatedData.mealTime !== undefined) { updateData.mealTime = new Date(validatedData.mealTime) }
       if (validatedData.category !== undefined) updateData.category = validatedData.category ?? null
       if (validatedData.cuisine !== undefined) updateData.cuisine = validatedData.cuisine ?? null
-      if (validatedData.spicyLevel !== undefined)
-        updateData.spicyLevel = validatedData.spicyLevel ?? null
+      if (validatedData.spicyLevel !== undefined) { updateData.spicyLevel = validatedData.spicyLevel ?? null }
       if (validatedData.fiberRich !== undefined) updateData.fiberRich = validatedData.fiberRich
       if (validatedData.dairy !== undefined) updateData.dairy = validatedData.dairy
       if (validatedData.gluten !== undefined) updateData.gluten = validatedData.gluten

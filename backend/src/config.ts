@@ -8,7 +8,7 @@ export const config = {
   corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
 
   // Database
-  databaseUrl: process.env.DATABASE_URL!,
+  databaseUrl: process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/poo_tracker',
 
   // Storage
   minio: {
@@ -44,7 +44,7 @@ export const config = {
 const requiredEnvVars = ['DATABASE_URL']
 
 for (const envVar of requiredEnvVars) {
-  if (!process.env[envVar]) {
+  if ((process.env[envVar] ?? '') === '') {
     throw new Error(`Missing required environment variable: ${envVar}`)
   }
 }

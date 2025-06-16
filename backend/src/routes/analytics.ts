@@ -16,7 +16,7 @@ router.get(
       const userId = req.userId
 
       // Ensure userId is defined
-      if (!userId) {
+      if (userId === undefined) {
         res.status(401).json({ error: 'User not authenticated' })
         return
       }

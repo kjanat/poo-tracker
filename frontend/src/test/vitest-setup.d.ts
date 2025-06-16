@@ -1,12 +1,11 @@
-/// <reference types="vitest" />
-/// <reference types="vite/client" />
-
 import type { TestingLibraryMatchers } from '@testing-library/jest-dom/matchers'
+import type 'vitest'
+import type 'vite/client'
 
 declare module 'vitest' {
-  interface Assertion<T = any>
+  interface Assertion<T = unknown>
     extends jest.Matchers<void>,
-      TestingLibraryMatchers<T, void> {}
+    TestingLibraryMatchers<T, void> {}
   interface AsymmetricMatchersContaining
-    extends TestingLibraryMatchers<any, void> {}
+    extends TestingLibraryMatchers<unknown, void> {}
 }

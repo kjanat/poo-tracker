@@ -184,17 +184,14 @@ router.put(
 
       // Convert undefined values to null for Prisma
       const updateData: any = {}
-      if (validatedData.bristolType !== undefined)
-        updateData.bristolType = validatedData.bristolType
+      if (validatedData.bristolType !== undefined) { updateData.bristolType = validatedData.bristolType }
       if (validatedData.volume !== undefined) updateData.volume = validatedData.volume ?? null
       if (validatedData.color !== undefined) updateData.color = validatedData.color ?? null
-      if (validatedData.consistency !== undefined)
-        updateData.consistency = validatedData.consistency ?? null
+      if (validatedData.consistency !== undefined) { updateData.consistency = validatedData.consistency ?? null }
       if (validatedData.floaters !== undefined) updateData.floaters = validatedData.floaters
       if (validatedData.pain !== undefined) updateData.pain = validatedData.pain ?? null
       if (validatedData.strain !== undefined) updateData.strain = validatedData.strain ?? null
-      if (validatedData.satisfaction !== undefined)
-        updateData.satisfaction = validatedData.satisfaction ?? null
+      if (validatedData.satisfaction !== undefined) { updateData.satisfaction = validatedData.satisfaction ?? null }
       if (validatedData.notes !== undefined) updateData.notes = validatedData.notes ?? null
       if (validatedData.smell !== undefined) updateData.smell = validatedData.smell ?? null
       if (validatedData.photoUrl !== undefined) updateData.photoUrl = validatedData.photoUrl ?? null
