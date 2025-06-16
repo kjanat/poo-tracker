@@ -54,7 +54,7 @@
     "**/*.test.ts",
     "**/*.spec.ts",
     "**/*.d.ts",
-    "vitest.config.ts"
+    "src/vitest.config.ts"
   ],
   "exclude": ["node_modules", "dist", "build", "coverage"],
   "ts-node": {
