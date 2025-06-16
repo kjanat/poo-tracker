@@ -7,9 +7,9 @@ authors = [
 ]
 readme = "README.md"
 license = { file = "../LICENSE" }
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
-    "fastapi==0.115.12",
+    "fastapi[standard]==0.115.12",
     "httpx==0.28.1",
     "numpy==2.3.0",
     "pandas==2.3.0",
@@ -43,7 +43,7 @@ build-backend = "hatchling.build"
 packages = ["src/ai_service"]
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py312"
 line-length = 88
 lint.select = [
     "E",  # pycodestyle errors
@@ -67,7 +67,7 @@ line-ending = "auto"
 
 [tool.black]
 line-length = 88
-target-version = ['py311']
+target-version = ['py312']
 include = '\.pyi?$'
 extend-exclude = '''
 /(
@@ -93,7 +93,7 @@ ensure_newline_before_comments = true
 line_length = 88
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 check_untyped_defs = true
 disallow_any_generics = true
 disallow_incomplete_defs = true

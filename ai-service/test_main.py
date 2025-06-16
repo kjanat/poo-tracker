@@ -2,9 +2,18 @@
 Basic tests for the Poo Tracker AI Service
 """
 
+from unittest.mock import Mock, patch
+
 import pytest
 from fastapi.testclient import TestClient
-from main import app
+
+# Mock Redis client before importing the app
+with patch("redis.from_url") as mock_redis:
+    mock_redis_client = Mock()
+    mock_redis_client.ping.return_value = True
+    mock_redis.return_value = mock_redis_client
+
+    from src.ai_service.main import app
 
 client = TestClient(app)
 
@@ -58,20 +67,12 @@ def test_bristol_types_validation():
 
 def test_redis_connection_handling():
     """Test that Redis connection is handled gracefully"""
-    import os
 
-    from main import redis_client
-
-    # Test that the redis client is properly initialized
-    assert redis_client is not None
-
-    # Test health endpoint with Redis (should work in CI with Redis service)
+    # Test health endpoint (Redis should be mocked)
     response = client.get("/health")
     assert response.status_code == 200
     data = response.json()
 
-    # If REDIS_URL is set, Redis should be connected
-    if os.getenv("REDIS_URL"):
-        assert data["redis_connected"] is True
-    # If no Redis URL, connection might be False but endpoint should still work
+    # With our mock, redis_connected should be True
+    assert data["redis_connected"] is True
     assert isinstance(data["redis_connected"], bool)

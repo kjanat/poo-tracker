@@ -15,8 +15,14 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Redis connection
-redis_client = redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379"))
+# Redis connection with timeout and error handling
+redis_client = redis.from_url(
+    os.getenv("REDIS_URL", "redis://localhost:6379"),
+    socket_connect_timeout=5,
+    socket_timeout=5,
+    retry_on_timeout=True,
+    health_check_interval=30,
+)
 
 
 class EntryData(BaseModel):
