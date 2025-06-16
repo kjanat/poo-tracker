@@ -73,12 +73,19 @@ router.get(
   '/:id',
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
+      const { id } = req.params
+
       if (!req.userId) {
         res.status(401).json({ error: 'User not authenticated' })
         return
       }
 
-      const entry = await entryService.findById(req.params.id!, req.userId)
+      if (!id) {
+        res.status(400).json({ error: 'Entry ID is required' })
+        return
+      }
+
+      const entry = await entryService.findById(id, req.userId)
 
       if (entry == null) {
         res.status(404).json({ error: 'Entry not found' })
@@ -138,8 +145,15 @@ router.put(
   '/:id',
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
+      const { id } = req.params
+
       if (!req.userId) {
         res.status(401).json({ error: 'User not authenticated' })
+        return
+      }
+
+      if (id === undefined) {
+        res.status(400).json({ error: 'Entry ID is required' })
         return
       }
 
@@ -166,7 +180,7 @@ router.put(
         return
       }
 
-      const entry = await entryService.update(req.params.id!, updateRequest, req.userId)
+      const entry = await entryService.update(id, updateRequest, req.userId)
 
       if (entry == null) {
         res.status(404).json({ error: 'Entry not found' })
@@ -185,12 +199,19 @@ router.delete(
   '/:id',
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
+      const { id } = req.params
+
       if (!req.userId) {
         res.status(401).json({ error: 'User not authenticated' })
         return
       }
 
-      const deleted = await entryService.delete(req.params.id!, req.userId)
+      if (id === undefined) {
+        res.status(400).json({ error: 'Entry ID is required' })
+        return
+      }
+
+      const deleted = await entryService.delete(id, req.userId)
 
       if (!deleted) {
         res.status(404).json({ error: 'Entry not found' })

@@ -24,14 +24,14 @@ export class MealService {
     // Build where clause
     const where: any = { userId }
 
-    if (category) {
+    if (category !== null && category !== undefined) {
       where.category = category
     }
 
-    if ((dateFrom != null) || (dateTo != null)) {
+    if ((dateFrom !== null && dateFrom !== undefined) || (dateTo !== null && dateTo !== undefined)) {
       where.mealTime = {}
-      if (dateFrom != null) where.mealTime.gte = dateFrom
-      if (dateTo != null) where.mealTime.lte = dateTo
+      if (dateFrom !== null && dateFrom !== undefined) where.mealTime.gte = dateFrom
+      if (dateTo !== null && dateTo !== undefined) where.mealTime.lte = dateTo
     }
 
     if (fiberRich !== undefined) {
@@ -81,8 +81,8 @@ export class MealService {
       data: {
         ...mealData,
         name: MealFactory.sanitizeName(mealData.name),
-        description: MealFactory.sanitizeDescription(mealData.description) || null,
-        notes: MealFactory.sanitizeNotes(mealData.notes) || null
+        description: MealFactory.sanitizeDescription(mealData.description),
+        notes: MealFactory.sanitizeNotes(mealData.notes)
       }
     })
   }
@@ -179,79 +179,5 @@ export class MealService {
       },
       recentMeals
     }
-  }
-
-  // Meal-Entry Relationship Management
-
-  async linkEntry (mealId: string, entryId: string, userId: string): Promise<boolean> {
-    // Verify both meal and entry belong to the user
-    const [meal, entry] = await Promise.all([
-      this.prisma.meal.findFirst({ where: { id: mealId, userId } }),
-      this.prisma.entry.findFirst({ where: { id: entryId, userId } })
-    ])
-
-    if ((meal == null) || (entry == null)) {
-      return false
-    }
-
-    // Check if relation already exists
-    const existingRelation = await this.prisma.mealEntryRelation.findFirst({
-      where: { mealId, entryId }
-    })
-
-    if (existingRelation != null) {
-      return false // Already linked
-    }
-
-    // Create the relation
-    await this.prisma.mealEntryRelation.create({
-      data: { mealId, entryId }
-    })
-
-    return true
-  }
-
-  async unlinkEntry (mealId: string, entryId: string, userId: string): Promise<boolean> {
-    // Verify the meal belongs to the user
-    const meal = await this.prisma.meal.findFirst({ where: { id: mealId, userId } })
-    if (meal == null) {
-      return false
-    }
-
-    // Find and delete the relation
-    const relation = await this.prisma.mealEntryRelation.findFirst({
-      where: { mealId, entryId }
-    })
-
-    if (relation == null) {
-      return false // Not linked
-    }
-
-    await this.prisma.mealEntryRelation.delete({
-      where: { id: relation.id }
-    })
-
-    return true
-  }
-
-  async getLinkedEntries (mealId: string, userId: string): Promise<any[]> {
-    // Verify the meal belongs to the user
-    const meal = await this.prisma.meal.findFirst({ where: { id: mealId, userId } })
-    if (meal == null) {
-      return []
-    }
-
-    // Get all entries linked to this meal
-    const linkedEntries = await this.prisma.entry.findMany({
-      where: {
-        userId,
-        meals: {
-          some: { mealId }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    })
-
-    return linkedEntries
   }
 }

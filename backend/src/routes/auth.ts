@@ -31,7 +31,7 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
       where: { email }
     })
 
-    if (existingUser) {
+    if (existingUser != null) {
       res.status(400).json({ error: 'User already exists with this email' })
       return
     }
@@ -86,7 +86,7 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction): P
       include: { auth: true }
     })
 
-    if (!user || !user.auth) {
+    if ((user == null) || (user.auth == null)) {
       res.status(401).json({ error: 'Invalid credentials' })
       return
     }
@@ -155,7 +155,7 @@ router.get(
         }
       })
 
-      if (!user) {
+      if (user == null) {
         res.status(404).json({ error: 'User not found' })
         return
       }
@@ -201,7 +201,7 @@ router.put(
           where: { userId: req.userId }
         })
 
-        if (!userAuth) {
+        if (userAuth == null) {
           res.status(404).json({ error: 'User auth not found' })
           return
         }
