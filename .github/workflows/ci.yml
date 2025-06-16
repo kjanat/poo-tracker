@@ -73,16 +73,16 @@ jobs:
           echo "✅ All done."
 
       - name: 🔍 Type check
-        run: pnpm run --filter frontend tsc --noEmit
+        run: pnpm run --filter @poo-tracker/frontend tsc --noEmit
 
       - name: 🧹 Lint
-        run: pnpm run --filter frontend lint
+        run: pnpm run --filter @poo-tracker/frontend lint
 
       - name: 🧪 Test
-        run: pnpm run --filter frontend test
+        run: pnpm run --filter @poo-tracker/frontend test
 
       - name: 🏗️ Build
-        run: pnpm run --filter frontend build
+        run: pnpm run --filter @poo-tracker/frontend build
 
   test-backend:
     name: 🚀 Backend Tests
@@ -170,10 +170,10 @@ jobs:
           echo "✅ All done."
 
       - name: 🔍 Type check
-        run: pnpm run --filter backend tsc --noEmit
+        run: pnpm run --filter @poo-tracker/backend tsc --noEmit
 
       - name: 🧹 Lint
-        run: pnpm run --filter backend lint
+        run: pnpm run --filter @poo-tracker/backend lint
 
       - name: 🗄️ Setup test database
         run: |
@@ -184,10 +184,10 @@ jobs:
           pnpm run db:migrate
 
       - name: 🧪 Test
-        run: pnpm run --filter backend test
+        run: pnpm run --filter @poo-tracker/backend test
 
       - name: 🏗️ Build
-        run: pnpm run --filter backend build
+        run: pnpm run --filter @poo-tracker/backend build
 
   test-ai-service:
     name: 🤖 AI Service Tests
