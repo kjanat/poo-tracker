@@ -10,35 +10,47 @@
     "dev:backend": "pnpm --filter @poo-tracker/backend run dev",
     "dev:ai": "cd ai-service && uv run uvicorn main:app --reload",
     "dev:full": "concurrently \"pnpm dev\" \"pnpm dev:ai\"",
+
     "build": "pnpm --recursive run build",
     "build:frontend": "pnpm --filter @poo-tracker/frontend run build",
     "build:backend": "pnpm --filter @poo-tracker/backend run build",
+
     "lint": "pnpm --recursive run lint",
     "lint:ai": "cd ai-service && uv run ruff check .",
     "lint:frontend": "pnpm --filter @poo-tracker/frontend run lint",
     "lint:backend": "pnpm --filter @poo-tracker/backend run lint",
+
     "lint:fix": "concurrently \"pnpm --recursive run lint:fix\" \"pnpm lint:fix:ai\"",
     "lint:fix:ai": "cd ai-service && uv run ruff check --fix .",
     "lint:fix:frontend": "pnpm --filter @poo-tracker/frontend run lint:fix",
     "lint:fix:backend": "pnpm --filter @poo-tracker/backend run lint:fix",
+
     "test": "pnpm --recursive run test",
     "test:ai": "cd ai-service && uv run pytest",
     "test:backend": "pnpm --filter @poo-tracker/backend run test",
     "test:frontend": "pnpm --filter @poo-tracker/frontend run test",
     "test:watch": "pnpm --recursive run test:watch",
+
     "type-check": "pnpm --recursive run type-check",
     "type-check:frontend": "pnpm --filter @poo-tracker/frontend run type-check",
     "type-check:backend": "pnpm --filter @poo-tracker/backend run type-check",
     "type-check:ai": "cd ai-service && uv run ruff check .",
-    "clean": "pnpm --recursive run clean",
+
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
+    
     "db:generate": "pnpm --filter @poo-tracker/backend run db:generate",
     "db:migrate": "pnpm --filter @poo-tracker/backend run db:migrate",
+    "db:migrate:prod": "pnpm --filter @poo-tracker/backend run db:migrate:prod",
     "db:seed": "pnpm --filter @poo-tracker/backend run db:seed",
     "db:studio": "pnpm --filter @poo-tracker/backend run db:studio",
     "db:reset": "pnpm --filter @poo-tracker/backend run db:reset",
+    "db:constraints": "pnpm --filter @poo-tracker/backend run db:constraints",
+    
     "prepare": "husky",
+
+    "clean": "pnpm --recursive run clean",
+
     "format:ai": "cd ai-service && uv run ruff format --check .",
     "format:ai:fix": "cd ai-service && uv run ruff format .",
     "prettier": "prettier --write .",
@@ -68,7 +80,7 @@
     "vitest": "^3.2.3"
   },
   "engines": {
-    "node": ">=18.0.0",
+    "node": ">=22.0.0",
     "pnpm": ">=9.0.0"
   },
   "lint-staged": {

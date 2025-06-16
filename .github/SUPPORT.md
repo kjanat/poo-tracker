@@ -119,7 +119,7 @@ When creating issues, these labels help us categorize and prioritize:
 **Environment:**
 
 - OS: Windows 11 / macOS 14 / Ubuntu 22.04
-- Node.js version: v18.17.0
+- Node.js version: v22.17.0
 - Browser: Chrome 119 (if frontend issue)
 - Docker version: 24.0.6 (if relevant)
 

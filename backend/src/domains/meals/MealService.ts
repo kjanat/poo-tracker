@@ -1,6 +1,6 @@
 import { PrismaClient, Prisma } from '@prisma/client'
 import type { Meal, CreateMealRequest, UpdateMealRequest, MealFilters, MealListResponse } from './types'
-import type { Entry } from '../entries/types'
+import type { BowelMovement } from '../bowel-movements/types'
 import { MealFactory } from './MealFactory'
 
 export class MealService {

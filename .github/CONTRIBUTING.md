@@ -18,7 +18,7 @@ This guide will help you understand our development process and how to submit co
 
 ### Prerequisites
 
-- **Node.js** (v18 or higher)
+- **Node.js** (v22 or higher)
 - **pnpm** (v8 or higher) - We don't use npm, get with the program
 - **Docker** and **Docker Compose**
 - **Git** (obviously)

@@ -1,18 +1,17 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "lib": ["ESNext"],
-    "moduleResolution": "bundler",
+    // Target Node.js environment (ES2024 requires Node.js 22+)
+    "target": "es2024",
+    "module": "commonjs",
+    "lib": ["es2024"],
+    "moduleResolution": "node",
+
+    // Output configuration
     "outDir": "./dist",
+    "rootDir": "./src",
+
+    // Type checking
     "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "removeComments": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
@@ -20,15 +19,46 @@
     "exactOptionalPropertyTypes": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "types": ["vitest/globals"]
+
+    // Module resolution
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
+    // Emit configuration
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "removeComments": false, // Keep comments for better debugging
+
+    // Node.js specific
+    "resolveJsonModule": true,
+    "allowJs": false,
+
+    // Types
+    "types": ["node", "vitest/globals"],
+
+    // Path mapping (useful for imports)
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@/types/*": ["src/types/*"],
+      "@/utils/*": ["src/utils/*"],
+      "@/db/*": ["src/db/*"]
+    }
   },
   "include": [
     "src/**/*",
+    "prisma/**/*",
     "**/*.test.ts",
     "**/*.spec.ts",
     "vitest.config.ts",
-    "prisma/**/*",
     "**/*.d.ts"
   ],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "build", "coverage"],
+  "ts-node": {
+    "esm": false,
+    "experimentalSpecifierResolution": "node"
+  }
 }

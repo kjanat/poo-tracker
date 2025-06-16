@@ -18,7 +18,7 @@ The backend provides a robust, type-safe REST API for managing users, bowel move
 
 ## 🛠 Tech Stack
 
-- **Runtime**: Node.js 18+ with TypeScript
+- **Runtime**: Node.js 22+ with TypeScript
 - **Framework**: Express v5 with modern middleware
 - **Database**: PostgreSQL with Prisma ORM v6
 - **Authentication**: JWT tokens with bcrypt password hashing
@@ -30,7 +30,7 @@ The backend provides a robust, type-safe REST API for managing users, bowel move
 
 ## 📋 Prerequisites
 
-- Node.js 18+
+- Node.js 22+
 - pnpm 9+ (installed at workspace root)
 - PostgreSQL database (or Docker for development)
 - Redis (optional, for caching and sessions)
