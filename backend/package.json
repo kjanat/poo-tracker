@@ -17,7 +17,8 @@
     "db:reset": "prisma migrate reset",
     "db:seed": "tsx src/utils/seed.ts",
     "db:studio": "prisma studio",
-    "db:generate": "prisma generate"
+    "db:generate": "prisma generate",
+    "type-check": "tsc --noEmit"
   },
   "engines": {
     "node": ">=18.0.0"

@@ -73,16 +73,16 @@ jobs:
           echo "✅ All done."
 
       - name: 🔍 Type check
-        run: pnpm run --filter @poo-tracker/frontend tsc --noEmit
+        run: pnpm type-check:frontend
 
       - name: 🧹 Lint
-        run: pnpm run --filter @poo-tracker/frontend lint
+        run: pnpm lint:frontend
 
       - name: 🧪 Test
-        run: pnpm run --filter @poo-tracker/frontend test
+        run: pnpm test:frontend
 
       - name: 🏗️ Build
-        run: pnpm run --filter @poo-tracker/frontend build
+        run: pnpm build:frontend
 
   test-backend:
     name: 🚀 Backend Tests
@@ -170,24 +170,24 @@ jobs:
           echo "✅ All done."
 
       - name: 🔍 Type check
-        run: pnpm run --filter @poo-tracker/backend tsc --noEmit
+        run: pnpm type-check:backend
 
       - name: 🧹 Lint
-        run: pnpm run --filter @poo-tracker/backend lint
+        run: pnpm lint:backend
 
       - name: 🗄️ Setup test database
         run: |
           cd backend
           echo "DATABASE_URL=postgresql://test_user:test_password@localhost:5432/test_db" > .env
           echo "REDIS_URL=redis://localhost:6379" >> .env
-          pnpm run db:generate
-          pnpm run db:migrate
+          pnpm db:generate
+          pnpm db:migrate
 
       - name: 🧪 Test
-        run: pnpm run --filter @poo-tracker/backend test
+        run: pnpm test:backend
 
       - name: 🏗️ Build
-        run: pnpm run --filter @poo-tracker/backend build
+        run: pnpm build:backend
 
   test-ai-service:
     name: 🤖 AI Service Tests
@@ -260,16 +260,10 @@ jobs:
 
           echo "✅ All done."
 
-      - name: 🧹 Format check with black
-        run: |
-          cd ai-service
-          uv run black --check .
-
       - name: 🦀 Lint with Ruff
         run: |
-          cd ai-service
-          uv run ruff check .
-          uv run ruff format --check .
+          pnpm lint:ai
+          pnpm format:ai
 
       - name: 🧪 Test with pytest
         env:
@@ -304,6 +298,8 @@ jobs:
           context: ./ai-service
           file: ./ai-service/Dockerfile
           push: false
+          sbom: true
+          provenance: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
