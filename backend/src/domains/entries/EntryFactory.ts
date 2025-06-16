@@ -1,7 +1,6 @@
 import type { CreateEntryRequest, Entry } from './types'
 
 export class EntryFactory {
-  constructor() {}
 
   createFromRequest (
     request: CreateEntryRequest,

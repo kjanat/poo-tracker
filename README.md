@@ -27,7 +27,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
    ```bash
    # Install Node.js dependencies (frontend + backend)
    pnpm install
-   
+
    # Install Python dependencies for AI service
    cd ai-service && uv sync && cd ..
    ```
@@ -44,10 +44,10 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
    ```bash
    # Start database and supporting services
    pnpm docker:up
-   
+
    # Start all development servers (frontend + backend + AI)
    pnpm dev:full
-   
+
    # OR start just frontend + backend
    pnpm dev
    ```
@@ -57,7 +57,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
    ```bash
    # Run database migrations
    pnpm db:migrate
-   
+
    # (Optional) Seed with test data
    pnpm db:seed
    ```
@@ -96,7 +96,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 pnpm dev:full         # Start frontend + backend + AI service
 pnpm dev              # Start frontend + backend only
 pnpm dev:frontend     # Start frontend only
-pnpm dev:backend      # Start backend only  
+pnpm dev:backend      # Start backend only
 pnpm dev:ai           # Start AI service only
 
 # Building
@@ -167,7 +167,7 @@ pnpm --parallel run dev
 ### API Endpoints
 
 | Endpoint                 | Method   | Description                           |
-|--------------------------|----------|---------------------------------------|
+| ------------------------ | -------- | ------------------------------------- |
 | `/api/auth/register`     | `POST`   | Register a new user                   |
 | `/api/auth/login`        | `POST`   | Authenticate user                     |
 | `/api/entries`           | `GET`    | Get bowel movement entries            |
@@ -237,7 +237,7 @@ We encrypt your brown notes and hide them away. Nobody's reading your logs excep
 - TailwindCSS for styling (no CSS modules)
 - RESTful API design
 - Comprehensive test coverage
-- ESLint + Prettier (follow the config, don't "fix" it)
+- ESLint with @typescript-eslint and Prettier (follow the config, don't "fix" it)
 - Use pnpm workspace commands for consistent development
 
 ## 🚀 Deployment

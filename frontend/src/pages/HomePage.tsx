@@ -46,7 +46,7 @@ export function HomePage () {
       {/* Features Section */}
       <section id='features' className='py-16'>
         <h2 className='text-4xl font-bold text-center mb-12'>
-          What's the fucking point?
+          What&apos;s the fucking point?
         </h2>
 
         <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-8'>
@@ -106,7 +106,7 @@ export function HomePage () {
               </div>
               <h3 className='text-xl font-semibold'>2. Shit</h3>
               <p className='text-gray-600'>
-                Preferably in a toilet, but we're not here to kink-shame.
+                Preferably in a toilet, but we&apos;re not here to kink-shame.
               </p>
             </div>
 
@@ -122,7 +122,7 @@ export function HomePage () {
               <div className='text-4xl'>🔄</div>
               <h3 className='text-xl font-semibold'>4. Repeat</h3>
               <p className='text-gray-600'>
-                Until you realize you're lactose intolerant or have IBS.
+                Until you realize you&apos;re lactose intolerant or have IBS.
               </p>
             </div>
           </div>
@@ -133,7 +133,7 @@ export function HomePage () {
       <section className='py-16 text-center'>
         <h2 className='text-3xl font-bold mb-6'>Privacy, baby</h2>
         <p className='text-lg text-gray-600 max-w-2xl mx-auto'>
-          We encrypt your brown notes and hide them away. Nobody's reading your
+          We encrypt your brown notes and hide them away. Nobody&apos;s reading your
           logs except you—and whatever godforsaken AI wants to learn about the
           day-after effects of your sushi buffet.
         </p>

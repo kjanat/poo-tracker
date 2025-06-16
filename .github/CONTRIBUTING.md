@@ -77,7 +77,7 @@ poo-tracker/
 
 ### Code Style
 
-We use ESLint with StandardJS rules and Prettier for formatting. Don't fight the config, just follow it.
+We use ESLint with the @typescript-eslint plugin and Prettier for formatting. Don't fight the config, just follow it.
 
 #### Frontend (React + TypeScript)
 
@@ -127,11 +127,7 @@ const createPooSchema = z.object({
   notes: z.string().max(500).optional()
 })
 
-export const createPoo = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const createPoo = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = createPooSchema.parse(req.body)
 
@@ -309,10 +305,7 @@ pnpm test:watch
  * console.log(`Bristol scale: ${rating}`) // Bristol scale: 4
  * ```
  */
-export async function analyzePooConsistency(
-  imageBuffer: Buffer,
-  userId: string
-): Promise<number> {
+export async function analyzePooConsistency(imageBuffer: Buffer, userId: string): Promise<number> {
   // Implementation here
 }
 ````

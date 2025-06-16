@@ -28,7 +28,7 @@ export interface CreateMealRequest {
   photoUrl?: string
 }
 
-export interface UpdateMealRequest extends Partial<CreateMealRequest> {}
+export type UpdateMealRequest = Partial<CreateMealRequest>
 
 export interface MealListResponse {
   meals: Meal[]

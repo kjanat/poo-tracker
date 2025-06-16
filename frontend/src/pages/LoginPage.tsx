@@ -99,7 +99,7 @@ export function LoginPage () {
         </div>
 
         <p className='text-center text-sm text-gray-600 mt-6'>
-          Don't have an account? We'll create one for you automatically on first
+          Don&apos;t have an account? We&apos;ll create one for you automatically on first
           login.
         </p>
       </div>
