@@ -2,11 +2,12 @@
 Tests for service layer components
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, patch
 
 import pytest
 
+from ai_service.models import BowelMovementData, MealData, SymptomData
 from ai_service.services.analyzer import AnalyzerService
 from ai_service.services.health_assessor import HealthAssessorService
 from ai_service.services.recommender import RecommenderService
@@ -51,6 +52,70 @@ class TestAnalyzerService:
         sample_entries = []
         result = await self.analyzer.analyze_correlations(sample_entries)
         assert isinstance(result, dict)
+
+    @pytest.mark.asyncio
+    async def test_analyze_comprehensive_patterns(self):
+        """Test comprehensive pattern analysis with sample data."""
+        now = datetime.now()
+        bowel_movements = []
+        for i in range(15):
+            created = now - timedelta(days=15 - i)
+            if i < 5:
+                bristol = 6
+            elif i < 10:
+                bristol = 4
+            else:
+                bristol = 3
+            bowel_movements.append(
+                BowelMovementData(
+                    id=f"bm-{i}",
+                    created_at=created,
+                    bristol_type=bristol,
+                    pain=5 if i < 5 else 2,
+                )
+            )
+
+        meals = [
+            MealData(
+                id="meal-1",
+                meal_time=now - timedelta(days=9, hours=10),
+                category="dairy",
+                spicy_level=2,
+                dairy=True,
+            ),
+            MealData(
+                id="meal-2",
+                meal_time=now - timedelta(days=3, hours=8),
+                category="fiber_rich",
+                spicy_level=1,
+                fiber_rich=True,
+            ),
+        ]
+
+        symptoms = [
+            SymptomData(
+                id="sym-1",
+                created_at=now - timedelta(days=9),
+                type="cramps",
+                severity=8,
+            )
+        ]
+
+        result = await self.analyzer.analyze_comprehensive_patterns(
+            bowel_movements,
+            meals,
+            symptoms,
+            user_id="user-1",
+        )
+
+        assert result["bristol_analysis"]["trend"] == "improving"
+        assert (
+            "avg_meal_to_bm_hours"
+            in result["correlations"]["meals"]["timing_correlations"]
+        )
+        assert result["correlations"]["symptoms"]["cramps"][
+            "avg_severity"
+        ] == pytest.approx(8.0)
 
 
 class TestHealthAssessorService:
@@ -132,7 +197,7 @@ class TestCacheManager:
         mock_redis_client.ping.side_effect = Exception("Connection failed")
         mock_redis.return_value = mock_redis_client
 
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: B017
             await self.cache_manager.ping()
 
     @pytest.mark.asyncio
@@ -186,3 +251,9 @@ class TestDataValidator:
     def _is_valid_bristol_type(self, bristol_type):
         """Helper method to validate Bristol type."""
         return isinstance(bristol_type, int) and 1 <= bristol_type <= 7
+
+
+def test_coverage(cov):
+    """Ensure coverage plugin reports some measured lines."""
+    percent = cov.report(show_missing=False)
+    assert percent > 0
