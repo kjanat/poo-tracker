@@ -214,7 +214,7 @@ Create `.env.local` in the frontend directory:
 
 ```env
 # API Configuration
-VITE_API_BASE_URL=http://localhost:3002
+VITE_API_URL=http://localhost:3002
 VITE_AI_SERVICE_URL=http://localhost:8001
 
 # Feature Flags
