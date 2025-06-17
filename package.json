@@ -10,35 +10,28 @@
     "dev:backend": "pnpm --filter @poo-tracker/backend run dev",
     "dev:ai": "cd ai-service && uv run uvicorn main:app --reload",
     "dev:full": "concurrently \"pnpm dev\" \"pnpm dev:ai\"",
-
     "build": "pnpm --recursive run build",
     "build:frontend": "pnpm --filter @poo-tracker/frontend run build",
     "build:backend": "pnpm --filter @poo-tracker/backend run build",
-
     "lint": "pnpm --recursive run lint",
     "lint:ai": "uv run ruff check ai-service",
     "lint:frontend": "pnpm --filter @poo-tracker/frontend run lint",
     "lint:backend": "pnpm --filter @poo-tracker/backend run lint",
-
     "lint:fix": "concurrently \"pnpm --recursive run lint:fix\" \"pnpm lint:fix:ai\"",
     "lint:fix:ai": "uv run ruff check ai-service --fix",
     "lint:fix:frontend": "pnpm --filter @poo-tracker/frontend run lint:fix",
     "lint:fix:backend": "pnpm --filter @poo-tracker/backend run lint:fix",
-
     "test": "pnpm --recursive run test",
     "test:ai": "uv run pytest ai-service",
     "test:backend": "pnpm --filter @poo-tracker/backend run test",
     "test:frontend": "pnpm --filter @poo-tracker/frontend run test",
     "test:watch": "pnpm --recursive run test:watch",
-
     "type-check": "pnpm --recursive run type-check",
     "type-check:frontend": "pnpm --filter @poo-tracker/frontend run type-check",
     "type-check:backend": "pnpm --filter @poo-tracker/backend run type-check",
     "type-check:ai": "uv run ruff check ai-service",
-
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
-
     "db:generate": "pnpm --filter @poo-tracker/backend run db:generate",
     "db:migrate": "pnpm --filter @poo-tracker/backend run db:migrate",
     "db:migrate:prod": "pnpm --filter @poo-tracker/backend run db:migrate:prod",
@@ -46,11 +39,8 @@
     "db:studio": "pnpm --filter @poo-tracker/backend run db:studio",
     "db:reset": "pnpm --filter @poo-tracker/backend run db:reset",
     "db:constraints": "pnpm --filter @poo-tracker/backend run db:constraints",
-
     "prepare": "husky",
-
     "clean": "pnpm --recursive run clean",
-
     "format": "concurrently \"pnpm format:all\" \"pnpm format:ai\"",
     "format:frontend": "prettier --write frontend",
     "format:backend": "prettier --write backend",
@@ -58,7 +48,6 @@
     "format:ai:check": "uv run ruff format ai-service --check",
     "format:all": "prettier --write .",
     "format:all:watch": "onchange \"**/*.{ts,tsx,js,jsx,json,md}\" -- prettier --write",
-
     "trunk": "trunk",
     "trunk:lint": "trunk check",
     "trunk:format": "trunk fmt"
@@ -83,6 +72,7 @@
     "lint-staged": "^16.1.2",
     "onchange": "^7.1.0",
     "prettier": "^3.5.3",
+    "prettier-eslint": "^16.4.2",
     "prettier-plugin-prisma": "^5.0.0",
     "typescript": "^5.8.3",
     "vitest": "^3.2.3"

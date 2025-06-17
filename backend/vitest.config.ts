@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitest/config'
-import path from 'path'
+import { resolve } from 'path'
 
 export default defineConfig({
   test: {
@@ -7,10 +7,7 @@ export default defineConfig({
     include: ['src/**/__tests__/**/*.ts', 'src/**/?(*.)+(spec|test).ts'],
     reporters: [
       'default',
-      ['html', { outputFile: './test-report.html' }],
-      ['text', { outputFile: './test-report.txt' }],
-      ['junit', { outputFile: './junit.xml' }],
-      ['json', { outputFile: './test-report.json' }]
+      ['junit', { outputFile: './../backend-junit.xml' }]
     ],
     coverage: {
       provider: 'v8',
@@ -22,7 +19,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src')
+      '@': resolve(__dirname, './src'),
     }
   }
 })

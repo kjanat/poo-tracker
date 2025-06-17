@@ -532,7 +532,9 @@ docker-compose.override.yml
 **/*-old.*
 prisma-shit.md
 .docs/
+**/*-junit.xml
 **/junit.xml
 **/test-report.json
 **/test-report.txt
 **/test-report.html
+poo-tracker.code-workspace

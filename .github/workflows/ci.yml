@@ -7,6 +7,9 @@ on:
     branches: [master, develop]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -81,6 +84,19 @@ jobs:
       - name: 🧪 Test
         run: pnpm test:frontend
 
+      - name: Upload results to Trunk
+        # Run this step even if the test step ahead fails
+        if: success() || failure()
+        uses: trunk-io/analytics-uploader@main
+        with:
+          # Path to your test results.
+          junit-paths: frontend-junit.xml
+          # Provide your Trunk organization slug.
+          org-slug: ${{ vars.TRUNK_ORG_SLUG }}
+          # Provide your Trunk API token as a GitHub secret.
+          token: ${{ secrets.TRUNK_API_TOKEN }}
+        continue-on-error: true
+
       - name: 🏗️ Build
         run: pnpm build:frontend
 
@@ -92,14 +108,20 @@ jobs:
     strategy:
       matrix:
         node-version: [22, 24]
+    env:
+      REDIS_HOST: localhost:6379
+      DATABASE_HOST: localhost:5432
+      POSTGRES_DB: test_db
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
 
     services:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_PASSWORD: test_password
-          POSTGRES_USER: test_user
-          POSTGRES_DB: test_db
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -177,14 +199,26 @@ jobs:
 
       - name: 🗄️ Setup test database
         run: |
-          cd backend
-          echo "DATABASE_URL=postgresql://test_user:test_password@localhost:5432/test_db" > .env
-          echo "REDIS_URL=redis://localhost:6379" >> .env
+          echo "DATABASE_URL=postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@${{ env.DATABASE_HOST }}/${{ env.POSTGRES_DB }}" > .env
+          echo "REDIS_URL=redis://${{ env.REDIS_HOST }}" >> .env
           pnpm db:generate
           pnpm db:migrate
 
       - name: 🧪 Test
         run: pnpm test:backend
+
+      - name: Upload results to Trunk
+        # Run this step even if the test step ahead fails
+        if: success() || failure()
+        uses: trunk-io/analytics-uploader@main
+        with:
+          # Path to your test results.
+          junit-paths: backend-junit.xml
+          # Provide your Trunk organization slug.
+          org-slug: ${{ vars.TRUNK_ORG_SLUG }}
+          # Provide your Trunk API token as a GitHub secret.
+          token: ${{ secrets.TRUNK_API_TOKEN }}
+        continue-on-error: true
 
       - name: 🏗️ Build
         run: pnpm build:backend
@@ -269,10 +303,9 @@ jobs:
         env:
           REDIS_URL: redis://localhost:6379
         run: |
-          cd ai-service
-          if [ -n "$(find . -name 'test_*.py' -o -name '*_test.py' | head -1)" ]; then
+          if [ -n "$(find ai-service -name 'test_*.py' -o -name '*_test.py' -maxdepth 2 | head -1)" ]; then
             echo "Running tests..."
-            uv run pytest --tb=short -v --junit-xml=junit.xml
+            uv run pytest ai-service --tb=auto -vv --junit-xml=ai_service-junit.xml
           else
             echo "No test files found (test_*.py or *_test.py), skipping tests"
             echo "✅ Test step completed (no tests to run)"
@@ -284,7 +317,7 @@ jobs:
         uses: trunk-io/analytics-uploader@main
         with:
           # Path to your test results.
-          junit-paths: '**/junit.xml'
+          junit-paths: ai_service-junit.xml
           # Provide your Trunk organization slug.
           org-slug: ${{ vars.TRUNK_ORG_SLUG }}
           # Provide your Trunk API token as a GitHub secret.
