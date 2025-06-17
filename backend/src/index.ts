@@ -8,8 +8,7 @@ import path from 'path'
 import { config } from './config'
 import { errorHandler } from './middleware/errorHandler'
 import { authRoutes } from './routes/auth'
-import entryRoutes from './routes/entries'
-import bowelMovementsRoutes from './routes/bowel-movements'
+import { entryRoutes } from './routes/entries'
 import { mealRoutes } from './routes/meals'
 import { uploadRoutes } from './routes/uploads'
 import { analyticsRoutes } from './routes/analytics'
@@ -38,7 +37,7 @@ const limiter = rateLimit({
 app.use(limiter)
 
 // General middleware
-app.use(compression())
+app.use(compression() as any)
 app.use(morgan('combined'))
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
@@ -53,8 +52,7 @@ app.get('/health', (_req, res) => {
 
 // API routes
 app.use('/api/auth', authRoutes)
-app.use('/api/entries', entryRoutes) // Legacy route (redirects to bowel-movements)
-app.use('/api/bowel-movements', bowelMovementsRoutes)
+app.use('/api/entries', entryRoutes)
 app.use('/api/meals', mealRoutes)
 app.use('/api/uploads', uploadRoutes)
 app.use('/api/analytics', analyticsRoutes)
@@ -63,7 +61,7 @@ app.use('/api/analytics', analyticsRoutes)
 app.use('/uploads', express.static(config.uploads.directory))
 
 // 404 handler
-app.use((_req, res) => {
+app.use((_req, res, next) => {
   res.status(404).json({ error: 'Not found' })
 })
 

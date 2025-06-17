@@ -2,34 +2,10 @@
 Basic tests for the Poo Tracker AI Service
 """
 
-from unittest.mock import AsyncMock, patch
-
 import pytest
 from fastapi.testclient import TestClient
 
-"""
-Basic tests for the Poo Tracker AI Service
-"""
-
-
-# Mock Redis client before importing the app
-with patch("redis.asyncio.from_url") as mock_redis:
-    # Mock Redis client
-    mock_redis_client = AsyncMock()
-    mock_redis_client.ping.return_value = True
-    mock_redis.return_value = mock_redis_client
-
-    from src.ai_service.main import app
-
-# Mock the CacheManager after import
-with patch("src.ai_service.utils.cache.CacheManager") as mock_cache_manager:
-    mock_cache_manager_instance = AsyncMock()
-    mock_cache_manager_instance.ping.return_value = True
-    mock_cache_manager.return_value = mock_cache_manager_instance
-
-# Set up app state for testing
-app.state.cache_manager = AsyncMock()
-app.state.cache_manager.ping = AsyncMock(return_value=True)
+from main import app
 
 client = TestClient(app)
 
@@ -83,12 +59,20 @@ def test_bristol_types_validation():
 
 def test_redis_connection_handling():
     """Test that Redis connection is handled gracefully"""
+    import os
 
-    # Test health endpoint (Redis should be mocked)
+    from main import redis_client
+
+    # Test that the redis client is properly initialized
+    assert redis_client is not None
+
+    # Test health endpoint with Redis (should work in CI with Redis service)
     response = client.get("/health")
     assert response.status_code == 200
     data = response.json()
 
-    # With our mock, redis_connected should be True
-    assert data["redis_connected"] is True
+    # If REDIS_URL is set, Redis should be connected
+    if os.getenv("REDIS_URL"):
+        assert data["redis_connected"] is True
+    # If no Redis URL, connection might be False but endpoint should still work
     assert isinstance(data["redis_connected"], bool)

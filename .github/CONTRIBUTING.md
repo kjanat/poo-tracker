@@ -18,7 +18,7 @@ This guide will help you understand our development process and how to submit co
 
 ### Prerequisites
 
-- **Node.js** (v22 or higher)
+- **Node.js** (v18 or higher)
 - **pnpm** (v8 or higher) - We don't use npm, get with the program
 - **Docker** and **Docker Compose**
 - **Git** (obviously)
@@ -77,7 +77,7 @@ poo-tracker/
 
 ### Code Style
 
-We use ESLint with the @typescript-eslint plugin and Prettier for formatting. Don't fight the config, just follow it.
+We use ESLint with StandardJS rules and Prettier for formatting. Don't fight the config, just follow it.
 
 #### Frontend (React + TypeScript)
 
@@ -118,31 +118,35 @@ export const Toilet: React.FC<ToiletProps> = ({ isOccupied, onFlush }) => {
 
 ```typescript
 // ✅ Good - Proper error handling and validation
-import { z } from 'zod'
-import { Request, Response, NextFunction } from 'express'
+import { z } from "zod";
+import { Request, Response, NextFunction } from "express";
 
 const createPooSchema = z.object({
   bristolScale: z.number().min(1).max(7),
   imageUrl: z.string().url().optional(),
   notes: z.string().max(500).optional()
-})
+});
 
-export const createPoo = async (req: Request, res: Response, next: NextFunction) => {
+export const createPoo = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const data = createPooSchema.parse(req.body)
+    const data = createPooSchema.parse(req.body);
 
     const poo = await prisma.poo.create({
       data: {
         ...data,
         userId: req.user.id
       }
-    })
+    });
 
-    res.status(201).json(poo)
+    res.status(201).json(poo);
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 ```
 
 ### Testing Standards
@@ -175,31 +179,31 @@ describe('Toilet', () => {
 
 ```typescript
 // ✅ Good - API endpoint testing
-import request from 'supertest'
-import { app } from '../app'
-import { createTestUser } from '../test-utils'
+import request from "supertest";
+import { app } from "../app";
+import { createTestUser } from "../test-utils";
 
-describe('POST /api/poos', () => {
-  it('should create a new poo entry', async () => {
-    const user = await createTestUser()
-    const token = generateToken(user.id)
+describe("POST /api/poos", () => {
+  it("should create a new poo entry", async () => {
+    const user = await createTestUser();
+    const token = generateToken(user.id);
 
     const response = await request(app)
-      .post('/api/poos')
-      .set('Authorization', `Bearer ${token}`)
+      .post("/api/poos")
+      .set("Authorization", `Bearer ${token}`)
       .send({
         bristolScale: 4,
-        notes: 'Perfect consistency'
+        notes: "Perfect consistency"
       })
-      .expect(201)
+      .expect(201);
 
     expect(response.body).toMatchObject({
       bristolScale: 4,
-      notes: 'Perfect consistency',
+      notes: "Perfect consistency",
       userId: user.id
-    })
-  })
-})
+    });
+  });
+});
 ```
 
 ## 🎯 Contributing Guidelines
@@ -305,7 +309,10 @@ pnpm test:watch
  * console.log(`Bristol scale: ${rating}`) // Bristol scale: 4
  * ```
  */
-export async function analyzePooConsistency(imageBuffer: Buffer, userId: string): Promise<number> {
+export async function analyzePooConsistency(
+  imageBuffer: Buffer,
+  userId: string
+): Promise<number> {
   // Implementation here
 }
 ````

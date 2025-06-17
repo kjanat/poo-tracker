@@ -4,11 +4,8 @@ on:
   push:
     branches: [master, develop]
   pull_request:
-  #   branches: [master, develop]
+    branches: [master, develop]
   workflow_dispatch:
-
-permissions:
-  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,7 +19,7 @@ jobs:
       contents: read
     strategy:
       matrix:
-        node-version: [22, 24]
+        node-version: [18, 20, 22]
 
     steps:
       - name: 📦 Checkout
@@ -40,32 +37,19 @@ jobs:
           cache: pnpm
 
       - name: 📦 Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: 🔍 Type check
-        run: pnpm type-check:frontend
+        run: pnpm run --filter frontend tsc --noEmit
 
       - name: 🧹 Lint
-        run: pnpm lint:frontend
+        run: pnpm run --filter frontend lint
 
       - name: 🧪 Test
-        run: pnpm test:frontend
-
-      - name: Upload results to Trunk
-        # Run this step even if the test step ahead fails
-        if: success() || failure()
-        uses: trunk-io/analytics-uploader@main
-        with:
-          # Path to your test results.
-          junit-paths: frontend-junit.xml
-          # Provide your Trunk organization slug.
-          org-slug: ${{ vars.TRUNK_ORG_SLUG }}
-          # Provide your Trunk API token as a GitHub secret.
-          token: ${{ secrets.TRUNK_API_TOKEN }}
-        continue-on-error: true
+        run: pnpm run --filter frontend test
 
       - name: 🏗️ Build
-        run: pnpm build:frontend
+        run: pnpm run --filter frontend build
 
   test-backend:
     name: 🚀 Backend Tests
@@ -74,21 +58,15 @@ jobs:
       contents: read
     strategy:
       matrix:
-        node-version: [22, 24]
-    env:
-      POSTGRES_DB: test_db
-      POSTGRES_USER: test_user
-      POSTGRES_PASSWORD: test_password
-      DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
-      REDIS_URL: redis://localhost:6379
+        node-version: [18, 20, 22]
 
     services:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_USER: test_user
+          POSTGRES_DB: test_db
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -123,64 +101,36 @@ jobs:
           cache: pnpm
 
       - name: 📦 Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Type check
+        run: pnpm run --filter backend tsc --noEmit
+
+      - name: 🧹 Lint
+        run: pnpm run --filter backend lint
 
       - name: 🗄️ Setup test database
         run: |
-          pnpm db:generate
-          pnpm db:migrate
-          pnpm db:seed
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          REDIS_URL: ${{ env.REDIS_URL }}
-
-      - name: 🔍 Type check
-        run: pnpm type-check:backend
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          REDIS_URL: ${{ env.REDIS_URL }}
-
-      - name: 🧹 Lint
-        run: pnpm lint:backend
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          REDIS_URL: ${{ env.REDIS_URL }}
+          cd backend
+          echo "DATABASE_URL=postgresql://test_user:test_password@localhost:5432/test_db" > .env
+          echo "REDIS_URL=redis://localhost:6379" >> .env
+          pnpm run db:generate
+          pnpm run db:migrate
 
       - name: 🧪 Test
-        run: pnpm test:backend
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          REDIS_URL: ${{ env.REDIS_URL }}
-
-      - name: Upload results to Trunk
-        # Run this step even if the test step ahead fails
-        if: success() || failure()
-        uses: trunk-io/analytics-uploader@main
-        with:
-          # Path to your test results.
-          junit-paths: backend-junit.xml
-          # Provide your Trunk organization slug.
-          org-slug: ${{ vars.TRUNK_ORG_SLUG }}
-          # Provide your Trunk API token as a GitHub secret.
-          token: ${{ secrets.TRUNK_API_TOKEN }}
-        continue-on-error: true
+        run: pnpm run --filter backend test
 
       - name: 🏗️ Build
-        run: pnpm build:backend
+        run: pnpm run --filter backend build
 
   test-ai-service:
     name: 🤖 AI Service Tests
     runs-on: ubuntu-latest
     permissions:
       contents: read
-
-    defaults:
-      run:
-        shell: bash
-        working-directory: ./ai-service
     strategy:
       matrix:
-        python-version: ['3.12', '3.13']
+        python-version: ["3.11", "3.12", "3.13"]
 
     services:
       redis:
@@ -197,60 +147,48 @@ jobs:
       - name: 📦 Checkout
         uses: actions/checkout@v4
 
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: latest
-
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-
       - name: 📦 Install uv and 🐍 Python ${{ matrix.python-version }}
         uses: astral-sh/setup-uv@v6
-        id: setup-uv
         with:
           activate-environment: true
-          working-directory: ai-service
-          version: latest
           python-version: ${{ matrix.python-version }}
+          version: latest
 
       - name: 📦 Install dependencies
-        run: uv sync
+        run: |
+          cd ai-service
+          uv pip install -r requirements.txt
+          uv pip install pytest pytest-asyncio httpx
+
+      - name: 🧹 Lint with flake8
+        run: |
+          cd ai-service
+          uvx flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          uvx flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: 🧹 Format check with black
+        run: |
+          cd ai-service
+          uvx black --check .
 
       - name: 🦀 Lint with Ruff
         run: |
-          uv run ruff check . || \
-            uv run ruff check . --fix && \
-            echo "Fixed formatting"
-          uv run ruff format .
+          cd ai-service
+          uvx ruff check .
+          uvx ruff format --check .
 
       - name: 🧪 Test with pytest
         env:
           REDIS_URL: redis://localhost:6379
         run: |
-          if [ -n "$(find . -name 'test_*.py' -o -name '*_test.py' -maxdepth 2 | head -1)" ]; then
+          cd ai-service
+          if [ -n "$(find . -name 'test_*.py' -o -name '*_test.py' | head -1)" ]; then
             echo "Running tests..."
-            uv run pytest --tb=auto -vv --junit-xml=ai_service-junit.xml
+            pytest --tb=short -v
           else
             echo "No test files found (test_*.py or *_test.py), skipping tests"
             echo "✅ Test step completed (no tests to run)"
           fi
-
-      - name: Upload results to Trunk
-        # Run this step even if the test step ahead fails
-        if: success() || failure()
-        uses: trunk-io/analytics-uploader@main
-        with:
-          # Path to your test results.
-          junit-paths: '**/ai_service-junit.xml'
-          # Provide your Trunk organization slug.
-          org-slug: ${{ vars.TRUNK_ORG_SLUG }}
-          # Provide your Trunk API token as a GitHub secret.
-          token: ${{ secrets.TRUNK_API_TOKEN }}
-        continue-on-error: true
 
   docker-build:
     name: 🐳 Docker Build Test
@@ -269,11 +207,9 @@ jobs:
       - name: 🏗️ Build AI Service Docker image
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./ai-service
           file: ./ai-service/Dockerfile
           push: false
-          sbom: true
-          provenance: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

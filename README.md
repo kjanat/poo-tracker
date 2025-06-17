@@ -8,9 +8,9 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 22+
+- [Node.js](https://nodejs.org/) 18+
 - [Docker](https://docs.docker.com/engine/) & [Docker Compose](https://docs.docker.com/compose/)
-- [pnpm](https://pnpm.io/) 9+ (because npm is for amateurs)
+- [pnpm](https://pnpm.io/) (because npm is for amateurs)
 - [uv](https://docs.astral.sh/uv/) for Python (because pip is for the weak)
 
 ### Setup
@@ -25,49 +25,35 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 2. **Install dependencies:**
 
    ```bash
-   # Install Node.js dependencies (frontend + backend)
    pnpm install
-
-   # Install Python dependencies for AI service
-   cd ai-service && uv sync && cd ..
    ```
 
 3. **Set up environment variables:**
 
    ```bash
    cp .env.example .env
-   cp frontend/.env.example frontend/.env.local
-   cp backend/.env.example backend/.env
-   cp ai-service/.env.example ai-service/.env
-   # Edit each file with your local values
+   # Edit .env with your configuration
    ```
 
 4. **Start the services:**
 
    ```bash
    # Start database and supporting services
-   pnpm docker:up
-
-   # Start all development servers (frontend + backend + AI)
-   pnpm dev:full
-
-   # OR start just frontend + backend
-   pnpm dev
+   pnpm run docker:up
+   
+   # Start the development servers
+   pnpm run dev
    ```
 
 5. **Set up the database:**
 
    ```bash
    # Run database migrations
-   pnpm db:migrate
-
+   pnpm run db:migrate
+   
    # (Optional) Seed with test data
-   pnpm db:seed
+   pnpm run db:seed
    ```
-
-   A sample set of credentials for API testing is provided in
-   [`login.example.json`](login.example.json). Copy this file to
-   `login.json` if you need a local login file that's ignored by Git.
 
 6. **Open your browser:**
 
@@ -78,26 +64,12 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
 ## 🏗️ Tech Stack
 
-- **Frontend**: React + Vite + TypeScript + TailwindCSS v4
-- **Backend**: Node.js + Express v5 + TypeScript + Prisma
+- **Frontend**: React + Vite + TypeScript + TailwindCSS
+- **Backend**: Node.js + Express + TypeScript + Prisma
 - **Database**: PostgreSQL
 - **Storage**: MinIO (S3-compatible for photos)
 - **AI Service**: Python + FastAPI + scikit-learn
 - **Infrastructure**: Docker + Docker Compose
-- **Package Management**: pnpm (Node.js) + uv (Python)
-
-## 🗝️ Environment Variables
-
-Each package ships with an `.env.example` file. Copy them and tweak the values before running anything:
-
-```bash
-cp .env.example .env
-cp frontend/.env.example frontend/.env.local
-cp backend/.env.example backend/.env
-cp ai-service/.env.example ai-service/.env
-```
-
-These example files contain **sample credentials only**. Replace them with your real secrets and **never commit private keys or passwords** to the repository.
 
 ## 📖 What's the fucking point?
 
@@ -112,82 +84,40 @@ These example files contain **sample credentials only**. Replace them with your 
 ### Available Scripts
 
 ```bash
-# Development - All Services
-pnpm dev:full         # Start frontend + backend + AI service
-pnpm dev              # Start frontend + backend only
-pnpm dev:frontend     # Start frontend only
-pnpm dev:backend      # Start backend only
-pnpm dev:ai           # Start AI service only
+# Development
+pnpm run dev          # Start frontend + backend
+pnpm run dev:frontend # Start frontend only
+pnpm run dev:backend  # Start backend only
 
-# Building
-pnpm build            # Build all projects
-pnpm build:frontend   # Build frontend only
-pnpm build:backend    # Build backend only
+# Database
+pnpm run db:migrate # Run Prisma migrations
+pnpm run db:seed    # Seed database
 
-# Database Operations
-pnpm db:migrate       # Run Prisma migrations
-pnpm db:seed          # Seed database with test data
-pnpm db:studio        # Open Prisma Studio
+# Docker
+pnpm run docker:up   # Start all services
+pnpm run docker:down # Stop all services
 
-# Docker Services
-pnpm docker:up        # Start PostgreSQL, Redis, MinIO
-pnpm docker:down      # Stop all Docker services
-
-# Testing & Quality
-pnpm test             # Run all tests (frontend + backend)
-pnpm test:watch       # Run tests in watch mode
-pnpm lint             # Run linters on all projects
-pnpm lint:fix         # Auto-fix linting issues
-pnpm clean            # Clean all build artifacts
-
-# Code Formatting
-pnpm prettier         # Format all files
-pnpm prettier:watch   # Watch and format on changes
+# Testing & Linting
+pnpm run test  # Run all tests
+pnpm run lint  # Run linters
+pnpm run build # Build for production
 ```
 
 ### Project Structure
 
-```graphql
+```tree
 poo-tracker/
-├── frontend/           # React frontend (Vite + TypeScript + TailwindCSS)
-│   ├── src/
-│   ├── package.json
-│   └── vite.config.ts
-├── backend/            # Express.js API (TypeScript + Prisma)
-│   ├── src/
-│   ├── prisma/
-│   └── package.json
-├── ai-service/         # Python FastAPI AI service
-│   ├── main.py
-│   ├── pyproject.toml
-│   └── uv.lock
-├── docker-compose.yml  # Infrastructure setup
-├── pnpm-workspace.yaml # Workspace configuration
-└── package.json        # Root workspace config
-```
-
-### Workspace Management
-
-This project uses **pnpm workspaces** for efficient monorepo management:
-
-```bash
-# Install dependencies for specific workspace
-pnpm --filter @poo-tracker/frontend add react-router-dom
-pnpm --filter @poo-tracker/backend add express-rate-limit
-
-# Run commands on specific workspaces
-pnpm --filter @poo-tracker/frontend build
-pnpm --filter @poo-tracker/backend test
-
-# Run commands on all workspaces
-pnpm --recursive run build
-pnpm --parallel run dev
+├── frontend/          # React frontend (Vite + TypeScript + TailwindCSS)
+├── backend/           # Express.js API (TypeScript + Prisma)
+├── ai-service/        # Python FastAPI AI service
+├── docker-compose.yml # Infrastructure setup
+└── package.json       # Root workspace config
 ```
 
 ### API Endpoints
 
 | Endpoint                 | Method   | Description                           |
-| ------------------------ | -------- | ------------------------------------- |
+|--------------------------|----------|---------------------------------------|
 | `/api/auth/register`     | `POST`   | Register a new user                   |
 | `/api/auth/login`        | `POST`   | Authenticate user                     |
 | `/api/entries`           | `GET`    | Get bowel movement entries            |
@@ -245,7 +175,7 @@ We encrypt your brown notes and hide them away. Nobody's reading your logs excep
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feat/amazing-feature`)
-3. Follow the coding standards (see [AGENTS.md](AGENTS.md))
+3. Follow the coding standards (see copilot instructions)
 4. Write tests for new features
 5. Commit using conventional commits (`feat: add Bristol chart selector`)
 6. Push and create a Pull Request
@@ -257,8 +187,7 @@ We encrypt your brown notes and hide them away. Nobody's reading your logs excep
 - TailwindCSS for styling (no CSS modules)
 - RESTful API design
 - Comprehensive test coverage
-- ESLint with @typescript-eslint and Prettier (follow the config, don't "fix" it)
-- Use pnpm workspace commands for consistent development
+- ESLint + Prettier (follow the config, don't "fix" it)
 
 ## 🚀 Deployment
 
@@ -284,47 +213,10 @@ AI_SERVICE_URL="http://localhost:8001"
 JWT_SECRET="your-super-secret-jwt-key-change-in-production"
 ```
 
-### AI Service Environment Variables
-
-The AI service has its own `.env` file located at `ai-service/.env.example`. The
-table below lists the most relevant options. See
-[ai-service/README.md](ai-service/README.md) for full configuration details.
-
-| Variable                 | Purpose                                      |
-| ------------------------ | -------------------------------------------- |
-| `DEBUG`                  | Enable debug mode for verbose logging        |
-| `ENVIRONMENT`            | Name of the runtime environment              |
-| `HOST`                   | Interface to bind the FastAPI server         |
-| `PORT`                   | Port for the HTTP service                    |
-| `WORKERS`                | Number of worker processes                   |
-| `REDIS_URL`              | Connection string for Redis caching          |
-| `REDIS_TIMEOUT`          | How long to wait for Redis responses         |
-| `REDIS_RETRY_ON_TIMEOUT` | Whether to retry when Redis times out        |
-| `CACHE_TTL`              | Default cache time-to-live in seconds        |
-| `CACHE_PREFIX`           | Prefix for all cache keys                    |
-| `ML_MODEL_PATH`          | Directory containing trained models          |
-| `ENABLE_ML_FEATURES`     | Toggle machine learning analysis             |
-| `MAX_ANALYSIS_DAYS`      | How far back to analyze entries              |
-| `MIN_ENTRIES_FOR_ML`     | Minimum records required before ML runs      |
-| `RATE_LIMIT_REQUESTS`    | Number of requests allowed per window        |
-| `RATE_LIMIT_WINDOW`      | Duration of the rate limit window in seconds |
-| `LOG_LEVEL`              | Logging verbosity level                      |
-| `LOG_FORMAT`             | Format of log output                         |
-| `BACKEND_URL`            | Base URL of the backend API                  |
-| `BACKEND_TIMEOUT`        | Timeout for backend API calls                |
-
 ### Production Build
 
 ```bash
-# Build all projects
-pnpm build
-
-# Or build individually
-pnpm build:frontend
-pnpm build:backend
-
-# AI service
-uv run uvicorn ai_service.main:app
+pnpm run build
 ```
 
 ## 📄 License
@@ -352,10 +244,3 @@ See the [LICENSE](LICENSE) file for full license details.
 **Golden Rule:** If your code stinks, it won't get merged. And yes, we'll know. 💩
 
 Ready to track some legendary logs? Get started above!
-
-<!--
-  markdownlint-configure-file {
-    "no-inline-html": false,
-    "no-alt-text": false,
-  }
--->

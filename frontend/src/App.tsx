@@ -1,13 +1,13 @@
-import { Routes, Route } from 'react-router-dom'
-import { Navbar } from './components/Navbar'
-import { HomePage } from './pages/HomePage'
-import { LoginPage } from './pages/LoginPage'
-import { DashboardPage } from './pages/DashboardPage'
-import { NewEntryPage } from './pages/NewEntryPage'
-import { AnalyticsPage } from './pages/AnalyticsPage'
-import { MealsPage } from './pages/MealsPage'
-import ProfilePage from './pages/ProfilePage'
-import { ProtectedRoute } from './components/ProtectedRoute'
+import { Routes, Route } from "react-router-dom";
+import { Navbar } from "./components/Navbar";
+import { HomePage } from "./pages/HomePage";
+import { LoginPage } from "./pages/LoginPage";
+import { DashboardPage } from "./pages/DashboardPage";
+import { NewEntryPage } from "./pages/NewEntryPage";
+import { AnalyticsPage } from "./pages/AnalyticsPage";
+import { MealsPage } from "./pages/MealsPage";
+import ProfilePage from "./pages/ProfilePage";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -66,7 +66,7 @@ function App() {
         </Routes>
       </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
