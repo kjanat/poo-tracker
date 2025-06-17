@@ -48,7 +48,7 @@ class TestHealthEndpoint:
             assert "version" in data
             assert isinstance(data["redis_connected"], bool)
             assert isinstance(data["ml_models_loaded"], bool)
-            assert isinstance(data["response_time_ms"], (int, float))
+            assert isinstance(data["response_time_ms"], int | float)
 
     def test_health_endpoint_degraded(self):
         """Test health endpoint returns degraded status when Redis is down."""
