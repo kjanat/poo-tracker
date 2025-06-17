@@ -39,41 +39,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: pnpm
 
-      - name: 📦 Install uv and 🐍 Python
-        uses: astral-sh/setup-uv@v6
-        with:
-          activate-environment: true
-          python-version: 3.13
-          version: latest
-
       - name: 📦 Install dependencies
-        run: |
-          command -v pnpm >/dev/null || { echo "❌ pnpm not found"; exit 1; }
-          command -v uv >/dev/null || { echo "❌ uv not found"; exit 1; }
-
-          pnpm install || { echo "❌ Failed to run pnpm install"; exit 1; }
-
-          [[ -d ai-service ]] || { echo "❌ Directory 'ai-service' not found"; exit 1; }
-          cd ai-service || exit 1
-
-          if [[ -f pyproject.toml ]]; then
-            uv sync 2>/dev/null || uv pip install -e . --system 2>/dev/null
-            status=$?
-          else
-            echo "⚠️  No pyproject.toml found — skipping uv sync and editable install"
-            status=1
-          fi
-
-          if [[ $status -ne 0 ]]; then
-            if [[ -f requirements.txt ]]; then
-              uv pip install -r requirements.txt --system || { echo "❌ uv install from requirements.txt failed"; exit 1; }
-            else
-              echo "❌ No valid pyproject.toml or requirements.txt found to install from"
-              exit 1
-            fi
-          fi
-
-          echo "✅ All done."
+        run: pnpm install
 
       - name: 🔍 Type check
         run: pnpm type-check:frontend
@@ -155,41 +122,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: pnpm
 
-      - name: 📦 Install uv and 🐍 Python
-        uses: astral-sh/setup-uv@v6
-        with:
-          activate-environment: true
-          python-version: 3.13
-          version: latest
-
       - name: 📦 Install dependencies
-        run: |
-          command -v pnpm >/dev/null || { echo "❌ pnpm not found"; exit 1; }
-          command -v uv >/dev/null || { echo "❌ uv not found"; exit 1; }
-
-          pnpm install || { echo "❌ Failed to run pnpm install"; exit 1; }
-
-          [[ -d ai-service ]] || { echo "❌ Directory 'ai-service' not found"; exit 1; }
-          cd ai-service || exit 1
-
-          if [[ -f pyproject.toml ]]; then
-            uv sync 2>/dev/null || uv pip install -e . --system 2>/dev/null
-            status=$?
-          else
-            echo "⚠️  No pyproject.toml found — skipping uv sync and editable install"
-            status=1
-          fi
-
-          if [[ $status -ne 0 ]]; then
-            if [[ -f requirements.txt ]]; then
-              uv pip install -r requirements.txt --system || { echo "❌ uv install from requirements.txt failed"; exit 1; }
-            else
-              echo "❌ No valid pyproject.toml or requirements.txt found to install from"
-              exit 1
-            fi
-          fi
-
-          echo "✅ All done."
+        run: pnpm install
 
       - name: 🔍 Type check
         run: pnpm type-check:backend
@@ -199,13 +133,17 @@ jobs:
 
       - name: 🗄️ Setup test database
         run: |
-          echo "DATABASE_URL=postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@${{ env.DATABASE_HOST }}/${{ env.POSTGRES_DB }}" > .env
-          echo "REDIS_URL=redis://${{ env.REDIS_HOST }}" >> .env
+          echo "DATABASE_URL=postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@${{ env.DATABASE_HOST }}/${{ env.POSTGRES_DB }}" >> $GITHUB_ENV
+          echo "REDIS_URL=redis://${{ env.REDIS_HOST }}" >> $GITHUB_ENV
           pnpm db:generate
           pnpm db:migrate
+          pnpm db:seed
 
       - name: 🧪 Test
         run: pnpm test:backend
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          REDIS_URL: ${{ env.REDIS_URL }}
 
       - name: Upload results to Trunk
         # Run this step even if the test step ahead fails
@@ -260,44 +198,22 @@ jobs:
 
       - name: 📦 Install uv and 🐍 Python ${{ matrix.python-version }}
         uses: astral-sh/setup-uv@v6
+        id: setup-uv
         with:
           activate-environment: true
-          python-version: ${{ matrix.python-version }}
+          working-directory: ai-service
           version: latest
+          python-version: ${{ matrix.python-version }}
 
       - name: 📦 Install dependencies
         run: |
-          command -v pnpm >/dev/null || { echo "❌ pnpm not found"; exit 1; }
-          command -v uv >/dev/null || { echo "❌ uv not found"; exit 1; }
-
-          pnpm install || { echo "❌ Failed to run pnpm install"; exit 1; }
-
-          [[ -d ai-service ]] || { echo "❌ Directory 'ai-service' not found"; exit 1; }
-          cd ai-service || exit 1
-
-          if [[ -f pyproject.toml ]]; then
-            uv sync 2>/dev/null || uv pip install -e . --system 2>/dev/null
-            status=$?
-          else
-            echo "⚠️  No pyproject.toml found — skipping uv sync and editable install"
-            status=1
-          fi
-
-          if [[ $status -ne 0 ]]; then
-            if [[ -f requirements.txt ]]; then
-              uv pip install -r requirements.txt --system || { echo "❌ uv install from requirements.txt failed"; exit 1; }
-            else
-              echo "❌ No valid pyproject.toml or requirements.txt found to install from"
-              exit 1
-            fi
-          fi
-
-          echo "✅ All done."
+          pnpm install -w
+          uv sync
 
       - name: 🦀 Lint with Ruff
         run: |
-          pnpm lint:ai
-          pnpm format:ai
+          uv run pnpm lint:ai
+          uv run pnpm format:ai
 
       - name: 🧪 Test with pytest
         env:
