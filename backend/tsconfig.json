@@ -51,6 +51,7 @@
   "include": [
     "src/**/*",
     "prisma/**/*",
+    "scripts/**/*",
     "**/*.test.ts",
     "**/*.spec.ts",
     "**/*.d.ts",

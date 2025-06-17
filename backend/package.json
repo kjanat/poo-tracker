@@ -5,9 +5,9 @@
   "main": "dist/index.js",
   "type": "commonjs",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx scripts/check-env.ts && tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node dist/scripts/check-env.js && node dist/index.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
