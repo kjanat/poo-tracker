@@ -54,7 +54,7 @@ jobs:
           cd ai-service || exit 1
 
           if [[ -f pyproject.toml ]]; then
-            uv sync 2>/dev/null || uv pip install -e . --system 2>/dev/null
+            uv sync --group dev 2>/dev/null || uv pip install -e . --system 2>/dev/null
             status=$?
           else
             echo "⚠️  No pyproject.toml found — skipping uv sync and editable install"
@@ -155,7 +155,7 @@ jobs:
           cd ai-service || exit 1
 
           if [[ -f pyproject.toml ]]; then
-            uv sync 2>/dev/null || uv pip install -e . --system 2>/dev/null
+            uv sync --group dev 2>/dev/null || uv pip install -e . --system 2>/dev/null
             status=$?
           else
             echo "⚠️  No pyproject.toml found — skipping uv sync and editable install"
