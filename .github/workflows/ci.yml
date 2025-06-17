@@ -81,6 +81,8 @@ jobs:
       POSTGRES_DB: test_db
       POSTGRES_USER: test_user
       POSTGRES_PASSWORD: test_password
+      DATABASE_URL: postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$DATABASE_HOST/$POSTGRES_DB
+      REDIS_URL: redis://$REDIS_HOST
 
     services:
       postgres:
@@ -127,11 +129,12 @@ jobs:
 
       - name: 🗄️ Setup test database
         run: |
-          echo "DATABASE_URL=postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@${{ env.DATABASE_HOST }}/${{ env.POSTGRES_DB }}" >> $GITHUB_ENV
-          echo "REDIS_URL=redis://${{ env.REDIS_HOST }}" >> $GITHUB_ENV
           pnpm db:generate
           pnpm db:migrate
           pnpm db:seed
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          REDIS_URL: ${{ env.REDIS_URL }}
 
       - name: 🔍 Type check
         run: pnpm type-check:backend
@@ -179,7 +182,7 @@ jobs:
         working-directory: ./ai-service
     strategy:
       matrix:
-        python-version: ['3.11', '3.12', '3.13']
+        python-version: ['3.12', '3.13', '3.14']
 
     services:
       redis:
