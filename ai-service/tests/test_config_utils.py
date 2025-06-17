@@ -92,7 +92,7 @@ class TestHealthMetricsCalculator:
     def test_calculate_overall_score_empty(self):
         """Test overall score calculation with empty data."""
         result = self.calculator.calculate_overall_score([])
-        assert isinstance(result, (int, float))
+        assert isinstance(result, int | float)
         assert 0 <= result <= 100
 
     def test_calculate_bristol_score(self):
@@ -103,14 +103,14 @@ class TestHealthMetricsCalculator:
             {"bristol_type": 5},
         ]
         result = self.calculator.calculate_bristol_score(sample_entries)
-        assert isinstance(result, (int, float))
+        assert isinstance(result, int | float)
         assert 0 <= result <= 100
 
     def test_calculate_frequency_score(self):
         """Test frequency score calculation."""
         sample_entries = []
         result = self.calculator.calculate_frequency_score(sample_entries)
-        assert isinstance(result, (int, float))
+        assert isinstance(result, int | float)
         assert 0 <= result <= 100
 
     def test_detect_health_issues(self):
