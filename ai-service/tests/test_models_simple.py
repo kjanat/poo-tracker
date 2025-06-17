@@ -5,7 +5,12 @@ Tests for models and data structures
 from datetime import datetime
 
 from ai_service.models.requests import BowelMovementEntry
-from ai_service.models.responses import AnalysisResponse, BristolAnalysis, ErrorResponse, HealthResponse
+from ai_service.models.responses import (
+    AnalysisResponse,
+    BristolAnalysis,
+    ErrorResponse,
+    HealthResponse,
+)
 
 
 class TestBowelMovementEntry:
@@ -44,14 +49,14 @@ class TestAnalysisResponse:
             patterns={},
             correlations={},
             recommendations=[],  # This should be a list
-            risk_factors=[],     # This should be a list
+            risk_factors=[],  # This should be a list
             bristol_trends=BristolAnalysis(
                 distribution={1: 0, 2: 0, 3: 5, 4: 10, 5: 3, 6: 1, 7: 0},
                 percentages={1: 0.0, 2: 0.0, 3: 26.3, 4: 52.6, 5: 15.8, 6: 5.3, 7: 0.0},
                 most_common={"type": 4, "count": 10},
-                health_indicator="healthy"
+                health_indicator="healthy",
             ),
-            analysis_metadata={}  # This field is required
+            analysis_metadata={},  # This field is required
         )
         assert isinstance(response.patterns, dict)
         assert isinstance(response.correlations, dict)

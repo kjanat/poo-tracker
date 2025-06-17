@@ -132,8 +132,8 @@ class TestCacheManager:
         mock_redis_client.ping.side_effect = Exception("Connection failed")
         mock_redis.return_value = mock_redis_client
 
-        with pytest.raises(Exception):
-            await self.cache_manager.ping()
+        result = await self.cache_manager.ping()
+        assert result is False
 
     @pytest.mark.asyncio
     async def test_close(self):

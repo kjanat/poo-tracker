@@ -275,7 +275,7 @@ pnpm build:frontend
 pnpm build:backend
 
 # AI service
-cd ai-service && uv run uvicorn main:app
+uv run uvicorn ai_service.main:app
 ```
 
 ## 📄 License
