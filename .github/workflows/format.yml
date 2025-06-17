@@ -84,8 +84,8 @@ jobs:
 
       - name: 🦀 Format with Ruff
         run: |
-          uv pnpm format:ai
-          uv pnpm lint:fix:ai
+          uv run pnpm format:ai
+          uv run pnpm lint:fix:ai
 
       - name: 📝 Check for changes
         id: verify-changed-files
