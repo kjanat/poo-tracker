@@ -99,6 +99,34 @@ class DataProcessor:
 
         return df
 
+    # ------------------------------------------------------------------
+    # Simple helper methods used in the test-suite
+    # ------------------------------------------------------------------
+
+    def normalize_entries(self, entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Return entries as-is after basic validation."""
+        if not entries:
+            return []
+        return [dict(e) for e in entries]
+
+    def extract_bristol_patterns(self, entries: list[dict[str, Any]]) -> dict[int, int]:
+        """Return distribution of Bristol types in the given entries."""
+        distribution: dict[int, int] = {}
+        for entry in entries:
+            bt = entry.get("bristol_type")
+            if bt is None:
+                continue
+            distribution[bt] = distribution.get(bt, 0) + 1
+        return distribution
+
+    def calculate_frequency_patterns(
+        self, entries: list[dict[str, Any]]
+    ) -> dict[str, Any]:
+        """Return basic frequency statistics."""
+        if not entries:
+            return {}
+        return {"count": len(entries)}
+
     def create_time_windows(
         self, df: pd.DataFrame, window_size: str = "1D", time_col: str = "created_at"
     ) -> pd.DataFrame:

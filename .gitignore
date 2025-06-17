@@ -508,6 +508,8 @@ $RECYCLE.BIN/
 *.pkl
 *.model
 models/
+!ai-service/src/ai_service/models/
+!ai-service/src/ai_service/models/**
 data/
 
 # Prisma
