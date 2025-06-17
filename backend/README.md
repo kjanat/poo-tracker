@@ -58,6 +58,11 @@ pnpm --filter @poo-tracker/backend dev
 pnpm dev:backend
 ```
 
+> **Security Note**: The default usernames and passwords in
+> [`docker-compose.yml`](../docker-compose.yml) are for **local development
+> only**. Generate unique, strong credentials for PostgreSQL, MinIO and Redis
+> before deploying to production.
+
 ### Manual Setup (if needed)
 
 ```bash
