@@ -100,6 +100,32 @@ docker run -p 8000:8000 poo-tracker-ai
 docker run -p 8000:8000 -e REDIS_URL=redis://your-redis-host:6379 poo-tracker-ai
 ```
 
+#### Docker + Redis Quickstart
+
+Running the container with a Redis instance lets the service cache results and improves
+overall performance. Specify the `REDIS_URL` and `PORT` environment variables when starting
+the image.
+
+```bash
+# Launch Redis (optional)
+docker run -d --name poo-redis -p 6379:6379 redis:7
+
+# Build the AI service image
+docker build -t poo-tracker-ai .
+
+# Run the service with environment variables
+docker run --rm -p 8000:8000 \
+  -e REDIS_URL=redis://localhost:6379 \
+  -e PORT=8000 \
+  poo-tracker-ai
+```
+
+Once running, the API exposes the following endpoints:
+
+- `http://localhost:8000/health`
+- `http://localhost:8000/analyze`
+- `http://localhost:8000/docs`
+
 ## 🌐 API Endpoints
 
 ### Health Check
