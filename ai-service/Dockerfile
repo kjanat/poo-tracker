@@ -11,14 +11,18 @@ RUN apt-get update && apt-get install -y \
 # Create non-root user
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
+# Copy LICENSE and README.md files first (needed for pyproject.toml)
+COPY LICENSE .
+COPY ai-service/README.md .
+
 # Copy pyproject.toml first to leverage Docker cache
-COPY pyproject.toml .
+COPY ai-service/pyproject.toml .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -e .
 
 # Copy source code
-COPY . .
+COPY ai-service/ .
 
 # Change ownership to appuser
 RUN chown -R appuser:appuser /app

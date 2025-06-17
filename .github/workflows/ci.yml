@@ -3,8 +3,8 @@ name: 🧪 CI
 on:
   push:
     branches: [master, develop]
-  pull_request:
-    branches: [master, develop]
+  # pull_request:
+  #   branches: [master, develop]
   workflow_dispatch:
 
 permissions:
@@ -180,7 +180,7 @@ jobs:
         working-directory: ./ai-service
     strategy:
       matrix:
-        python-version: ['3.12', '3.13', '3.14']
+        python-version: ['3.12', '3.13']
 
     services:
       redis:
@@ -269,7 +269,7 @@ jobs:
       - name: 🏗️ Build AI Service Docker image
         uses: docker/build-push-action@v6
         with:
-          context: ./ai-service
+          context: .
           file: ./ai-service/Dockerfile
           push: false
           sbom: true
