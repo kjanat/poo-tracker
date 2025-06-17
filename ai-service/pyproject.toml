@@ -6,7 +6,7 @@ authors = [
     { name = "Kaj Kowalski", email = "dev+poo-tracker@kjanat.com" }
 ]
 readme = "README.md"
-license = { file = "../LICENSE" }
+license = { file = "LICENSE" }
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.115.12",
