@@ -2,7 +2,7 @@
 Tests for service layer components
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -115,7 +115,18 @@ class TestCacheManager:
 
     def setup_method(self):
         """Setup test fixtures."""
+        patcher = patch("redis.asyncio.from_url")
+        self._patcher = patcher
+        mock_from_url = patcher.start()
+        mock_client = AsyncMock()
+        mock_client.ping = AsyncMock(return_value=True)
+        mock_client.aclose = AsyncMock()
+        mock_from_url.return_value = mock_client
         self.cache_manager = CacheManager()
+
+    def teardown_method(self):
+        """Stop Redis patcher."""
+        self._patcher.stop()
 
     @pytest.mark.asyncio
     @patch("redis.asyncio.from_url")
@@ -193,3 +204,166 @@ class TestDataValidator:
     def _is_valid_bristol_type(self, bristol_type):
         """Helper method to validate Bristol type."""
         return isinstance(bristol_type, int) and 1 <= bristol_type <= 7
+
+
+class TestAnalyzeComprehensivePatterns:
+    """Test comprehensive pattern analysis."""
+
+    class DummyBM:
+        def __init__(
+            self,
+            id: str,
+            user_id: str,
+            bristol_type: int,
+            created_at: datetime,
+            pain: int | None = None,
+            strain: int | None = None,
+            satisfaction: int | None = None,
+            volume: str | None = None,
+        ) -> None:
+            self.id = id
+            self.user_id = user_id
+            self.bristol_type = bristol_type
+            self.created_at = created_at
+            self.pain = pain
+            self.strain = strain
+            self.satisfaction = satisfaction
+            self.volume = volume
+
+        def to_dict(self) -> dict:
+            return self.__dict__
+
+    class DummyMeal:
+        def __init__(
+            self,
+            id: str,
+            user_id: str,
+            meal_time: datetime,
+            category: str | None = None,
+            name: str | None = None,
+            spicy_level: int | None = None,
+            fiber_rich: bool | None = None,
+            dairy: bool | None = None,
+            gluten: bool | None = None,
+            created_at: datetime | None = None,
+        ) -> None:
+            self.id = id
+            self.user_id = user_id
+            self.meal_time = meal_time
+            self.category = category
+            self.name = name
+            self.spicy_level = spicy_level
+            self.fiber_rich = fiber_rich
+            self.dairy = dairy
+            self.gluten = gluten
+            self.created_at = created_at or meal_time
+
+        def to_dict(self) -> dict:
+            return self.__dict__
+
+    class DummySymptom:
+        def __init__(
+            self,
+            id: str,
+            user_id: str,
+            type: str,
+            severity: int,
+            created_at: datetime,
+            bowel_movement_id: str | None = None,
+        ) -> None:
+            self.id = id
+            self.user_id = user_id
+            self.type = type
+            self.severity = severity
+            self.created_at = created_at
+            self.bowel_movement_id = bowel_movement_id
+
+        def to_dict(self) -> dict:
+            return self.__dict__
+
+    @pytest.mark.asyncio
+    async def test_analyze_comprehensive_patterns(self):
+        """Verify trends and correlations from real-like data."""
+        analyzer = AnalyzerService()
+        now = datetime.now()
+
+        # Early bowel movements lean toward diarrhea
+        bowel_movements = [
+            self.DummyBM(
+                id=f"bm-{i}",
+                user_id="user-1",
+                bristol_type=6 if i % 2 == 0 else 7,
+                created_at=now - timedelta(days=15 - i),
+            )
+            for i in range(6)
+        ]
+
+        # Recent entries are healthier
+        bowel_movements.extend(
+            [
+                self.DummyBM(
+                    id=f"bm-{i}",
+                    user_id="user-1",
+                    bristol_type=3 if i % 2 == 0 else 4,
+                    created_at=now - timedelta(days=15 - i),
+                )
+                for i in range(6, 12)
+            ]
+        )
+
+        meals = [
+            self.DummyMeal(
+                id="meal-1",
+                user_id="user-1",
+                name="Spicy Curry",
+                meal_time=now - timedelta(days=14),
+                category="dinner",
+                spicy_level=8,
+                fiber_rich=False,
+                dairy=False,
+                gluten=True,
+                created_at=now - timedelta(days=14),
+            ),
+            self.DummyMeal(
+                id="meal-2",
+                user_id="user-1",
+                name="Oatmeal",
+                meal_time=now - timedelta(days=10),
+                category="breakfast",
+                spicy_level=0,
+                fiber_rich=True,
+                dairy=False,
+                gluten=False,
+                created_at=now - timedelta(days=10),
+            ),
+        ]
+
+        symptoms = [
+            self.DummySymptom(
+                id="sym-1",
+                user_id="user-1",
+                bowel_movement_id="bm-1",
+                type="bloating",
+                severity=5,
+                created_at=bowel_movements[1].created_at + timedelta(hours=1),
+            ),
+            self.DummySymptom(
+                id="sym-2",
+                user_id="user-1",
+                bowel_movement_id="bm-8",
+                type="gas",
+                severity=2,
+                created_at=bowel_movements[8].created_at + timedelta(hours=2),
+            ),
+        ]
+
+        result = await analyzer.analyze_comprehensive_patterns(
+            bowel_movements,
+            meals,
+            symptoms,
+            user_id="user-1",
+        )
+
+        assert result["bristol_analysis"]["trend"] == "improving"
+        assert result["correlations"]["meals"]["category_correlations"]
+        assert "bloating" in result["correlations"]["symptoms"]

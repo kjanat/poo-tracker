@@ -104,7 +104,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
             error=exc.detail,
             timestamp=datetime.now(),
             request_id=getattr(request.state, "request_id", None),
-        ).dict(),
+        ).model_dump(),
     )
 
 
@@ -119,7 +119,7 @@ async def general_exception_handler(request: Request, exc: Exception):
             error="Internal server error",
             detail=str(exc) if settings.is_development else None,
             timestamp=datetime.now(),
-        ).dict(),
+        ).model_dump(),
     )
 
 
@@ -308,7 +308,7 @@ async def analyze_patterns(request: AnalysisRequest):
 
         # Cache the result
         await app.state.cache_manager.cache_analysis_result(
-            cache_key, response.dict(), ttl=settings.cache_ttl
+            cache_key, response.model_dump(), ttl=settings.cache_ttl
         )
 
         logger.info("Analysis completed successfully")
