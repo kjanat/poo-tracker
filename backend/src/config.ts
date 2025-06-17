@@ -1,51 +1,79 @@
 import dotenv from 'dotenv'
+import { z } from 'zod'
 
 dotenv.config()
 
+const envSchema = z.object({
+  API_PORT: z.coerce.number().int().min(1).default(3002),
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  CORS_ORIGIN: z.string().url().default('http://localhost:5173'),
+
+  DATABASE_URL: z.string().url(),
+
+  MINIO_ENDPOINT: z.string().nonempty(),
+  MINIO_ACCESS_KEY: z.string().nonempty(),
+  MINIO_SECRET_KEY: z.string().nonempty(),
+  MINIO_BUCKET_NAME: z.string().nonempty(),
+  MINIO_USE_SSL: z.coerce.boolean().default(false),
+
+  AI_SERVICE_URL: z.string().url(),
+
+  REDIS_URL: z.string().url(),
+
+  JWT_SECRET: z.string().nonempty(),
+  JWT_EXPIRES_IN: z.string().nonempty(),
+
+  UPLOAD_DIR: z.string().default('./uploads'),
+  UPLOAD_BASE_URL: z.string().url().default('http://localhost:3002'),
+  MAX_FILE_SIZE: z.coerce
+    .number()
+    .int()
+    .default(5 * 1024 * 1024)
+})
+
+const parsed = envSchema.safeParse(process.env)
+
+if (!parsed.success) {
+  const formatted = JSON.stringify(parsed.error.flatten().fieldErrors, null, 2)
+  throw new Error(`Invalid environment variables:\n${formatted}`)
+}
+
+const env = parsed.data
+
 export const config = {
-  port: parseInt(process.env.API_PORT ?? '3002'),
-  nodeEnv: process.env.NODE_ENV ?? 'development',
-  corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
+  port: env.API_PORT,
+  nodeEnv: env.NODE_ENV,
+  corsOrigin: env.CORS_ORIGIN,
 
   // Database
-  databaseUrl:
-    process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/poo_tracker',
+  databaseUrl: env.DATABASE_URL,
 
   // Storage
   minio: {
-    endpoint: process.env.MINIO_ENDPOINT ?? 'localhost:9000',
-    accessKey: process.env.MINIO_ACCESS_KEY ?? 'minioadmin',
-    secretKey: process.env.MINIO_SECRET_KEY ?? 'minioadmin123',
-    bucketName: process.env.MINIO_BUCKET_NAME ?? 'poo-photos',
-    useSSL: process.env.MINIO_USE_SSL === 'true'
+    endpoint: env.MINIO_ENDPOINT,
+    accessKey: env.MINIO_ACCESS_KEY,
+    secretKey: env.MINIO_SECRET_KEY,
+    bucketName: env.MINIO_BUCKET_NAME,
+    useSSL: env.MINIO_USE_SSL
   },
 
   // AI Service
-  aiServiceUrl: process.env.AI_SERVICE_URL ?? 'http://localhost:8001',
+  aiServiceUrl: env.AI_SERVICE_URL,
 
   // Redis
-  redisUrl: process.env.REDIS_URL ?? 'redis://localhost:6379',
+  redisUrl: env.REDIS_URL,
 
   // JWT
   jwt: {
-    secret: process.env.JWT_SECRET ?? 'your-super-secret-jwt-key-change-in-production',
-    expiresIn: process.env.JWT_EXPIRES_IN ?? '7d'
+    secret: env.JWT_SECRET,
+    expiresIn: env.JWT_EXPIRES_IN
   },
 
   // Image uploads
   uploads: {
-    directory: process.env.UPLOAD_DIR ?? './uploads',
-    baseUrl: process.env.UPLOAD_BASE_URL ?? 'http://localhost:3002',
-    maxFileSize: parseInt(process.env.MAX_FILE_SIZE ?? '5242880'), // 5MB
+    directory: env.UPLOAD_DIR,
+    baseUrl: env.UPLOAD_BASE_URL,
+    maxFileSize: env.MAX_FILE_SIZE,
     allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'] as const
   }
 } as const
-
-// Validate required environment variables
-const requiredEnvVars = ['DATABASE_URL']
-
-for (const envVar of requiredEnvVars) {
-  if ((process.env[envVar] ?? '') === '') {
-    throw new Error(`Missing required environment variable: ${envVar}`)
-  }
-}
