@@ -38,12 +38,12 @@ export function useEntries(): UseEntriesResult {
     try {
       setIsSubmitting(true)
       setError(null)
-      
+
       // Convert CreateEntryData to CreateEntryRequest
       const requestData: CreateEntryRequest = {
         bristolType: data.bristolType,
         notes: data.notes,
-        floaters: data.floaters ?? false,
+        floaters: data.floaters ?? false
       }
 
       // Only add optional properties if they have values
@@ -53,7 +53,7 @@ export function useEntries(): UseEntriesResult {
       if (data.pain !== undefined) requestData.pain = data.pain
       if (data.strain !== undefined) requestData.strain = data.strain
       if (data.smell) requestData.smell = data.smell
-      
+
       await entryService.createEntry(requestData)
       await loadEntries() // Refresh the list
     } catch (err) {

@@ -5,7 +5,7 @@ export class EntryFactory {
     return {
       bristolType: 4,
       notes: '',
-      floaters: false,
+      floaters: false
     }
   }
 
@@ -16,7 +16,7 @@ export class EntryFactory {
       color: '',
       notes: '',
       photo: null,
-      floaters: false,
+      floaters: false
     }
   }
 
@@ -38,7 +38,7 @@ export class EntryFactory {
     const result: CreateEntryRequest = {
       bristolType: getNumberValue('bristolType') ?? 4,
       notes: getValue('notes') ?? '',
-      floaters: Boolean(formData.floaters),
+      floaters: Boolean(formData.floaters)
     }
 
     // Only add optional properties if they have values
@@ -76,7 +76,7 @@ export class EntryFactory {
     const result: CreateEntryRequest = {
       bristolType: updates.bristolType ?? current.bristolType,
       notes: updates.notes ?? current.notes ?? '',
-      floaters: updates.floaters ?? current.floaters ?? false,
+      floaters: updates.floaters ?? current.floaters ?? false
     }
 
     // Only add optional properties if they have values

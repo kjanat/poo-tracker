@@ -83,11 +83,11 @@
   },
   "lint-staged": {
     "backend/**/*.{ts,tsx,js,jsx}": [
-      "pnpm type-check:backend",
+      "bash -c 'cd backend && pnpm type-check'",
       "pnpm format:backend"
     ],
     "frontend/**/*.{ts,tsx,js,jsx}": [
-      "pnpm type-check:frontend",
+      "bash -c 'cd frontend && pnpm type-check'",
       "pnpm format:frontend"
     ],
     "ai-service/**/*.py": [

@@ -8,7 +8,7 @@ export class MealFactory {
       spicyLevel: 1,
       fiberRich: false,
       dairy: false,
-      gluten: false,
+      gluten: false
     }
   }
 
@@ -32,7 +32,12 @@ export class MealFactory {
       throw new Error('Meal name is required')
     }
 
-    const categoryValue = getValue('category') as 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK' | undefined
+    const categoryValue = getValue('category') as
+      | 'BREAKFAST'
+      | 'LUNCH'
+      | 'DINNER'
+      | 'SNACK'
+      | undefined
     if (!categoryValue || !['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'].includes(categoryValue)) {
       throw new Error('Valid meal category is required')
     }
@@ -43,7 +48,7 @@ export class MealFactory {
       spicyLevel: getNumberValue('spicyLevel') ?? 1,
       fiberRich: Boolean(formData.fiberRich),
       dairy: Boolean(formData.dairy),
-      gluten: Boolean(formData.gluten),
+      gluten: Boolean(formData.gluten)
     }
 
     // Only add optional properties if they have values
@@ -72,7 +77,7 @@ export class MealFactory {
       spicyLevel: updates.spicyLevel ?? current.spicyLevel ?? 1,
       fiberRich: updates.fiberRich ?? current.fiberRich,
       dairy: updates.dairy ?? current.dairy,
-      gluten: updates.gluten ?? current.gluten,
+      gluten: updates.gluten ?? current.gluten
     }
 
     // Only add optional properties if they have values

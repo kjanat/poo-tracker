@@ -33,7 +33,7 @@ export function useEntryForm(): UseEntryFormResult {
       color: entry.color || '',
       notes: entry.notes || '',
       photo: null, // Photo editing not supported in this version
-      floaters: entry.floaters ?? false,
+      floaters: entry.floaters ?? false
     }
 
     // Only add optional properties if they have values

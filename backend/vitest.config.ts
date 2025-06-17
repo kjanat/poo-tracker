@@ -5,10 +5,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/__tests__/**/*.ts', 'src/**/?(*.)+(spec|test).ts'],
-    reporters: [
-      'default',
-      ['junit', { outputFile: './../backend-junit.xml' }]
-    ],
+    reporters: ['default', ['junit', { outputFile: './../backend-junit.xml' }]],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov', 'html'],
@@ -19,7 +16,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
+      '@': resolve(__dirname, './src')
     }
   }
 })
