@@ -75,5 +75,11 @@ export const config = {
     baseUrl: env.UPLOAD_BASE_URL,
     maxFileSize: env.MAX_FILE_SIZE,
     allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'] as const
+  },
+
+  // Logging
+  log: {
+    level: process.env.LOG_LEVEL ?? 'info',
+    format: process.env.LOG_FORMAT ?? 'text'
   }
 } as const
