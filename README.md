@@ -354,8 +354,10 @@ See the [LICENSE](LICENSE) file for full license details.
 Ready to track some legendary logs? Get started above!
 
 <!--
+
   markdownlint-configure-file {
     "no-inline-html": false,
     "no-alt-text": false,
   }
+
 -->
