@@ -8,7 +8,7 @@
 
     // Output configuration
     "outDir": "./dist",
-    "rootDir": "./src",
+    // "rootDir": "./src", // Commented out to allow vitest.config.ts in root
 
     // Type checking
     "strict": true,
@@ -54,7 +54,7 @@
     "**/*.test.ts",
     "**/*.spec.ts",
     "**/*.d.ts",
-    "../vitest.config.ts"
+    "vitest.config.ts"
   ],
   "exclude": ["node_modules", "dist", "build", "coverage"],
   "ts-node": {
