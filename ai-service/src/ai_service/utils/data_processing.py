@@ -482,3 +482,40 @@ class DataProcessor:
         )
 
         return features
+
+    def normalize_entries(self, entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Return entries with timestamps parsed to ISO format."""
+        normalized: list[dict[str, Any]] = []
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            item = entry.copy()
+            ts = item.get("timestamp")
+            if ts:
+                item["timestamp"] = pd.to_datetime(ts).isoformat()
+            normalized.append(item)
+        return normalized
+
+    def extract_bristol_patterns(self, entries: list[dict[str, Any]]) -> dict[str, Any]:
+        """Compute simple Bristol type counts."""
+        counts: dict[int, int] = {}
+        for entry in entries:
+            bt = entry.get("bristol_type")
+            if isinstance(bt, int):
+                counts[bt] = counts.get(bt, 0) + 1
+        return {"counts": counts}
+
+    def calculate_frequency_patterns(
+        self, entries: list[dict[str, Any]]
+    ) -> dict[str, Any]:
+        """Calculate average number of entries per day."""
+        if not entries:
+            return {}
+        timestamps = [
+            pd.to_datetime(e["timestamp"]) for e in entries if "timestamp" in e
+        ]
+        if not timestamps:
+            return {}
+        df = pd.DataFrame({"ts": timestamps})
+        counts = df.groupby(df["ts"].dt.date).size()
+        return {"avg_per_day": counts.mean()}

@@ -159,6 +159,7 @@ async def health_check():
 
     return HealthResponse(
         status=status_val,
+        timestamp=datetime.now(),
         redis_connected=redis_connected,
         ml_models_loaded=ml_models_loaded,
         response_time_ms=response_time_ms,
@@ -283,10 +284,12 @@ async def analyze_patterns(request: AnalysisRequest):
         recommendations = []
         risk_factors = []
         if request.include_recommendations:
-            recommendations = await app.state.recommender.generate_recommendations(
-                analysis_result=analysis_result,
-                bowel_movements=bowel_movements,
-                meals=meals if meals else None,
+            recommendations = (
+                await app.state.recommender.generate_recommendations_detailed(
+                    analysis_result=analysis_result,
+                    bowel_movements=bowel_movements,
+                    meals=meals if meals else None,
+                )
             )
 
             risk_factors = await app.state.recommender.identify_risk_factors(

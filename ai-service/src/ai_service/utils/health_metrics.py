@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Any
 
 import numpy as np
+import pandas as pd
 
 from ..config.logging import get_logger
 
@@ -52,7 +53,7 @@ class HealthMetricsCalculator:
         # Convert to 0-100 scale
         return round(avg_score * 100, 2)
 
-    def calculate_frequency_score(self, daily_frequencies: list[float]) -> float:
+    def _frequency_score_from_list(self, daily_frequencies: list[float]) -> float:
         """
         Calculate health score based on bowel movement frequency.
 
@@ -168,7 +169,7 @@ class HealthMetricsCalculator:
 
         # Calculate component scores
         bristol_score = self.calculate_bristol_health_score(bristol_types)
-        frequency_score = self.calculate_frequency_score(daily_frequencies)
+        frequency_score = self._frequency_score_from_list(daily_frequencies)
         pain_score = self.calculate_pain_score(pain_scores or [])
         satisfaction_score = self.calculate_satisfaction_score(
             satisfaction_scores or []
@@ -532,3 +533,62 @@ class HealthMetricsCalculator:
             return "Poor digestive regularity"
         else:
             return "Very irregular digestive patterns"
+
+    # ------------------------------------------------------------------
+    # Simple wrapper methods used by the test-suite
+    # ------------------------------------------------------------------
+
+    def calculate_overall_score(self, entries: list[dict[str, Any]]) -> float:
+        """Return overall health score for raw entry dictionaries."""
+        bristol = [e.get("bristol_type") for e in entries if "bristol_type" in e]
+        timestamps = [
+            pd.to_datetime(e.get("timestamp"))
+            for e in entries
+            if e.get("timestamp") is not None
+        ]
+        daily_freq = []
+        if timestamps:
+            df = pd.DataFrame({"ts": timestamps})
+            daily_freq = df.groupby(df["ts"].dt.date).size().tolist()
+
+        scores = self.calculate_overall_health_score(bristol, daily_freq)
+        return scores["overall_score"]
+
+    def calculate_bristol_score(self, entries: list[dict[str, Any]]) -> float:
+        """Convenience wrapper for calculating Bristol score from entries."""
+        types = [e.get("bristol_type") for e in entries if "bristol_type" in e]
+        return self.calculate_bristol_health_score(types)
+
+    def calculate_frequency_score(self, entries: list[dict[str, Any]]) -> float:
+        """Calculate frequency health score from raw entries."""
+        timestamps = [
+            pd.to_datetime(e.get("timestamp"))
+            for e in entries
+            if e.get("timestamp") is not None
+        ]
+        if not timestamps:
+            return 0.0
+        df = pd.DataFrame({"ts": timestamps})
+        daily = df.groupby(df["ts"].dt.date).size().tolist()
+        return self._frequency_score_from_list(daily)
+
+    def detect_health_issues(
+        self, entries: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
+        """Return simple risk factors for the given entries."""
+        types = [e.get("bristol_type") for e in entries if "bristol_type" in e]
+        timestamps = [
+            pd.to_datetime(e.get("timestamp"))
+            for e in entries
+            if e.get("timestamp") is not None
+        ]
+        freq = []
+        if timestamps:
+            df = pd.DataFrame({"ts": timestamps})
+            freq = df.groupby(df["ts"].dt.date).size().tolist()
+        return self.calculate_risk_factors(types, frequencies=freq)
+
+    def generate_health_alerts(self, entries: list[dict[str, Any]]) -> list[str]:
+        """Generate textual alerts based on detected issues."""
+        issues = self.detect_health_issues(entries)
+        return [issue.get("description", "") for issue in issues]

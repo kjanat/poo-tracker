@@ -6,6 +6,7 @@ from datetime import datetime
 from unittest.mock import AsyncMock, patch
 
 import pytest
+import redis.exceptions
 
 from ai_service.services.analyzer import AnalyzerService
 from ai_service.services.health_assessor import HealthAssessorService
@@ -129,10 +130,12 @@ class TestCacheManager:
     async def test_ping_failure(self, mock_redis):
         """Test ping operation failure."""
         mock_redis_client = AsyncMock()
-        mock_redis_client.ping.side_effect = Exception("Connection failed")
+        mock_redis_client.ping.side_effect = redis.exceptions.RedisError(
+            "Connection failed"
+        )
         mock_redis.return_value = mock_redis_client
 
-        with pytest.raises(Exception):
+        with pytest.raises(redis.exceptions.RedisError):
             await self.cache_manager.ping()
 
     @pytest.mark.asyncio

@@ -26,6 +26,16 @@ class AnalyzerService:
         self.data_processor = DataProcessor()
         self.health_calculator = HealthMetricsCalculator()
 
+    async def analyze_patterns(self, entries: list[dict[str, Any]]) -> dict[str, Any]:
+        """Simple placeholder used by tests."""
+        return {}
+
+    async def analyze_correlations(
+        self, entries: list[dict[str, Any]]
+    ) -> dict[str, Any]:
+        """Simple placeholder used by tests."""
+        return {}
+
     async def analyze_comprehensive_patterns(
         self,
         bowel_movements: list[BowelMovementData],

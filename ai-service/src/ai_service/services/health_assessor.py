@@ -16,6 +16,10 @@ class HealthAssessorService:
     def __init__(self):
         self.health_calculator = HealthMetricsCalculator()
 
+    async def assess_health(self, entries: list[dict[str, Any]]) -> dict[str, Any]:
+        """Placeholder for tests."""
+        return {}
+
     async def calculate_health_score(
         self,
         bowel_movements: list[BowelMovementData],

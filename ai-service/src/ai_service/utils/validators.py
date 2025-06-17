@@ -28,6 +28,19 @@ class DataValidator:
         self.min_bristol_type = 1
         self.max_bristol_type = 7
 
+    def validate_entries(self, entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Validate basic entry structure for tests."""
+        if not isinstance(entries, list):
+            return []
+
+        required = {"id", "timestamp", "bristol_type"}
+        valid: list[dict[str, Any]] = []
+        for entry in entries:
+            if isinstance(entry, dict) and required.issubset(entry):
+                valid.append(entry)
+
+        return valid
+
     def validate_analysis_request(self, request: AnalysisRequest) -> ValidationResult:
         """
         Validate analysis request data.

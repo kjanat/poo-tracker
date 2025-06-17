@@ -38,7 +38,7 @@ class CacheManager:
             return True
         except Exception as e:
             logger.warning(f"Redis ping failed: {e}")
-            return False
+            raise
 
     async def get(self, key: str) -> Any | None:
         """Get value from cache."""

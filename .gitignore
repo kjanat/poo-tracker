@@ -509,6 +509,8 @@ $RECYCLE.BIN/
 *.model
 models/
 data/
+!ai-service/src/ai_service/models/
+!ai-service/src/ai_service/models/**
 
 # Prisma
 backend/prisma/migrations/dev.db*
