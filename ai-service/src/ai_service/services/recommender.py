@@ -71,7 +71,7 @@ class RecommenderService:
         analysis_result: dict[str, Any],
         bowel_movements: list[BowelMovementData],
         meals: list[MealData] | None = None,
-    ) -> list[Recommendation]:
+    ) -> dict[str, Any]:
         """
         Generate personalized recommendations based on analysis.
 
@@ -114,7 +114,7 @@ class RecommenderService:
         recommendations.sort(
             key=lambda x: self._get_priority_weight(x.priority), reverse=True
         )
-        return recommendations[:10]  # Return top 10 recommendations
+        return {"recommendations": recommendations[:10]}
 
     async def identify_risk_factors(
         self,
