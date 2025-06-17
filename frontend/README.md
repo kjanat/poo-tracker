@@ -210,7 +210,7 @@ The frontend communicates with:
 
 ### Environment Variables
 
-Create `.env.local` in the frontend directory:
+Copy `frontend/.env.example` to `.env.local` and adjust the values:
 
 ```env
 # API Configuration
