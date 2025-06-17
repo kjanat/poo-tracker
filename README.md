@@ -264,6 +264,35 @@ AI_SERVICE_URL="http://localhost:8001"
 JWT_SECRET="your-super-secret-jwt-key-change-in-production"
 ```
 
+### AI Service Environment Variables
+
+The AI service has its own `.env` file located at `ai-service/.env.example`. The
+table below lists the most relevant options. See
+[ai-service/README.md](ai-service/README.md) for full configuration details.
+
+| Variable                 | Purpose                                      |
+| ------------------------ | -------------------------------------------- |
+| `DEBUG`                  | Enable debug mode for verbose logging        |
+| `ENVIRONMENT`            | Name of the runtime environment              |
+| `HOST`                   | Interface to bind the FastAPI server         |
+| `PORT`                   | Port for the HTTP service                    |
+| `WORKERS`                | Number of worker processes                   |
+| `REDIS_URL`              | Connection string for Redis caching          |
+| `REDIS_TIMEOUT`          | How long to wait for Redis responses         |
+| `REDIS_RETRY_ON_TIMEOUT` | Whether to retry when Redis times out        |
+| `CACHE_TTL`              | Default cache time-to-live in seconds        |
+| `CACHE_PREFIX`           | Prefix for all cache keys                    |
+| `ML_MODEL_PATH`          | Directory containing trained models          |
+| `ENABLE_ML_FEATURES`     | Toggle machine learning analysis             |
+| `MAX_ANALYSIS_DAYS`      | How far back to analyze entries              |
+| `MIN_ENTRIES_FOR_ML`     | Minimum records required before ML runs      |
+| `RATE_LIMIT_REQUESTS`    | Number of requests allowed per window        |
+| `RATE_LIMIT_WINDOW`      | Duration of the rate limit window in seconds |
+| `LOG_LEVEL`              | Logging verbosity level                      |
+| `LOG_FORMAT`             | Format of log output                         |
+| `BACKEND_URL`            | Base URL of the backend API                  |
+| `BACKEND_TIMEOUT`        | Timeout for backend API calls                |
+
 ### Production Build
 
 ```bash
