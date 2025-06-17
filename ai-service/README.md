@@ -74,7 +74,7 @@ uv sync --group dev
 
 ```bash
 # Using uvicorn directly
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+uvicorn ai_service.main:app --reload --host 0.0.0.0 --port 8000
 
 # Or using Python
 python main.py
@@ -84,7 +84,7 @@ python main.py
 
 ```bash
 # Using uvicorn with production settings
-uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+uvicorn ai_service.main:app --host 0.0.0.0 --port 8000 --workers 4
 ```
 
 ### Docker
