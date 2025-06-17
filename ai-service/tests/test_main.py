@@ -15,7 +15,7 @@ with patch("redis.asyncio.from_url") as mock_redis:
     mock_redis_client.ping.return_value = True
     mock_redis.return_value = mock_redis_client
 
-    from src.ai_service.main import app
+    from ai_service.main import app
 
 # Set up app state for testing
 app.state.cache_manager = AsyncMock()

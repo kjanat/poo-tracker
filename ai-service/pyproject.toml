@@ -107,6 +107,9 @@ warn_unused_ignores = true
 minversion = "6.0"
 addopts = "-ra -q"
 testpaths = [
-    ".",
+    "tests",
+]
+pythonpath = [
+    "src",
 ]
 asyncio_mode = "auto"
