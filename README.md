@@ -62,6 +62,10 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
    pnpm db:seed
    ```
 
+   A sample set of credentials for API testing is provided in
+   [`login.example.json`](login.example.json). Copy this file to
+   `login.json` if you need a local login file that's ignored by Git.
+
 6. **Open your browser:**
 
 - Frontend: <http://localhost:5173>
