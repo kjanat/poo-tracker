@@ -35,9 +35,12 @@ fi
 echo "🐳 Starting Docker services..."
 pnpm docker:up
 
-# Wait for PostgreSQL to be ready
+# Wait for PostgreSQL to be ready using pg_isready
 echo "⏳ Waiting for PostgreSQL to be ready..."
-sleep 10
+until docker compose exec -T postgres pg_isready -U poo_user -d poo_tracker >/dev/null 2>&1; do
+    echo "🔄 Postgres not ready yet, retrying in 1s..."
+    sleep 1
+done
 
 # Run database migrations
 echo "🗄️ Running database migrations..."
