@@ -36,7 +36,10 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
    ```bash
    cp .env.example .env
-   # Edit .env with your configuration
+   cp frontend/.env.example frontend/.env.local
+   cp backend/.env.example backend/.env
+   cp ai-service/.env.example ai-service/.env
+   # Edit each file with your local values
    ```
 
 4. **Start the services:**
@@ -78,6 +81,19 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 - **AI Service**: Python + FastAPI + scikit-learn
 - **Infrastructure**: Docker + Docker Compose
 - **Package Management**: pnpm (Node.js) + uv (Python)
+
+## 🗝️ Environment Variables
+
+Each package ships with an `.env.example` file. Copy them and tweak the values before running anything:
+
+```bash
+cp .env.example .env
+cp frontend/.env.example frontend/.env.local
+cp backend/.env.example backend/.env
+cp ai-service/.env.example ai-service/.env
+```
+
+These example files contain **sample credentials only**. Replace them with your real secrets and **never commit private keys or passwords** to the repository.
 
 ## 📖 What's the fucking point?
 

@@ -216,6 +216,8 @@ ai-service/
 
 ### Environment Variables
 
+Copy `ai-service/.env.example` to `.env` and update values as needed.
+
 - `REDIS_URL` - Redis connection URL (default: `redis://localhost:6379`)
 - `PORT` - Service port (default: 8000)
 
