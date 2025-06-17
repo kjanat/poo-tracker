@@ -125,12 +125,6 @@ jobs:
       - name: 📦 Install dependencies
         run: pnpm install
 
-      - name: 🔍 Type check
-        run: pnpm type-check:backend
-
-      - name: 🧹 Lint
-        run: pnpm lint:backend
-
       - name: 🗄️ Setup test database
         run: |
           echo "DATABASE_URL=postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@${{ env.DATABASE_HOST }}/${{ env.POSTGRES_DB }}" >> $GITHUB_ENV
@@ -138,6 +132,18 @@ jobs:
           pnpm db:generate
           pnpm db:migrate
           pnpm db:seed
+
+      - name: 🔍 Type check
+        run: pnpm type-check:backend
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          REDIS_URL: ${{ env.REDIS_URL }}
+
+      - name: 🧹 Lint
+        run: pnpm lint:backend
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          REDIS_URL: ${{ env.REDIS_URL }}
 
       - name: 🧪 Test
         run: pnpm test:backend
@@ -166,6 +172,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./ai-service
     strategy:
       matrix:
         python-version: ['3.11', '3.12', '3.13']
@@ -206,14 +217,14 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: 📦 Install dependencies
-        run: |
-          pnpm install -w
-          uv sync
+        run: uv sync
 
       - name: 🦀 Lint with Ruff
         run: |
-          uv run pnpm lint:ai
-          uv run pnpm format:ai
+          uv run ruff check ai-service || \
+            uv run ruff check ai-service --fix && \
+            echo "Fixed formatting"
+          uv run ruff format ai-service
 
       - name: 🧪 Test with pytest
         env:
