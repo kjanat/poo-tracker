@@ -250,7 +250,7 @@ class TestErrorHandling:
         """Test analyze endpoint with malformed JSON."""
         response = client.post(
             "/analyze",
-            data="invalid json",
+            content="invalid json",
             headers={"content-type": "application/json"},
         )
         assert response.status_code == 422

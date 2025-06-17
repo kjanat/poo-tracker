@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class BowelMovementEntry(BaseModel):
@@ -60,5 +60,4 @@ class AnalysisRequest(BaseModel):
     include_predictions: bool = Field(False, alias="includePredictions")
     include_recommendations: bool = Field(False, alias="includeRecommendations")
 
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)

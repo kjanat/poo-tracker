@@ -131,4 +131,4 @@ class CacheManager:
     async def close(self):
         """Close Redis connection."""
         if self.redis_client:
-            await self.redis_client.close()
+            await self.redis_client.aclose()
