@@ -2,18 +2,31 @@
 Basic tests for the Poo Tracker AI Service
 """
 
-from unittest.mock import Mock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
 
-# Mock Redis client before importing the app
-with patch("redis.from_url") as mock_redis:
-    mock_redis_client = Mock()
+# Mock Redis client and cache manager before importing the app
+with (
+    patch("redis.asyncio.from_url") as mock_redis,
+    patch("src.ai_service.utils.cache.CacheManager") as mock_cache_manager,
+):
+    # Mock Redis client
+    mock_redis_client = AsyncMock()
     mock_redis_client.ping.return_value = True
     mock_redis.return_value = mock_redis_client
 
+    # Mock cache manager
+    mock_cache_manager_instance = AsyncMock()
+    mock_cache_manager_instance.ping.return_value = True
+    mock_cache_manager.return_value = mock_cache_manager_instance
+
     from src.ai_service.main import app
+
+# Set up app state for testing
+app.state.cache_manager = AsyncMock()
+app.state.cache_manager.ping = AsyncMock(return_value=True)
 
 client = TestClient(app)
 

@@ -245,7 +245,7 @@ jobs:
         uses: trunk-io/analytics-uploader@main
         with:
           # Path to your test results.
-          junit-paths: ai_service-junit.xml
+          junit-paths: '**/ai_service-junit.xml'
           # Provide your Trunk organization slug.
           org-slug: ${{ vars.TRUNK_ORG_SLUG }}
           # Provide your Trunk API token as a GitHub secret.

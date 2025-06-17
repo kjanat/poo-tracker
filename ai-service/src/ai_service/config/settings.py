@@ -3,61 +3,57 @@
 from functools import lru_cache
 from typing import Any
 
-from pydantic import BaseSettings, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
     # Basic app settings
     app_name: str = "Poo Tracker AI Service"
     app_version: str = "1.0.0"
-    debug: bool = Field(default=False, env="DEBUG")
-    environment: str = Field(default="development", env="ENVIRONMENT")
+    debug: bool = False
+    environment: str = "development"
 
     # Server settings
-    host: str = Field(default="0.0.0.0", env="HOST")
-    port: int = Field(default=8000, env="PORT")
-    workers: int = Field(default=1, env="WORKERS")
+    host: str = "0.0.0.0"
+    port: int = 8000
+    workers: int = 1
 
     # Redis settings
-    redis_url: str = Field(default="redis://localhost:6379", env="REDIS_URL")
-    redis_timeout: int = Field(default=5, env="REDIS_TIMEOUT")
-    redis_retry_on_timeout: bool = Field(default=True, env="REDIS_RETRY_ON_TIMEOUT")
+    redis_url: str = "redis://localhost:6379"
+    redis_timeout: int = 5
+    redis_retry_on_timeout: bool = True
 
     # Cache settings
-    cache_ttl: int = Field(default=3600, env="CACHE_TTL")  # 1 hour default
-    cache_prefix: str = Field(default="poo_tracker", env="CACHE_PREFIX")
+    cache_ttl: int = 3600  # 1 hour default
+    cache_prefix: str = "poo_tracker"
 
     # ML settings
-    ml_model_path: str = Field(default="./data/models", env="ML_MODEL_PATH")
-    enable_ml_features: bool = Field(default=True, env="ENABLE_ML_FEATURES")
+    ml_model_path: str = "./data/models"
+    enable_ml_features: bool = True
 
     # Analysis settings
-    max_analysis_days: int = Field(default=365, env="MAX_ANALYSIS_DAYS")
-    min_entries_for_ml: int = Field(default=10, env="MIN_ENTRIES_FOR_ML")
+    max_analysis_days: int = 365
+    min_entries_for_ml: int = 10
 
     # Security settings
-    api_key: str | None = Field(default=None, env="API_KEY")
-    enable_auth: bool = Field(default=False, env="ENABLE_AUTH")
+    api_key: str | None = None
+    enable_auth: bool = False
 
     # Rate limiting
-    rate_limit_requests: int = Field(default=100, env="RATE_LIMIT_REQUESTS")
-    rate_limit_window: int = Field(default=60, env="RATE_LIMIT_WINDOW")  # seconds
+    rate_limit_requests: int = 100
+    rate_limit_window: int = 60  # seconds
 
     # Logging
-    log_level: str = Field(default="INFO", env="LOG_LEVEL")
-    log_format: str = Field(default="json", env="LOG_FORMAT")  # json or text
+    log_level: str = "INFO"
+    log_format: str = "json"  # json or text
 
     # Backend integration
-    backend_url: str = Field(default="http://localhost:3002", env="BACKEND_URL")
-    backend_timeout: int = Field(default=30, env="BACKEND_TIMEOUT")
-
-    class Config:
-        """Pydantic config."""
-
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    backend_url: str = "http://localhost:3002"
+    backend_timeout: int = 30
 
     @property
     def redis_config(self) -> dict[str, Any]:

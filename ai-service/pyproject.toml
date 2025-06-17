@@ -11,14 +11,14 @@ requires-python = ">=3.12"
 dependencies = [
     "fastapi[standard]==0.115.12",
     "httpx==0.28.1",
-    "numpy==2.3.0",
-    "pandas==2.3.0",
+    "numpy>=2.0.0",
+    "pandas>=2.2.0",
     "pydantic==2.11.7",
     "pydantic-settings==2.6.1",
     "python-dotenv==1.1.0",
     "python-multipart==0.0.20",
-    "redis==6.2.0",
-    "scikit-learn==1.7.0",
+    "redis>=5.0.0",
+    "scikit-learn>=1.5.0",
     "uvicorn[standard]==0.34.3; sys_platform == 'linux'",
 ]
 
@@ -44,7 +44,7 @@ build-backend = "hatchling.build"
 packages = ["src/ai_service"]
 
 [tool.ruff]
-target-version = "py312"
+target-version = "py310"
 line-length = 88
 lint.select = [
     "E",  # pycodestyle errors
@@ -68,7 +68,7 @@ line-ending = "auto"
 
 [tool.black]
 line-length = 88
-target-version = ['py312']
+target-version = ['py310']
 include = '\.pyi?$'
 extend-exclude = '''
 /(
@@ -94,7 +94,7 @@ ensure_newline_before_comments = true
 line_length = 88
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.10"
 check_untyped_defs = true
 disallow_any_generics = true
 disallow_incomplete_defs = true
