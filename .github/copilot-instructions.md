@@ -17,7 +17,7 @@ If your code stinks, it won’t get merged. And yes, we’ll know.
 - **AI / ML**: Python FastAPI service (Dockerized), talks to Node backend via REST
 - **CI/CD**: GitHub Actions
 - **Testing**: Vitest (frontend), Jest/Supertest (backend), pytest (AI service)
-- **Linting**: ESLint with @typescript-eslint and Prettier (don't fight the config)
+- **Linting**: ESLint (StandardJS rules), Prettier (and don’t “fix” the config, just follow it)
 - **Infra**: Docker everywhere. No raw installs.
 - **Package Managers**:
   - pnpm (because npm is for amateurs)

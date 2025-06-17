@@ -1,31 +1,25 @@
 {
-  "name": "@poo-tracker/backend",
+  "name": "poo-tracker-backend",
   "version": "1.0.0",
   "description": "Backend API for Poo Tracker",
   "main": "dist/index.js",
-  "type": "commonjs",
   "scripts": {
-    "dev": "tsx scripts/check-env.ts && tsx watch src/index.ts",
+    "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/scripts/check-env.js && node dist/index.js",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "test": "vitest run",
-    "test:watch": "vitest --watch",
-    "test:coverage": "vitest run --coverage",
-    "clean": "pnpm --package=rimraf dlx rimraf dist node_modules",
-    "db:generate": "prisma generate",
+    "start": "node dist/index.js",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "db:migrate": "prisma migrate dev",
-    "db:migrate:prod": "prisma migrate deploy",
+    "db:reset": "prisma migrate reset",
     "db:seed": "tsx src/utils/seed.ts",
     "db:studio": "prisma studio",
-    "db:reset": "prisma migrate reset",
-    "db:constraints": "tsx src/utils/add-constraints.ts",
-    "type-check": "tsc --noEmit"
+    "db:generate": "prisma generate"
   },
   "engines": {
-    "node": ">=22.0.0",
-    "pnpm": ">=9.0.0"
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
@@ -43,23 +37,34 @@
     "redis": "^5.5.6",
     "sharp": "^0.34.2",
     "uuid": "^11.1.0",
-    "winston": "^3.17.0",
     "zod": "^3.25.64"
   },
   "devDependencies": {
-    "@types/winston": "^2.4.4",
-    "@types/bcryptjs": "^2.4.6",
     "@types/compression": "^1.8.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
-    "@types/jsonwebtoken": "^9.0.10",
+    "@types/jest": "^29.5.14",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/morgan": "^1.9.10",
     "@types/multer": "^1.4.13",
-    "@types/node": "^24.0.3",
+    "@types/node": "^24.0.1",
     "@types/supertest": "^6.0.3",
     "@types/uuid": "^10.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.34.0",
+    "@typescript-eslint/parser": "^8.34.0",
+    "eslint": "^9.29.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-n": "^17.20.0",
+    "eslint-plugin-promise": "^7.2.1",
+    "jest": "^30.0.0",
+    "prettier": "^3.5.3",
+    "prettier-plugin-prisma": "^5.0.0",
+    "prettier-plugin-sql": "^0.19.1",
     "prisma": "^6.9.0",
     "supertest": "^7.1.1",
-    "tsx": "^4.20.3"
+    "ts-jest": "^29.4.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
   }
 }

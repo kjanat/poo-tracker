@@ -1,16 +1,14 @@
 import { Router, Response, NextFunction } from 'express'
 import { PrismaClient } from '@prisma/client'
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth'
-import { BowelMovementService } from '../domains/bowel-movements/BowelMovementService'
 
 const router: Router = Router()
 const prisma = new PrismaClient()
-const bowelMovementService = new BowelMovementService(prisma)
 
 // Apply authentication to all routes
 router.use(authenticateToken)
 
-// GET /api/analytics/summary - Get user's bowel movement summary
+// GET /api/analytics/summary - Get user's poop summary
 router.get(
   '/summary',
   async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
@@ -18,13 +16,57 @@ router.get(
       const userId = req.userId
 
       // Ensure userId is defined
-      if (userId === undefined) {
+      if (!userId) {
         res.status(401).json({ error: 'User not authenticated' })
         return
       }
 
-      const analytics = await bowelMovementService.getAnalytics(userId)
-      res.json(analytics)
+      // Get basic stats
+      const totalEntries = await prisma.entry.count({
+        where: { userId }
+      })
+
+      // Get bristol type distribution
+      const bristolDistribution = await prisma.entry.groupBy({
+        by: ['bristolType'],
+        where: { userId },
+        _count: true,
+        orderBy: { bristolType: 'asc' }
+      })
+
+      // Get recent entries
+      const recentEntries = await prisma.entry.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        select: {
+          id: true,
+          bristolType: true,
+          createdAt: true,
+          satisfaction: true
+        }
+      })
+
+      // Calculate average satisfaction if available
+      const avgSatisfaction = await prisma.entry.aggregate({
+        where: {
+          userId,
+          satisfaction: { not: null }
+        },
+        _avg: {
+          satisfaction: true
+        }
+      })
+
+      res.json({
+        totalEntries,
+        bristolDistribution: bristolDistribution.map((item) => ({
+          type: item.bristolType,
+          count: item._count
+        })),
+        recentEntries,
+        averageSatisfaction: avgSatisfaction._avg?.satisfaction ?? null
+      })
     } catch (error) {
       next(error)
     }

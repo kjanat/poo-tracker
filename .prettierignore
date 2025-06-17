@@ -21,7 +21,4 @@ pnpm-lock.yaml
 **/*.log
 **/.env
 **/.env.*
-**/.pnpmrc
 # **/prisma/migrations/**/*.sql
-
-**/package.json

@@ -1,65 +1,25 @@
 {
   "compilerOptions": {
-    // Target Node.js environment (ES2024 requires Node.js 22+)
-    "target": "es2024",
+    "target": "esnext",
     "module": "commonjs",
-    "lib": ["es2024"],
-    "moduleResolution": "node",
-
-    // Output configuration
+    "lib": ["ES2024"],
     "outDir": "./dist",
-    // "rootDir": "./src", // Commented out to allow vitest.config.ts in root
-
-    // Type checking
+    "rootDir": "./src",
     "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "removeComments": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-
-    // Module resolution
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-
-    // Emit configuration
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "removeComments": false, // Keep comments for better debugging
-
-    // Node.js specific
-    "resolveJsonModule": true,
-    "allowJs": false,
-
-    // Types
-    "types": ["node", "vitest/globals"],
-
-    // Path mapping (useful for imports)
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"],
-      "@/types/*": ["src/types/*"],
-      "@/utils/*": ["src/utils/*"],
-      "@/db/*": ["src/db/*"]
-    }
+    "exactOptionalPropertyTypes": true
   },
-  "include": [
-    "src/**/*",
-    "prisma/**/*",
-    "scripts/**/*",
-    "**/*.test.ts",
-    "**/*.spec.ts",
-    "**/*.d.ts",
-    "vitest.config.ts"
-  ],
-  "exclude": ["node_modules", "dist", "build", "coverage"],
-  "ts-node": {
-    "esm": false,
-    "experimentalSpecifierResolution": "node"
-  }
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }

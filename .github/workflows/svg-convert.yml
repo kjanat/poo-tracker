@@ -11,46 +11,46 @@ on:
   workflow_dispatch:
     inputs:
       svg-path:
-        description: 'Path to SVG file to convert'
+        description: "Path to SVG file to convert"
         required: false
-        default: 'branding/logo.svg'
+        default: "branding/logo.svg"
         type: string
       output-dir:
-        description: 'Directory to output converted files'
+        description: "Directory to output converted files"
         required: false
-        default: 'branding/'
+        default: "branding/"
         type: string
       formats:
-        description: 'Formats to generate (ico,png,react,react-native)'
+        description: "Formats to generate (ico,png,react,react-native)"
         required: false
-        default: 'ico,png,react,react-native'
+        default: "ico,png,react,react-native"
         type: string
       typescript:
-        description: 'Generate TypeScript components'
+        description: "Generate TypeScript components"
         required: false
         default: false
         type: boolean
       base-name:
-        description: 'Base name for output files (without extension) Defaults to SVG filename'
+        description: "Base name for output files (without extension) Defaults to SVG filename"
         required: false
         type: string
       png-sizes:
-        description: 'Sizes for PNG output (comma-separated)'
+        description: "Sizes for PNG output (comma-separated)"
         required: false
-        default: '16,32,64,128,256'
+        default: "16,32,64,128,256"
         type: string
       ico-sizes:
-        description: 'Sizes for ICO output (comma-separated)'
+        description: "Sizes for ICO output (comma-separated)"
         required: false
-        default: '16,32,48,64'
+        default: "16,32,48,64"
         type: string
       react-props-interface:
-        description: 'Interface name for React component props'
+        description: "Interface name for React component props"
         required: false
-        default: 'SVGProps'
+        default: "SVGProps"
         type: string
       debug:
-        description: 'Enable debug logging'
+        description: "Enable debug logging"
         required: false
         default: false
         type: boolean
