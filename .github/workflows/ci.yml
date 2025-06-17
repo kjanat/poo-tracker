@@ -224,18 +224,18 @@ jobs:
 
       - name: 🦀 Lint with Ruff
         run: |
-          uv run ruff check ai-service || \
-            uv run ruff check ai-service --fix && \
+          uv run ruff check . || \
+            uv run ruff check . --fix && \
             echo "Fixed formatting"
-          uv run ruff format ai-service
+          uv run ruff format .
 
       - name: 🧪 Test with pytest
         env:
           REDIS_URL: redis://localhost:6379
         run: |
-          if [ -n "$(find ai-service -name 'test_*.py' -o -name '*_test.py' -maxdepth 2 | head -1)" ]; then
+          if [ -n "$(find . -name 'test_*.py' -o -name '*_test.py' -maxdepth 2 | head -1)" ]; then
             echo "Running tests..."
-            uv run pytest ai-service --tb=auto -vv --junit-xml=ai_service-junit.xml
+            uv run pytest --tb=auto -vv --junit-xml=ai_service-junit.xml
           else
             echo "No test files found (test_*.py or *_test.py), skipping tests"
             echo "✅ Test step completed (no tests to run)"
