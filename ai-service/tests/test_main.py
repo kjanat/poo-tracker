@@ -5,22 +5,15 @@ Basic tests for the Poo Tracker AI Service
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-# Mock Redis client and cache manager before importing the app
-with (
-    patch("redis.asyncio.from_url") as mock_redis,
-    patch("src.ai_service.utils.cache.CacheManager") as mock_cache_manager,
-):
+# Mock Redis client before importing the app
+with patch("redis.asyncio.from_url") as mock_redis:
     # Mock Redis client
     mock_redis_client = AsyncMock()
     mock_redis_client.ping.return_value = True
     mock_redis.return_value = mock_redis_client
-
-    # Mock cache manager
-    mock_cache_manager_instance = AsyncMock()
-    mock_cache_manager_instance.ping.return_value = True
-    mock_cache_manager.return_value = mock_cache_manager_instance
 
     from src.ai_service.main import app
 
@@ -61,8 +54,6 @@ def test_root_endpoint():
 async def test_api_structure():
     """Test that the API is properly structured"""
     # Check that the app is a FastAPI instance
-    from fastapi import FastAPI
-
     assert isinstance(app, FastAPI)
 
     # Check that routes exist
