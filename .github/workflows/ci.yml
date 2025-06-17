@@ -76,13 +76,11 @@ jobs:
       matrix:
         node-version: [22, 24]
     env:
-      REDIS_HOST: localhost:6379
-      DATABASE_HOST: localhost:5432
       POSTGRES_DB: test_db
       POSTGRES_USER: test_user
       POSTGRES_PASSWORD: test_password
-      DATABASE_URL: postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$DATABASE_HOST/$POSTGRES_DB
-      REDIS_URL: redis://$REDIS_HOST
+      DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+      REDIS_URL: redis://localhost:6379
 
     services:
       postgres:
