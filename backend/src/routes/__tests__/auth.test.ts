@@ -27,6 +27,10 @@ vi.mock('../../config', () => ({
     jwt: {
       secret: 'test-secret-key',
       expiresIn: '7d'
+    },
+    log: {
+      level: 'debug',
+      format: 'text'
     }
   }
 }))

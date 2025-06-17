@@ -3,6 +3,7 @@ import { Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import { authenticateToken, AuthenticatedRequest } from '../auth'
 import { config } from '../../config'
+import { logger } from '../../utils/logger'
 
 // Mock dependencies
 vi.mock('jsonwebtoken')
@@ -10,6 +11,10 @@ vi.mock('../../config', () => ({
   config: {
     jwt: {
       secret: 'test-secret-key'
+    },
+    log: {
+      level: 'debug',
+      format: 'text'
     }
   }
 }))
@@ -38,9 +43,11 @@ describe('authenticateToken middleware', () => {
     // Setup mock next function
     mockNext = vi.fn()
 
-    // Mock console methods to avoid noise in test output
-
-    vi.spyOn(console, 'log').mockImplementation(() => {})
+    // Mock logger methods to avoid noise in test output
+    vi.spyOn(logger, 'debug').mockImplementation(() => logger)
+    vi.spyOn(logger, 'info').mockImplementation(() => logger)
+    vi.spyOn(logger, 'warn').mockImplementation(() => logger)
+    vi.spyOn(logger, 'error').mockImplementation(() => logger)
   })
 
   afterEach(() => {
@@ -262,7 +269,8 @@ describe('authenticateToken middleware', () => {
   describe('logging behavior', () => {
     it('should log appropriate messages for successful authentication', () => {
       // Setup
-      const consoleSpy = vi.spyOn(console, 'log')
+      const debugSpy = vi.spyOn(logger, 'debug')
+      const infoSpy = vi.spyOn(logger, 'info')
       const token = 'valid-jwt-token'
       const userId = 'user-123'
       mockReq.headers = { authorization: `Bearer ${token}` }
@@ -273,33 +281,35 @@ describe('authenticateToken middleware', () => {
       authenticateToken(mockReq as AuthenticatedRequest, mockRes as Response, mockNext)
 
       // Verify logging
-      expect(consoleSpy).toHaveBeenCalledWith('🔐 Auth middleware - Headers:', 'Present')
-      expect(consoleSpy).toHaveBeenCalledWith(
-        '🎫 Auth middleware - Token received:',
-        'valid-jwt-token...'
+      expect(debugSpy).toHaveBeenCalledWith('🔐 Auth middleware - Headers: Present')
+      expect(debugSpy).toHaveBeenCalledWith(
+        '🎫 Auth middleware - Token received: valid-jwt-token...'
       )
-      expect(consoleSpy).toHaveBeenCalledWith('✅ Auth middleware - Token valid, userId:', userId)
+      expect(infoSpy).toHaveBeenCalledWith(`✅ Auth middleware - Token valid, userId: ${userId}`)
 
-      consoleSpy.mockRestore()
+      debugSpy.mockRestore()
+      infoSpy.mockRestore()
     })
 
     it('should log appropriate messages for missing token', () => {
       // Setup
-      const consoleSpy = vi.spyOn(console, 'log')
+      const debugSpy = vi.spyOn(logger, 'debug')
+      const warnSpy = vi.spyOn(logger, 'warn')
 
       // Execute
       authenticateToken(mockReq as AuthenticatedRequest, mockRes as Response, mockNext)
 
       // Verify logging
-      expect(consoleSpy).toHaveBeenCalledWith('🔐 Auth middleware - Headers:', 'Missing')
-      expect(consoleSpy).toHaveBeenCalledWith('❌ Auth middleware - No token provided')
+      expect(debugSpy).toHaveBeenCalledWith('🔐 Auth middleware - Headers: Missing')
+      expect(warnSpy).toHaveBeenCalledWith('❌ Auth middleware - No token provided')
 
-      consoleSpy.mockRestore()
+      debugSpy.mockRestore()
+      warnSpy.mockRestore()
     })
 
     it('should log appropriate messages for invalid token', () => {
       // Setup
-      const consoleSpy = vi.spyOn(console, 'log')
+      const errorSpy = vi.spyOn(logger, 'error')
       const token = 'invalid-token'
       mockReq.headers = { authorization: `Bearer ${token}` }
 
@@ -312,12 +322,9 @@ describe('authenticateToken middleware', () => {
       authenticateToken(mockReq as AuthenticatedRequest, mockRes as Response, mockNext)
 
       // Verify logging
-      expect(consoleSpy).toHaveBeenCalledWith(
-        '❌ Auth middleware - Token invalid:',
-        'jwt malformed'
-      )
+      expect(errorSpy).toHaveBeenCalledWith('❌ Auth middleware - Token invalid: jwt malformed')
 
-      consoleSpy.mockRestore()
+      errorSpy.mockRestore()
     })
   })
 })
