@@ -180,7 +180,7 @@ jobs:
         working-directory: ./ai-service
     strategy:
       matrix:
-        python-version: ['3.12', '3.13', '3.14']
+        python-version: ['3.12', '3.13']
 
     services:
       redis:

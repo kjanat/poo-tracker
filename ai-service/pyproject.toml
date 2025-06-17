@@ -3,7 +3,7 @@ name = "poo-tracker-ai-service"
 version = "1.0.0"
 description = "AI service for Poo Tracker analytics and insights"
 authors = [
-    { name = "Kaj Kowalski", email = "dev@kajkowalski.nl" }
+    { name = "Kaj Kowalski", email = "dev+poo-tracker@kjanat.com" }
 ]
 readme = "README.md"
 license = { file = "../LICENSE" }
