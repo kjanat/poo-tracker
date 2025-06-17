@@ -12,6 +12,7 @@ from ai_service.services.health_assessor import HealthAssessorService
 from ai_service.services.recommender import RecommenderService
 from ai_service.utils.cache import CacheManager
 from ai_service.utils.validators import DataValidator
+from tests.dummy_data import DummyBM, DummyMeal, DummySymptom
 
 
 class TestAnalyzerService:
@@ -209,78 +210,6 @@ class TestDataValidator:
 class TestAnalyzeComprehensivePatterns:
     """Test comprehensive pattern analysis."""
 
-    class DummyBM:
-        def __init__(
-            self,
-            id: str,
-            user_id: str,
-            bristol_type: int,
-            created_at: datetime,
-            pain: int | None = None,
-            strain: int | None = None,
-            satisfaction: int | None = None,
-            volume: str | None = None,
-        ) -> None:
-            self.id = id
-            self.user_id = user_id
-            self.bristol_type = bristol_type
-            self.created_at = created_at
-            self.pain = pain
-            self.strain = strain
-            self.satisfaction = satisfaction
-            self.volume = volume
-
-        def to_dict(self) -> dict:
-            return self.__dict__
-
-    class DummyMeal:
-        def __init__(
-            self,
-            id: str,
-            user_id: str,
-            meal_time: datetime,
-            category: str | None = None,
-            name: str | None = None,
-            spicy_level: int | None = None,
-            fiber_rich: bool | None = None,
-            dairy: bool | None = None,
-            gluten: bool | None = None,
-            created_at: datetime | None = None,
-        ) -> None:
-            self.id = id
-            self.user_id = user_id
-            self.meal_time = meal_time
-            self.category = category
-            self.name = name
-            self.spicy_level = spicy_level
-            self.fiber_rich = fiber_rich
-            self.dairy = dairy
-            self.gluten = gluten
-            self.created_at = created_at or meal_time
-
-        def to_dict(self) -> dict:
-            return self.__dict__
-
-    class DummySymptom:
-        def __init__(
-            self,
-            id: str,
-            user_id: str,
-            type: str,
-            severity: int,
-            created_at: datetime,
-            bowel_movement_id: str | None = None,
-        ) -> None:
-            self.id = id
-            self.user_id = user_id
-            self.type = type
-            self.severity = severity
-            self.created_at = created_at
-            self.bowel_movement_id = bowel_movement_id
-
-        def to_dict(self) -> dict:
-            return self.__dict__
-
     @pytest.mark.asyncio
     async def test_analyze_comprehensive_patterns(self):
         """Verify trends and correlations from real-like data."""
@@ -289,7 +218,7 @@ class TestAnalyzeComprehensivePatterns:
 
         # Early bowel movements lean toward diarrhea
         bowel_movements = [
-            self.DummyBM(
+            DummyBM(
                 id=f"bm-{i}",
                 user_id="user-1",
                 bristol_type=6 if i % 2 == 0 else 7,
@@ -301,7 +230,7 @@ class TestAnalyzeComprehensivePatterns:
         # Recent entries are healthier
         bowel_movements.extend(
             [
-                self.DummyBM(
+                DummyBM(
                     id=f"bm-{i}",
                     user_id="user-1",
                     bristol_type=3 if i % 2 == 0 else 4,
@@ -312,7 +241,7 @@ class TestAnalyzeComprehensivePatterns:
         )
 
         meals = [
-            self.DummyMeal(
+            DummyMeal(
                 id="meal-1",
                 user_id="user-1",
                 name="Spicy Curry",
@@ -324,7 +253,7 @@ class TestAnalyzeComprehensivePatterns:
                 gluten=True,
                 created_at=now - timedelta(days=14),
             ),
-            self.DummyMeal(
+            DummyMeal(
                 id="meal-2",
                 user_id="user-1",
                 name="Oatmeal",
@@ -339,7 +268,7 @@ class TestAnalyzeComprehensivePatterns:
         ]
 
         symptoms = [
-            self.DummySymptom(
+            DummySymptom(
                 id="sym-1",
                 user_id="user-1",
                 bowel_movement_id="bm-1",
@@ -347,7 +276,7 @@ class TestAnalyzeComprehensivePatterns:
                 severity=5,
                 created_at=bowel_movements[1].created_at + timedelta(hours=1),
             ),
-            self.DummySymptom(
+            DummySymptom(
                 id="sym-2",
                 user_id="user-1",
                 bowel_movement_id="bm-8",
