@@ -92,7 +92,7 @@ class HealthAssessorService:
 
         # Basic health score
         health_score = await self.calculate_health_score(bowel_movements, symptoms)
-        assessment["health_score"] = health_score.dict()
+        assessment["health_score"] = health_score.model_dump()
 
         # Risk factors
         bristol_types = [bm.bristol_type for bm in bowel_movements]

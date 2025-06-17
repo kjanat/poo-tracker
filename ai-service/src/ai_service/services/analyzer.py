@@ -86,16 +86,16 @@ class AnalyzerService:
 
         return {
             "patterns": {
-                "timing": timing_patterns.dict(),
-                "frequency": frequency_stats.dict(),
+                "timing": timing_patterns.model_dump(),
+                "frequency": frequency_stats.model_dump(),
                 "consistency_trends": self._analyze_consistency_trends(bm_df),
             },
-            "bristol_analysis": bristol_analysis.dict(),
+            "bristol_analysis": bristol_analysis.model_dump(),
             "correlations": {
                 "meals": meal_correlations,
                 "symptoms": symptom_correlations,
             },
-            "metadata": metadata.dict(),
+            "metadata": metadata.model_dump(),
         }
 
     async def _analyze_bristol_patterns(self, df: pd.DataFrame) -> BristolAnalysis:

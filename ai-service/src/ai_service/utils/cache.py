@@ -82,7 +82,7 @@ class CacheManager:
     async def generate_analysis_cache_key(self, request: Any) -> str:
         """Generate cache key for analysis request."""
         # Create a hash of the request data
-        request_str = json.dumps(request.dict(), sort_keys=True, default=str)
+        request_str = json.dumps(request.model_dump(), sort_keys=True, default=str)
         hash_digest = hashlib.md5(request_str.encode()).hexdigest()
 
         return f"{settings.cache_prefix}:analysis:{hash_digest}"
