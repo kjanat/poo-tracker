@@ -8,10 +8,12 @@ export const errorHandler = (
   err: ApiError,
   _req: Request,
   res: Response,
+  // Next function is required by Express but not used
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _next: NextFunction
 ): void => {
   const statusCode = err.statusCode ?? 500
-  const message = err.message || 'Internal Server Error'
+  const message = (err.message ?? '') !== '' ? err.message : 'Internal Server Error'
 
   // Log error details (but not in production)
   if (process.env.NODE_ENV !== 'production') {

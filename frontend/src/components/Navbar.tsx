@@ -1,28 +1,19 @@
-import { Link } from "react-router-dom";
-import { useAuthStore } from "../stores/authStore";
-import {
-  LogOut,
-  Home,
-  BarChart3,
-  Plus,
-  UtensilsCrossed,
-  User
-} from "lucide-react";
-import Logo from "./Logo";
-import { getLogoProps } from "../utils/branding";
+import { Link } from 'react-router-dom'
+import { useAuthStore } from '../stores/authStore'
+import { LogOut, Home, BarChart3, Plus, UtensilsCrossed, User } from 'lucide-react'
+import Logo from './Logo'
+import { getLogoProps } from '../utils/branding'
 
 export function Navbar() {
-  const { isAuthenticated, user, logout } = useAuthStore();
+  const { isAuthenticated, user, logout } = useAuthStore()
 
   return (
     <nav className="bg-white shadow-lg border-b-4 border-poo-brown-500">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-2">
-            <Logo {...getLogoProps("navbar")} />
-            <span className="text-xl font-bold text-poo-brown-700">
-              Poo Tracker
-            </span>
+            <Logo {...getLogoProps('navbar')} />
+            <span className="text-xl font-bold text-poo-brown-700">Poo Tracker</span>
           </Link>
 
           <div className="flex items-center space-x-4">
@@ -90,5 +81,5 @@ export function Navbar() {
         </div>
       </div>
     </nav>
-  );
+  )
 }

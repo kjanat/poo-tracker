@@ -2,9 +2,30 @@
   "compilerOptions": {
     "composite": true,
     "skipLibCheck": true,
+    "target": "es2024",
+    "lib": ["es2024"],
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "types": ["node", "vite/client"],
+
+    /* Path mapping for config files */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
-  "include": ["vite.config.ts"]
+  "include": [
+    "vite.config.ts",
+    "vitest.config.ts",
+    "tailwind.config.ts",
+    "postcss.config.js",
+    "*.config.ts",
+    "*.config.js"
+  ],
+  "exclude": ["src/**/*"]
 }

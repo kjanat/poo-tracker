@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { z } from 'zod'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'
 import { config } from '../config'
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth'
 
@@ -31,13 +31,14 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
       where: { email }
     })
 
-    if (existingUser) {
+    if (existingUser != null) {
       res.status(400).json({ error: 'User already exists with this email' })
       return
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12)
+    const salt = await bcrypt.genSalt(12)
+    const hashedPassword = await bcrypt.hash(password, salt)
 
     // Create user with separate auth record
     const user = await prisma.user.create({
@@ -46,7 +47,8 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
         name: name ?? null,
         auth: {
           create: {
-            password: hashedPassword
+            passwordHash: hashedPassword,
+            salt
           }
         }
       }
@@ -86,13 +88,13 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction): P
       include: { auth: true }
     })
 
-    if (!user || !user.auth) {
+    if (user == null || user.auth == null) {
       res.status(401).json({ error: 'Invalid credentials' })
       return
     }
 
     // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.auth.password)
+    const isPasswordValid = await bcrypt.compare(password, user.auth.passwordHash)
     if (!isPasswordValid) {
       res.status(401).json({ error: 'Invalid credentials' })
       return
@@ -155,7 +157,7 @@ router.get(
         }
       })
 
-      if (!user) {
+      if (user == null) {
         res.status(404).json({ error: 'User not found' })
         return
       }
@@ -201,27 +203,31 @@ router.put(
           where: { userId: req.userId }
         })
 
-        if (!userAuth) {
+        if (userAuth == null) {
           res.status(404).json({ error: 'User auth not found' })
           return
         }
 
-        const isCurrentPasswordValid = await bcrypt.compare(currentPassword, userAuth.password)
+        const isCurrentPasswordValid = await bcrypt.compare(currentPassword, userAuth.passwordHash)
         if (!isCurrentPasswordValid) {
           res.status(400).json({ error: 'Current password is incorrect' })
           return
         }
 
         // Hash new password and update
-        const hashedNewPassword = await bcrypt.hash(newPassword, 12)
+        const salt = await bcrypt.genSalt(12)
+        const hashedNewPassword = await bcrypt.hash(newPassword, salt)
         await prisma.userAuth.update({
           where: { userId: req.userId },
-          data: { password: hashedNewPassword }
+          data: {
+            passwordHash: hashedNewPassword,
+            salt: salt
+          }
         })
       }
 
       // Update user profile
-      const updateData: any = {}
+      const updateData: Prisma.UserUpdateInput = {}
       if (name !== undefined) updateData.name = name
       if (email !== undefined) updateData.email = email
 

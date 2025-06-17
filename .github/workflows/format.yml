@@ -45,25 +45,48 @@ jobs:
 
       - name: 📦 Install dependencies
         run: |
-          pnpm install --frozen-lockfile
-          cd ai-service && uv pip install -r requirements.txt
+          command -v pnpm >/dev/null || { echo "❌ pnpm not found"; exit 1; }
+          command -v uv >/dev/null || { echo "❌ uv not found"; exit 1; }
+
+          pnpm install || { echo "❌ Failed to run pnpm install"; exit 1; }
+
+          [[ -d ai-service ]] || { echo "❌ Directory 'ai-service' not found"; exit 1; }
+          cd ai-service || exit 1
+
+          if [[ -f pyproject.toml ]]; then
+            uv sync --group dev 2>/dev/null || uv pip install -e . --system 2>/dev/null
+            status=$?
+          else
+            echo "⚠️  No pyproject.toml found — skipping uv sync and editable install"
+            status=1
+          fi
+
+          if [[ $status -ne 0 ]]; then
+            if [[ -f requirements.txt ]]; then
+              uv pip install -r requirements.txt --system || { echo "❌ uv install from requirements.txt failed"; exit 1; }
+            else
+              echo "❌ No valid pyproject.toml or requirements.txt found to install from"
+              exit 1
+            fi
+          fi
+
+          echo "✅ All done."
 
       - name: 🎨 Format TypeScript/JavaScript
         run: |
-          pnpm run --filter frontend lint:fix || true
-          pnpm run --filter backend lint:fix || true
+          pnpm lint:fix:frontend || true
+          pnpm lint:fix:backend || true
 
       - name: 🎨 Format Python
         run: |
-          cd ai-service
-          uvx black .
-          uvx isort .
+          uvx black ai-service
+          uvx isort ai-service
 
       - name: 🦀 Format with Ruff
         run: |
           cd ai-service
-          uvx ruff check --fix .
-          uvx ruff format .
+          uv run ruff format .
+          uv run ruff check . --fix
 
       - name: 📝 Check for changes
         id: verify-changed-files
@@ -124,19 +147,42 @@ jobs:
 
       - name: 📦 Install dependencies
         run: |
-          pnpm install --frozen-lockfile
-          cd ai-service && uv pip install -r requirements.txt
+          command -v pnpm >/dev/null || { echo "❌ pnpm not found"; exit 1; }
+          command -v uv >/dev/null || { echo "❌ uv not found"; exit 1; }
+
+          pnpm install || { echo "❌ Failed to run pnpm install"; exit 1; }
+
+          [[ -d ai-service ]] || { echo "❌ Directory 'ai-service' not found"; exit 1; }
+          cd ai-service || exit 1
+
+          if [[ -f pyproject.toml ]]; then
+            uv sync --group dev 2>/dev/null || uv pip install -e . --system 2>/dev/null
+            status=$?
+          else
+            echo "⚠️  No pyproject.toml found — skipping uv sync and editable install"
+            status=1
+          fi
+
+          if [[ $status -ne 0 ]]; then
+            if [[ -f requirements.txt ]]; then
+              uv pip install -r requirements.txt --system || { echo "❌ uv install from requirements.txt failed"; exit 1; }
+            else
+              echo "❌ No valid pyproject.toml or requirements.txt found to install from"
+              exit 1
+            fi
+          fi
+
+          echo "✅ All done."
 
       - name: 🧹 Lint Frontend
-        run: pnpm run --filter frontend lint
+        run: pnpm lint:frontend
 
       - name: 🧹 Lint Backend
-        run: pnpm run --filter backend lint
+        run: pnpm lint:backend
 
       - name: 🧹 Lint Python
         run: |
-          cd ai-service
-          uvx ruff check .
-          uvx ruff format --check .
-          uvx black --check .
-          uvx isort --check-only .
+          uvx ruff check ai-service
+          uvx ruff format ai-service --check
+          uvx black ai-service --check
+          uvx isort ai-service --check-only

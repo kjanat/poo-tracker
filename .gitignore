@@ -508,6 +508,8 @@ $RECYCLE.BIN/
 *.pkl
 *.model
 models/
+!ai-service/src/ai_service/models/
+!ai-service/src/ai_service/models/**
 data/
 
 # Prisma
@@ -526,3 +528,17 @@ docker-compose.override.yml
 *.swo
 
 .pnpm-store/
+
+# .trunk/
+.vscode/
+**/*-old.*
+prisma-shit.md
+.docs/
+**/*-junit.xml
+**/junit.xml
+**/test-report.json
+**/test-report.txt
+**/test-report.html
+poo-tracker.code-workspace
+login.json
+**/__pycache__/

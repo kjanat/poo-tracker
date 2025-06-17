@@ -21,12 +21,12 @@ export interface ProcessedImage {
 }
 
 export interface ImageProcessingService {
-  processImage(
+  processImage: (
     buffer: Buffer,
     originalName: string,
     config?: Partial<ImageProcessingConfig>
-  ): Promise<ProcessedImage>
-  deleteImage(filename: string): Promise<void>
+  ) => Promise<ProcessedImage>
+  deleteImage: (filename: string) => Promise<void>
 }
 
 export class SharpImageProcessingService implements ImageProcessingService {
@@ -46,7 +46,7 @@ export class SharpImageProcessingService implements ImageProcessingService {
 
   async processImage(
     buffer: Buffer,
-    originalName: string,
+    _originalName: string,
     config: Partial<ImageProcessingConfig> = {}
   ): Promise<ProcessedImage> {
     const finalConfig = { ...this.defaultConfig, ...config }
