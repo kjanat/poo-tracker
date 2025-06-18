@@ -36,7 +36,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
 
       - name: 📦 Install uv and 🐍 Python
         uses: astral-sh/setup-uv@v6
@@ -125,13 +124,11 @@ jobs:
       - name: 🏗️ Build and push AI Service Docker image
         uses: docker/build-push-action@v6
         with:
-          context: ./ai-service
+          context: .
           file: ./ai-service/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
           sbom: true
           provenance: true

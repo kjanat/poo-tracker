@@ -37,7 +37,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: pnpm
 
       - name: 📦 Install dependencies
         run: pnpm install
@@ -120,7 +119,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: pnpm
 
       - name: 📦 Install dependencies
         run: pnpm install
@@ -206,7 +204,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
 
       - name: 📦 Install uv and 🐍 Python ${{ matrix.python-version }}
         uses: astral-sh/setup-uv@v6
