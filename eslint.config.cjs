@@ -21,7 +21,8 @@ module.exports = [
       '**/*.d.ts',
       '**/branding/',
       '**/out/',
-      '**/.next/'
+      '**/.next/',
+      'ai-service/'
     ]
   },
 
