@@ -44,7 +44,7 @@
     "sharp": "^0.34.2",
     "uuid": "^11.1.0",
     "winston": "^3.17.0",
-    "zod": "^3.25.64"
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@types/winston": "^2.4.4",
