@@ -7,7 +7,7 @@ updates:
       interval: 'weekly'
       day: 'monday'
       time: '09:00'
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 2
     labels:
       - 'dependencies'
       - 'frontend'
@@ -15,24 +15,9 @@ updates:
       prefix: '⬆️'
       include: 'scope'
     groups:
-      react:
+      frontend-deps:
         patterns:
-          - 'react*'
-          - '@types/react*'
-      vite:
-        patterns:
-          - 'vite*'
-          - '@vitejs/*'
-      testing:
-        patterns:
-          - '*test*'
-          - '*jest*'
-          - 'vitest'
-      linting:
-        patterns:
-          - 'eslint*'
-          - 'prettier'
-          - '@typescript-eslint/*'
+          - '*'
 
   # Backend dependencies
   - package-ecosystem: 'npm'
@@ -41,7 +26,7 @@ updates:
       interval: 'weekly'
       day: 'monday'
       time: '09:00'
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 2
     labels:
       - 'dependencies'
       - 'backend'
@@ -49,23 +34,9 @@ updates:
       prefix: '⬆️'
       include: 'scope'
     groups:
-      express:
+      backend-deps:
         patterns:
-          - 'express*'
-          - '@types/express*'
-      prisma:
-        patterns:
-          - 'prisma*'
-          - '@prisma/*'
-      testing:
-        patterns:
-          - '*test*'
-          - '*jest*'
-      linting:
-        patterns:
-          - 'eslint*'
-          - 'prettier'
-          - '@typescript-eslint/*'
+          - '*'
 
   # Root workspace dependencies
   - package-ecosystem: 'npm'
@@ -74,13 +45,17 @@ updates:
       interval: 'weekly'
       day: 'monday'
       time: '09:00'
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 1
     labels:
       - 'dependencies'
       - 'workspace'
     commit-message:
       prefix: '⬆️'
       include: 'scope'
+    groups:
+      root-deps:
+        patterns:
+          - '*'
 
   # AI Service Python dependencies
   - package-ecosystem: 'pip'
@@ -89,7 +64,7 @@ updates:
       interval: 'weekly'
       day: 'monday'
       time: '09:00'
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
     labels:
       - 'dependencies'
       - 'ai-service'
@@ -98,20 +73,9 @@ updates:
       prefix: '⬆️'
       include: 'scope'
     groups:
-      fastapi:
+      ai-service-py:
         patterns:
-          - 'fastapi*'
-          - 'uvicorn*'
-          - 'pydantic*'
-      data-science:
-        patterns:
-          - 'numpy*'
-          - 'pandas*'
-          - 'scikit-learn*'
-      testing:
-        patterns:
-          - 'pytest*'
-          - 'httpx'
+          - '*'
 
   # Docker dependencies
   - package-ecosystem: 'docker'
@@ -120,6 +84,7 @@ updates:
       interval: 'weekly'
       day: 'monday'
       time: '09:00'
+    open-pull-requests-limit: 1
     labels:
       - 'dependencies'
       - 'docker'
@@ -133,6 +98,7 @@ updates:
       interval: 'weekly'
       day: 'monday'
       time: '09:00'
+    open-pull-requests-limit: 1
     labels:
       - 'dependencies'
       - 'docker-compose'
@@ -146,6 +112,7 @@ updates:
       interval: 'weekly'
       day: 'monday'
       time: '09:00'
+    open-pull-requests-limit: 1
     labels:
       - 'dependencies'
       - 'github-actions'
