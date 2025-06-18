@@ -28,7 +28,7 @@
     "pnpm": ">=9.0.0"
   },
   "dependencies": {
-    "@prisma/client": "^6.9.0",
+    "@prisma/client": "^6.10.0",
     "bcryptjs": "^3.0.2",
     "compression": "^1.8.0",
     "cors": "^2.8.5",
@@ -58,7 +58,7 @@
     "@types/node": "^24.0.3",
     "@types/supertest": "^6.0.3",
     "@types/uuid": "^10.0.0",
-    "prisma": "^6.9.0",
+    "prisma": "^6.10.0",
     "supertest": "^7.1.1",
     "tsx": "^4.20.3"
   }
