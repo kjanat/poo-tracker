@@ -37,13 +37,13 @@ We'll split the codebase into **layers**, like so.
 
 ## 🔄 2. Strategy Pattern — Where To Use It
 
-| Area                        | Strategy Pattern Use Case                        |
-| --------------------------- | ------------------------------------------------ |
-| 🔑 API Key Auth             | Allow switching between auth strategies per-org  |
-| 📤 Exporters                | Different export formats: JSON, CSV, XML, PDF    |
-| 📊 Analytics Providers      | You might support internal analytics vs. plug-in |
-| 🔁 Rate Limiting Strategies | Per org/user, per endpoint, etc.                 |
-| 🌍 Chat Metadata Processors | Extensible pipelines for enrichment, tagging     |
+| Area                        | Strategy Pattern Use Case                       |
+| --------------------------- | ----------------------------------------------- |
+| 🔑 API Key Auth             | Allow switching between auth strategies per-org |
+| 📤 Exporters                | Different export formats: JSON, CSV, XML, PDF   |
+| 📊 Analytics Providers      | You might support internal analytics vs. plugin |
+| 🔁 Rate Limiting Strategies | Per org/user, per endpoint, etc.                |
+| 🌍 Chat Metadata Processors | Extensible pipelines for enrichment, tagging    |
 
 ### ✅ Example: Exporter Strategy
 

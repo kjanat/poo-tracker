@@ -1,6 +1,6 @@
 # Poo Tracker Backend (Go)
 
-This service implements the API for Poo Tracker using Go and the Gin framework. The previous Node.js backend has been fully rewritten in Go with dependency injection and in-memory repositories for easy testing.
+This service implements the API for Poo Tracker using Go and the Gin framework. The previous Node.js backend has been fully rewritten in Go, with dependency injection and in-memory repositories for easy testing.
 
 ## Development
 
