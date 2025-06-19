@@ -77,13 +77,13 @@ class TestHealthResponse:
             redis_connected=True,
             ml_models_loaded=True,
             response_time_ms=50.0,
-            version="1.0.0",
+            version="0.1.0",
         )
         assert response.status == "healthy"
         assert response.redis_connected is True
         assert response.ml_models_loaded is True
         assert response.response_time_ms == 50.0
-        assert response.version == "1.0.0"
+        assert response.version == "0.1.0"
 
 
 class TestErrorResponse:

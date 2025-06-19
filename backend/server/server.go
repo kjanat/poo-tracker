@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/kjanat/poo-tracker/backend/internal/middleware"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 	"github.com/kjanat/poo-tracker/backend/internal/service"
 )
@@ -44,4 +45,9 @@ func (a *App) registerRoutes() {
 	meals.DELETE("/:id", a.deleteMeal)
 
 	api.GET("/analytics", a.getAnalytics)
+
+	// User management routes
+	api.POST("/register", func(c *gin.Context) { RegisterHandler(c.Writer, c.Request) })
+	api.POST("/login", func(c *gin.Context) { LoginHandler(c.Writer, c.Request) })
+	api.GET("/profile", gin.WrapH(middleware.AuthMiddleware(AuthService)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { ProfileHandler(w, r) }))))
 }

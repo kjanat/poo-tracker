@@ -1,13 +1,44 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
+	"strings"
+
+	"github.com/kjanat/poo-tracker/backend/internal/model"
+	"github.com/kjanat/poo-tracker/backend/internal/service"
 )
 
-// AuthMiddleware is a stub for JWT authentication middleware.
-func AuthMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// TODO: implement JWT auth check
-		next.ServeHTTP(w, r)
-	})
+type contextKey string
+
+const userContextKey = contextKey("user")
+
+func contextWithUser(ctx context.Context, user *model.User) context.Context {
+	return context.WithValue(ctx, userContextKey, user)
+}
+
+func UserFromContext(ctx context.Context) *model.User {
+	user, _ := ctx.Value(userContextKey).(*model.User)
+	return user
+}
+
+// AuthMiddleware is a middleware for JWT authentication.
+func AuthMiddleware(auth service.AuthService) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			header := r.Header.Get("Authorization")
+			if header == "" || !strings.HasPrefix(header, "Bearer ") {
+				http.Error(w, "missing or invalid auth header", http.StatusUnauthorized)
+				return
+			}
+			token := strings.TrimPrefix(header, "Bearer ")
+			user, err := auth.ValidateToken(token)
+			if err != nil {
+				http.Error(w, "invalid token", http.StatusUnauthorized)
+				return
+			}
+			ctx := contextWithUser(r.Context(), user)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
 }

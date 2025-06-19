@@ -1,8 +1,9 @@
 package repository
 
 import (
-	"poo-tracker/internal/model"
 	"testing"
+
+	"github.com/kjanat/poo-tracker/backend/internal/model"
 )
 
 func TestMemoryUserRepository(t *testing.T) {

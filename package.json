@@ -1,6 +1,6 @@
 {
   "name": "poo-tracker",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "The brutally honest app for tracking your bowel movements",
   "type": "module",
   "private": true,
