@@ -73,10 +73,9 @@ type LoginRequest struct {
 
 // LoginResponse represents the login response
 type LoginResponse struct {
-	User         User   `json:"user"`
-	Token        string `json:"token"`
-	RefreshToken string `json:"refreshToken"`
-	ExpiresAt    int64  `json:"expiresAt"`
+	User      User   `json:"user"`
+	Token     string `json:"token"`
+	ExpiresAt int64  `json:"expiresAt"`
 }
 
 // UpdateUserSettingsRequest represents the request to update user settings

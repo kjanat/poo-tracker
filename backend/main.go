@@ -11,10 +11,17 @@ import (
 )
 
 func main() {
+	// Get JWT secret from environment variable with fallback for development
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		jwtSecret = "dev_secret_change_in_production"
+		log.Println("Warning: Using default JWT secret. Set JWT_SECRET environment variable for production.")
+	}
+
 	userRepo := repository.NewMemoryUserRepository()
 	auth := &service.JWTAuthService{
 		UserRepo: userRepo,
-		Secret:   "dev_secret", // TODO: use env var
+		Secret:   jwtSecret,
 		Expiry:   24 * time.Hour,
 	}
 	server.AuthService = auth

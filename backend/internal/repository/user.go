@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"sync"
+
 	"github.com/kjanat/poo-tracker/backend/internal/model"
 )
 
@@ -20,6 +22,7 @@ type UserRepository interface {
 
 // MemoryUserRepository is an in-memory implementation for testing.
 type MemoryUserRepository struct {
+	mu        sync.RWMutex
 	users     map[string]*model.User
 	auths     map[string]*model.UserAuth // keyed by userID
 	emailToID map[string]string
@@ -34,11 +37,18 @@ func NewMemoryUserRepository() *MemoryUserRepository {
 }
 
 func (r *MemoryUserRepository) CreateUser(user *model.User) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
 	r.users[user.ID] = user
+	r.emailToID[user.Email] = user.ID
 	return nil
 }
 
 func (r *MemoryUserRepository) GetUserByID(id string) (*model.User, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
 	user, ok := r.users[id]
 	if !ok {
 		return nil, ErrNotFound
@@ -47,36 +57,58 @@ func (r *MemoryUserRepository) GetUserByID(id string) (*model.User, error) {
 }
 
 func (r *MemoryUserRepository) GetUserByEmail(email string) (*model.User, error) {
-	for _, user := range r.users {
-		if user.Email == email {
-			return user, nil
-		}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	userID, ok := r.emailToID[email]
+	if !ok {
+		return nil, ErrNotFound
 	}
-	return nil, ErrNotFound
+	user, ok := r.users[userID]
+	if !ok {
+		return nil, ErrNotFound
+	}
+	return user, nil
 }
 
 func (r *MemoryUserRepository) UpdateUser(user *model.User) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
 	if _, ok := r.users[user.ID]; !ok {
 		return ErrNotFound
 	}
 	r.users[user.ID] = user
+	r.emailToID[user.Email] = user.ID
 	return nil
 }
 
 func (r *MemoryUserRepository) DeleteUser(id string) error {
-	if _, ok := r.users[id]; !ok {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	user, ok := r.users[id]
+	if !ok {
 		return ErrNotFound
 	}
 	delete(r.users, id)
+	delete(r.emailToID, user.Email)
+	delete(r.auths, id) // Also remove auth data
 	return nil
 }
 
 func (r *MemoryUserRepository) CreateUserAuth(auth *model.UserAuth) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
 	r.auths[auth.UserID] = auth
 	return nil
 }
 
 func (r *MemoryUserRepository) GetUserAuthByUserID(userID string) (*model.UserAuth, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
 	auth, ok := r.auths[userID]
 	if !ok {
 		return nil, ErrNotFound
@@ -85,15 +117,24 @@ func (r *MemoryUserRepository) GetUserAuthByUserID(userID string) (*model.UserAu
 }
 
 func (r *MemoryUserRepository) GetUserAuthByEmail(email string) (*model.UserAuth, error) {
-	for _, user := range r.users {
-		if user.Email == email {
-			return r.GetUserAuthByUserID(user.ID)
-		}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	userID, ok := r.emailToID[email]
+	if !ok {
+		return nil, ErrNotFound
 	}
-	return nil, ErrNotFound
+	auth, ok := r.auths[userID]
+	if !ok {
+		return nil, ErrNotFound
+	}
+	return auth, nil
 }
 
 func (r *MemoryUserRepository) UpdateUserAuth(auth *model.UserAuth) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
 	if _, ok := r.auths[auth.UserID]; !ok {
 		return ErrNotFound
 	}

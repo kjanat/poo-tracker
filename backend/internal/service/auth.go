@@ -26,9 +26,16 @@ type JWTAuthService struct {
 }
 
 func (a *JWTAuthService) Register(email, password, name string) (*model.User, string, error) {
-	if _, err := a.UserRepo.GetUserByEmail(email); err == nil {
+	// Check if email is already registered, distinguishing between not found and other errors
+	_, err := a.UserRepo.GetUserByEmail(email)
+	if err == nil {
 		return nil, "", errors.New("email already registered")
 	}
+	// Only accept "not found" error - return other errors directly
+	if err != repository.ErrNotFound {
+		return nil, "", err
+	}
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, "", err
@@ -40,10 +47,14 @@ func (a *JWTAuthService) Register(email, password, name string) (*model.User, st
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
+
+	// Create user first
 	err = a.UserRepo.CreateUser(user)
 	if err != nil {
 		return nil, "", err
 	}
+
+	// Create auth data - if this fails, we should clean up the user
 	auth := &model.UserAuth{
 		UserID:       user.ID,
 		PasswordHash: string(hash),
@@ -54,8 +65,11 @@ func (a *JWTAuthService) Register(email, password, name string) (*model.User, st
 	}
 	err = a.UserRepo.CreateUserAuth(auth)
 	if err != nil {
+		// Clean up the user if auth creation fails
+		_ = a.UserRepo.DeleteUser(user.ID)
 		return nil, "", err
 	}
+
 	token, err := a.generateToken(user)
 	if err != nil {
 		return nil, "", err
@@ -84,6 +98,10 @@ func (a *JWTAuthService) Login(email, password string) (*model.User, string, err
 
 func (a *JWTAuthService) ValidateToken(tokenStr string) (*model.User, error) {
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		// Validate the signing algorithm to prevent algorithm confusion attacks
+		if token.Method.Alg() != "HS256" {
+			return nil, errors.New("invalid signing algorithm")
+		}
 		return []byte(a.Secret), nil
 	})
 	if err != nil || !token.Valid {

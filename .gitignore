@@ -545,3 +545,4 @@ login.json
 
 # Build artifacts
 backend/bin/
+**/tmp/

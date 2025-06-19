@@ -50,6 +50,13 @@ func (e ValidationErrors) Error() string {
 	return msg
 }
 
+// safeAppendValidationError safely appends an error to ValidationErrors if it's a ValidationError
+func safeAppendValidationError(errors *ValidationErrors, err error) {
+	if validationErr, ok := err.(ValidationError); ok {
+		*errors = append(*errors, validationErr)
+	}
+}
+
 // HasErrors returns true if there are any validation errors
 func (e ValidationErrors) HasErrors() bool {
 	return len(e) > 0
@@ -218,9 +225,10 @@ func ValidateURL(url string, fieldName string) error {
 	if url == "" {
 		return nil // Optional field
 	}
-	urlRegex := regexp.MustCompile(`^https?://[^\s/$.?#].[^\s]*$`)
+	// Strict regex for HTTP/HTTPS URLs only with proper structure
+	urlRegex := regexp.MustCompile(`^https?://[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*(:[0-9]{1,5})?(/[^\s]*)?$`)
 	if !urlRegex.MatchString(url) {
-		return ValidationError{Field: fieldName, Message: "invalid URL format"}
+		return ValidationError{Field: fieldName, Message: "invalid URL format - only HTTP/HTTPS URLs are allowed"}
 	}
 	if len(url) > 2048 {
 		return ValidationError{Field: fieldName, Message: "URL cannot be longer than 2048 characters"}
@@ -254,10 +262,10 @@ func ValidateBowelMovement(bm model.BowelMovement) ValidationErrors {
 func validateBowelMovementRequired(bm model.BowelMovement) ValidationErrors {
 	var errors ValidationErrors
 	if err := ValidateUserID(bm.UserID); err != nil {
-		errors = append(errors, err.(ValidationError))
+		safeAppendValidationError(&errors, err)
 	}
 	if err := ValidateBristolType(bm.BristolType); err != nil {
-		errors = append(errors, err.(ValidationError))
+		safeAppendValidationError(&errors, err)
 	}
 	return errors
 }
@@ -266,22 +274,22 @@ func validateBowelMovementEnums(bm model.BowelMovement) ValidationErrors {
 	var errors ValidationErrors
 	if bm.Volume != nil {
 		if err := ValidateEnum(*bm.Volume, "volume"); err != nil {
-			errors = append(errors, err.(ValidationError))
+			safeAppendValidationError(&errors, err)
 		}
 	}
 	if bm.Color != nil {
 		if err := ValidateEnum(*bm.Color, "color"); err != nil {
-			errors = append(errors, err.(ValidationError))
+			safeAppendValidationError(&errors, err)
 		}
 	}
 	if bm.Consistency != nil {
 		if err := ValidateEnum(*bm.Consistency, "consistency"); err != nil {
-			errors = append(errors, err.(ValidationError))
+			safeAppendValidationError(&errors, err)
 		}
 	}
 	if bm.SmellLevel != nil {
 		if err := ValidateEnum(*bm.SmellLevel, "smellLevel"); err != nil {
-			errors = append(errors, err.(ValidationError))
+			safeAppendValidationError(&errors, err)
 		}
 	}
 	return errors
