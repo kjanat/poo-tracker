@@ -103,7 +103,7 @@ Complete implementation of the poo-tracker backend to match the comprehensive Pr
 - [ ] Create UserTwoFactor model
 - [ ] Implement TOTP 2FA
 - [ ] Add password policies validation
-- [ ] Add rate limiting middleware
+- [ ] Add rate-limiting middleware
 - [ ] Security headers middleware
 - [ ] Comprehensive security tests
 
@@ -141,4 +141,4 @@ Complete implementation of the poo-tracker backend to match the comprehensive Pr
 
 ---
 
-_Last Updated: 2025-06-19_
+## Last Updated: 2025-06-19

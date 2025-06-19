@@ -42,11 +42,9 @@ func NewMemoryMealRepo() *memoryMealRepo {
 func (m *memoryBowelRepo) List(ctx context.Context) ([]model.BowelMovement, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	res := make([]model.BowelMovement, len(m.bmStore))
-	i := 0
+	res := make([]model.BowelMovement, 0, len(m.bmStore))
 	for _, v := range m.bmStore {
-		res[i] = v
-		i++
+		res = append(res, v)
 	}
 	return res, nil
 }
