@@ -10,7 +10,8 @@ import (
 )
 
 func TestHealth(t *testing.T) {
-	app := New(repository.NewMemory(), service.AvgBristol{})
+	repo := repository.NewMemory()
+	app := New(repo, repo, service.AvgBristol{})
 	req, _ := http.NewRequest(http.MethodGet, "/health", nil)
 	w := httptest.NewRecorder()
 	app.Engine.ServeHTTP(w, req)

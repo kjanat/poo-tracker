@@ -183,6 +183,11 @@ pnpm --parallel run dev
 | `/api/bowel-movements/:id` | `GET`    | Get a specific entry              |
 | `/api/bowel-movements/:id` | `PUT`    | Update a bowel movement entry     |
 | `/api/bowel-movements/:id` | `DELETE` | Delete a bowel movement entry     |
+| `/api/meals`               | `GET`    | List meal entries                 |
+| `/api/meals`               | `POST`   | Create a new meal entry           |
+| `/api/meals/:id`           | `GET`    | Get a specific meal               |
+| `/api/meals/:id`           | `PUT`    | Update a meal entry               |
+| `/api/meals/:id`           | `DELETE` | Delete a meal entry               |
 | `/api/analytics`           | `GET`    | Get simple analytics              |
 
 ## 📝 How it works

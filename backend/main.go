@@ -7,6 +7,9 @@ import (
 )
 
 func main() {
-	app := server.New(repository.NewMemory(), service.AvgBristol{})
-	app.Engine.Run() // defaults to :8080
+	mem := repository.NewMemory()
+	app := server.New(mem, mem, service.AvgBristol{})
+	if err := app.Engine.Run(); err != nil {
+		panic(err)
+	}
 }

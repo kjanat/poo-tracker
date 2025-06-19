@@ -104,3 +104,87 @@ func (a *App) getAnalytics(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, stats)
 }
+
+func (a *App) listMeals(c *gin.Context) {
+	list, err := a.meals.ListMeals(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"data": list})
+}
+
+func (a *App) createMeal(c *gin.Context) {
+	var req struct {
+		UserID   string `json:"userId"`
+		Name     string `json:"name"`
+		Calories int    `json:"calories"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	meal := model.Meal{UserID: req.UserID, Name: req.Name, Calories: req.Calories}
+	created, err := a.meals.CreateMeal(c.Request.Context(), meal)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusCreated, created)
+}
+
+func (a *App) getMeal(c *gin.Context) {
+	id := c.Param("id")
+	meal, err := a.meals.GetMeal(c.Request.Context(), id)
+	if err != nil {
+		if err == repository.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, meal)
+}
+
+func (a *App) updateMeal(c *gin.Context) {
+	id := c.Param("id")
+	var req struct {
+		Name     *string `json:"name"`
+		Calories *int    `json:"calories"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	meal := model.Meal{ID: id}
+	if req.Name != nil {
+		meal.Name = *req.Name
+	}
+	if req.Calories != nil {
+		meal.Calories = *req.Calories
+	}
+	updated, err := a.meals.UpdateMeal(c.Request.Context(), meal)
+	if err != nil {
+		if err == repository.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, updated)
+}
+
+func (a *App) deleteMeal(c *gin.Context) {
+	id := c.Param("id")
+	if err := a.meals.DeleteMeal(c.Request.Context(), id); err != nil {
+		if err == repository.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
