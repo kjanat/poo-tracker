@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/kjanat/poo-tracker/backend/internal/model"
@@ -263,20 +264,77 @@ func (a *App) listMeals(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": list})
 }
 
+// createMealRequest defines the request structure for creating meals
+type createMealRequest struct {
+	UserID      string              `json:"userId"`
+	Name        string              `json:"name"`
+	Description string              `json:"description,omitempty"`
+	MealTime    *time.Time          `json:"mealTime,omitempty"`
+	Category    *model.MealCategory `json:"category,omitempty"`
+	Cuisine     string              `json:"cuisine,omitempty"`
+	Calories    int                 `json:"calories,omitempty"`
+	SpicyLevel  *int                `json:"spicyLevel,omitempty"`
+	FiberRich   bool                `json:"fiberRich,omitempty"`
+	Dairy       bool                `json:"dairy,omitempty"`
+	Gluten      bool                `json:"gluten,omitempty"`
+	PhotoURL    string              `json:"photoUrl,omitempty"`
+	Notes       string              `json:"notes,omitempty"`
+}
+
+// applyMealFields applies fields from the request to the meal
+func applyMealFields(meal *model.Meal, req *createMealRequest) {
+	meal.Name = req.Name
+	if req.Description != "" {
+		meal.Description = req.Description
+	}
+	if req.MealTime != nil {
+		meal.MealTime = *req.MealTime
+	}
+	if req.Category != nil {
+		meal.Category = req.Category
+	}
+	if req.Cuisine != "" {
+		meal.Cuisine = req.Cuisine
+	}
+	if req.Calories > 0 {
+		meal.Calories = req.Calories
+	}
+	if req.SpicyLevel != nil {
+		meal.SpicyLevel = req.SpicyLevel
+	}
+	meal.FiberRich = req.FiberRich
+	meal.Dairy = req.Dairy
+	meal.Gluten = req.Gluten
+	if req.PhotoURL != "" {
+		meal.PhotoURL = req.PhotoURL
+	}
+	if req.Notes != "" {
+		meal.Notes = req.Notes
+	}
+}
+
 func (a *App) createMeal(c *gin.Context) {
-	var req model.Meal
+	var req createMealRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Validate the meal
-	if validationErrors := validation.ValidateMeal(req); validationErrors.HasErrors() {
+	// Create a new meal with the user ID
+	meal := model.Meal{
+		UserID: req.UserID,
+	}
+
+	// Apply fields from the request
+	applyMealFields(&meal, &req)
+
+	// Validate the complete meal
+	if validationErrors := validation.ValidateMeal(meal); validationErrors.HasErrors() {
 		c.JSON(http.StatusBadRequest, gin.H{"error": validationErrors.Error()})
 		return
 	}
 
-	created, err := a.meals.Create(c.Request.Context(), req)
+	created, err := a.meals.Create(c.Request.Context(), meal)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
