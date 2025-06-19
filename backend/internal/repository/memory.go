@@ -141,7 +141,7 @@ func (m *memoryRepo) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (m *memoryRepo) ListMeals(ctx context.Context) ([]model.Meal, error) {
+func (m *memoryRepo) List(ctx context.Context) ([]model.Meal, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	res := make([]model.Meal, 0, len(m.mealStore))
@@ -151,7 +151,7 @@ func (m *memoryRepo) ListMeals(ctx context.Context) ([]model.Meal, error) {
 	return res, nil
 }
 
-func (m *memoryRepo) CreateMeal(ctx context.Context, meal model.Meal) (model.Meal, error) {
+func (m *memoryRepo) Create(ctx context.Context, meal model.Meal) (model.Meal, error) {
 	if meal.ID == "" {
 		meal.ID = uuid.NewString()
 	}
@@ -170,7 +170,7 @@ func (m *memoryRepo) CreateMeal(ctx context.Context, meal model.Meal) (model.Mea
 	return meal, nil
 }
 
-func (m *memoryRepo) GetMeal(ctx context.Context, id string) (model.Meal, error) {
+func (m *memoryRepo) Get(ctx context.Context, id string) (model.Meal, error) {
 	m.mu.RLock()
 	meal, ok := m.mealStore[id]
 	m.mu.RUnlock()
@@ -180,7 +180,7 @@ func (m *memoryRepo) GetMeal(ctx context.Context, id string) (model.Meal, error)
 	return meal, nil
 }
 
-func (m *memoryRepo) UpdateMeal(ctx context.Context, id string, update model.MealUpdate) (model.Meal, error) {
+func (m *memoryRepo) Update(ctx context.Context, id string, update model.MealUpdate) (model.Meal, error) {
 	m.mu.Lock()
 	existing, ok := m.mealStore[id]
 	if !ok {
@@ -232,7 +232,7 @@ func (m *memoryRepo) UpdateMeal(ctx context.Context, id string, update model.Mea
 	return existing, nil
 }
 
-func (m *memoryRepo) DeleteMeal(ctx context.Context, id string) error {
+func (m *memoryRepo) Delete(ctx context.Context, id string) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if _, ok := m.mealStore[id]; !ok {

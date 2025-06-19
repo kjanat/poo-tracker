@@ -228,7 +228,7 @@ func (a *App) getAnalytics(c *gin.Context) {
 }
 
 func (a *App) listMeals(c *gin.Context) {
-	list, err := a.meals.ListMeals(c.Request.Context())
+	list, err := a.meals.List(c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -249,7 +249,7 @@ func (a *App) createMeal(c *gin.Context) {
 		return
 	}
 
-	created, err := a.meals.CreateMeal(c.Request.Context(), req)
+	created, err := a.meals.Create(c.Request.Context(), req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -259,7 +259,7 @@ func (a *App) createMeal(c *gin.Context) {
 
 func (a *App) getMeal(c *gin.Context) {
 	id := c.Param("id")
-	meal, err := a.meals.GetMeal(c.Request.Context(), id)
+	meal, err := a.meals.Get(c.Request.Context(), id)
 	if err != nil {
 		if err == repository.ErrNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
@@ -285,7 +285,7 @@ func (a *App) updateMeal(c *gin.Context) {
 		return
 	}
 
-	updated, err := a.meals.UpdateMeal(c.Request.Context(), id, update)
+	updated, err := a.meals.Update(c.Request.Context(), id, update)
 	if err != nil {
 		if err == repository.ErrNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
@@ -339,7 +339,7 @@ func validateMealUpdateFields(update *model.MealUpdate) validation.ValidationErr
 
 func (a *App) deleteMeal(c *gin.Context) {
 	id := c.Param("id")
-	if err := a.meals.DeleteMeal(c.Request.Context(), id); err != nil {
+	if err := a.meals.Delete(c.Request.Context(), id); err != nil {
 		if err == repository.ErrNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 			return

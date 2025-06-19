@@ -15,9 +15,9 @@ type BowelMovementRepository interface {
 }
 
 type MealRepository interface {
-	ListMeals(ctx context.Context) ([]model.Meal, error)
-	CreateMeal(ctx context.Context, m model.Meal) (model.Meal, error)
-	GetMeal(ctx context.Context, id string) (model.Meal, error)
-	UpdateMeal(ctx context.Context, id string, update model.MealUpdate) (model.Meal, error)
-	DeleteMeal(ctx context.Context, id string) error
+	List(ctx context.Context) ([]model.Meal, error)
+	Create(ctx context.Context, m model.Meal) (model.Meal, error)
+	Get(ctx context.Context, id string) (model.Meal, error)
+	Update(ctx context.Context, id string, update model.MealUpdate) (model.Meal, error)
+	Delete(ctx context.Context, id string) error
 }
