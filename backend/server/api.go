@@ -146,7 +146,9 @@ func validateBowelMovementUpdateBristolType(update *model.BowelMovementUpdate) v
 	var errs validation.ValidationErrors
 	if update.BristolType != nil {
 		if err := validation.ValidateBristolType(*update.BristolType); err != nil {
-			errs = append(errs, err.(validation.ValidationError))
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
 		}
 	}
 	return errs
@@ -156,17 +158,23 @@ func validateBowelMovementUpdateScales(update *model.BowelMovementUpdate) valida
 	var errs validation.ValidationErrors
 	if update.Pain != nil {
 		if err := validation.ValidateScale(*update.Pain, "pain"); err != nil {
-			errs = append(errs, err.(validation.ValidationError))
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
 		}
 	}
 	if update.Strain != nil {
 		if err := validation.ValidateScale(*update.Strain, "strain"); err != nil {
-			errs = append(errs, err.(validation.ValidationError))
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
 		}
 	}
 	if update.Satisfaction != nil {
 		if err := validation.ValidateScale(*update.Satisfaction, "satisfaction"); err != nil {
-			errs = append(errs, err.(validation.ValidationError))
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
 		}
 	}
 	return errs
@@ -176,22 +184,30 @@ func validateBowelMovementUpdateEnums(update *model.BowelMovementUpdate) validat
 	var errs validation.ValidationErrors
 	if update.Volume != nil {
 		if err := validation.ValidateEnum(*update.Volume, "volume"); err != nil {
-			errs = append(errs, err.(validation.ValidationError))
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
 		}
 	}
 	if update.Color != nil {
 		if err := validation.ValidateEnum(*update.Color, "color"); err != nil {
-			errs = append(errs, err.(validation.ValidationError))
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
 		}
 	}
 	if update.Consistency != nil {
 		if err := validation.ValidateEnum(*update.Consistency, "consistency"); err != nil {
-			errs = append(errs, err.(validation.ValidationError))
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
 		}
 	}
 	if update.SmellLevel != nil {
 		if err := validation.ValidateEnum(*update.SmellLevel, "smellLevel"); err != nil {
-			errs = append(errs, err.(validation.ValidationError))
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
 		}
 	}
 	return errs
@@ -201,12 +217,16 @@ func validateBowelMovementUpdateOptionals(update *model.BowelMovementUpdate) val
 	var errs validation.ValidationErrors
 	if update.PhotoURL != nil {
 		if err := validation.ValidateURL(*update.PhotoURL, "photoUrl"); err != nil {
-			errs = append(errs, err.(validation.ValidationError))
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
 		}
 	}
 	if update.Notes != nil {
 		if err := validation.ValidateNotes(*update.Notes, "notes"); err != nil {
-			errs = append(errs, err.(validation.ValidationError))
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
 		}
 	}
 	return errs
@@ -320,7 +340,9 @@ func validateMealUpdateName(update *model.MealUpdate) validation.ValidationError
 	var errs validation.ValidationErrors
 	if update.Name != nil {
 		if err := validation.ValidateMealName(*update.Name); err != nil {
-			errs = append(errs, err.(validation.ValidationError))
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
 		}
 	}
 	return errs
@@ -330,7 +352,9 @@ func validateMealUpdateCalories(update *model.MealUpdate) validation.ValidationE
 	var errs validation.ValidationErrors
 	if update.Calories != nil {
 		if err := validation.ValidateCalories(*update.Calories); err != nil {
-			errs = append(errs, err.(validation.ValidationError))
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
 		}
 	}
 	return errs
@@ -340,7 +364,9 @@ func validateMealUpdateSpicyLevel(update *model.MealUpdate) validation.Validatio
 	var errs validation.ValidationErrors
 	if update.SpicyLevel != nil {
 		if err := validation.ValidateSpicyLevel(*update.SpicyLevel); err != nil {
-			errs = append(errs, err.(validation.ValidationError))
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
 		}
 	}
 	return errs
@@ -350,7 +376,9 @@ func validateMealUpdateCategory(update *model.MealUpdate) validation.ValidationE
 	var errs validation.ValidationErrors
 	if update.Category != nil {
 		if err := validation.ValidateEnum(*update.Category, "category"); err != nil {
-			errs = append(errs, err.(validation.ValidationError))
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
 		}
 	}
 	return errs
@@ -360,7 +388,9 @@ func validateMealUpdatePhotoURL(update *model.MealUpdate) validation.ValidationE
 	var errs validation.ValidationErrors
 	if update.PhotoURL != nil {
 		if err := validation.ValidateURL(*update.PhotoURL, "photoUrl"); err != nil {
-			errs = append(errs, err.(validation.ValidationError))
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
 		}
 	}
 	return errs
@@ -370,7 +400,9 @@ func validateMealUpdateDescription(update *model.MealUpdate) validation.Validati
 	var errs validation.ValidationErrors
 	if update.Description != nil {
 		if err := validation.ValidateNotes(*update.Description, "description"); err != nil {
-			errs = append(errs, err.(validation.ValidationError))
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
 		}
 	}
 	return errs
@@ -380,7 +412,9 @@ func validateMealUpdateNotes(update *model.MealUpdate) validation.ValidationErro
 	var errs validation.ValidationErrors
 	if update.Notes != nil {
 		if err := validation.ValidateNotes(*update.Notes, "notes"); err != nil {
-			errs = append(errs, err.(validation.ValidationError))
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
 		}
 	}
 	return errs
