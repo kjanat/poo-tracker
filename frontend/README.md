@@ -266,7 +266,7 @@ This application handles sensitive health data:
 
 This frontend integrates with:
 
-- **Backend API**: `../backend/` - Authentication, data storage, business logic
+- **Backend API**: Go/Gin service at `../backend/` - Authentication and data logic
 - **AI Service**: `../ai-service/` - Pattern analysis and recommendations
 - **Docker Services**: PostgreSQL, Redis, MinIO for complete functionality
 

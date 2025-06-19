@@ -37,7 +37,6 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
    ```bash
    cp .env.example .env
    cp frontend/.env.example frontend/.env.local
-   cp backend/.env.example backend/.env
    cp ai-service/.env.example ai-service/.env
    # Edit each file with your local values
    ```
@@ -89,7 +88,6 @@ Each package ships with an `.env.example` file. Copy them and tweak the values b
 ```bash
 cp .env.example .env
 cp frontend/.env.example frontend/.env.local
-cp backend/.env.example backend/.env
 cp ai-service/.env.example ai-service/.env
 ```
 

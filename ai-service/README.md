@@ -299,7 +299,7 @@ This project is part of the Poo Tracker application suite.
 
 This service is designed to work with:
 
-- **Backend API**: Node.js/Express backend at `../backend/`
+- **Backend API**: Go/Gin backend at `../backend/`
 - **Frontend**: React application at `../frontend/`
 - **Database**: PostgreSQL with Prisma ORM
 - **Caching**: Redis for performance optimization

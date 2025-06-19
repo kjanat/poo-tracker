@@ -33,10 +33,10 @@ jobs:
         with:
           version: latest
 
-      - name: 📦 Setup Node.js ${{ matrix.node-version }}
+      - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22
 
       - name: 📦 Install dependencies
         run: pnpm install
@@ -73,38 +73,7 @@ jobs:
       contents: read
     strategy:
       matrix:
-        node-version: [22, 24]
-    env:
-      POSTGRES_DB: test_db
-      POSTGRES_USER: test_user
-      POSTGRES_PASSWORD: test_password
-      DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
-      REDIS_URL: redis://localhost:6379
-
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ env.POSTGRES_DB }}
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
-      redis:
-        image: redis:8-alpine
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
+        go-version: [1.22]
 
     steps:
       - name: 📦 Checkout
@@ -115,40 +84,22 @@ jobs:
         with:
           version: latest
 
-      - name: 📦 Setup Node.js ${{ matrix.node-version }}
+      - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22
 
       - name: 📦 Install dependencies
         run: pnpm install
 
-      - name: 🗄️ Setup test database
-        run: |
-          pnpm db:generate
-          pnpm db:migrate
-          pnpm db:seed
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          REDIS_URL: ${{ env.REDIS_URL }}
-
-      - name: 🔍 Type check
-        run: pnpm type-check:backend
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          REDIS_URL: ${{ env.REDIS_URL }}
-
-      - name: 🧹 Lint
-        run: pnpm lint:backend
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          REDIS_URL: ${{ env.REDIS_URL }}
+      - name: 🔍 Lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          working-directory: backend
 
       - name: 🧪 Test
         run: pnpm test:backend
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          REDIS_URL: ${{ env.REDIS_URL }}
 
       - name: Upload results to Trunk
         # Run this step even if the test step ahead fails
