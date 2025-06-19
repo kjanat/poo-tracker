@@ -35,14 +35,14 @@ Complete implementation of the poo-tracker backend to match the comprehensive Pr
 
 **Priority: High** | **Dependencies:** Phase 1 ✅ | **Started:** 2025-06-19
 
-- [ ] Create User, UserAuth, UserSettings models
-- [ ] Create user repositories (memory + interface)
-- [ ] Create authentication service with JWT
-- [ ] Create auth middleware
-- [ ] Create user API handlers (register, login, profile, settings)
-- [ ] Add user management tests
-- [ ] Update main.go with auth routes
-- [ ] Add go.mod dependencies (JWT, crypto, validator)
+- ⏳ Create User, UserAuth, UserSettings models
+- ⏳ Create user repositories (memory + interface)
+- ⏳ Create authentication service with JWT
+- ⏳ Create auth middleware
+- ⏳ Create user API handlers (register, login, profile, settings)
+- ⏳ Add user management tests
+- ⏳ Update main.go with auth routes
+- ⏳ Add go.mod dependencies (JWT, crypto, validator)
 
 **Files to create:**
 
@@ -120,7 +120,7 @@ Complete implementation of the poo-tracker backend to match the comprehensive Pr
 
 ### ⏳ In Progress
 
-- Phase 1: Core Infrastructure & Enums
+- Phase 2: User Management Foundation
 
 ### 📊 Statistics
 
@@ -131,11 +131,14 @@ Complete implementation of the poo-tracker backend to match the comprehensive Pr
 
 ### 🎯 Next Actions
 
-1. Implement enums.go with all required types
-2. Create validation package
-3. Enhance bowel.go and meal.go models
-4. Update repositories and handlers
-5. Create comprehensive tests
+1. Implement User, UserAuth, UserSettings models
+2. Create user repositories (memory + interface)
+3. Implement authentication service with JWT
+4. Create auth middleware
+5. Add user API handlers (register, login, profile, settings)
+6. Add user management tests
+7. Update main.go with auth routes
+8. Add go.mod dependencies (JWT, crypto, validator)
 
 ---
 

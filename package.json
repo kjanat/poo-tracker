@@ -36,7 +36,7 @@
     "clean": "pnpm --recursive run clean",
     "format": "concurrently \"pnpm format:all\" \"pnpm format:ai\"",
     "format:frontend": "prettier --write frontend",
-    "format:backend": "gofmt -w backend/**/*.go",
+    "format:backend": "gofmt -s -w backend/**/*.go",
     "format:ai": "uv run ruff format ai-service",
     "format:ai:check": "uv run ruff format ai-service --check",
     "format:all": "prettier --write .",
