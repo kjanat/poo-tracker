@@ -14,170 +14,182 @@ import (
 	"github.com/kjanat/poo-tracker/backend/internal/service"
 )
 
-func TestUserAPIHandler(t *testing.T) {
-	// Setup test dependencies
+// Test helper function to create user handlers
+func createTestUserHandlers() *UserAPIHandlers {
 	userRepo := repository.NewMemoryUserRepository()
 	authService := &service.JWTAuthService{
 		UserRepo: userRepo,
 		Secret:   "test_secret",
 		Expiry:   24 * time.Hour,
 	}
+	return NewUserAPIHandlers(authService)
+}
 
-	// Create user handlers with dependency injection
-	userHandlers := NewUserAPIHandlers(authService)
+func TestRegisterHandler_Success(t *testing.T) {
+	userHandlers := createTestUserHandlers()
 
-	t.Run("Register - Success", func(t *testing.T) {
-		reqBody := model.CreateUserRequest{
-			Email:    "test@example.com",
-			Password: "password123",
-			Name:     "Test User",
-		}
-		jsonBody, _ := json.Marshal(reqBody)
+	reqBody := model.CreateUserRequest{
+		Email:    "test@example.com",
+		Password: "password123",
+		Name:     "Test User",
+	}
+	jsonBody, _ := json.Marshal(reqBody)
 
-		req := httptest.NewRequest(http.MethodPost, "/register", bytes.NewBuffer(jsonBody))
-		w := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodPost, "/register", bytes.NewBuffer(jsonBody))
+	w := httptest.NewRecorder()
 
-		userHandlers.RegisterHandler(w, req)
+	userHandlers.RegisterHandler(w, req)
 
-		if w.Code != http.StatusOK {
-			t.Errorf("Expected status 200, got %d", w.Code)
-		}
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d", w.Code)
+	}
 
-		var resp model.LoginResponse
-		if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
-			t.Fatal("Failed to decode response")
-		}
+	var resp model.LoginResponse
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal("Failed to decode response")
+	}
 
-		if resp.User.Email != "test@example.com" {
-			t.Errorf("Expected email test@example.com, got %s", resp.User.Email)
-		}
-		if resp.Token == "" {
-			t.Error("Expected token to be set")
-		}
-		if resp.ExpiresAt == 0 {
-			t.Error("Expected ExpiresAt to be set")
-		}
-	})
+	if resp.User.Email != "test@example.com" {
+		t.Errorf("Expected email test@example.com, got %s", resp.User.Email)
+	}
+	if resp.Token == "" {
+		t.Error("Expected token to be set")
+	}
+	if resp.ExpiresAt == 0 {
+		t.Error("Expected ExpiresAt to be set")
+	}
+}
 
-	t.Run("Register - Invalid Email", func(t *testing.T) {
-		reqBody := model.CreateUserRequest{
-			Email:    "invalid-email",
-			Password: "password123",
-			Name:     "Test User",
-		}
-		jsonBody, _ := json.Marshal(reqBody)
+func TestRegisterHandler_InvalidEmail(t *testing.T) {
+	userHandlers := createTestUserHandlers()
 
-		req := httptest.NewRequest(http.MethodPost, "/register", bytes.NewBuffer(jsonBody))
-		w := httptest.NewRecorder()
+	reqBody := model.CreateUserRequest{
+		Email:    "invalid-email",
+		Password: "password123",
+		Name:     "Test User",
+	}
+	jsonBody, _ := json.Marshal(reqBody)
 
-		userHandlers.RegisterHandler(w, req)
+	req := httptest.NewRequest(http.MethodPost, "/register", bytes.NewBuffer(jsonBody))
+	w := httptest.NewRecorder()
 
-		if w.Code != http.StatusBadRequest {
-			t.Errorf("Expected status 400, got %d", w.Code)
-		}
-	})
+	userHandlers.RegisterHandler(w, req)
 
-	t.Run("Register - Missing Fields", func(t *testing.T) {
-		reqBody := model.CreateUserRequest{
-			Email: "test2@example.com",
-			// Missing password and name
-		}
-		jsonBody, _ := json.Marshal(reqBody)
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("Expected status 400, got %d", w.Code)
+	}
+}
 
-		req := httptest.NewRequest(http.MethodPost, "/register", bytes.NewBuffer(jsonBody))
-		w := httptest.NewRecorder()
+func TestRegisterHandler_MissingFields(t *testing.T) {
+	userHandlers := createTestUserHandlers()
 
-		userHandlers.RegisterHandler(w, req)
+	reqBody := model.CreateUserRequest{
+		Email: "test2@example.com",
+		// Missing password and name
+	}
+	jsonBody, _ := json.Marshal(reqBody)
 
-		if w.Code != http.StatusBadRequest {
-			t.Errorf("Expected status 400, got %d", w.Code)
-		}
-	})
+	req := httptest.NewRequest(http.MethodPost, "/register", bytes.NewBuffer(jsonBody))
+	w := httptest.NewRecorder()
 
-	t.Run("Login - Success", func(t *testing.T) {
-		// First register a user
-		_, _, err := authService.Register("login@example.com", "password123", "Login User")
-		if err != nil {
-			t.Fatal("Failed to register user for login test")
-		}
+	userHandlers.RegisterHandler(w, req)
 
-		reqBody := model.LoginRequest{
-			Email:    "login@example.com",
-			Password: "password123",
-		}
-		jsonBody, _ := json.Marshal(reqBody)
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("Expected status 400, got %d", w.Code)
+	}
+}
 
-		req := httptest.NewRequest(http.MethodPost, "/login", bytes.NewBuffer(jsonBody))
-		w := httptest.NewRecorder()
+func TestLoginHandler_Success(t *testing.T) {
+	userHandlers := createTestUserHandlers()
 
-		userHandlers.LoginHandler(w, req)
+	// First register a user
+	_, _, err := userHandlers.AuthService.Register("login@example.com", "password123", "Login User")
+	if err != nil {
+		t.Fatal("Failed to register user for login test")
+	}
 
-		if w.Code != http.StatusOK {
-			t.Errorf("Expected status 200, got %d", w.Code)
-		}
+	reqBody := model.LoginRequest{
+		Email:    "login@example.com",
+		Password: "password123",
+	}
+	jsonBody, _ := json.Marshal(reqBody)
 
-		var resp model.LoginResponse
-		if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
-			t.Fatal("Failed to decode response")
-		}
+	req := httptest.NewRequest(http.MethodPost, "/login", bytes.NewBuffer(jsonBody))
+	w := httptest.NewRecorder()
 
-		if resp.Token == "" {
-			t.Error("Expected token to be set")
-		}
-	})
+	userHandlers.LoginHandler(w, req)
 
-	t.Run("Login - Invalid Credentials", func(t *testing.T) {
-		reqBody := model.LoginRequest{
-			Email:    "nonexistent@example.com",
-			Password: "wrongpassword",
-		}
-		jsonBody, _ := json.Marshal(reqBody)
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d", w.Code)
+	}
 
-		req := httptest.NewRequest(http.MethodPost, "/login", bytes.NewBuffer(jsonBody))
-		w := httptest.NewRecorder()
+	var resp model.LoginResponse
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatal("Failed to decode response")
+	}
 
-		userHandlers.LoginHandler(w, req)
+	if resp.Token == "" {
+		t.Error("Expected token to be set")
+	}
+}
 
-		if w.Code != http.StatusUnauthorized {
-			t.Errorf("Expected status 401, got %d", w.Code)
-		}
-	})
+func TestLoginHandler_InvalidCredentials(t *testing.T) {
+	userHandlers := createTestUserHandlers()
 
-	t.Run("Profile - Success", func(t *testing.T) {
-		user := &model.User{
-			ID:    "test-user-id",
-			Email: "profile@example.com",
-			Name:  "Profile User",
-		}
+	reqBody := model.LoginRequest{
+		Email:    "nonexistent@example.com",
+		Password: "wrongpassword",
+	}
+	jsonBody, _ := json.Marshal(reqBody)
 
-		req := httptest.NewRequest(http.MethodGet, "/profile", nil)
-		req = req.WithContext(middleware.ContextWithUser(req.Context(), user))
-		w := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodPost, "/login", bytes.NewBuffer(jsonBody))
+	w := httptest.NewRecorder()
 
-		userHandlers.ProfileHandler(w, req)
+	userHandlers.LoginHandler(w, req)
 
-		if w.Code != http.StatusOK {
-			t.Errorf("Expected status 200, got %d", w.Code)
-		}
+	if w.Code != http.StatusUnauthorized {
+		t.Errorf("Expected status 401, got %d", w.Code)
+	}
+}
 
-		var respUser model.User
-		if err := json.NewDecoder(w.Body).Decode(&respUser); err != nil {
-			t.Fatal("Failed to decode response")
-		}
+func TestProfileHandler_Success(t *testing.T) {
+	userHandlers := createTestUserHandlers()
 
-		if respUser.Email != "profile@example.com" {
-			t.Errorf("Expected email profile@example.com, got %s", respUser.Email)
-		}
-	})
+	user := &model.User{
+		ID:    "test-user-id",
+		Email: "profile@example.com",
+		Name:  "Profile User",
+	}
 
-	t.Run("Profile - Unauthorized", func(t *testing.T) {
-		req := httptest.NewRequest(http.MethodGet, "/profile", nil)
-		w := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/profile", nil)
+	req = req.WithContext(middleware.ContextWithUser(req.Context(), user))
+	w := httptest.NewRecorder()
 
-		userHandlers.ProfileHandler(w, req)
+	userHandlers.ProfileHandler(w, req)
 
-		if w.Code != http.StatusUnauthorized {
-			t.Errorf("Expected status 401, got %d", w.Code)
-		}
-	})
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d", w.Code)
+	}
+
+	var respUser model.User
+	if err := json.NewDecoder(w.Body).Decode(&respUser); err != nil {
+		t.Fatal("Failed to decode response")
+	}
+
+	if respUser.Email != "profile@example.com" {
+		t.Errorf("Expected email profile@example.com, got %s", respUser.Email)
+	}
+}
+
+func TestProfileHandler_Unauthorized(t *testing.T) {
+	userHandlers := createTestUserHandlers()
+
+	req := httptest.NewRequest(http.MethodGet, "/profile", nil)
+	w := httptest.NewRecorder()
+
+	userHandlers.ProfileHandler(w, req)
+
+	if w.Code != http.StatusUnauthorized {
+		t.Errorf("Expected status 401, got %d", w.Code)
+	}
 }

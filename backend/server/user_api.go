@@ -23,30 +23,6 @@ func NewUserAPIHandlers(authService service.AuthService) *UserAPIHandlers {
 	return &UserAPIHandlers{AuthService: authService}
 }
 
-// UserAPIHandler handles user-related API endpoints.
-func (h *UserAPIHandlers) UserAPIHandler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodPost:
-		if r.URL.Path == "/register" {
-			h.RegisterHandler(w, r)
-			return
-		}
-		if r.URL.Path == "/login" {
-			h.LoginHandler(w, r)
-			return
-		}
-		http.Error(w, "not found", http.StatusNotFound)
-	case http.MethodGet:
-		if r.URL.Path == "/profile" {
-			h.ProfileHandler(w, r)
-			return
-		}
-		http.Error(w, "not found", http.StatusNotFound)
-	default:
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-	}
-}
-
 func (h *UserAPIHandlers) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	var req model.CreateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {

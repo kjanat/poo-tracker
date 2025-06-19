@@ -18,31 +18,8 @@ func (a *App) listBowelMovements(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": list})
 }
 
-func (a *App) createBowelMovement(c *gin.Context) {
-	var req struct {
-		UserID      string `json:"userId"`
-		BristolType int    `json:"bristolType"`
-		Notes       string `json:"notes,omitempty"`
-		// Accept optional enhanced fields
-		Volume       *model.Volume      `json:"volume,omitempty"`
-		Color        *model.Color       `json:"color,omitempty"`
-		Consistency  *model.Consistency `json:"consistency,omitempty"`
-		Floaters     bool               `json:"floaters,omitempty"`
-		Pain         int                `json:"pain,omitempty"`
-		Strain       int                `json:"strain,omitempty"`
-		Satisfaction int                `json:"satisfaction,omitempty"`
-		PhotoURL     string             `json:"photoUrl,omitempty"`
-		SmellLevel   *model.SmellLevel  `json:"smellLevel,omitempty"`
-	}
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Start with a new bowel movement with defaults
-	bm := model.NewBowelMovement(req.UserID, req.BristolType)
-
-	// Override with provided values
+// applyOptionalFields applies optional fields from the request to the bowel movement
+func applyOptionalFields(bm *model.BowelMovement, req *createBowelMovementRequest) {
 	if req.Notes != "" {
 		bm.Notes = req.Notes
 	}
@@ -71,6 +48,36 @@ func (a *App) createBowelMovement(c *gin.Context) {
 	if req.SmellLevel != nil {
 		bm.SmellLevel = req.SmellLevel
 	}
+}
+
+// createBowelMovementRequest defines the request structure for creating bowel movements
+type createBowelMovementRequest struct {
+	UserID       string             `json:"userId"`
+	BristolType  int                `json:"bristolType"`
+	Notes        string             `json:"notes,omitempty"`
+	Volume       *model.Volume      `json:"volume,omitempty"`
+	Color        *model.Color       `json:"color,omitempty"`
+	Consistency  *model.Consistency `json:"consistency,omitempty"`
+	Floaters     bool               `json:"floaters,omitempty"`
+	Pain         int                `json:"pain,omitempty"`
+	Strain       int                `json:"strain,omitempty"`
+	Satisfaction int                `json:"satisfaction,omitempty"`
+	PhotoURL     string             `json:"photoUrl,omitempty"`
+	SmellLevel   *model.SmellLevel  `json:"smellLevel,omitempty"`
+}
+
+func (a *App) createBowelMovement(c *gin.Context) {
+	var req createBowelMovementRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Start with a new bowel movement with defaults
+	bm := model.NewBowelMovement(req.UserID, req.BristolType)
+
+	// Apply optional fields
+	applyOptionalFields(&bm, &req)
 
 	// Validate the complete bowel movement
 	if validationErrors := validation.ValidateBowelMovement(bm); validationErrors.HasErrors() {
