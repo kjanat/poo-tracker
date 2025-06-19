@@ -27,6 +27,10 @@ func (a *App) createBowelMovement(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	if req.BristolType < 1 || req.BristolType > 7 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "bristolType must be between 1 and 7"})
+		return
+	}
 	bm := model.BowelMovement{
 		UserID:      req.UserID,
 		BristolType: req.BristolType,
