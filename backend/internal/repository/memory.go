@@ -10,24 +10,36 @@ import (
 )
 
 var (
-	_ BowelMovementRepository = (*memoryRepo)(nil)
-	_ MealRepository          = (*memoryRepo)(nil)
+	_ BowelMovementRepository = (*memoryBowelRepo)(nil)
+	_ MealRepository          = (*memoryMealRepo)(nil)
 )
 
-type memoryRepo struct {
+// Separate memoryBowelRepo and memoryMealRepo for interface compliance
+
+type memoryBowelRepo struct {
+	mu      sync.RWMutex
+	bmStore map[string]model.BowelMovement
+}
+
+type memoryMealRepo struct {
 	mu        sync.RWMutex
-	bmStore   map[string]model.BowelMovement
 	mealStore map[string]model.Meal
 }
 
-func NewMemory() *memoryRepo {
-	return &memoryRepo{
-		bmStore:   make(map[string]model.BowelMovement),
+func NewMemoryBowelRepo() *memoryBowelRepo {
+	return &memoryBowelRepo{
+		bmStore: make(map[string]model.BowelMovement),
+	}
+}
+
+func NewMemoryMealRepo() *memoryMealRepo {
+	return &memoryMealRepo{
 		mealStore: make(map[string]model.Meal),
 	}
 }
 
-func (m *memoryRepo) List(ctx context.Context) ([]model.BowelMovement, error) {
+// BowelMovementRepository methods for memoryBowelRepo
+func (m *memoryBowelRepo) List(ctx context.Context) ([]model.BowelMovement, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	res := make([]model.BowelMovement, len(m.bmStore))
@@ -39,7 +51,7 @@ func (m *memoryRepo) List(ctx context.Context) ([]model.BowelMovement, error) {
 	return res, nil
 }
 
-func (m *memoryRepo) Create(ctx context.Context, bm model.BowelMovement) (model.BowelMovement, error) {
+func (m *memoryBowelRepo) Create(ctx context.Context, bm model.BowelMovement) (model.BowelMovement, error) {
 	if bm.ID == "" {
 		bm.ID = uuid.NewString()
 	}
@@ -69,7 +81,7 @@ func (m *memoryRepo) Create(ctx context.Context, bm model.BowelMovement) (model.
 	return bm, nil
 }
 
-func (m *memoryRepo) Get(ctx context.Context, id string) (model.BowelMovement, error) {
+func (m *memoryBowelRepo) Get(ctx context.Context, id string) (model.BowelMovement, error) {
 	m.mu.RLock()
 	bm, ok := m.bmStore[id]
 	m.mu.RUnlock()
@@ -79,7 +91,7 @@ func (m *memoryRepo) Get(ctx context.Context, id string) (model.BowelMovement, e
 	return bm, nil
 }
 
-func (m *memoryRepo) Update(ctx context.Context, id string, update model.BowelMovementUpdate) (model.BowelMovement, error) {
+func (m *memoryBowelRepo) Update(ctx context.Context, id string, update model.BowelMovementUpdate) (model.BowelMovement, error) {
 	m.mu.Lock()
 	existing, ok := m.bmStore[id]
 	if !ok {
@@ -131,7 +143,7 @@ func (m *memoryRepo) Update(ctx context.Context, id string, update model.BowelMo
 	return existing, nil
 }
 
-func (m *memoryRepo) Delete(ctx context.Context, id string) error {
+func (m *memoryBowelRepo) Delete(ctx context.Context, id string) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if _, ok := m.bmStore[id]; !ok {
@@ -141,7 +153,8 @@ func (m *memoryRepo) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (m *memoryRepo) List(ctx context.Context) ([]model.Meal, error) {
+// MealRepository methods for memoryMealRepo
+func (m *memoryMealRepo) List(ctx context.Context) ([]model.Meal, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	res := make([]model.Meal, 0, len(m.mealStore))
@@ -151,7 +164,7 @@ func (m *memoryRepo) List(ctx context.Context) ([]model.Meal, error) {
 	return res, nil
 }
 
-func (m *memoryRepo) Create(ctx context.Context, meal model.Meal) (model.Meal, error) {
+func (m *memoryMealRepo) Create(ctx context.Context, meal model.Meal) (model.Meal, error) {
 	if meal.ID == "" {
 		meal.ID = uuid.NewString()
 	}
@@ -170,7 +183,7 @@ func (m *memoryRepo) Create(ctx context.Context, meal model.Meal) (model.Meal, e
 	return meal, nil
 }
 
-func (m *memoryRepo) Get(ctx context.Context, id string) (model.Meal, error) {
+func (m *memoryMealRepo) Get(ctx context.Context, id string) (model.Meal, error) {
 	m.mu.RLock()
 	meal, ok := m.mealStore[id]
 	m.mu.RUnlock()
@@ -180,7 +193,7 @@ func (m *memoryRepo) Get(ctx context.Context, id string) (model.Meal, error) {
 	return meal, nil
 }
 
-func (m *memoryRepo) Update(ctx context.Context, id string, update model.MealUpdate) (model.Meal, error) {
+func (m *memoryMealRepo) Update(ctx context.Context, id string, update model.MealUpdate) (model.Meal, error) {
 	m.mu.Lock()
 	existing, ok := m.mealStore[id]
 	if !ok {
@@ -232,7 +245,7 @@ func (m *memoryRepo) Update(ctx context.Context, id string, update model.MealUpd
 	return existing, nil
 }
 
-func (m *memoryRepo) Delete(ctx context.Context, id string) error {
+func (m *memoryMealRepo) Delete(ctx context.Context, id string) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if _, ok := m.mealStore[id]; !ok {

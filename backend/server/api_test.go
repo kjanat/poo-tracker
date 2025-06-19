@@ -12,9 +12,10 @@ import (
 )
 
 func setup() *App {
-	repo := repository.NewMemory()
+	repo := repository.NewMemoryBowelRepo()
+	meals := repository.NewMemoryMealRepo()
 	strategy := service.AvgBristol{}
-	return New(repo, repo, strategy)
+	return New(repo, meals, strategy)
 }
 
 func TestBowelMovementCRUD(t *testing.T) {

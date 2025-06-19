@@ -19,8 +19,9 @@ func main() {
 	}
 	server.AuthService = auth
 
-	mem := repository.NewMemory()
-	app := server.New(mem, mem, service.AvgBristol{})
+	bowelRepo := repository.NewMemoryBowelRepo()
+	mealRepo := repository.NewMemoryMealRepo()
+	app := server.New(bowelRepo, mealRepo, service.AvgBristol{})
 
 	log.Println("Starting Poo Tracker server...")
 	if err := app.Engine.Run(); err != nil {

@@ -47,7 +47,10 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	resp := model.LoginResponse{User: *user, Token: token, ExpiresAt: 0}
-	json.NewEncoder(w).Encode(resp)
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -62,7 +65,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	resp := model.LoginResponse{User: *user, Token: token, ExpiresAt: 0}
-	json.NewEncoder(w).Encode(resp)
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }
 
 func ProfileHandler(w http.ResponseWriter, r *http.Request) {
@@ -71,7 +77,10 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
 		return
 	}
-	json.NewEncoder(w).Encode(user)
+	if err := json.NewEncoder(w).Encode(user); err != nil {
+		http.Error(w, "Failed to encode user", http.StatusInternalServerError)
+		return
+	}
 }
 
 func getUserFromContext(ctx context.Context) *model.User {

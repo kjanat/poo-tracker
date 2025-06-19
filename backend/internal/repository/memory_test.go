@@ -8,7 +8,7 @@ import (
 )
 
 func TestMemoryRepo_UpdateWithZeroValues(t *testing.T) {
-	repo := NewMemory()
+	repo := NewMemoryBowelRepo()
 	ctx := context.Background()
 
 	// Create initial bowel movement
