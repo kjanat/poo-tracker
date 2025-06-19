@@ -26,12 +26,19 @@ The `main.go` file wires dependencies using constructor functions. A memory repo
 - `GET /health` – basic health check
 - `GET /api/bowel-movements` – list entries
 - `POST /api/bowel-movements` – create entry
+  - Request body: `{"userId": "string", "bristolType": 1-7, "notes": "optional"}`
 - `GET /api/bowel-movements/:id` – get entry
 - `PUT /api/bowel-movements/:id` – update entry
+  - Request body: `{"bristolType": 1-7, "notes": "optional"}` (partial updates supported)
 - `DELETE /api/bowel-movements/:id` – delete entry
 - `GET /api/meals` – list meals
 - `POST /api/meals` – create meal
+  - Request body: `{"userId": "string", "name": "string", "calories": number}`
 - `GET /api/meals/:id` – get meal
 - `PUT /api/meals/:id` – update meal
+  - Request body: `{"name": "string", "calories": number}` (partial updates supported)
+- `DELETE /api/meals/:id` – delete meal
+- `GET /api/analytics` – summary statistics
+  - Response: Analytics data based on configured strategy
 - `DELETE /api/meals/:id` – delete meal
 - `GET /api/analytics` – summary statistics

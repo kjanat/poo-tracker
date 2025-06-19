@@ -32,16 +32,16 @@ func (a *App) registerRoutes() {
 	bm := api.Group("/bowel-movements")
 	bm.GET("", a.listBowelMovements)
 	bm.POST("", a.createBowelMovement)
-	bm.GET(":id", a.getBowelMovement)
-	bm.PUT(":id", a.updateBowelMovement)
-	bm.DELETE(":id", a.deleteBowelMovement)
+	bm.GET("/:id", a.getBowelMovement)
+	bm.PUT("/:id", a.updateBowelMovement)
+	bm.DELETE("/:id", a.deleteBowelMovement)
 
 	meals := api.Group("/meals")
 	meals.GET("", a.listMeals)
 	meals.POST("", a.createMeal)
-	meals.GET(":id", a.getMeal)
-	meals.PUT(":id", a.updateMeal)
-	meals.DELETE(":id", a.deleteMeal)
+	meals.GET("/:id", a.getMeal)
+	meals.PUT("/:id", a.updateMeal)
+	meals.DELETE("/:id", a.deleteMeal)
 
 	api.GET("/analytics", a.getAnalytics)
 }

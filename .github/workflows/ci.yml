@@ -73,7 +73,7 @@ jobs:
       contents: read
     strategy:
       matrix:
-        go-version: [1.22]
+        go-version: [1.22, 1.23, 1.24]
 
     steps:
       - name: 📦 Checkout
@@ -88,6 +88,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      - name: 📦 Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
 
       - name: 📦 Install dependencies
         run: pnpm install

@@ -25,7 +25,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 2. **Install dependencies:**
 
    ```bash
-   # Install Node.js dependencies (frontend only)
+   # Install Node.js dependencies (frontend only - backend now uses Go)
    pnpm install
 
    # Install Python dependencies for AI service

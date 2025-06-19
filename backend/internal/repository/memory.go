@@ -30,9 +30,11 @@ func NewMemory() *memoryRepo {
 func (m *memoryRepo) List(ctx context.Context) ([]model.BowelMovement, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	res := make([]model.BowelMovement, 0, len(m.bmStore))
+	res := make([]model.BowelMovement, len(m.bmStore))
+	i := 0
 	for _, v := range m.bmStore {
-		res = append(res, v)
+		res[i] = v
+		i++
 	}
 	return res, nil
 }
@@ -60,21 +62,24 @@ func (m *memoryRepo) Get(ctx context.Context, id string) (model.BowelMovement, e
 	return bm, nil
 }
 
-func (m *memoryRepo) Update(ctx context.Context, bm model.BowelMovement) (model.BowelMovement, error) {
+func (m *memoryRepo) Update(ctx context.Context, id string, update model.BowelMovementUpdate) (model.BowelMovement, error) {
 	m.mu.Lock()
-	existing, ok := m.bmStore[bm.ID]
+	existing, ok := m.bmStore[id]
 	if !ok {
 		m.mu.Unlock()
 		return model.BowelMovement{}, ErrNotFound
 	}
-	if bm.BristolType != 0 {
-		existing.BristolType = bm.BristolType
+
+	// Only update fields that are explicitly provided (non-nil pointers)
+	if update.BristolType != nil {
+		existing.BristolType = *update.BristolType
 	}
-	if bm.Notes != "" {
-		existing.Notes = bm.Notes
+	if update.Notes != nil {
+		existing.Notes = *update.Notes
 	}
+
 	existing.UpdatedAt = time.Now().UTC()
-	m.bmStore[bm.ID] = existing
+	m.bmStore[id] = existing
 	m.mu.Unlock()
 	return existing, nil
 }

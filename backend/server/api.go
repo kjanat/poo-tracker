@@ -60,22 +60,19 @@ func (a *App) getBowelMovement(c *gin.Context) {
 
 func (a *App) updateBowelMovement(c *gin.Context) {
 	id := c.Param("id")
-	var req struct {
-		BristolType *int    `json:"bristolType"`
-		Notes       *string `json:"notes"`
-	}
-	if err := c.ShouldBindJSON(&req); err != nil {
+	var update model.BowelMovementUpdate
+	if err := c.ShouldBindJSON(&update); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	bm := model.BowelMovement{ID: id}
-	if req.BristolType != nil {
-		bm.BristolType = *req.BristolType
+
+	// Validate Bristol type if provided
+	if update.BristolType != nil && (*update.BristolType < 1 || *update.BristolType > 7) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "bristolType must be between 1 and 7"})
+		return
 	}
-	if req.Notes != nil {
-		bm.Notes = *req.Notes
-	}
-	updated, err := a.repo.Update(c.Request.Context(), bm)
+
+	updated, err := a.repo.Update(c.Request.Context(), id, update)
 	if err != nil {
 		if err == repository.ErrNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})

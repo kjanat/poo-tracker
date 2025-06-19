@@ -11,3 +11,10 @@ type BowelMovement struct {
 	CreatedAt   time.Time `json:"createdAt"`
 	UpdatedAt   time.Time `json:"updatedAt"`
 }
+
+// BowelMovementUpdate represents fields that can be updated on a BowelMovement.
+// Pointer fields allow distinguishing between "not provided" and "set to zero value".
+type BowelMovementUpdate struct {
+	BristolType *int    `json:"bristolType,omitempty"`
+	Notes       *string `json:"notes,omitempty"`
+}

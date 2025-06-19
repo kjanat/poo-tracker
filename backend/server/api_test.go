@@ -50,6 +50,13 @@ func TestBowelMovementCRUD(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d", w.Code)
 	}
+	var updated map[string]any
+	if err := json.Unmarshal(w.Body.Bytes(), &updated); err != nil {
+		t.Fatal(err)
+	}
+	if updated["bristolType"].(float64) != 4 {
+		t.Fatalf("expected bristolType 4, got %v", updated["bristolType"])
+	}
 
 	req = httptest.NewRequest(http.MethodGet, "/api/analytics", nil)
 	w = httptest.NewRecorder()
