@@ -294,9 +294,8 @@ func (r *memoryBowelDetailsRepo) Create(ctx context.Context, details model.Bowel
 	r.mu.Unlock()
 
 	// Update the corresponding BowelMovement to indicate it has details
-	if r.bowelRepo != nil {
-		r.bowelRepo.updateHasDetails(details.BowelMovementID, true)
-	}
+	// Intentionally ignore error: details creation should not fail if HasDetails sync fails
+	_ = r.bowelRepo.updateHasDetails(details.BowelMovementID, true)
 
 	return details, nil
 }
@@ -375,10 +374,8 @@ func (r *memoryBowelDetailsRepo) Delete(ctx context.Context, bowelMovementID str
 	delete(r.detailsStore, bowelMovementID)
 
 	// Update the corresponding BowelMovement to indicate it no longer has details
-	if r.bowelRepo != nil {
-		r.bowelRepo.updateHasDetails(bowelMovementID, false)
-	}
-
+	// Intentionally ignore error: details deletion should not fail if HasDetails sync fails
+	_ = r.bowelRepo.updateHasDetails(bowelMovementID, false)
 	return nil
 }
 

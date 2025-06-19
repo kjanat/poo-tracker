@@ -12,12 +12,16 @@ If your code stinks, it won’t get merged. And yes, we’ll know.
 
 - **Frontend**: React (with Vite), TypeScript, TailwindCSS
 - **Backend/API**: Go (Gin framework, dependency injection, in-memory repositories)
-- **Database**: PostgreSQL (use Prisma ORM, or GTFO)
+  - Clean architecture with repository pattern
+  - JWT authentication with user management
+  - Enhanced BowelMovement model with separated details for performance
+  - Comprehensive validation and error handling
+- **Database**: PostgreSQL (planned - currently using in-memory for development)
 - **Storage**: S3-compatible for turd-photos (MinIO for local, AWS S3 for prod)
 - **AI / ML**: Python FastAPI service (Dockerized), talks to Go backend via REST
 - **CI/CD**: GitHub Actions
 - **Testing**: Vitest (frontend), go test (backend), pytest (AI service)
-- **Linting**: ESLint with @typescript-eslint and Prettier (don't fight the config)
+- **Linting**: ESLint with @typescript-eslint and Prettier (don't fight the config), golangci-lint (backend)
 - **Infra**: Docker everywhere. No raw installs.
 - **Package Managers**:
   - pnpm (because npm is for amateurs)
@@ -27,27 +31,53 @@ If your code stinks, it won’t get merged. And yes, we’ll know.
 
 ## Coding Practices
 
-1. **TypeScript is not optional.**  
-   If you sneak in any plain JavaScript, I will revert your commit and send you a brown paper bag.
-2. **Component-based everything.**  
-   No 1,000-line files. If your React component grows a tumor, split it.
-3. **Tailwind > CSS files**  
-   No CSS modules, no SCSS, no “quick fixes” in styles.css. Utility-first or GTFO.
-4. **Backend: RESTful.**  
-   If you say “GraphQL” I’ll call your mother.
-5. **Database migrations happen automatically.**
-   No SQL scripts in the repo, unless you’re writing a damn seed file.
-6. **Photo uploads must stream.**  
-   No base64 blobs in the database, you animal.
-7. **AI service is firewalled from main app.**  
-   Only ever accessible via backend. Don’t let your SPA talk directly to Python, or you’ll make me regret giving you network access.
-8. **Write tests.**  
-   Every new feature needs tests. If you “forget”, the next person gets to refactor your code, and nobody wants that.
-9. **Env vars go in `.env.example`**  
-   Don’t hardcode keys, don’t commit real secrets.
-10. **Follow commit conventions**:
+1. **TypeScript is not optional.**
 
-    ```
+   If you sneak in any plain JavaScript, I will revert your commit and send you a brown paper bag.
+
+2. **Component-based everything.**
+
+   No 1,000-line files. If your React component grows a tumor, split it.
+
+3. **Tailwind > CSS files**
+
+   No CSS modules, no SCSS, no “quick fixes” in styles.css. Utility-first or GTFO.
+
+4. **Backend: RESTful.**
+
+   If you say "GraphQL" I'll call your mother.
+
+5. **Go backend standards:**
+
+   - Always handle error return values (errcheck will catch you)
+   - Use pointer types for optional fields to distinguish nil from zero values
+   - Repository pattern with clean interfaces
+   - Comprehensive validation for all inputs
+   - JWT middleware for protected endpoints
+
+6. **Database migrations happen automatically.**
+
+   No SQL scripts in the repo, unless you're writing a damn seed file.
+
+7. **Photo uploads must stream.**
+
+   No base64 blobs in the database, you animal.
+
+8. **AI service is firewalled from main app.**
+
+   Only ever accessible via backend. Don't let your SPA talk directly to Python, or you'll make me regret giving you network access.
+
+9. **Write tests.**
+
+   Every new feature needs tests. If you "forget", the next person gets to refactor your code, and nobody wants that.
+
+10. **Env vars go in `.env.example`**
+
+Don't hardcode keys, don't commit real secrets.
+
+11. **Follow commit conventions**:
+
+    ```txt
     feat: add Bristol stool chart selector
     fix: correct off-by-one in shit counter
     chore: update dependencies
