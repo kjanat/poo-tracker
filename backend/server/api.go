@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kjanat/poo-tracker/backend/internal/model"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
+	"github.com/kjanat/poo-tracker/backend/internal/validation"
 )
 
 func (a *App) listBowelMovements(c *gin.Context) {
@@ -21,21 +22,62 @@ func (a *App) createBowelMovement(c *gin.Context) {
 	var req struct {
 		UserID      string `json:"userId"`
 		BristolType int    `json:"bristolType"`
-		Notes       string `json:"notes"`
+		Notes       string `json:"notes,omitempty"`
+		// Accept optional enhanced fields
+		Volume       *model.Volume      `json:"volume,omitempty"`
+		Color        *model.Color       `json:"color,omitempty"`
+		Consistency  *model.Consistency `json:"consistency,omitempty"`
+		Floaters     bool               `json:"floaters,omitempty"`
+		Pain         int                `json:"pain,omitempty"`
+		Strain       int                `json:"strain,omitempty"`
+		Satisfaction int                `json:"satisfaction,omitempty"`
+		PhotoURL     string             `json:"photoUrl,omitempty"`
+		SmellLevel   *model.SmellLevel  `json:"smellLevel,omitempty"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if req.BristolType < 1 || req.BristolType > 7 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "bristolType must be between 1 and 7"})
+
+	// Start with a new bowel movement with defaults
+	bm := model.NewBowelMovement(req.UserID, req.BristolType)
+
+	// Override with provided values
+	if req.Notes != "" {
+		bm.Notes = req.Notes
+	}
+	if req.Volume != nil {
+		bm.Volume = req.Volume
+	}
+	if req.Color != nil {
+		bm.Color = req.Color
+	}
+	if req.Consistency != nil {
+		bm.Consistency = req.Consistency
+	}
+	bm.Floaters = req.Floaters
+	if req.Pain > 0 {
+		bm.Pain = req.Pain
+	}
+	if req.Strain > 0 {
+		bm.Strain = req.Strain
+	}
+	if req.Satisfaction > 0 {
+		bm.Satisfaction = req.Satisfaction
+	}
+	if req.PhotoURL != "" {
+		bm.PhotoURL = req.PhotoURL
+	}
+	if req.SmellLevel != nil {
+		bm.SmellLevel = req.SmellLevel
+	}
+
+	// Validate the complete bowel movement
+	if validationErrors := validation.ValidateBowelMovement(bm); validationErrors.HasErrors() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": validationErrors.Error()})
 		return
 	}
-	bm := model.BowelMovement{
-		UserID:      req.UserID,
-		BristolType: req.BristolType,
-		Notes:       req.Notes,
-	}
+
 	created, err := a.repo.Create(c.Request.Context(), bm)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -66,9 +108,61 @@ func (a *App) updateBowelMovement(c *gin.Context) {
 		return
 	}
 
-	// Validate Bristol type if provided
-	if update.BristolType != nil && (*update.BristolType < 1 || *update.BristolType > 7) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "bristolType must be between 1 and 7"})
+	// Validate individual fields if provided
+	var validationErrors validation.ValidationErrors
+	if update.BristolType != nil {
+		if err := validation.ValidateBristolType(*update.BristolType); err != nil {
+			validationErrors = append(validationErrors, err.(validation.ValidationError))
+		}
+	}
+	if update.Pain != nil {
+		if err := validation.ValidateScale(*update.Pain, "pain"); err != nil {
+			validationErrors = append(validationErrors, err.(validation.ValidationError))
+		}
+	}
+	if update.Strain != nil {
+		if err := validation.ValidateScale(*update.Strain, "strain"); err != nil {
+			validationErrors = append(validationErrors, err.(validation.ValidationError))
+		}
+	}
+	if update.Satisfaction != nil {
+		if err := validation.ValidateScale(*update.Satisfaction, "satisfaction"); err != nil {
+			validationErrors = append(validationErrors, err.(validation.ValidationError))
+		}
+	}
+	if update.Volume != nil {
+		if err := validation.ValidateEnum(*update.Volume, "volume"); err != nil {
+			validationErrors = append(validationErrors, err.(validation.ValidationError))
+		}
+	}
+	if update.Color != nil {
+		if err := validation.ValidateEnum(*update.Color, "color"); err != nil {
+			validationErrors = append(validationErrors, err.(validation.ValidationError))
+		}
+	}
+	if update.Consistency != nil {
+		if err := validation.ValidateEnum(*update.Consistency, "consistency"); err != nil {
+			validationErrors = append(validationErrors, err.(validation.ValidationError))
+		}
+	}
+	if update.SmellLevel != nil {
+		if err := validation.ValidateEnum(*update.SmellLevel, "smellLevel"); err != nil {
+			validationErrors = append(validationErrors, err.(validation.ValidationError))
+		}
+	}
+	if update.PhotoURL != nil {
+		if err := validation.ValidateURL(*update.PhotoURL, "photoUrl"); err != nil {
+			validationErrors = append(validationErrors, err.(validation.ValidationError))
+		}
+	}
+	if update.Notes != nil {
+		if err := validation.ValidateNotes(*update.Notes, "notes"); err != nil {
+			validationErrors = append(validationErrors, err.(validation.ValidationError))
+		}
+	}
+
+	if validationErrors.HasErrors() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": validationErrors.Error()})
 		return
 	}
 
@@ -116,17 +210,19 @@ func (a *App) listMeals(c *gin.Context) {
 }
 
 func (a *App) createMeal(c *gin.Context) {
-	var req struct {
-		UserID   string `json:"userId"`
-		Name     string `json:"name"`
-		Calories int    `json:"calories"`
-	}
+	var req model.Meal
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	meal := model.Meal{UserID: req.UserID, Name: req.Name, Calories: req.Calories}
-	created, err := a.meals.CreateMeal(c.Request.Context(), meal)
+
+	// Validate the meal
+	if validationErrors := validation.ValidateMeal(req); validationErrors.HasErrors() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": validationErrors.Error()})
+		return
+	}
+
+	created, err := a.meals.CreateMeal(c.Request.Context(), req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -150,22 +246,56 @@ func (a *App) getMeal(c *gin.Context) {
 
 func (a *App) updateMeal(c *gin.Context) {
 	id := c.Param("id")
-	var req struct {
-		Name     *string `json:"name"`
-		Calories *int    `json:"calories"`
-	}
-	if err := c.ShouldBindJSON(&req); err != nil {
+	var update model.MealUpdate
+	if err := c.ShouldBindJSON(&update); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	meal := model.Meal{ID: id}
-	if req.Name != nil {
-		meal.Name = *req.Name
+
+	// Validate individual fields if provided
+	var validationErrors validation.ValidationErrors
+	if update.Name != nil {
+		if err := validation.ValidateMealName(*update.Name); err != nil {
+			validationErrors = append(validationErrors, err.(validation.ValidationError))
+		}
 	}
-	if req.Calories != nil {
-		meal.Calories = *req.Calories
+	if update.Calories != nil {
+		if err := validation.ValidateCalories(*update.Calories); err != nil {
+			validationErrors = append(validationErrors, err.(validation.ValidationError))
+		}
 	}
-	updated, err := a.meals.UpdateMeal(c.Request.Context(), meal)
+	if update.SpicyLevel != nil {
+		if err := validation.ValidateSpicyLevel(*update.SpicyLevel); err != nil {
+			validationErrors = append(validationErrors, err.(validation.ValidationError))
+		}
+	}
+	if update.Category != nil {
+		if err := validation.ValidateEnum(*update.Category, "category"); err != nil {
+			validationErrors = append(validationErrors, err.(validation.ValidationError))
+		}
+	}
+	if update.PhotoURL != nil {
+		if err := validation.ValidateURL(*update.PhotoURL, "photoUrl"); err != nil {
+			validationErrors = append(validationErrors, err.(validation.ValidationError))
+		}
+	}
+	if update.Description != nil {
+		if err := validation.ValidateNotes(*update.Description, "description"); err != nil {
+			validationErrors = append(validationErrors, err.(validation.ValidationError))
+		}
+	}
+	if update.Notes != nil {
+		if err := validation.ValidateNotes(*update.Notes, "notes"); err != nil {
+			validationErrors = append(validationErrors, err.(validation.ValidationError))
+		}
+	}
+
+	if validationErrors.HasErrors() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": validationErrors.Error()})
+		return
+	}
+
+	updated, err := a.meals.UpdateMeal(c.Request.Context(), id, update)
 	if err != nil {
 		if err == repository.ErrNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
