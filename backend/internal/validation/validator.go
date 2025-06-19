@@ -243,62 +243,72 @@ func ValidateEnum[T interface{ IsValid() bool }](value T, fieldName string) erro
 func ValidateBowelMovement(bm model.BowelMovement) ValidationErrors {
 	var errors ValidationErrors
 
-	// Required fields
+	errors = append(errors, validateBowelMovementRequired(bm)...)  // Required fields
+	errors = append(errors, validateBowelMovementEnums(bm)...)     // Enum fields
+	errors = append(errors, validateBowelMovementScales(bm)...)    // Scale fields
+	errors = append(errors, validateBowelMovementOptionals(bm)...) // Optional fields
+
+	return errors
+}
+
+func validateBowelMovementRequired(bm model.BowelMovement) ValidationErrors {
+	var errors ValidationErrors
 	if err := ValidateUserID(bm.UserID); err != nil {
 		errors = append(errors, err.(ValidationError))
 	}
-
 	if err := ValidateBristolType(bm.BristolType); err != nil {
 		errors = append(errors, err.(ValidationError))
 	}
+	return errors
+}
 
-	// Optional enum fields
+func validateBowelMovementEnums(bm model.BowelMovement) ValidationErrors {
+	var errors ValidationErrors
 	if bm.Volume != nil {
 		if err := ValidateEnum(*bm.Volume, "volume"); err != nil {
 			errors = append(errors, err.(ValidationError))
 		}
 	}
-
 	if bm.Color != nil {
 		if err := ValidateEnum(*bm.Color, "color"); err != nil {
 			errors = append(errors, err.(ValidationError))
 		}
 	}
-
 	if bm.Consistency != nil {
 		if err := ValidateEnum(*bm.Consistency, "consistency"); err != nil {
 			errors = append(errors, err.(ValidationError))
 		}
 	}
-
 	if bm.SmellLevel != nil {
 		if err := ValidateEnum(*bm.SmellLevel, "smellLevel"); err != nil {
 			errors = append(errors, err.(ValidationError))
 		}
 	}
+	return errors
+}
 
-	// Scale fields
+func validateBowelMovementScales(bm model.BowelMovement) ValidationErrors {
+	var errors ValidationErrors
 	if err := ValidateScale(bm.Pain, "pain"); err != nil {
 		errors = append(errors, err.(ValidationError))
 	}
-
 	if err := ValidateScale(bm.Strain, "strain"); err != nil {
 		errors = append(errors, err.(ValidationError))
 	}
-
 	if err := ValidateScale(bm.Satisfaction, "satisfaction"); err != nil {
 		errors = append(errors, err.(ValidationError))
 	}
+	return errors
+}
 
-	// Optional fields
+func validateBowelMovementOptionals(bm model.BowelMovement) ValidationErrors {
+	var errors ValidationErrors
 	if err := ValidateURL(bm.PhotoURL, "photoUrl"); err != nil {
 		errors = append(errors, err.(ValidationError))
 	}
-
 	if err := ValidateNotes(bm.Notes, "notes"); err != nil {
 		errors = append(errors, err.(ValidationError))
 	}
-
 	return errors
 }
 
