@@ -1,19 +1,19 @@
-root = "./backend"
-testdata_dir = "testdata"
-tmp_dir = "bin/tmp"
+root = "."
+testdata_dir = "backend/testdata"
+tmp_dir = "backend/bin/tmp"
 
 [build]
   args_bin = []
-  bin = "bin/tmp/main"
-  cmd = "cd backend && go build -o ../bin/tmp/main ."
+  bin = "./backend/bin/tmp/main"
+  cmd = "cd backend && go build -o ./bin/tmp/main ."
   delay = 1000
-  exclude_dir = ["assets", "tmp", "vendor", "testdata"]
+  exclude_dir = ["assets", "tmp", "vendor", "testdata", "bin"]
   exclude_file = []
   exclude_regex = ["_test.go"]
   exclude_unchanged = false
   follow_symlink = false
   full_bin = ""
-  include_dir = ["backend", "frontend", "ai-service"]
+  include_dir = []
   include_ext = ["go", "tpl", "tmpl", "html", "css", "js"]
   include_file = []
   kill_delay = "0s"
