@@ -299,42 +299,84 @@ func (a *App) updateMeal(c *gin.Context) {
 
 func validateMealUpdateFields(update *model.MealUpdate) validation.ValidationErrors {
 	var validationErrors validation.ValidationErrors
+	validationErrors = append(validationErrors, validateMealUpdateName(update)...)        // Name
+	validationErrors = append(validationErrors, validateMealUpdateCalories(update)...)    // Calories
+	validationErrors = append(validationErrors, validateMealUpdateSpicyLevel(update)...)  // SpicyLevel
+	validationErrors = append(validationErrors, validateMealUpdateCategory(update)...)    // Category
+	validationErrors = append(validationErrors, validateMealUpdatePhotoURL(update)...)    // PhotoURL
+	validationErrors = append(validationErrors, validateMealUpdateDescription(update)...) // Description
+	validationErrors = append(validationErrors, validateMealUpdateNotes(update)...)       // Notes
+	return validationErrors
+}
+
+func validateMealUpdateName(update *model.MealUpdate) validation.ValidationErrors {
+	var errs validation.ValidationErrors
 	if update.Name != nil {
 		if err := validation.ValidateMealName(*update.Name); err != nil {
-			validationErrors = append(validationErrors, err.(validation.ValidationError))
+			errs = append(errs, err.(validation.ValidationError))
 		}
 	}
+	return errs
+}
+
+func validateMealUpdateCalories(update *model.MealUpdate) validation.ValidationErrors {
+	var errs validation.ValidationErrors
 	if update.Calories != nil {
 		if err := validation.ValidateCalories(*update.Calories); err != nil {
-			validationErrors = append(validationErrors, err.(validation.ValidationError))
+			errs = append(errs, err.(validation.ValidationError))
 		}
 	}
+	return errs
+}
+
+func validateMealUpdateSpicyLevel(update *model.MealUpdate) validation.ValidationErrors {
+	var errs validation.ValidationErrors
 	if update.SpicyLevel != nil {
 		if err := validation.ValidateSpicyLevel(*update.SpicyLevel); err != nil {
-			validationErrors = append(validationErrors, err.(validation.ValidationError))
+			errs = append(errs, err.(validation.ValidationError))
 		}
 	}
+	return errs
+}
+
+func validateMealUpdateCategory(update *model.MealUpdate) validation.ValidationErrors {
+	var errs validation.ValidationErrors
 	if update.Category != nil {
 		if err := validation.ValidateEnum(*update.Category, "category"); err != nil {
-			validationErrors = append(validationErrors, err.(validation.ValidationError))
+			errs = append(errs, err.(validation.ValidationError))
 		}
 	}
+	return errs
+}
+
+func validateMealUpdatePhotoURL(update *model.MealUpdate) validation.ValidationErrors {
+	var errs validation.ValidationErrors
 	if update.PhotoURL != nil {
 		if err := validation.ValidateURL(*update.PhotoURL, "photoUrl"); err != nil {
-			validationErrors = append(validationErrors, err.(validation.ValidationError))
+			errs = append(errs, err.(validation.ValidationError))
 		}
 	}
+	return errs
+}
+
+func validateMealUpdateDescription(update *model.MealUpdate) validation.ValidationErrors {
+	var errs validation.ValidationErrors
 	if update.Description != nil {
 		if err := validation.ValidateNotes(*update.Description, "description"); err != nil {
-			validationErrors = append(validationErrors, err.(validation.ValidationError))
+			errs = append(errs, err.(validation.ValidationError))
 		}
 	}
+	return errs
+}
+
+func validateMealUpdateNotes(update *model.MealUpdate) validation.ValidationErrors {
+	var errs validation.ValidationErrors
 	if update.Notes != nil {
 		if err := validation.ValidateNotes(*update.Notes, "notes"); err != nil {
-			validationErrors = append(validationErrors, err.(validation.ValidationError))
+			errs = append(errs, err.(validation.ValidationError))
 		}
 	}
-	return validationErrors
+	return errs
 }
 
 func (a *App) deleteMeal(c *gin.Context) {

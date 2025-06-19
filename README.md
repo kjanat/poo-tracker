@@ -54,7 +54,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
 5. **Set up the database:**
 
-   The Go backend expects a running PostgreSQL instance. Use Docker Compose:
+   Start the PostgreSQL database using Docker Compose:
 
    ```bash
    pnpm docker:up
