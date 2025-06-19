@@ -13,24 +13,32 @@ import (
 	"github.com/kjanat/poo-tracker/backend/internal/validation"
 )
 
-var AuthService service.AuthService // should be initialized in main
+// UserAPIHandlers handles user-related API endpoints with dependency injection
+type UserAPIHandlers struct {
+	AuthService service.AuthService // Made public for middleware access
+}
+
+// NewUserAPIHandlers creates a new UserAPIHandlers with the provided auth service
+func NewUserAPIHandlers(authService service.AuthService) *UserAPIHandlers {
+	return &UserAPIHandlers{AuthService: authService}
+}
 
 // UserAPIHandler handles user-related API endpoints.
-func UserAPIHandler(w http.ResponseWriter, r *http.Request) {
+func (h *UserAPIHandlers) UserAPIHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 		if r.URL.Path == "/register" {
-			RegisterHandler(w, r)
+			h.RegisterHandler(w, r)
 			return
 		}
 		if r.URL.Path == "/login" {
-			LoginHandler(w, r)
+			h.LoginHandler(w, r)
 			return
 		}
 		http.Error(w, "not found", http.StatusNotFound)
 	case http.MethodGet:
 		if r.URL.Path == "/profile" {
-			ProfileHandler(w, r)
+			h.ProfileHandler(w, r)
 			return
 		}
 		http.Error(w, "not found", http.StatusNotFound)
@@ -39,7 +47,7 @@ func UserAPIHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func RegisterHandler(w http.ResponseWriter, r *http.Request) {
+func (h *UserAPIHandlers) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	var req model.CreateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "invalid request format", http.StatusBadRequest)
@@ -64,7 +72,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, token, err := AuthService.Register(req.Email, req.Password, req.Name)
+	user, token, err := h.AuthService.Register(req.Email, req.Password, req.Name)
 	if err != nil {
 		// Generic error response to avoid leaking internal details
 		http.Error(w, "registration failed", http.StatusBadRequest)
@@ -82,7 +90,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
+func (h *UserAPIHandlers) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var req model.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "invalid request format", http.StatusBadRequest)
@@ -97,7 +105,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: Implement rate limiting here to prevent brute force attacks
 
-	user, token, err := AuthService.Login(req.Email, req.Password)
+	user, token, err := h.AuthService.Login(req.Email, req.Password)
 	if err != nil {
 		http.Error(w, "invalid credentials", http.StatusUnauthorized)
 		return
@@ -114,7 +122,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func ProfileHandler(w http.ResponseWriter, r *http.Request) {
+func (h *UserAPIHandlers) ProfileHandler(w http.ResponseWriter, r *http.Request) {
 	// Authentication should be handled by middleware, not here
 	// This handler assumes the user is already authenticated and set in context
 	user := getUserFromContext(r.Context())

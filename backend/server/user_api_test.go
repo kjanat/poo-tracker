@@ -22,9 +22,9 @@ func TestUserAPIHandler(t *testing.T) {
 		Secret:   "test_secret",
 		Expiry:   24 * time.Hour,
 	}
-	originalAuthService := AuthService
-	AuthService = authService
-	defer func() { AuthService = originalAuthService }()
+
+	// Create user handlers with dependency injection
+	userHandlers := NewUserAPIHandlers(authService)
 
 	t.Run("Register - Success", func(t *testing.T) {
 		reqBody := model.CreateUserRequest{
@@ -37,7 +37,7 @@ func TestUserAPIHandler(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/register", bytes.NewBuffer(jsonBody))
 		w := httptest.NewRecorder()
 
-		RegisterHandler(w, req)
+		userHandlers.RegisterHandler(w, req)
 
 		if w.Code != http.StatusOK {
 			t.Errorf("Expected status 200, got %d", w.Code)
@@ -70,7 +70,7 @@ func TestUserAPIHandler(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/register", bytes.NewBuffer(jsonBody))
 		w := httptest.NewRecorder()
 
-		RegisterHandler(w, req)
+		userHandlers.RegisterHandler(w, req)
 
 		if w.Code != http.StatusBadRequest {
 			t.Errorf("Expected status 400, got %d", w.Code)
@@ -87,7 +87,7 @@ func TestUserAPIHandler(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/register", bytes.NewBuffer(jsonBody))
 		w := httptest.NewRecorder()
 
-		RegisterHandler(w, req)
+		userHandlers.RegisterHandler(w, req)
 
 		if w.Code != http.StatusBadRequest {
 			t.Errorf("Expected status 400, got %d", w.Code)
@@ -110,7 +110,7 @@ func TestUserAPIHandler(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/login", bytes.NewBuffer(jsonBody))
 		w := httptest.NewRecorder()
 
-		LoginHandler(w, req)
+		userHandlers.LoginHandler(w, req)
 
 		if w.Code != http.StatusOK {
 			t.Errorf("Expected status 200, got %d", w.Code)
@@ -136,7 +136,7 @@ func TestUserAPIHandler(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/login", bytes.NewBuffer(jsonBody))
 		w := httptest.NewRecorder()
 
-		LoginHandler(w, req)
+		userHandlers.LoginHandler(w, req)
 
 		if w.Code != http.StatusUnauthorized {
 			t.Errorf("Expected status 401, got %d", w.Code)
@@ -154,7 +154,7 @@ func TestUserAPIHandler(t *testing.T) {
 		req = req.WithContext(middleware.ContextWithUser(req.Context(), user))
 		w := httptest.NewRecorder()
 
-		ProfileHandler(w, req)
+		userHandlers.ProfileHandler(w, req)
 
 		if w.Code != http.StatusOK {
 			t.Errorf("Expected status 200, got %d", w.Code)
@@ -174,7 +174,7 @@ func TestUserAPIHandler(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/profile", nil)
 		w := httptest.NewRecorder()
 
-		ProfileHandler(w, req)
+		userHandlers.ProfileHandler(w, req)
 
 		if w.Code != http.StatusUnauthorized {
 			t.Errorf("Expected status 401, got %d", w.Code)

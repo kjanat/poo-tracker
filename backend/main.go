@@ -24,11 +24,10 @@ func main() {
 		Secret:   jwtSecret,
 		Expiry:   24 * time.Hour,
 	}
-	server.AuthService = auth
 
 	bowelRepo := repository.NewMemoryBowelRepo()
 	mealRepo := repository.NewMemoryMealRepo()
-	app := server.New(bowelRepo, mealRepo, service.AvgBristol{})
+	app := server.New(bowelRepo, mealRepo, service.AvgBristol{}, auth)
 
 	log.Println("Starting Poo Tracker server...")
 	if err := app.Engine.Run(); err != nil {

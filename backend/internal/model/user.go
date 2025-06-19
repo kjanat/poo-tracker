@@ -39,8 +39,8 @@ type UserSettings struct {
 	PrivacyLevel        int       `json:"privacyLevel"` // 1-5 scale
 	NotificationEnabled bool      `json:"notificationEnabled"`
 	ThemePreference     *string   `json:"themePreference,omitempty"` // light, dark, auto
-	DarkMode            bool      `json:"dark_mode"`
-	PreferredUnits      *string   `json:"preferred_units,omitempty"`
+	DarkMode            bool      `json:"darkMode"`
+	PreferredUnits      *string   `json:"preferredUnits,omitempty"`
 	CreatedAt           time.Time `json:"createdAt"`
 	UpdatedAt           time.Time `json:"updatedAt"`
 }
@@ -87,8 +87,8 @@ type UpdateUserSettingsRequest struct {
 	PrivacyLevel        *int    `json:"privacyLevel,omitempty"`
 	NotificationEnabled *bool   `json:"notificationEnabled,omitempty"`
 	ThemePreference     *string `json:"themePreference,omitempty"`
-	DarkMode            *bool   `json:"dark_mode,omitempty"`
-	PreferredUnits      *string `json:"preferred_units,omitempty"`
+	DarkMode            *bool   `json:"darkMode,omitempty"`
+	PreferredUnits      *string `json:"preferredUnits,omitempty"`
 }
 
 // ChangePasswordRequest represents the request to change password

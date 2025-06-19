@@ -10,15 +10,23 @@ import (
 )
 
 type App struct {
-	Engine    *gin.Engine
-	repo      repository.BowelMovementRepository
-	meals     repository.MealRepository
-	analytics *service.Service
+	Engine       *gin.Engine
+	repo         repository.BowelMovementRepository
+	meals        repository.MealRepository
+	analytics    *service.Service
+	userHandlers *UserAPIHandlers
 }
 
-func New(repo repository.BowelMovementRepository, meals repository.MealRepository, strategy service.AnalyticsStrategy) *App {
+func New(repo repository.BowelMovementRepository, meals repository.MealRepository, strategy service.AnalyticsStrategy, authService service.AuthService) *App {
 	engine := gin.Default()
-	app := &App{Engine: engine, repo: repo, meals: meals, analytics: service.New(repo, strategy)}
+	userHandlers := NewUserAPIHandlers(authService)
+	app := &App{
+		Engine:       engine,
+		repo:         repo,
+		meals:        meals,
+		analytics:    service.New(repo, strategy),
+		userHandlers: userHandlers,
+	}
 
 	engine.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
@@ -47,7 +55,7 @@ func (a *App) registerRoutes() {
 	api.GET("/analytics", a.getAnalytics)
 
 	// User management routes
-	api.POST("/register", func(c *gin.Context) { RegisterHandler(c.Writer, c.Request) })
-	api.POST("/login", func(c *gin.Context) { LoginHandler(c.Writer, c.Request) })
-	api.GET("/profile", gin.WrapH(middleware.AuthMiddleware(AuthService)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { ProfileHandler(w, r) }))))
+	api.POST("/register", func(c *gin.Context) { a.userHandlers.RegisterHandler(c.Writer, c.Request) })
+	api.POST("/login", func(c *gin.Context) { a.userHandlers.LoginHandler(c.Writer, c.Request) })
+	api.GET("/profile", gin.WrapH(middleware.AuthMiddleware(a.userHandlers.AuthService)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { a.userHandlers.ProfileHandler(w, r) }))))
 }

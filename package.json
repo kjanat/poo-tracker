@@ -34,13 +34,13 @@
     "prepare": "husky",
     "preinstall": "npx only-allow pnpm",
     "clean": "pnpm --recursive run clean",
-    "format": "concurrently \"pnpm format:all\" \"pnpm format:ai\"",
+    "format": "concurrently \"pnpm format:prettier\" \"pnpm format:ai\" \"pnpm format:backend\"",
     "format:frontend": "prettier --write frontend",
     "format:backend": "gofmt -s -w backend/**/*.go",
     "format:ai": "uv run ruff format ai-service",
     "format:ai:check": "uv run ruff format ai-service --check",
-    "format:all": "prettier --write .",
-    "format:all:watch": "onchange \"**/*.{ts,tsx,js,jsx,json,md}\" -- prettier --write",
+    "format:prettier": "prettier --write .",
+    "format:prettier:watch": "onchange \"**/*.{ts,tsx,js,jsx,json,md}\" -- prettier --write",
     "trunk": "trunk",
     "trunk:lint": "trunk check",
     "trunk:format": "trunk fmt"
@@ -88,10 +88,10 @@
       "pnpm format:ai"
     ],
     "*.{json,md,yml,yaml}": [
-      "pnpm format:all"
+      "pnpm format:prettier"
     ],
     "*.{css,scss,less}": [
-      "pnpm format:all"
+      "pnpm format:prettier"
     ]
   }
 }

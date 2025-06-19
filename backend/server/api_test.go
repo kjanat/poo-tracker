@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 	"github.com/kjanat/poo-tracker/backend/internal/service"
@@ -15,7 +16,16 @@ func setup() *App {
 	repo := repository.NewMemoryBowelRepo()
 	meals := repository.NewMemoryMealRepo()
 	strategy := service.AvgBristol{}
-	return New(repo, meals, strategy)
+
+	// Create a mock auth service for testing
+	userRepo := repository.NewMemoryUserRepository()
+	authService := &service.JWTAuthService{
+		UserRepo: userRepo,
+		Secret:   "test-secret",
+		Expiry:   24 * time.Hour,
+	}
+
+	return New(repo, meals, strategy, authService)
 }
 
 func TestBowelMovementCRUD(t *testing.T) {
