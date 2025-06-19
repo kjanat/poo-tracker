@@ -2,57 +2,22 @@ package server
 
 import (
 	"net/http"
-	"sync"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
+	"github.com/kjanat/poo-tracker/backend/internal/model"
+	"github.com/kjanat/poo-tracker/backend/internal/repository"
 )
 
-// BowelMovement represents a bowel movement entry
-// This is a simplified version of the previous Node.js model
-// ID is generated on creation
-// UserID would normally come from authentication middleware
-// For demo purposes we keep it simple
-
-type BowelMovement struct {
-	ID          string    `json:"id"`
-	UserID      string    `json:"userId"`
-	BristolType int       `json:"bristolType"`
-	Notes       string    `json:"notes,omitempty"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
-}
-
-// In-memory store and mutex for thread safety
-var (
-	store = make(map[string]BowelMovement)
-	mu    sync.RWMutex
-)
-
-func registerRoutes(r *gin.Engine) {
-	api := r.Group("/api")
-	bm := api.Group("/bowel-movements")
-	bm.GET("", listBowelMovements)
-	bm.POST("", createBowelMovement)
-	bm.GET(":id", getBowelMovement)
-	bm.PUT(":id", updateBowelMovement)
-	bm.DELETE(":id", deleteBowelMovement)
-
-	api.GET("/analytics", getAnalytics)
-}
-
-func listBowelMovements(c *gin.Context) {
-	mu.RLock()
-	defer mu.RUnlock()
-	movements := make([]BowelMovement, 0, len(store))
-	for _, m := range store {
-		movements = append(movements, m)
+func (a *App) listBowelMovements(c *gin.Context) {
+	list, err := a.repo.List(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
-	c.JSON(http.StatusOK, gin.H{"data": movements})
+	c.JSON(http.StatusOK, gin.H{"data": list})
 }
 
-func createBowelMovement(c *gin.Context) {
+func (a *App) createBowelMovement(c *gin.Context) {
 	var req struct {
 		UserID      string `json:"userId"`
 		BristolType int    `json:"bristolType"`
@@ -62,38 +27,34 @@ func createBowelMovement(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	id := uuid.NewString()
-	now := time.Now().UTC()
-	bm := BowelMovement{
-		ID:          id,
+	bm := model.BowelMovement{
 		UserID:      req.UserID,
 		BristolType: req.BristolType,
 		Notes:       req.Notes,
-		CreatedAt:   now,
-		UpdatedAt:   now,
 	}
-
-	mu.Lock()
-	store[id] = bm
-	mu.Unlock()
-
-	c.JSON(http.StatusCreated, bm)
+	created, err := a.repo.Create(c.Request.Context(), bm)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusCreated, created)
 }
 
-func getBowelMovement(c *gin.Context) {
+func (a *App) getBowelMovement(c *gin.Context) {
 	id := c.Param("id")
-	mu.RLock()
-	bm, ok := store[id]
-	mu.RUnlock()
-	if !ok {
-		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+	bm, err := a.repo.Get(c.Request.Context(), id)
+	if err != nil {
+		if err == repository.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, bm)
 }
 
-func updateBowelMovement(c *gin.Context) {
+func (a *App) updateBowelMovement(c *gin.Context) {
 	id := c.Param("id")
 	var req struct {
 		BristolType *int    `json:"bristolType"`
@@ -103,54 +64,43 @@ func updateBowelMovement(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	mu.Lock()
-	bm, ok := store[id]
-	if !ok {
-		mu.Unlock()
-		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
-		return
-	}
+	bm := model.BowelMovement{ID: id}
 	if req.BristolType != nil {
 		bm.BristolType = *req.BristolType
 	}
 	if req.Notes != nil {
 		bm.Notes = *req.Notes
 	}
-	bm.UpdatedAt = time.Now().UTC()
-	store[id] = bm
-	mu.Unlock()
-
-	c.JSON(http.StatusOK, bm)
+	updated, err := a.repo.Update(c.Request.Context(), bm)
+	if err != nil {
+		if err == repository.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, updated)
 }
 
-func deleteBowelMovement(c *gin.Context) {
+func (a *App) deleteBowelMovement(c *gin.Context) {
 	id := c.Param("id")
-	mu.Lock()
-	_, ok := store[id]
-	if ok {
-		delete(store, id)
-	}
-	mu.Unlock()
-	if !ok {
-		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+	if err := a.repo.Delete(c.Request.Context(), id); err != nil {
+		if err == repository.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.Status(http.StatusNoContent)
 }
 
-func getAnalytics(c *gin.Context) {
-	mu.RLock()
-	defer mu.RUnlock()
-	total := len(store)
-	if total == 0 {
-		c.JSON(http.StatusOK, gin.H{"total": 0})
+func (a *App) getAnalytics(c *gin.Context) {
+	stats, err := a.analytics.Stats(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	sum := 0
-	for _, bm := range store {
-		sum += bm.BristolType
-	}
-	avg := float64(sum) / float64(total)
-	c.JSON(http.StatusOK, gin.H{"total": total, "avgBristol": avg})
+	c.JSON(http.StatusOK, stats)
 }

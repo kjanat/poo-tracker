@@ -1,7 +1,6 @@
 # Poo Tracker Backend (Go)
 
-This Go service exposes a REST API for the Poo Tracker app. It now replicates the
-core functionality of the old Node.js backend using the Gin framework.
+This service implements the API for Poo Tracker using Go and the Gin framework. The previous Node.js backend was replaced with a lightweight Go application that follows a simple clean-architecture approach.
 
 ## Development
 
@@ -12,6 +11,15 @@ go run ./backend
 # Run tests
 go test ./...
 ```
+
+### Architecture
+
+- `internal/model` – domain models
+- `internal/repository` – repository interfaces and implementations
+- `internal/service` – business logic with pluggable analytics strategies
+- `server` – HTTP handlers and routing
+
+The `main.go` file wires dependencies using constructor functions. A memory repository is used by default but can be swapped out for a real database implementation.
 
 ### Endpoints
 
