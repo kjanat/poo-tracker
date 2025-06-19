@@ -21,8 +21,8 @@ func (a *App) listBowelMovements(c *gin.Context) {
 
 // applyOptionalFields applies optional fields from the request to the bowel movement
 func applyOptionalFields(bm *model.BowelMovement, req *createBowelMovementRequest) {
-	if req.Notes != "" {
-		bm.Notes = req.Notes
+	if req.Notes != nil {
+		bm.Notes = *req.Notes
 	}
 	if req.Volume != nil {
 		bm.Volume = req.Volume
@@ -33,18 +33,20 @@ func applyOptionalFields(bm *model.BowelMovement, req *createBowelMovementReques
 	if req.Consistency != nil {
 		bm.Consistency = req.Consistency
 	}
-	bm.Floaters = req.Floaters
-	if req.Pain > 0 {
-		bm.Pain = req.Pain
+	if req.Floaters != nil {
+		bm.Floaters = *req.Floaters
 	}
-	if req.Strain > 0 {
-		bm.Strain = req.Strain
+	if req.Pain != nil {
+		bm.Pain = *req.Pain
 	}
-	if req.Satisfaction > 0 {
-		bm.Satisfaction = req.Satisfaction
+	if req.Strain != nil {
+		bm.Strain = *req.Strain
 	}
-	if req.PhotoURL != "" {
-		bm.PhotoURL = req.PhotoURL
+	if req.Satisfaction != nil {
+		bm.Satisfaction = *req.Satisfaction
+	}
+	if req.PhotoURL != nil {
+		bm.PhotoURL = *req.PhotoURL
 	}
 	if req.SmellLevel != nil {
 		bm.SmellLevel = req.SmellLevel
@@ -55,15 +57,15 @@ func applyOptionalFields(bm *model.BowelMovement, req *createBowelMovementReques
 type createBowelMovementRequest struct {
 	UserID       string             `json:"userId"`
 	BristolType  int                `json:"bristolType"`
-	Notes        string             `json:"notes,omitempty"`
+	Notes        *string            `json:"notes,omitempty"`
 	Volume       *model.Volume      `json:"volume,omitempty"`
 	Color        *model.Color       `json:"color,omitempty"`
 	Consistency  *model.Consistency `json:"consistency,omitempty"`
-	Floaters     bool               `json:"floaters,omitempty"`
-	Pain         int                `json:"pain,omitempty"`
-	Strain       int                `json:"strain,omitempty"`
-	Satisfaction int                `json:"satisfaction,omitempty"`
-	PhotoURL     string             `json:"photoUrl,omitempty"`
+	Floaters     *bool              `json:"floaters,omitempty"`
+	Pain         *int               `json:"pain,omitempty"`
+	Strain       *int               `json:"strain,omitempty"`
+	Satisfaction *int               `json:"satisfaction,omitempty"`
+	PhotoURL     *string            `json:"photoUrl,omitempty"`
 	SmellLevel   *model.SmellLevel  `json:"smellLevel,omitempty"`
 }
 
