@@ -40,6 +40,17 @@ The `main.go` file wires dependencies using constructor functions. A memory repo
 - `DELETE /api/meals/:id` – delete meal
 - `GET /api/analytics` – summary statistics
   - Response: Analytics data based on configured strategy
+
+#### BowelMovement Details (Enhanced tracking)
+
+- `POST /api/bowel-movements/:id/details` – create detailed information for bowel movement
+  - Request body: `{"notes": "string", "detailedNotes": "string", "environment": "string", "preConditions": "string", "postConditions": "string", "aiRecommendations": "string", "tags": ["string"], "weatherCondition": "string", "stressLevel": 1-10, "sleepQuality": 1-10, "exerciseIntensity": 1-10}`
+- `GET /api/bowel-movements/:id/details` – get detailed information
+- `PUT /api/bowel-movements/:id/details` – update detailed information
+- `DELETE /api/bowel-movements/:id/details` – delete detailed information
+
+#### User Management
+
 - `POST /api/register` – create user account
   - Request body: `{"email": "string", "password": "string", "name": "string"}`
 - `POST /api/login` – authenticate user
@@ -53,12 +64,15 @@ The `main.go` file wires dependencies using constructor functions. A memory repo
 
 - Clean architecture with dependency injection
 - In-memory repositories for bowel movements, meals, and users
+- **Enhanced BowelMovement model with separated details for performance**
+- **BowelMovementDetails with comprehensive tracking fields and AI analysis**
 - JWT authentication with user registration and login
 - Comprehensive validation for all endpoints
-- Full CRUD operations for bowel movements and meals
+- Full CRUD operations for bowel movements, meals, and details
 - Analytics service with pluggable strategies
 - Comprehensive test coverage
 - RESTful API design
+- **Automatic HasDetails flag synchronization between models**
 
 ### 🔄 In Progress / Planned
 

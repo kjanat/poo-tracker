@@ -52,16 +52,28 @@ Complete implementation of the poo-tracker backend to match the comprehensive Pr
 - [x] internal/middleware/auth.go + auth_test.go
 - [x] server/user_api.go + user_api_test.go
 
-### Phase 3 - Enhanced Core Models ⏸️ PENDING
+### Phase 3 - Enhanced Core Models ✅ COMPLETED
 
-**Priority: Medium** | **Dependencies:** Phase 1, 2
+**Priority: Medium** | **Dependencies:** Phase 1, 2 ✅ | **Started:** 2025-06-20 | **Completed:** 2025-06-20
 
-- [ ] Create BowelMovementDetails model (separate for performance)
-- [ ] Update BowelMovement to reference details
-- [ ] Update repositories to handle details relationship
-- [ ] Update API handlers for enhanced fields
-- [ ] Create migration logic for existing data
-- [ ] Update all related tests
+- [x] Create BowelMovementDetails model (separate for performance)
+- [x] Update BowelMovement to reference details
+- [x] Update repositories to handle details relationship
+- [x] Update API handlers for enhanced fields
+- [x] Create migration logic for existing data
+- [x] Update all related tests
+
+**Files completed:**
+
+- [x] internal/model/bowel.go (enhanced with BowelMovementDetails)
+- [x] internal/repository/repository.go (BowelMovementDetailsRepository interface)
+- [x] internal/repository/memory.go (BowelMovementDetails CRUD + HasDetails sync)
+- [x] server/server.go (updated to include details repository)
+- [x] server/api.go (BowelMovementDetails CRUD handlers)
+- [x] main.go (repository initialization updated)
+- [x] internal/repository/bowel_details_test.go (comprehensive tests)
+- [x] server/details_api_test.go (API endpoint tests)
+- [x] All existing tests updated to work with new model
 
 ### Phase 4 - New Domain Models ⏸️ PENDING
 
@@ -118,26 +130,26 @@ Complete implementation of the poo-tracker backend to match the comprehensive Pr
 - Health endpoint
 - Test script fixes
 - User management foundation (Phase 2)
+- Enhanced core models with BowelMovementDetails separation (Phase 3)
 
 ### ⏳ In Progress
 
-- Phase 3: Enhanced Core Models
+- None
 
 ### 📊 Statistics
 
 - **Total Tasks:** 50+
-- **Completed:** 16 (32%)
-- **In Progress:** 6 (12%)
+- **Completed:** 22 (44%)
+- **In Progress:** 0 (0%)
 - **Pending:** 28+ (56%)
 
 ### 🎯 Next Actions
 
-1. Implement BowelMovementDetails model
-2. Update BowelMovement to reference details
-3. Update repositories to handle details relationship
-4. Update API handlers for enhanced fields
-5. Create migration logic for existing data
-6. Update all related tests
+1. Implement Symptom model and repository (Phase 4)
+2. Implement Medication model and repository (Phase 4)
+3. Create symptom and medication API handlers (Phase 4)
+4. Add comprehensive tests for new models (Phase 4)
+5. Update main.go with new routes (Phase 4)
 
 ---
 
