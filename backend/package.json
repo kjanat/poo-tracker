@@ -28,7 +28,7 @@
     "pnpm": ">=9.0.0"
   },
   "dependencies": {
-    "@prisma/client": "^6.9.0",
+    "@prisma/client": "^6.10.0",
     "bcryptjs": "^3.0.2",
     "compression": "^1.8.0",
     "cors": "^2.8.5",
@@ -44,7 +44,7 @@
     "sharp": "^0.34.2",
     "uuid": "^11.1.0",
     "winston": "^3.17.0",
-    "zod": "^3.25.64"
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@types/winston": "^2.4.4",
@@ -57,7 +57,7 @@
     "@types/multer": "^1.4.13",
     "@types/supertest": "^6.0.3",
     "@types/uuid": "^10.0.0",
-    "prisma": "^6.9.0",
+    "prisma": "^6.10.0",
     "supertest": "^7.1.1",
     "tsx": "^4.20.3"
   }
