@@ -40,14 +40,11 @@ jobs:
         with:
           go-version-file: 'backend/go.mod'
 
-      - name: 🦃 Install golangci-lint
+      - name: 🔍 Lint
         uses: golangci/golangci-lint-action@v6
         with:
           version: latest
-          install-mode: binary
-          args: --version
-          skip-cache: true
-          skip-save-cache: true
+          working-directory: backend
 
       - name: 📦 Install uv and 🐍 Python
         uses: astral-sh/setup-uv@v6
