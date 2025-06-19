@@ -16,7 +16,7 @@ echo "🚀 Setting up Poo Tracker development environment..."
         export PATH="$HOME/.cargo/bin:$PATH"
     fi
 
-# Install Node.js dependencies (frontend + backend)
+# Install Node.js dependencies (frontend)
 echo "📦 Installing Node.js dependencies..."
 pnpm install
 
@@ -42,13 +42,7 @@ until docker compose exec -T postgres pg_isready -U poo_user -d poo_tracker >/de
     sleep 1
 done
 
-# Run database migrations
-echo "🗄️ Running database migrations..."
-pnpm db:migrate
-
-# Optionally seed database
-echo "🌱 Seeding database with test data..."
-pnpm db:seed
+# No automatic migrations for Go backend
 
 echo "✅ Setup complete! Run 'pnpm dev:full' to start all services"
 echo ""

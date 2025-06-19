@@ -25,7 +25,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 2. **Install dependencies:**
 
    ```bash
-   # Install Node.js dependencies (frontend + backend)
+   # Install Node.js dependencies (frontend only)
    pnpm install
 
    # Install Python dependencies for AI service
@@ -48,21 +48,17 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
    # Start database and supporting services
    pnpm docker:up
 
-   # Start all development servers (frontend + backend + AI)
-   pnpm dev:full
-
-   # OR start just frontend + backend
-   pnpm dev
+   # Start all development servers (frontend + Go backend + AI)
+   pnpm dev:frontend & pnpm dev:backend & pnpm dev:ai
+   wait
    ```
 
 5. **Set up the database:**
 
-   ```bash
-   # Run database migrations
-   pnpm db:migrate
+   The Go backend expects a running PostgreSQL instance. Use Docker Compose:
 
-   # (Optional) Seed with test data
-   pnpm db:seed
+   ```bash
+   pnpm docker:up
    ```
 
    A sample set of credentials for API testing is provided in
@@ -79,7 +75,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 ## 🏗️ Tech Stack
 
 - **Frontend**: React + Vite + TypeScript + TailwindCSS v4
-- **Backend**: Node.js + Express v5 + TypeScript + Prisma
+- **Backend**: Go + Gin
 - **Database**: PostgreSQL
 - **Storage**: MinIO (S3-compatible for photos)
 - **AI Service**: Python + FastAPI + scikit-learn
@@ -113,21 +109,18 @@ These example files contain **sample credentials only**. Replace them with your 
 
 ```bash
 # Development - All Services
-pnpm dev:full         # Start frontend + backend + AI service
-pnpm dev              # Start frontend + backend only
+pnpm dev:full         # Start frontend, Go backend and AI service
 pnpm dev:frontend     # Start frontend only
-pnpm dev:backend      # Start backend only
+pnpm dev:backend      # Start Go backend only
 pnpm dev:ai           # Start AI service only
 
 # Building
 pnpm build            # Build all projects
 pnpm build:frontend   # Build frontend only
-pnpm build:backend    # Build backend only
+pnpm build:backend    # Build Go backend only
 
 # Database Operations
-pnpm db:migrate       # Run Prisma migrations
-pnpm db:seed          # Seed database with test data
-pnpm db:studio        # Open Prisma Studio
+# (Database migrations handled via SQL scripts in Go backend)
 
 # Docker Services
 pnpm docker:up        # Start PostgreSQL, Redis, MinIO
@@ -153,10 +146,10 @@ poo-tracker/
 │   ├── src/
 │   ├── package.json
 │   └── vite.config.ts
-├── backend/            # Express.js API (TypeScript + Prisma)
-│   ├── src/
-│   ├── prisma/
-│   └── package.json
+├── backend/            # Go API (Gin framework)
+│   ├── *.go
+│   ├── go.mod
+│   └── README.md
 ├── ai-service/         # Python FastAPI AI service
 │   ├── main.py
 │   ├── pyproject.toml
@@ -173,11 +166,10 @@ This project uses **pnpm workspaces** for efficient monorepo management:
 ```bash
 # Install dependencies for specific workspace
 pnpm --filter @poo-tracker/frontend add react-router-dom
-pnpm --filter @poo-tracker/backend add express-rate-limit
+
 
 # Run commands on specific workspaces
 pnpm --filter @poo-tracker/frontend build
-pnpm --filter @poo-tracker/backend test
 
 # Run commands on all workspaces
 pnpm --recursive run build
@@ -186,16 +178,14 @@ pnpm --parallel run dev
 
 ### API Endpoints
 
-| Endpoint                 | Method   | Description                           |
-| ------------------------ | -------- | ------------------------------------- |
-| `/api/auth/register`     | `POST`   | Register a new user                   |
-| `/api/auth/login`        | `POST`   | Authenticate user                     |
-| `/api/entries`           | `GET`    | Get bowel movement entries            |
-| `/api/entries`           | `POST`   | Create a new bowel movement entry     |
-| `/api/entries/:id`       | `PUT`    | Update a bowel movement entry         |
-| `/api/entries/:id`       | `DELETE` | Delete a bowel movement entry         |
-| `/api/uploads/photo`     | `POST`   | Upload a photo of your bowel movement |
-| `/api/analytics/summary` | `GET`    | Get AI analysis summary               |
+| Endpoint                   | Method   | Description                       |
+| -------------------------- | -------- | --------------------------------- |
+| `/api/bowel-movements`     | `GET`    | List bowel movement entries       |
+| `/api/bowel-movements`     | `POST`   | Create a new bowel movement entry |
+| `/api/bowel-movements/:id` | `GET`    | Get a specific entry              |
+| `/api/bowel-movements/:id` | `PUT`    | Update a bowel movement entry     |
+| `/api/bowel-movements/:id` | `DELETE` | Delete a bowel movement entry     |
+| `/api/analytics`           | `GET`    | Get simple analytics              |
 
 ## 📝 How it works
 
@@ -321,7 +311,7 @@ pnpm build
 
 # Or build individually
 pnpm build:frontend
-pnpm build:backend
+pnpm build:backend    # Build Go backend only
 
 # AI service
 uv run uvicorn ai_service.main:app

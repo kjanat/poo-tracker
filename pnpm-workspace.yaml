@@ -1,4 +1,4 @@
 packages:
   - 'frontend'
-  - 'backend'
+  # backend rewritten in Go, not part of pnpm workspaces
   # ai-service excluded since it's Python
