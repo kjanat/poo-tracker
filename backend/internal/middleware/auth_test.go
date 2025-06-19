@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -22,7 +21,10 @@ func TestAuthMiddleware(t *testing.T) {
 	}
 
 	// Create a test user and get a valid token
-	testUser, validToken, err := authService.Register("test@example.com", "password123", "Test User")
+	var testUser *model.User
+	var validToken string
+	var err error
+	testUser, validToken, err = authService.Register("test@example.com", "password123", "Test User")
 	if err != nil {
 		t.Fatalf("Failed to create test user: %v", err)
 	}
@@ -53,7 +55,7 @@ func TestAuthMiddleware(t *testing.T) {
 				}
 
 				// Add user to context
-				ctx := context.WithValue(r.Context(), "user", user)
+				ctx := ContextWithUser(r.Context(), user)
 				next.ServeHTTP(w, r.WithContext(ctx))
 			})
 		}
@@ -61,13 +63,16 @@ func TestAuthMiddleware(t *testing.T) {
 
 	// Test handler that checks if user is in context
 	testHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		user := r.Context().Value("user").(*model.User)
+		user := UserFromContext(r.Context())
 		if user == nil {
 			http.Error(w, "user not found in context", http.StatusInternalServerError)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("success"))
+		_, err := w.Write([]byte("success"))
+		if err != nil {
+			http.Error(w, "failed to write response", http.StatusInternalServerError)
+		}
 	})
 
 	t.Run("Valid Token", func(t *testing.T) {
@@ -160,7 +165,7 @@ func TestAuthMiddleware(t *testing.T) {
 
 		// Handler that checks user context
 		contextTestHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			user := r.Context().Value("user").(*model.User)
+			user := UserFromContext(r.Context())
 			if user == nil {
 				t.Error("User should be in context")
 				http.Error(w, "no user in context", http.StatusInternalServerError)

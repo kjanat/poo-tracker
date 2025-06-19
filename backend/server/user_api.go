@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kjanat/poo-tracker/backend/internal/middleware"
 	"github.com/kjanat/poo-tracker/backend/internal/model"
 	"github.com/kjanat/poo-tracker/backend/internal/service"
 	"github.com/kjanat/poo-tracker/backend/internal/validation"
@@ -130,6 +131,5 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUserFromContext(ctx context.Context) *model.User {
-	user, _ := ctx.Value("user").(*model.User)
-	return user
+	return middleware.UserFromContext(ctx)
 }

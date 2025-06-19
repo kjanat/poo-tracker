@@ -2,13 +2,13 @@ package server
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
+	"github.com/kjanat/poo-tracker/backend/internal/middleware"
 	"github.com/kjanat/poo-tracker/backend/internal/model"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 	"github.com/kjanat/poo-tracker/backend/internal/service"
@@ -151,7 +151,7 @@ func TestUserAPIHandler(t *testing.T) {
 		}
 
 		req := httptest.NewRequest(http.MethodGet, "/profile", nil)
-		req = req.WithContext(context.WithValue(req.Context(), "user", user))
+		req = req.WithContext(middleware.ContextWithUser(req.Context(), user))
 		w := httptest.NewRecorder()
 
 		ProfileHandler(w, req)

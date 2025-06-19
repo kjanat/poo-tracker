@@ -13,7 +13,7 @@ type contextKey string
 
 const userContextKey = contextKey("user")
 
-func contextWithUser(ctx context.Context, user *model.User) context.Context {
+func ContextWithUser(ctx context.Context, user *model.User) context.Context {
 	return context.WithValue(ctx, userContextKey, user)
 }
 
@@ -37,7 +37,7 @@ func AuthMiddleware(auth service.AuthService) func(http.Handler) http.Handler {
 				http.Error(w, "invalid token", http.StatusUnauthorized)
 				return
 			}
-			ctx := contextWithUser(r.Context(), user)
+			ctx := ContextWithUser(r.Context(), user)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
