@@ -12,17 +12,19 @@ import (
 type App struct {
 	Engine       *gin.Engine
 	repo         repository.BowelMovementRepository
+	details      repository.BowelMovementDetailsRepository
 	meals        repository.MealRepository
 	analytics    *service.Service
 	userHandlers *UserAPIHandlers
 }
 
-func New(repo repository.BowelMovementRepository, meals repository.MealRepository, strategy service.AnalyticsStrategy, authService service.AuthService) *App {
+func New(repo repository.BowelMovementRepository, details repository.BowelMovementDetailsRepository, meals repository.MealRepository, strategy service.AnalyticsStrategy, authService service.AuthService) *App {
 	engine := gin.Default()
 	userHandlers := NewUserAPIHandlers(authService)
 	app := &App{
 		Engine:       engine,
 		repo:         repo,
+		details:      details,
 		meals:        meals,
 		analytics:    service.New(repo, strategy),
 		userHandlers: userHandlers,
@@ -44,6 +46,12 @@ func (a *App) registerRoutes() {
 	bm.GET("/:id", a.getBowelMovement)
 	bm.PUT("/:id", a.updateBowelMovement)
 	bm.DELETE("/:id", a.deleteBowelMovement)
+
+	// BowelMovementDetails routes
+	bm.POST("/:id/details", a.createBowelMovementDetails)
+	bm.GET("/:id/details", a.getBowelMovementDetails)
+	bm.PUT("/:id/details", a.updateBowelMovementDetails)
+	bm.DELETE("/:id/details", a.deleteBowelMovementDetails)
 
 	meals := api.Group("/meals")
 	meals.GET("", a.listMeals)

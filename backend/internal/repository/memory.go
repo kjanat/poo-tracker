@@ -10,15 +10,22 @@ import (
 )
 
 var (
-	_ BowelMovementRepository = (*memoryBowelRepo)(nil)
-	_ MealRepository          = (*memoryMealRepo)(nil)
+	_ BowelMovementRepository        = (*memoryBowelRepo)(nil)
+	_ BowelMovementDetailsRepository = (*memoryBowelDetailsRepo)(nil)
+	_ MealRepository                 = (*memoryMealRepo)(nil)
 )
 
-// Separate memoryBowelRepo and memoryMealRepo for interface compliance
+// Separate memory repositories for interface compliance
 
 type memoryBowelRepo struct {
 	mu      sync.RWMutex
 	bmStore map[string]model.BowelMovement
+}
+
+type memoryBowelDetailsRepo struct {
+	mu           sync.RWMutex
+	detailsStore map[string]model.BowelMovementDetails // keyed by BowelMovementID
+	bowelRepo    *memoryBowelRepo                      // reference to update HasDetails flag
 }
 
 type memoryMealRepo struct {
@@ -29,6 +36,13 @@ type memoryMealRepo struct {
 func NewMemoryBowelRepo() *memoryBowelRepo {
 	return &memoryBowelRepo{
 		bmStore: make(map[string]model.BowelMovement),
+	}
+}
+
+func NewMemoryBowelDetailsRepo(bowelRepo *memoryBowelRepo) *memoryBowelDetailsRepo {
+	return &memoryBowelDetailsRepo{
+		detailsStore: make(map[string]model.BowelMovementDetails),
+		bowelRepo:    bowelRepo,
 	}
 }
 
@@ -128,9 +142,6 @@ func (m *memoryBowelRepo) Update(ctx context.Context, id string, update model.Bo
 	if update.SmellLevel != nil {
 		existing.SmellLevel = update.SmellLevel
 	}
-	if update.Notes != nil {
-		existing.Notes = *update.Notes
-	}
 	if update.RecordedAt != nil {
 		existing.RecordedAt = *update.RecordedAt
 	}
@@ -139,6 +150,22 @@ func (m *memoryBowelRepo) Update(ctx context.Context, id string, update model.Bo
 	m.bmStore[id] = existing
 	m.mu.Unlock()
 	return existing, nil
+}
+
+// updateHasDetails updates the HasDetails flag for a bowel movement
+// This is an internal method used by the details repository
+func (m *memoryBowelRepo) updateHasDetails(id string, hasDetails bool) error {
+	m.mu.Lock()
+	existing, ok := m.bmStore[id]
+	if !ok {
+		m.mu.Unlock()
+		return ErrNotFound
+	}
+	existing.HasDetails = hasDetails
+	existing.UpdatedAt = time.Now().UTC()
+	m.bmStore[id] = existing
+	m.mu.Unlock()
+	return nil
 }
 
 func (m *memoryBowelRepo) Delete(ctx context.Context, id string) error {
@@ -251,4 +278,113 @@ func (m *memoryMealRepo) Delete(ctx context.Context, id string) error {
 	}
 	delete(m.mealStore, id)
 	return nil
+}
+
+// BowelMovementDetailsRepository methods for memoryBowelDetailsRepo
+func (r *memoryBowelDetailsRepo) Create(ctx context.Context, details model.BowelMovementDetails) (model.BowelMovementDetails, error) {
+	if details.ID == "" {
+		details.ID = uuid.NewString()
+	}
+	now := time.Now().UTC()
+	details.CreatedAt = now
+	details.UpdatedAt = now
+
+	r.mu.Lock()
+	r.detailsStore[details.BowelMovementID] = details
+	r.mu.Unlock()
+
+	// Update the corresponding BowelMovement to indicate it has details
+	if r.bowelRepo != nil {
+		r.bowelRepo.updateHasDetails(details.BowelMovementID, true)
+	}
+
+	return details, nil
+}
+
+func (r *memoryBowelDetailsRepo) Get(ctx context.Context, bowelMovementID string) (model.BowelMovementDetails, error) {
+	r.mu.RLock()
+	details, ok := r.detailsStore[bowelMovementID]
+	r.mu.RUnlock()
+	if !ok {
+		return model.BowelMovementDetails{}, ErrNotFound
+	}
+	return details, nil
+}
+
+func (r *memoryBowelDetailsRepo) Update(ctx context.Context, bowelMovementID string, update model.BowelMovementDetailsUpdate) (model.BowelMovementDetails, error) {
+	r.mu.Lock()
+	existing, ok := r.detailsStore[bowelMovementID]
+	if !ok {
+		r.mu.Unlock()
+		return model.BowelMovementDetails{}, ErrNotFound
+	}
+
+	// Apply updates
+	if update.Notes != nil {
+		existing.Notes = *update.Notes
+	}
+	if update.DetailedNotes != nil {
+		existing.DetailedNotes = *update.DetailedNotes
+	}
+	if update.Environment != nil {
+		existing.Environment = *update.Environment
+	}
+	if update.PreConditions != nil {
+		existing.PreConditions = *update.PreConditions
+	}
+	if update.PostConditions != nil {
+		existing.PostConditions = *update.PostConditions
+	}
+	if update.AIAnalysis != nil {
+		existing.AIAnalysis = update.AIAnalysis
+	}
+	if update.AIConfidence != nil {
+		existing.AIConfidence = update.AIConfidence
+	}
+	if update.AIRecommendations != nil {
+		existing.AIRecommendations = *update.AIRecommendations
+	}
+	if update.Tags != nil {
+		existing.Tags = update.Tags
+	}
+	if update.WeatherCondition != nil {
+		existing.WeatherCondition = *update.WeatherCondition
+	}
+	if update.StressLevel != nil {
+		existing.StressLevel = update.StressLevel
+	}
+	if update.SleepQuality != nil {
+		existing.SleepQuality = update.SleepQuality
+	}
+	if update.ExerciseIntensity != nil {
+		existing.ExerciseIntensity = update.ExerciseIntensity
+	}
+
+	existing.UpdatedAt = time.Now().UTC()
+	r.detailsStore[bowelMovementID] = existing
+	r.mu.Unlock()
+	return existing, nil
+}
+
+func (r *memoryBowelDetailsRepo) Delete(ctx context.Context, bowelMovementID string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, ok := r.detailsStore[bowelMovementID]; !ok {
+		return ErrNotFound
+	}
+	delete(r.detailsStore, bowelMovementID)
+
+	// Update the corresponding BowelMovement to indicate it no longer has details
+	if r.bowelRepo != nil {
+		r.bowelRepo.updateHasDetails(bowelMovementID, false)
+	}
+
+	return nil
+}
+
+func (r *memoryBowelDetailsRepo) Exists(ctx context.Context, bowelMovementID string) (bool, error) {
+	r.mu.RLock()
+	_, exists := r.detailsStore[bowelMovementID]
+	r.mu.RUnlock()
+	return exists, nil
 }

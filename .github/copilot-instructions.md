@@ -11,12 +11,12 @@ If your code stinks, it won’t get merged. And yes, we’ll know.
 ## Tech Stack
 
 - **Frontend**: React (with Vite), TypeScript, TailwindCSS
-- **Backend/API**: Node.js, Express, TypeScript
+- **Backend/API**: Go (Gin framework, dependency injection, in-memory repositories)
 - **Database**: PostgreSQL (use Prisma ORM, or GTFO)
 - **Storage**: S3-compatible for turd-photos (MinIO for local, AWS S3 for prod)
-- **AI / ML**: Python FastAPI service (Dockerized), talks to Node backend via REST
+- **AI / ML**: Python FastAPI service (Dockerized), talks to Go backend via REST
 - **CI/CD**: GitHub Actions
-- **Testing**: Vitest (frontend), Jest/Supertest (backend), pytest (AI service)
+- **Testing**: Vitest (frontend), go test (backend), pytest (AI service)
 - **Linting**: ESLint with @typescript-eslint and Prettier (don't fight the config)
 - **Infra**: Docker everywhere. No raw installs.
 - **Package Managers**:
@@ -35,7 +35,7 @@ If your code stinks, it won’t get merged. And yes, we’ll know.
    No CSS modules, no SCSS, no “quick fixes” in styles.css. Utility-first or GTFO.
 4. **Backend: RESTful.**  
    If you say “GraphQL” I’ll call your mother.
-5. **Database migrations with Prisma only.**  
+5. **Database migrations happen automatically.**
    No SQL scripts in the repo, unless you’re writing a damn seed file.
 6. **Photo uploads must stream.**  
    No base64 blobs in the database, you animal.

@@ -274,7 +274,6 @@ func TestValidateBowelMovement(t *testing.T) {
 		Pain:         3,
 		Strain:       2,
 		Satisfaction: 7,
-		Notes:        "Test notes",
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 		RecordedAt:   time.Now(),

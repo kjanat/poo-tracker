@@ -3,6 +3,7 @@ package model
 import "time"
 
 // BowelMovement represents a bowel movement entry with comprehensive tracking.
+// Large text fields and detailed metadata are stored in BowelMovementDetails for performance.
 type BowelMovement struct {
 	ID         string    `json:"id"`
 	UserID     string    `json:"userId"`
@@ -24,22 +25,45 @@ type BowelMovement struct {
 	Strain       int `json:"strain"`       // 1-10 scale, default 1
 	Satisfaction int `json:"satisfaction"` // 1-10 scale, default 5
 
-	// Optional fields
+	// Optional fields (light data)
 	PhotoURL   string      `json:"photoUrl,omitempty"`
 	SmellLevel *SmellLevel `json:"smellLevel,omitempty"`
-	Notes      string      `json:"notes,omitempty"`
+
+	// Reference to details (loaded separately)
+	HasDetails bool `json:"hasDetails"` // Indicates if details exist for this bowel movement
 }
 
 // BowelMovementDetails represents detailed information stored separately for performance.
+// This includes large text fields, AI analysis, and other detailed metadata.
 type BowelMovementDetails struct {
-	ID              string      `json:"id"`
-	BowelMovementID string      `json:"bowelMovementId"`
-	Notes           string      `json:"notes,omitempty"`
-	AIAnalysis      interface{} `json:"aiAnalysis,omitempty"` // JSON field for AI analysis
+	ID              string    `json:"id"`
+	BowelMovementID string    `json:"bowelMovementId"`
+	CreatedAt       time.Time `json:"createdAt"`
+	UpdatedAt       time.Time `json:"updatedAt"`
+
+	// Large text fields (stored separately for performance)
+	Notes          string `json:"notes,omitempty"`
+	DetailedNotes  string `json:"detailedNotes,omitempty"`  // More extensive notes
+	Environment    string `json:"environment,omitempty"`    // Bathroom conditions, privacy, etc.
+	PreConditions  string `json:"preConditions,omitempty"`  // What led to this movement
+	PostConditions string `json:"postConditions,omitempty"` // How you felt after
+
+	// AI analysis and metadata
+	AIAnalysis        interface{} `json:"aiAnalysis,omitempty"`        // JSON field for AI analysis
+	AIConfidence      *float64    `json:"aiConfidence,omitempty"`      // 0.0-1.0 confidence score
+	AIRecommendations string      `json:"aiRecommendations,omitempty"` // AI-generated recommendations
+
+	// Extended metadata
+	Tags              []string `json:"tags,omitempty"`              // User-defined tags
+	WeatherCondition  string   `json:"weatherCondition,omitempty"`  // Weather at time of movement
+	StressLevel       *int     `json:"stressLevel,omitempty"`       // 1-10 scale
+	SleepQuality      *int     `json:"sleepQuality,omitempty"`      // 1-10 scale (night before)
+	ExerciseIntensity *int     `json:"exerciseIntensity,omitempty"` // 1-10 scale (day before)
 }
 
 // BowelMovementUpdate represents fields that can be updated on a BowelMovement.
 // Pointer fields allow distinguishing between "not provided" and "set to zero value".
+// Note: Notes and detailed fields are updated via BowelMovementDetails.
 type BowelMovementUpdate struct {
 	BristolType  *int         `json:"bristolType,omitempty"`
 	Volume       *Volume      `json:"volume,omitempty"`
@@ -51,8 +75,24 @@ type BowelMovementUpdate struct {
 	Satisfaction *int         `json:"satisfaction,omitempty"`
 	PhotoURL     *string      `json:"photoUrl,omitempty"`
 	SmellLevel   *SmellLevel  `json:"smellLevel,omitempty"`
-	Notes        *string      `json:"notes,omitempty"`
 	RecordedAt   *time.Time   `json:"recordedAt,omitempty"`
+}
+
+// BowelMovementDetailsUpdate represents fields that can be updated on BowelMovementDetails.
+type BowelMovementDetailsUpdate struct {
+	Notes             *string     `json:"notes,omitempty"`
+	DetailedNotes     *string     `json:"detailedNotes,omitempty"`
+	Environment       *string     `json:"environment,omitempty"`
+	PreConditions     *string     `json:"preConditions,omitempty"`
+	PostConditions    *string     `json:"postConditions,omitempty"`
+	AIAnalysis        interface{} `json:"aiAnalysis,omitempty"`
+	AIConfidence      *float64    `json:"aiConfidence,omitempty"`
+	AIRecommendations *string     `json:"aiRecommendations,omitempty"`
+	Tags              []string    `json:"tags,omitempty"`
+	WeatherCondition  *string     `json:"weatherCondition,omitempty"`
+	StressLevel       *int        `json:"stressLevel,omitempty"`
+	SleepQuality      *int        `json:"sleepQuality,omitempty"`
+	ExerciseIntensity *int        `json:"exerciseIntensity,omitempty"`
 }
 
 // NewBowelMovement creates a new BowelMovement with sensible defaults.
@@ -68,5 +108,16 @@ func NewBowelMovement(userID string, bristolType int) BowelMovement {
 		Strain:       1, // Default: minimal strain
 		Satisfaction: 5, // Default: neutral satisfaction
 		Floaters:     false,
+	}
+}
+
+// NewBowelMovementDetails creates a new BowelMovementDetails with defaults.
+func NewBowelMovementDetails(bowelMovementID string) BowelMovementDetails {
+	now := time.Now()
+	return BowelMovementDetails{
+		BowelMovementID: bowelMovementID,
+		CreatedAt:       now,
+		UpdatedAt:       now,
+		Tags:            []string{},
 	}
 }

@@ -15,7 +15,6 @@ func TestMemoryRepo_UpdateWithZeroValues(t *testing.T) {
 	initial := model.BowelMovement{
 		UserID:      "user1",
 		BristolType: 5,
-		Notes:       "Initial notes",
 	}
 	created, err := repo.Create(ctx, initial)
 	if err != nil {
@@ -24,10 +23,10 @@ func TestMemoryRepo_UpdateWithZeroValues(t *testing.T) {
 
 	// Test updating to zero values - this should work now
 	bristolZero := 0
-	emptyNotes := ""
+	painZero := 0
 	update := model.BowelMovementUpdate{
 		BristolType: &bristolZero,
-		Notes:       &emptyNotes,
+		Pain:        &painZero,
 	}
 
 	updated, err := repo.Update(ctx, created.ID, update)
@@ -39,15 +38,15 @@ func TestMemoryRepo_UpdateWithZeroValues(t *testing.T) {
 	if updated.BristolType != 0 {
 		t.Errorf("Expected BristolType to be 0, got %d", updated.BristolType)
 	}
-	if updated.Notes != "" {
-		t.Errorf("Expected Notes to be empty, got %q", updated.Notes)
+	if updated.Pain != 0 {
+		t.Errorf("Expected Pain to be 0, got %d", updated.Pain)
 	}
 
-	// Test partial update - only update BristolType, leave Notes as is
+	// Test partial update - only update BristolType, leave Pain as is
 	newBristol := 3
 	partialUpdate := model.BowelMovementUpdate{
 		BristolType: &newBristol,
-		// Notes is nil, so it should not be updated
+		// Pain is nil, so it should not be updated
 	}
 
 	updated2, err := repo.Update(ctx, created.ID, partialUpdate)
@@ -55,31 +54,31 @@ func TestMemoryRepo_UpdateWithZeroValues(t *testing.T) {
 		t.Fatalf("Failed to partial update entry: %v", err)
 	}
 
-	// Verify only BristolType was updated, Notes remained empty
+	// Verify only BristolType was updated, Pain remained 0
 	if updated2.BristolType != 3 {
 		t.Errorf("Expected BristolType to be 3, got %d", updated2.BristolType)
 	}
-	if updated2.Notes != "" {
-		t.Errorf("Expected Notes to remain empty, got %q", updated2.Notes)
+	if updated2.Pain != 0 {
+		t.Errorf("Expected Pain to remain 0, got %d", updated2.Pain)
 	}
 
-	// Test updating Notes back to non-empty while keeping BristolType
-	newNotes := "Updated notes"
-	notesUpdate := model.BowelMovementUpdate{
-		Notes: &newNotes,
+	// Test updating Pain back to non-zero while keeping BristolType
+	newPain := 5
+	painUpdate := model.BowelMovementUpdate{
+		Pain: &newPain,
 		// BristolType is nil, so it should not be updated
 	}
 
-	updated3, err := repo.Update(ctx, created.ID, notesUpdate)
+	updated3, err := repo.Update(ctx, created.ID, painUpdate)
 	if err != nil {
-		t.Fatalf("Failed to update notes: %v", err)
+		t.Fatalf("Failed to update pain: %v", err)
 	}
 
-	// Verify only Notes was updated, BristolType remained 3
+	// Verify only Pain was updated, BristolType remained 3
 	if updated3.BristolType != 3 {
 		t.Errorf("Expected BristolType to remain 3, got %d", updated3.BristolType)
 	}
-	if updated3.Notes != "Updated notes" {
-		t.Errorf("Expected Notes to be 'Updated notes', got %q", updated3.Notes)
+	if updated3.Pain != 5 {
+		t.Errorf("Expected Pain to be 5, got %d", updated3.Pain)
 	}
 }

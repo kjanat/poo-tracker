@@ -314,9 +314,7 @@ func validateBowelMovementOptionals(bm model.BowelMovement) ValidationErrors {
 	if err := ValidateURL(bm.PhotoURL, "photoUrl"); err != nil {
 		errors = append(errors, err.(ValidationError))
 	}
-	if err := ValidateNotes(bm.Notes, "notes"); err != nil {
-		errors = append(errors, err.(ValidationError))
-	}
+	// Notes validation moved to BowelMovementDetails
 	return errors
 }
 

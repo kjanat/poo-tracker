@@ -25,14 +25,15 @@ func setup() *App {
 		Expiry:   24 * time.Hour,
 	}
 
-	return New(repo, meals, strategy, authService)
+	detailsRepo := repository.NewMemoryBowelDetailsRepo(repo)
+	return New(repo, detailsRepo, meals, strategy, authService)
 }
 
 func TestBowelMovementCRUD(t *testing.T) {
 	app := setup()
 	r := app.Engine
 
-	body := `{"userId":"u1","bristolType":3,"notes":"test"}`
+	body := `{"userId":"u1","bristolType":3}`
 	req := httptest.NewRequest(http.MethodPost, "/api/bowel-movements", bytes.NewBufferString(body))
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()

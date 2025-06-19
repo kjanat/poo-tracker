@@ -21,9 +21,6 @@ func (a *App) listBowelMovements(c *gin.Context) {
 
 // applyOptionalFields applies optional fields from the request to the bowel movement
 func applyOptionalFields(bm *model.BowelMovement, req *createBowelMovementRequest) {
-	if req.Notes != nil {
-		bm.Notes = *req.Notes
-	}
 	if req.Volume != nil {
 		bm.Volume = req.Volume
 	}
@@ -57,7 +54,6 @@ func applyOptionalFields(bm *model.BowelMovement, req *createBowelMovementReques
 type createBowelMovementRequest struct {
 	UserID       string             `json:"userId"`
 	BristolType  int                `json:"bristolType"`
-	Notes        *string            `json:"notes,omitempty"`
 	Volume       *model.Volume      `json:"volume,omitempty"`
 	Color        *model.Color       `json:"color,omitempty"`
 	Consistency  *model.Consistency `json:"consistency,omitempty"`
@@ -220,13 +216,6 @@ func validateBowelMovementUpdateOptionals(update *model.BowelMovementUpdate) val
 	var errs validation.ValidationErrors
 	if update.PhotoURL != nil {
 		if err := validation.ValidateURL(*update.PhotoURL, "photoUrl"); err != nil {
-			if verr, ok := err.(validation.ValidationError); ok {
-				errs = append(errs, verr)
-			}
-		}
-	}
-	if update.Notes != nil {
-		if err := validation.ValidateNotes(*update.Notes, "notes"); err != nil {
 			if verr, ok := err.(validation.ValidationError); ok {
 				errs = append(errs, verr)
 			}
@@ -491,4 +480,202 @@ func (a *App) deleteMeal(c *gin.Context) {
 		return
 	}
 	c.Status(http.StatusNoContent)
+}
+
+// BowelMovementDetails handlers
+
+// createBowelMovementDetailsRequest defines the request structure for creating bowel movement details
+type createBowelMovementDetailsRequest struct {
+	Notes             *string  `json:"notes,omitempty"`
+	DetailedNotes     *string  `json:"detailedNotes,omitempty"`
+	Environment       *string  `json:"environment,omitempty"`
+	PreConditions     *string  `json:"preConditions,omitempty"`
+	PostConditions    *string  `json:"postConditions,omitempty"`
+	AIRecommendations *string  `json:"aiRecommendations,omitempty"`
+	Tags              []string `json:"tags,omitempty"`
+	WeatherCondition  *string  `json:"weatherCondition,omitempty"`
+	StressLevel       *int     `json:"stressLevel,omitempty"`
+	SleepQuality      *int     `json:"sleepQuality,omitempty"`
+	ExerciseIntensity *int     `json:"exerciseIntensity,omitempty"`
+}
+
+func (a *App) createBowelMovementDetails(c *gin.Context) {
+	bowelMovementID := c.Param("id")
+
+	// Check if the bowel movement exists
+	_, err := a.repo.Get(c.Request.Context(), bowelMovementID)
+	if err != nil {
+		if err == repository.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "bowel movement not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Check if details already exist
+	exists, err := a.details.Exists(c.Request.Context(), bowelMovementID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if exists {
+		c.JSON(http.StatusConflict, gin.H{"error": "details already exist for this bowel movement"})
+		return
+	}
+
+	var req createBowelMovementDetailsRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Create new details
+	details := model.NewBowelMovementDetails(bowelMovementID)
+
+	// Apply optional fields
+	applyBowelMovementDetailsFields(&details, &req)
+
+	// Validate the details
+	if validationErrors := validateBowelMovementDetailsFields(details); validationErrors.HasErrors() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": validationErrors.Error()})
+		return
+	}
+
+	created, err := a.details.Create(c.Request.Context(), details)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusCreated, created)
+}
+
+func (a *App) getBowelMovementDetails(c *gin.Context) {
+	bowelMovementID := c.Param("id")
+	details, err := a.details.Get(c.Request.Context(), bowelMovementID)
+	if err != nil {
+		if err == repository.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "details not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, details)
+}
+
+func (a *App) updateBowelMovementDetails(c *gin.Context) {
+	bowelMovementID := c.Param("id")
+
+	var update model.BowelMovementDetailsUpdate
+	if err := c.ShouldBindJSON(&update); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Validate the update fields
+	if validationErrors := validateBowelMovementDetailsUpdate(update); validationErrors.HasErrors() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": validationErrors.Error()})
+		return
+	}
+
+	updated, err := a.details.Update(c.Request.Context(), bowelMovementID, update)
+	if err != nil {
+		if err == repository.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "details not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, updated)
+}
+
+func (a *App) deleteBowelMovementDetails(c *gin.Context) {
+	bowelMovementID := c.Param("id")
+	if err := a.details.Delete(c.Request.Context(), bowelMovementID); err != nil {
+		if err == repository.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "details not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
+
+// Helper functions for BowelMovementDetails
+
+func applyBowelMovementDetailsFields(details *model.BowelMovementDetails, req *createBowelMovementDetailsRequest) {
+	if req.Notes != nil {
+		details.Notes = *req.Notes
+	}
+	if req.DetailedNotes != nil {
+		details.DetailedNotes = *req.DetailedNotes
+	}
+	if req.Environment != nil {
+		details.Environment = *req.Environment
+	}
+	if req.PreConditions != nil {
+		details.PreConditions = *req.PreConditions
+	}
+	if req.PostConditions != nil {
+		details.PostConditions = *req.PostConditions
+	}
+	if req.AIRecommendations != nil {
+		details.AIRecommendations = *req.AIRecommendations
+	}
+	if req.Tags != nil {
+		details.Tags = req.Tags
+	}
+	if req.WeatherCondition != nil {
+		details.WeatherCondition = *req.WeatherCondition
+	}
+	if req.StressLevel != nil {
+		details.StressLevel = req.StressLevel
+	}
+	if req.SleepQuality != nil {
+		details.SleepQuality = req.SleepQuality
+	}
+	if req.ExerciseIntensity != nil {
+		details.ExerciseIntensity = req.ExerciseIntensity
+	}
+}
+
+func validateBowelMovementDetailsFields(details model.BowelMovementDetails) validation.ValidationErrors {
+	var errs validation.ValidationErrors
+	if details.Notes != "" {
+		if err := validation.ValidateNotes(details.Notes, "notes"); err != nil {
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
+		}
+	}
+	if details.DetailedNotes != "" {
+		if err := validation.ValidateNotes(details.DetailedNotes, "detailedNotes"); err != nil {
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
+		}
+	}
+	return errs
+}
+
+func validateBowelMovementDetailsUpdate(update model.BowelMovementDetailsUpdate) validation.ValidationErrors {
+	var errs validation.ValidationErrors
+	if update.Notes != nil {
+		if err := validation.ValidateNotes(*update.Notes, "notes"); err != nil {
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
+		}
+	}
+	if update.DetailedNotes != nil {
+		if err := validation.ValidateNotes(*update.DetailedNotes, "detailedNotes"); err != nil {
+			if verr, ok := err.(validation.ValidationError); ok {
+				errs = append(errs, verr)
+			}
+		}
+	}
+	return errs
 }

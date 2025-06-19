@@ -22,7 +22,8 @@ func TestHealth(t *testing.T) {
 		Expiry:   24 * time.Hour,
 	}
 
-	app := New(repo, meals, service.AvgBristol{}, authService)
+	detailsRepo := repository.NewMemoryBowelDetailsRepo(repo)
+	app := New(repo, detailsRepo, meals, service.AvgBristol{}, authService)
 	req, _ := http.NewRequest(http.MethodGet, "/health", nil)
 	w := httptest.NewRecorder()
 	app.Engine.ServeHTTP(w, req)

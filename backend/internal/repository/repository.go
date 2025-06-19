@@ -21,3 +21,11 @@ type MealRepository interface {
 	Update(ctx context.Context, id string, update model.MealUpdate) (model.Meal, error)
 	Delete(ctx context.Context, id string) error
 }
+
+type BowelMovementDetailsRepository interface {
+	Create(ctx context.Context, details model.BowelMovementDetails) (model.BowelMovementDetails, error)
+	Get(ctx context.Context, bowelMovementID string) (model.BowelMovementDetails, error)
+	Update(ctx context.Context, bowelMovementID string, update model.BowelMovementDetailsUpdate) (model.BowelMovementDetails, error)
+	Delete(ctx context.Context, bowelMovementID string) error
+	Exists(ctx context.Context, bowelMovementID string) (bool, error)
+}
