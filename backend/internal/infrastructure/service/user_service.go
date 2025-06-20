@@ -74,7 +74,7 @@ func (s *UserService) GetByID(ctx context.Context, id string) (*user.User, error
 	userEntity, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return nil, user.ErrNotFound
+			return nil, user.ErrUserNotFound
 		}
 		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
@@ -91,7 +91,7 @@ func (s *UserService) GetByEmail(ctx context.Context, email string) (*user.User,
 	userEntity, err := s.repo.GetByEmail(ctx, email)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return nil, user.ErrNotFound
+			return nil, user.ErrUserNotFound
 		}
 		return nil, fmt.Errorf("failed to get user by email: %w", err)
 	}
@@ -108,7 +108,7 @@ func (s *UserService) GetByUsername(ctx context.Context, username string) (*user
 	userEntity, err := s.repo.GetByUsername(ctx, username)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return nil, user.ErrNotFound
+			return nil, user.ErrUserNotFound
 		}
 		return nil, fmt.Errorf("failed to get user by username: %w", err)
 	}
@@ -126,7 +126,7 @@ func (s *UserService) Update(ctx context.Context, id string, input *user.UpdateU
 	_, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return nil, user.ErrNotFound
+			return nil, user.ErrUserNotFound
 		}
 		return nil, fmt.Errorf("failed to get user for update: %w", err)
 	}
@@ -174,7 +174,7 @@ func (s *UserService) Delete(ctx context.Context, id string) error {
 	_, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return user.ErrNotFound
+			return user.ErrUserNotFound
 		}
 		return fmt.Errorf("failed to verify user exists: %w", err)
 	}
@@ -364,7 +364,7 @@ func (s *UserService) ChangePassword(ctx context.Context, userID string, input *
 	userAuth, err := s.repo.GetAuthByUserID(ctx, userID)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return user.ErrNotFound
+			return user.ErrUserNotFound
 		}
 		return fmt.Errorf("failed to get user auth for password change: %w", err)
 	}
@@ -403,7 +403,7 @@ func (s *UserService) DeactivateAccount(ctx context.Context, userID string) erro
 	_, err := s.repo.GetByID(ctx, userID)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return user.ErrNotFound
+			return user.ErrUserNotFound
 		}
 		return fmt.Errorf("failed to get user for deactivation: %w", err)
 	}
@@ -425,7 +425,7 @@ func (s *UserService) GetSettings(ctx context.Context, userID string) (*user.Use
 	settings, err := s.repo.GetSettingsByUserID(ctx, userID)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return nil, user.ErrNotFound
+			return nil, user.ErrUserNotFound
 		}
 		return nil, fmt.Errorf("failed to get user settings: %w", err)
 	}
@@ -521,7 +521,7 @@ func (s *UserService) validateCreateInput(input *user.CreateUserInput) error {
 	}
 
 	if input.Name == "" {
-		return user.ErrInvalidName
+		return user.ErrInvalidInput
 	}
 
 	if input.Age != nil && (*input.Age < 1 || *input.Age > 150) {
@@ -553,7 +553,7 @@ func (s *UserService) validateUpdateInput(input *user.UpdateUserInput) error {
 	}
 
 	if input.Name != nil && *input.Name == "" {
-		return user.ErrInvalidName
+		return user.ErrInvalidInput
 	}
 
 	if input.Age != nil && (*input.Age < 1 || *input.Age > 150) {
@@ -585,11 +585,11 @@ func (s *UserService) validateRegisterInput(input *user.RegisterInput) error {
 	}
 
 	if input.Name == "" {
-		return user.ErrInvalidName
+		return user.ErrInvalidInput
 	}
 
 	if input.Password == "" {
-		return user.ErrInvalidPassword
+		return user.ErrWeakPassword
 	}
 
 	return nil
@@ -605,7 +605,7 @@ func (s *UserService) validateLoginInput(input *user.LoginInput) error {
 	}
 
 	if input.Password == "" {
-		return user.ErrInvalidPassword
+		return user.ErrWeakPassword
 	}
 
 	return nil
@@ -617,11 +617,11 @@ func (s *UserService) validateChangePasswordInput(input *user.ChangePasswordInpu
 	}
 
 	if input.CurrentPassword == "" {
-		return user.ErrInvalidPassword
+		return user.ErrWeakPassword
 	}
 
 	if input.NewPassword == "" {
-		return user.ErrInvalidPassword
+		return user.ErrWeakPassword
 	}
 
 	if input.CurrentPassword == input.NewPassword {

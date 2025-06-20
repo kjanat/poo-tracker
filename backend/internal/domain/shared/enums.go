@@ -1,7 +1,8 @@
 package shared
 
 import (
-	"database/sql/driver"
+	"database/sql"        // For sql.Scanner interface
+	"database/sql/driver" // For driver.Valuer interface
 	"fmt"
 )
 
@@ -41,6 +42,41 @@ func (v Volume) Value() (driver.Value, error) {
 		return nil, fmt.Errorf("invalid volume: %s", v)
 	}
 	return string(v), nil
+}
+
+// ParseVolume converts a string to Volume with validation
+func ParseVolume(s string) (Volume, error) {
+	v := Volume(s)
+	if !v.IsValid() {
+		return "", fmt.Errorf("invalid volume: %s", s)
+	}
+	return v, nil
+}
+
+// Scan implements the sql.Scanner interface for database reading
+func (v *Volume) Scan(value interface{}) error {
+	if value == nil {
+		*v = ""
+		return nil
+	}
+	switch s := value.(type) {
+	case string:
+		parsed, err := ParseVolume(s)
+		if err != nil {
+			return err
+		}
+		*v = parsed
+		return nil
+	case []byte:
+		parsed, err := ParseVolume(string(s))
+		if err != nil {
+			return err
+		}
+		*v = parsed
+		return nil
+	default:
+		return fmt.Errorf("cannot scan %T into Volume", value)
+	}
 }
 
 // Color represents the color of a bowel movement
@@ -87,6 +123,41 @@ func (c Color) Value() (driver.Value, error) {
 	return string(c), nil
 }
 
+// ParseColor converts a string to Color with validation
+func ParseColor(s string) (Color, error) {
+	c := Color(s)
+	if !c.IsValid() {
+		return "", fmt.Errorf("invalid color: %s", s)
+	}
+	return c, nil
+}
+
+// Scan implements the sql.Scanner interface for database reading
+func (c *Color) Scan(value interface{}) error {
+	if value == nil {
+		*c = ""
+		return nil
+	}
+	switch s := value.(type) {
+	case string:
+		parsed, err := ParseColor(s)
+		if err != nil {
+			return err
+		}
+		*c = parsed
+		return nil
+	case []byte:
+		parsed, err := ParseColor(string(s))
+		if err != nil {
+			return err
+		}
+		*c = parsed
+		return nil
+	default:
+		return fmt.Errorf("cannot scan %T into Color", value)
+	}
+}
+
 // Consistency represents the consistency of a bowel movement
 type Consistency string
 
@@ -123,6 +194,41 @@ func (c Consistency) Value() (driver.Value, error) {
 		return nil, fmt.Errorf("invalid consistency: %s", c)
 	}
 	return string(c), nil
+}
+
+// ParseConsistency converts a string to Consistency with validation
+func ParseConsistency(s string) (Consistency, error) {
+	c := Consistency(s)
+	if !c.IsValid() {
+		return "", fmt.Errorf("invalid consistency: %s", s)
+	}
+	return c, nil
+}
+
+// Scan implements the sql.Scanner interface for database reading
+func (c *Consistency) Scan(value interface{}) error {
+	if value == nil {
+		*c = ""
+		return nil
+	}
+	switch s := value.(type) {
+	case string:
+		parsed, err := ParseConsistency(s)
+		if err != nil {
+			return err
+		}
+		*c = parsed
+		return nil
+	case []byte:
+		parsed, err := ParseConsistency(string(s))
+		if err != nil {
+			return err
+		}
+		*c = parsed
+		return nil
+	default:
+		return fmt.Errorf("cannot scan %T into Consistency", value)
+	}
 }
 
 // SmellLevel represents the smell intensity level
@@ -164,6 +270,41 @@ func (s SmellLevel) Value() (driver.Value, error) {
 	return string(s), nil
 }
 
+// ParseSmellLevel converts a string to SmellLevel with validation
+func ParseSmellLevel(s string) (SmellLevel, error) {
+	sl := SmellLevel(s)
+	if !sl.IsValid() {
+		return "", fmt.Errorf("invalid smell level: %s", s)
+	}
+	return sl, nil
+}
+
+// Scan implements the sql.Scanner interface for database reading
+func (s *SmellLevel) Scan(value interface{}) error {
+	if value == nil {
+		*s = ""
+		return nil
+	}
+	switch v := value.(type) {
+	case string:
+		parsed, err := ParseSmellLevel(v)
+		if err != nil {
+			return err
+		}
+		*s = parsed
+		return nil
+	case []byte:
+		parsed, err := ParseSmellLevel(string(v))
+		if err != nil {
+			return err
+		}
+		*s = parsed
+		return nil
+	default:
+		return fmt.Errorf("cannot scan %T into SmellLevel", value)
+	}
+}
+
 // MealCategory represents the category/type of a meal
 type MealCategory string
 
@@ -201,6 +342,41 @@ func (m MealCategory) Value() (driver.Value, error) {
 		return nil, fmt.Errorf("invalid meal category: %s", m)
 	}
 	return string(m), nil
+}
+
+// ParseMealCategory converts a string to MealCategory with validation
+func ParseMealCategory(s string) (MealCategory, error) {
+	mc := MealCategory(s)
+	if !mc.IsValid() {
+		return "", fmt.Errorf("invalid meal category: %s", s)
+	}
+	return mc, nil
+}
+
+// Scan implements the sql.Scanner interface for database reading
+func (m *MealCategory) Scan(value interface{}) error {
+	if value == nil {
+		*m = ""
+		return nil
+	}
+	switch s := value.(type) {
+	case string:
+		parsed, err := ParseMealCategory(s)
+		if err != nil {
+			return err
+		}
+		*m = parsed
+		return nil
+	case []byte:
+		parsed, err := ParseMealCategory(string(s))
+		if err != nil {
+			return err
+		}
+		*m = parsed
+		return nil
+	default:
+		return fmt.Errorf("cannot scan %T into MealCategory", value)
+	}
 }
 
 // SymptomCategory represents categories for symptoms
@@ -248,6 +424,41 @@ func (sc SymptomCategory) Value() (driver.Value, error) {
 	return string(sc), nil
 }
 
+// ParseSymptomCategory converts a string to SymptomCategory with validation
+func ParseSymptomCategory(s string) (SymptomCategory, error) {
+	sc := SymptomCategory(s)
+	if !sc.IsValid() {
+		return "", fmt.Errorf("invalid symptom category: %s", s)
+	}
+	return sc, nil
+}
+
+// Scan implements the sql.Scanner interface for database reading
+func (sc *SymptomCategory) Scan(value interface{}) error {
+	if value == nil {
+		*sc = ""
+		return nil
+	}
+	switch s := value.(type) {
+	case string:
+		parsed, err := ParseSymptomCategory(s)
+		if err != nil {
+			return err
+		}
+		*sc = parsed
+		return nil
+	case []byte:
+		parsed, err := ParseSymptomCategory(string(s))
+		if err != nil {
+			return err
+		}
+		*sc = parsed
+		return nil
+	default:
+		return fmt.Errorf("cannot scan %T into SymptomCategory", value)
+	}
+}
+
 // SymptomType represents different types of symptoms
 type SymptomType string
 
@@ -292,6 +503,41 @@ func (s SymptomType) Value() (driver.Value, error) {
 		return nil, fmt.Errorf("invalid symptom type: %s", s)
 	}
 	return string(s), nil
+}
+
+// ParseSymptomType converts a string to SymptomType with validation
+func ParseSymptomType(s string) (SymptomType, error) {
+	st := SymptomType(s)
+	if !st.IsValid() {
+		return "", fmt.Errorf("invalid symptom type: %s", s)
+	}
+	return st, nil
+}
+
+// Scan implements the sql.Scanner interface for database reading
+func (s *SymptomType) Scan(value interface{}) error {
+	if value == nil {
+		*s = ""
+		return nil
+	}
+	switch v := value.(type) {
+	case string:
+		parsed, err := ParseSymptomType(v)
+		if err != nil {
+			return err
+		}
+		*s = parsed
+		return nil
+	case []byte:
+		parsed, err := ParseSymptomType(string(v))
+		if err != nil {
+			return err
+		}
+		*s = parsed
+		return nil
+	default:
+		return fmt.Errorf("cannot scan %T into SymptomType", value)
+	}
 }
 
 // MedicationCategory represents categories for medications
@@ -341,6 +587,41 @@ func (mc MedicationCategory) Value() (driver.Value, error) {
 		return nil, fmt.Errorf("invalid medication category: %s", mc)
 	}
 	return string(mc), nil
+}
+
+// ParseMedicationCategory converts a string to MedicationCategory with validation
+func ParseMedicationCategory(s string) (MedicationCategory, error) {
+	mc := MedicationCategory(s)
+	if !mc.IsValid() {
+		return "", fmt.Errorf("invalid medication category: %s", s)
+	}
+	return mc, nil
+}
+
+// Scan implements the sql.Scanner interface for database reading
+func (mc *MedicationCategory) Scan(value interface{}) error {
+	if value == nil {
+		*mc = ""
+		return nil
+	}
+	switch s := value.(type) {
+	case string:
+		parsed, err := ParseMedicationCategory(s)
+		if err != nil {
+			return err
+		}
+		*mc = parsed
+		return nil
+	case []byte:
+		parsed, err := ParseMedicationCategory(string(s))
+		if err != nil {
+			return err
+		}
+		*mc = parsed
+		return nil
+	default:
+		return fmt.Errorf("cannot scan %T into MedicationCategory", value)
+	}
 }
 
 // MedicationForm represents forms of medications
@@ -394,6 +675,41 @@ func (mf MedicationForm) Value() (driver.Value, error) {
 	return string(mf), nil
 }
 
+// ParseMedicationForm converts a string to MedicationForm with validation
+func ParseMedicationForm(s string) (MedicationForm, error) {
+	mf := MedicationForm(s)
+	if !mf.IsValid() {
+		return "", fmt.Errorf("invalid medication form: %s", s)
+	}
+	return mf, nil
+}
+
+// Scan implements the sql.Scanner interface for database reading
+func (mf *MedicationForm) Scan(value interface{}) error {
+	if value == nil {
+		*mf = ""
+		return nil
+	}
+	switch s := value.(type) {
+	case string:
+		parsed, err := ParseMedicationForm(s)
+		if err != nil {
+			return err
+		}
+		*mf = parsed
+		return nil
+	case []byte:
+		parsed, err := ParseMedicationForm(string(s))
+		if err != nil {
+			return err
+		}
+		*mf = parsed
+		return nil
+	default:
+		return fmt.Errorf("cannot scan %T into MedicationForm", value)
+	}
+}
+
 // MedicationRoute represents routes of administration for medications
 type MedicationRoute string
 
@@ -440,3 +756,62 @@ func (mr MedicationRoute) Value() (driver.Value, error) {
 	}
 	return string(mr), nil
 }
+
+// ParseMedicationRoute converts a string to MedicationRoute with validation
+func ParseMedicationRoute(s string) (MedicationRoute, error) {
+	mr := MedicationRoute(s)
+	if !mr.IsValid() {
+		return "", fmt.Errorf("invalid medication route: %s", s)
+	}
+	return mr, nil
+}
+
+// Scan implements the sql.Scanner interface for database reading
+func (mr *MedicationRoute) Scan(value interface{}) error {
+	if value == nil {
+		*mr = ""
+		return nil
+	}
+	switch s := value.(type) {
+	case string:
+		parsed, err := ParseMedicationRoute(s)
+		if err != nil {
+			return err
+		}
+		*mr = parsed
+		return nil
+	case []byte:
+		parsed, err := ParseMedicationRoute(string(s))
+		if err != nil {
+			return err
+		}
+		*mr = parsed
+		return nil
+	default:
+		return fmt.Errorf("cannot scan %T into MedicationRoute", value)
+	}
+}
+
+// Compile-time interface checks
+var (
+	_ driver.Valuer = (*Volume)(nil)
+	_ sql.Scanner   = (*Volume)(nil)
+	_ driver.Valuer = (*Color)(nil)
+	_ sql.Scanner   = (*Color)(nil)
+	_ driver.Valuer = (*Consistency)(nil)
+	_ sql.Scanner   = (*Consistency)(nil)
+	_ driver.Valuer = (*SmellLevel)(nil)
+	_ sql.Scanner   = (*SmellLevel)(nil)
+	_ driver.Valuer = (*MealCategory)(nil)
+	_ sql.Scanner   = (*MealCategory)(nil)
+	_ driver.Valuer = (*SymptomCategory)(nil)
+	_ sql.Scanner   = (*SymptomCategory)(nil)
+	_ driver.Valuer = (*SymptomType)(nil)
+	_ sql.Scanner   = (*SymptomType)(nil)
+	_ driver.Valuer = (*MedicationCategory)(nil)
+	_ sql.Scanner   = (*MedicationCategory)(nil)
+	_ driver.Valuer = (*MedicationForm)(nil)
+	_ sql.Scanner   = (*MedicationForm)(nil)
+	_ driver.Valuer = (*MedicationRoute)(nil)
+	_ sql.Scanner   = (*MedicationRoute)(nil)
+)
