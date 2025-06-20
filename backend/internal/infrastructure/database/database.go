@@ -50,7 +50,7 @@ func GetConfigFromEnv() Config {
 	}
 
 	var dsn string
-	var logLevel logger.LogLevel = logger.Info
+	var logLevel logger.LogLevel
 
 	switch DatabaseType(dbType) {
 	case SQLite:
