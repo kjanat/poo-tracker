@@ -68,18 +68,20 @@ func AuditMiddleware(auditService *service.AuditService) gin.HandlerFunc {
 		var oldData, newData interface{}
 
 		if len(requestBody) > 0 {
-			json.Unmarshal(requestBody, &newData)
+			// Ignore JSON parsing errors for audit logging
+			_ = json.Unmarshal(requestBody, &newData)
 		}
 
 		// For successful responses, capture the response data
 		if c.Writer.Status() >= 200 && c.Writer.Status() < 300 {
 			var responseData interface{}
 			if writer.body.Len() > 0 {
-				json.Unmarshal(writer.body.Bytes(), &responseData)
-				if action == model.AuditCreate {
-					newData = responseData
-				} else if action == model.AuditUpdate {
-					newData = responseData
+				// Ignore JSON parsing errors for audit logging
+				if err := json.Unmarshal(writer.body.Bytes(), &responseData); err == nil {
+					switch action {
+					case model.AuditCreate, model.AuditUpdate:
+						newData = responseData
+					}
 				}
 			}
 		}

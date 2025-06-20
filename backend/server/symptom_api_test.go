@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -100,7 +101,7 @@ func TestSymptomAPI_GetSymptom(t *testing.T) {
 
 	// Create a symptom first
 	symptom := model.NewSymptom("test-user", "Test Symptom")
-	created, _ := repo.Create(nil, symptom)
+	created, _ := repo.Create(context.TODO(), symptom)
 
 	router := gin.New()
 	router.Use(func(c *gin.Context) {
@@ -140,7 +141,7 @@ func TestSymptomAPI_GetSymptom_AccessDenied(t *testing.T) {
 
 	// Create a symptom for different user
 	symptom := model.NewSymptom("other-user", "Other User Symptom")
-	created, _ := repo.Create(nil, symptom)
+	created, _ := repo.Create(context.TODO(), symptom)
 
 	router := gin.New()
 	router.Use(func(c *gin.Context) {
@@ -169,9 +170,10 @@ func TestSymptomAPI_GetSymptoms(t *testing.T) {
 	symptom2 := model.NewSymptom("test-user", "Symptom 2")
 	symptom3 := model.NewSymptom("other-user", "Other User Symptom")
 
-	repo.Create(nil, symptom1)
-	repo.Create(nil, symptom2)
-	repo.Create(nil, symptom3)
+	// Create test data (ignore errors in test setup)
+	_, _ = repo.Create(context.TODO(), symptom1)
+	_, _ = repo.Create(context.TODO(), symptom2)
+	_, _ = repo.Create(context.TODO(), symptom3)
 
 	router := gin.New()
 	router.Use(func(c *gin.Context) {
@@ -208,7 +210,7 @@ func TestSymptomAPI_UpdateSymptom(t *testing.T) {
 
 	// Create a symptom first
 	symptom := model.NewSymptom("test-user", "Original")
-	created, _ := repo.Create(nil, symptom)
+	created, _ := repo.Create(context.TODO(), symptom)
 
 	router := gin.New()
 	router.Use(func(c *gin.Context) {
@@ -261,7 +263,7 @@ func TestSymptomAPI_DeleteSymptom(t *testing.T) {
 
 	// Create a symptom first
 	symptom := model.NewSymptom("test-user", "To Delete")
-	created, _ := repo.Create(nil, symptom)
+	created, _ := repo.Create(context.TODO(), symptom)
 
 	router := gin.New()
 	router.Use(func(c *gin.Context) {
@@ -279,7 +281,7 @@ func TestSymptomAPI_DeleteSymptom(t *testing.T) {
 	}
 
 	// Verify symptom is deleted
-	_, err := repo.GetByID(nil, created.ID)
+	_, err := repo.GetByID(context.TODO(), created.ID)
 	if err == nil {
 		t.Error("Expected error when getting deleted symptom")
 	}
@@ -301,8 +303,8 @@ func TestSymptomAPI_GetSymptomsByDateRange(t *testing.T) {
 	symptom2 := model.NewSymptom("test-user", "Today")
 	symptom2.RecordedAt = now
 
-	repo.Create(nil, symptom1)
-	repo.Create(nil, symptom2)
+	_, _ = repo.Create(context.TODO(), symptom1)
+	_, _ = repo.Create(context.TODO(), symptom2)
 
 	router := gin.New()
 	router.Use(func(c *gin.Context) {
@@ -348,8 +350,8 @@ func TestSymptomAPI_GetSymptomsByCategory(t *testing.T) {
 	symptom2 := model.NewSymptom("test-user", "Other")
 	// No category
 
-	repo.Create(nil, symptom1)
-	repo.Create(nil, symptom2)
+	_, _ = repo.Create(context.TODO(), symptom1)
+	_, _ = repo.Create(context.TODO(), symptom2)
 
 	router := gin.New()
 	router.Use(func(c *gin.Context) {

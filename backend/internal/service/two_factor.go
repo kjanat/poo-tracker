@@ -107,8 +107,8 @@ func (s *TwoFactorService) VerifyToken(ctx context.Context, userID string, token
 
 	// Try TOTP token first
 	if s.verifyTOTPToken(twoFactor.Secret, token) {
-		// Update last used time
-		s.repo.UpdateLastUsed(ctx, userID)
+		// Update last used time (ignore error as it's not critical)
+		_ = s.repo.UpdateLastUsed(ctx, userID)
 		return true, nil
 	}
 
@@ -120,8 +120,8 @@ func (s *TwoFactorService) VerifyToken(ctx context.Context, userID string, token
 			if err != nil {
 				return false, fmt.Errorf("failed to remove backup code: %w", err)
 			}
-			// Update last used time
-			s.repo.UpdateLastUsed(ctx, userID)
+			// Update last used time (ignore error as it's not critical)
+			_ = s.repo.UpdateLastUsed(ctx, userID)
 			return true, nil
 		}
 	}

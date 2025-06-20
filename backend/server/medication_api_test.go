@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -101,7 +102,7 @@ func TestMedicationAPI_GetMedication(t *testing.T) {
 
 	// Create a medication first
 	medication := model.NewMedication("test-user", "Test Med", "10mg", "daily")
-	created, _ := repo.Create(nil, medication)
+	created, _ := repo.Create(context.TODO(), medication)
 
 	router := gin.New()
 	router.Use(func(c *gin.Context) {
@@ -141,7 +142,7 @@ func TestMedicationAPI_GetMedication_AccessDenied(t *testing.T) {
 
 	// Create a medication for different user
 	medication := model.NewMedication("other-user", "Other Med", "10mg", "daily")
-	created, _ := repo.Create(nil, medication)
+	created, _ := repo.Create(context.TODO(), medication)
 
 	router := gin.New()
 	router.Use(func(c *gin.Context) {
@@ -170,9 +171,10 @@ func TestMedicationAPI_GetMedications(t *testing.T) {
 	med2 := model.NewMedication("test-user", "Med 2", "20mg", "twice daily")
 	med3 := model.NewMedication("other-user", "Other Med", "30mg", "weekly")
 
-	repo.Create(nil, med1)
-	repo.Create(nil, med2)
-	repo.Create(nil, med3)
+	// Create test data (ignore errors in test setup)
+	_, _ = repo.Create(context.TODO(), med1)
+	_, _ = repo.Create(context.TODO(), med2)
+	_, _ = repo.Create(context.TODO(), med3)
 
 	router := gin.New()
 	router.Use(func(c *gin.Context) {
@@ -214,8 +216,9 @@ func TestMedicationAPI_GetActiveMedications(t *testing.T) {
 	inactiveMed := model.NewMedication("test-user", "Inactive Med", "20mg", "daily")
 	inactiveMed.IsActive = false
 
-	repo.Create(nil, activeMed)
-	repo.Create(nil, inactiveMed)
+	// Create test data (ignore errors in test setup)
+	_, _ = repo.Create(context.TODO(), activeMed)
+	_, _ = repo.Create(context.TODO(), inactiveMed)
 
 	router := gin.New()
 	router.Use(func(c *gin.Context) {
@@ -256,7 +259,7 @@ func TestMedicationAPI_UpdateMedication(t *testing.T) {
 
 	// Create a medication first
 	medication := model.NewMedication("test-user", "Original", "10mg", "daily")
-	created, _ := repo.Create(nil, medication)
+	created, _ := repo.Create(context.TODO(), medication)
 
 	router := gin.New()
 	router.Use(func(c *gin.Context) {
@@ -310,7 +313,7 @@ func TestMedicationAPI_DeleteMedication(t *testing.T) {
 
 	// Create a medication first
 	medication := model.NewMedication("test-user", "To Delete", "10mg", "daily")
-	created, _ := repo.Create(nil, medication)
+	created, _ := repo.Create(context.TODO(), medication)
 
 	router := gin.New()
 	router.Use(func(c *gin.Context) {
@@ -328,7 +331,7 @@ func TestMedicationAPI_DeleteMedication(t *testing.T) {
 	}
 
 	// Verify medication is deleted
-	_, err := repo.GetByID(nil, created.ID)
+	_, err := repo.GetByID(context.TODO(), created.ID)
 	if err == nil {
 		t.Error("Expected error when getting deleted medication")
 	}
@@ -342,7 +345,7 @@ func TestMedicationAPI_MarkAsTaken(t *testing.T) {
 
 	// Create a medication first
 	medication := model.NewMedication("test-user", "Test Med", "10mg", "daily")
-	created, _ := repo.Create(nil, medication)
+	created, _ := repo.Create(context.TODO(), medication)
 
 	router := gin.New()
 	router.Use(func(c *gin.Context) {
@@ -367,7 +370,7 @@ func TestMedicationAPI_MarkAsTaken(t *testing.T) {
 	}
 
 	// Verify medication is marked as taken
-	updated, err := repo.GetByID(nil, created.ID)
+	updated, err := repo.GetByID(context.TODO(), created.ID)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}

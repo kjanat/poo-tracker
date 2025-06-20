@@ -76,9 +76,10 @@ func TestMedicationRepository_GetByUserID(t *testing.T) {
 	med2 := model.NewMedication("user1", "Medication 2", "20mg", "twice daily")
 	med3 := model.NewMedication("user2", "Medication 3", "30mg", "weekly")
 
-	repo.Create(ctx, med1)
-	repo.Create(ctx, med2)
-	repo.Create(ctx, med3)
+	// Create test medications (ignore errors in test setup)
+	_, _ = repo.Create(ctx, med1)
+	_, _ = repo.Create(ctx, med2)
+	_, _ = repo.Create(ctx, med3)
 
 	medications, err := repo.GetByUserID(ctx, "user1", 10, 0)
 	if err != nil {
@@ -162,8 +163,8 @@ func TestMedicationRepository_GetActiveByUserID(t *testing.T) {
 	inactiveMed := model.NewMedication("user1", "Inactive Med", "20mg", "daily")
 	inactiveMed.IsActive = false
 
-	repo.Create(ctx, activeMed)
-	repo.Create(ctx, inactiveMed)
+	_, _ = repo.Create(ctx, activeMed)
+	_, _ = repo.Create(ctx, inactiveMed)
 
 	medications, err := repo.GetActiveByUserID(ctx, "user1")
 	if err != nil {
@@ -191,8 +192,8 @@ func TestMedicationRepository_GetByUserIDAndCategory(t *testing.T) {
 	med2 := model.NewMedication("user1", "Other Med", "20mg", "daily")
 	// No category set
 
-	repo.Create(ctx, med1)
-	repo.Create(ctx, med2)
+	_, _ = repo.Create(ctx, med1)
+	_, _ = repo.Create(ctx, med2)
 
 	medications, err := repo.GetByUserIDAndCategory(ctx, "user1", category)
 	if err != nil {

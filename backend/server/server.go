@@ -11,21 +11,23 @@ import (
 )
 
 type App struct {
-	Engine               *gin.Engine
-	repo                 repository.BowelMovementRepository
-	details              repository.BowelMovementDetailsRepository
-	meals                repository.MealRepository
-	symptoms             repository.SymptomRepository
-	medications          repository.MedicationRepository
-	mealBowelRelations   repository.MealBowelMovementRelationRepository
-	mealSymptomRelations repository.MealSymptomRelationRepository
-	analytics            *service.Service
-	authService          service.AuthService
-	auditService         *service.AuditService
-	userHandlers         *UserAPIHandlers
-	symptomHandler       *SymptomHandler
-	medicationHandler    *MedicationHandler
-	// relationsHandler     *RelationsHandler // TODO: implement
+	Engine                     *gin.Engine
+	repo                       repository.BowelMovementRepository
+	details                    repository.BowelMovementDetailsRepository
+	meals                      repository.MealRepository
+	symptoms                   repository.SymptomRepository
+	medications                repository.MedicationRepository
+	mealBowelRelations         repository.MealBowelMovementRelationRepository
+	mealSymptomRelations       repository.MealSymptomRelationRepository
+	analytics                  *service.Service
+	authService                service.AuthService
+	auditService               *service.AuditService
+	userHandlers               *UserAPIHandlers
+	symptomHandler             *SymptomHandler
+	medicationHandler          *MedicationHandler
+	mealBowelRelationHandler   *MealBowelRelationHandler
+	mealSymptomRelationHandler *MealSymptomRelationHandler
+	relationCoordinatorHandler *RelationCoordinatorHandler
 }
 
 func New(repo repository.BowelMovementRepository, details repository.BowelMovementDetailsRepository, meals repository.MealRepository, symptoms repository.SymptomRepository, medications repository.MedicationRepository, mealBowelRelations repository.MealBowelMovementRelationRepository, mealSymptomRelations repository.MealSymptomRelationRepository, strategy service.AnalyticsStrategy, authService service.AuthService) *App {
@@ -42,23 +44,27 @@ func New(repo repository.BowelMovementRepository, details repository.BowelMoveme
 	userHandlers := NewUserAPIHandlers(authService)
 	symptomHandler := NewSymptomHandler(symptoms)
 	medicationHandler := NewMedicationHandler(medications)
-	// relationsHandler := NewRelationsHandler(mealBowelRelations, mealSymptomRelations) // TODO: implement
+	mealBowelRelationHandler := NewMealBowelRelationHandler(mealBowelRelations)
+	mealSymptomRelationHandler := NewMealSymptomRelationHandler(mealSymptomRelations)
+	relationCoordinatorHandler := NewRelationCoordinatorHandler(mealBowelRelations, mealSymptomRelations)
 	app := &App{
-		Engine:               engine,
-		repo:                 repo,
-		details:              details,
-		meals:                meals,
-		symptoms:             symptoms,
-		medications:          medications,
-		mealBowelRelations:   mealBowelRelations,
-		mealSymptomRelations: mealSymptomRelations,
-		analytics:            service.New(repo, strategy),
-		authService:          authService,
-		auditService:         auditService,
-		userHandlers:         userHandlers,
-		symptomHandler:       symptomHandler,
-		medicationHandler:    medicationHandler,
-		// relationsHandler:     relationsHandler, // TODO: implement
+		Engine:                     engine,
+		repo:                       repo,
+		details:                    details,
+		meals:                      meals,
+		symptoms:                   symptoms,
+		medications:                medications,
+		mealBowelRelations:         mealBowelRelations,
+		mealSymptomRelations:       mealSymptomRelations,
+		analytics:                  service.New(repo, strategy),
+		authService:                authService,
+		auditService:               auditService,
+		userHandlers:               userHandlers,
+		symptomHandler:             symptomHandler,
+		medicationHandler:          medicationHandler,
+		mealBowelRelationHandler:   mealBowelRelationHandler,
+		mealSymptomRelationHandler: mealSymptomRelationHandler,
+		relationCoordinatorHandler: relationCoordinatorHandler,
 	}
 
 	engine.GET("/health", func(c *gin.Context) {
@@ -114,6 +120,29 @@ func (a *App) registerRoutes() {
 	medications.GET("/active", a.medicationHandler.GetActiveMedications)
 	medications.POST("/:id/taken", a.medicationHandler.MarkMedicationAsTaken)
 	medications.GET("/category/:category", a.medicationHandler.GetMedicationsByCategory)
+
+	// Meal-Bowel Movement Relation routes
+	mealBowelRelations := api.Group("/meal-bowel-relations")
+	mealBowelRelations.Use(middleware.JWTAuthMiddleware(a.authService))
+	mealBowelRelations.GET("", a.mealBowelRelationHandler.GetMealBowelRelations)
+	mealBowelRelations.POST("", a.mealBowelRelationHandler.CreateMealBowelRelation)
+	mealBowelRelations.GET("/:id", a.mealBowelRelationHandler.GetMealBowelRelation)
+	mealBowelRelations.PUT("/:id", a.mealBowelRelationHandler.UpdateMealBowelRelation)
+	mealBowelRelations.DELETE("/:id", a.mealBowelRelationHandler.DeleteMealBowelRelation)
+
+	// Meal-Symptom Relation routes
+	mealSymptomRelations := api.Group("/meal-symptom-relations")
+	mealSymptomRelations.Use(middleware.JWTAuthMiddleware(a.authService))
+	mealSymptomRelations.GET("", a.mealSymptomRelationHandler.GetMealSymptomRelations)
+	mealSymptomRelations.POST("", a.mealSymptomRelationHandler.CreateMealSymptomRelation)
+	mealSymptomRelations.GET("/:id", a.mealSymptomRelationHandler.GetMealSymptomRelation)
+	mealSymptomRelations.PUT("/:id", a.mealSymptomRelationHandler.UpdateMealSymptomRelation)
+	mealSymptomRelations.DELETE("/:id", a.mealSymptomRelationHandler.DeleteMealSymptomRelation)
+
+	// Combined relation routes
+	relations := api.Group("/relations")
+	relations.Use(middleware.JWTAuthMiddleware(a.authService))
+	relations.GET("/meals/:mealId", a.relationCoordinatorHandler.GetRelationsByMeal)
 
 	api.GET("/analytics", a.getAnalytics)
 

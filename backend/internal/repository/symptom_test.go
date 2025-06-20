@@ -73,9 +73,10 @@ func TestSymptomRepository_GetByUserID(t *testing.T) {
 	symptom2 := model.NewSymptom("user1", "Nausea")
 	symptom3 := model.NewSymptom("user2", "Pain")
 
-	repo.Create(ctx, symptom1)
-	repo.Create(ctx, symptom2)
-	repo.Create(ctx, symptom3)
+	// Create test data (ignore errors in test setup)
+	_, _ = repo.Create(ctx, symptom1)
+	_, _ = repo.Create(ctx, symptom2)
+	_, _ = repo.Create(ctx, symptom3)
 
 	symptoms, err := repo.GetByUserID(ctx, "user1", 10, 0)
 	if err != nil {
@@ -161,9 +162,9 @@ func TestSymptomRepository_GetByUserIDAndDateRange(t *testing.T) {
 	symptom3 := model.NewSymptom("user1", "Tomorrow")
 	symptom3.RecordedAt = tomorrow
 
-	repo.Create(ctx, symptom1)
-	repo.Create(ctx, symptom2)
-	repo.Create(ctx, symptom3)
+	_, _ = repo.Create(ctx, symptom1)
+	_, _ = repo.Create(ctx, symptom2)
+	_, _ = repo.Create(ctx, symptom3)
 
 	// Query for symptoms from yesterday to today
 	symptoms, err := repo.GetByUserIDAndDateRange(ctx, "user1", yesterday.Add(-time.Hour), now.Add(time.Hour))
@@ -188,8 +189,8 @@ func TestSymptomRepository_GetByUserIDAndCategory(t *testing.T) {
 	symptom2 := model.NewSymptom("user1", "Other Issue")
 	// No category set
 
-	repo.Create(ctx, symptom1)
-	repo.Create(ctx, symptom2)
+	_, _ = repo.Create(ctx, symptom1)
+	_, _ = repo.Create(ctx, symptom2)
 
 	symptoms, err := repo.GetByUserIDAndCategory(ctx, "user1", category)
 	if err != nil {
@@ -217,8 +218,8 @@ func TestSymptomRepository_GetByUserIDAndType(t *testing.T) {
 	symptom2 := model.NewSymptom("user1", "Other Symptom")
 	// No type set
 
-	repo.Create(ctx, symptom1)
-	repo.Create(ctx, symptom2)
+	_, _ = repo.Create(ctx, symptom1)
+	_, _ = repo.Create(ctx, symptom2)
 
 	symptoms, err := repo.GetByUserIDAndType(ctx, "user1", symptomType)
 	if err != nil {

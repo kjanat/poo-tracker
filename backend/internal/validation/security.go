@@ -27,7 +27,7 @@ func ValidateStrongPassword(password string) ValidationErrors {
 			hasLower = true
 		case char >= '0' && char <= '9':
 			hasDigit = true
-		case !((char >= 'A' && char <= 'Z') || (char >= 'a' && char <= 'z') || (char >= '0' && char <= '9')):
+		case char < 'A' || (char > 'Z' && char < 'a') || (char > 'z' && char < '0') || char > '9':
 			hasSpecial = true
 		}
 	}
