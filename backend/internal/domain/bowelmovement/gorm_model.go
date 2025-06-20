@@ -1,4 +1,4 @@
-package bowel_movement
+package bowelmovement
 
 import (
 	"time"
@@ -7,8 +7,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// BowelMovement represents a bowel movement record
-type BowelMovement struct {
+// BowelMovementDB represents a bowel movement record stored via GORM.
+type BowelMovementDB struct {
 	ID          uuid.UUID      `gorm:"type:uuid;primary_key" json:"id"`
 	UserID      uuid.UUID      `gorm:"type:uuid;not null;index" json:"user_id"`
 	Timestamp   time.Time      `gorm:"not null;index" json:"timestamp"`
@@ -26,7 +26,7 @@ type BowelMovement struct {
 }
 
 // BeforeCreate GORM hook to set UUID if not provided
-func (b *BowelMovement) BeforeCreate(tx *gorm.DB) error {
+func (b *BowelMovementDB) BeforeCreate(tx *gorm.DB) error {
 	if b.ID == uuid.Nil {
 		b.ID = uuid.New()
 	}
@@ -34,16 +34,6 @@ func (b *BowelMovement) BeforeCreate(tx *gorm.DB) error {
 }
 
 // TableName returns the table name for BowelMovement
-func (BowelMovement) TableName() string {
+func (BowelMovementDB) TableName() string {
 	return "bowel_movements"
-}
-
-// Repository interface for BowelMovement operations
-type Repository interface {
-	Create(bm *BowelMovement) error
-	GetByID(id uuid.UUID) (*BowelMovement, error)
-	GetByUserID(userID uuid.UUID, limit, offset int) ([]*BowelMovement, error)
-	Update(bm *BowelMovement) error
-	Delete(id uuid.UUID) error
-	GetByDateRange(userID uuid.UUID, start, end time.Time) ([]*BowelMovement, error)
 }

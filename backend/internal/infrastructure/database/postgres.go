@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
-	"github.com/kjanat/poo-tracker/backend/internal/domain/bowel_movement"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/user"
 )
 
@@ -50,6 +50,6 @@ func (p *PostgreSQLDatabase) Migrate() error {
 	// Auto-migrate domain models
 	return p.db.AutoMigrate(
 		&user.User{},
-		&bowel_movement.BowelMovement{},
+		&bowelmovement.BowelMovementDB{},
 	)
 }
