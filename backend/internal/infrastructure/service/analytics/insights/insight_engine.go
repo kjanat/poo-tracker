@@ -62,13 +62,12 @@ func (ie *InsightEngine) GetRecommendationStrings(
 	recs := ie.GenerateRecommendations(bowelValues, mealValues, symptomValues)
 	var result []string
 	for _, rec := range recs {
-		result = append(result, rec.Description)
+		result = append(result, rec.Message)
 	}
 	return result
 }
 
 // Pattern-based insights
-
 func (ie *InsightEngine) generatePatternInsights(
 	bowelMovements []bowelmovement.BowelMovement,
 	meals []meal.Meal,
@@ -117,55 +116,33 @@ func (ie *InsightEngine) analyzeBristolConsistency(movements []bowelmovement.Bow
 
 	if float64(type1and2Count)/float64(totalCount) > 0.5 {
 		insight = &shared.InsightRecommendation{
-			ID:       fmt.Sprintf("bristol-constipation-%d", time.Now().Unix()),
-			Type:     "pattern",
-			Priority: "High",
-			Title:    "Constipation Pattern Detected",
-			Description: fmt.Sprintf("Over 50%% of your bowel movements (Bristol types 1-2) indicate constipation. This pattern has been observed in %d out of %d recent movements.",
-				type1and2Count, totalCount),
-			Evidence: []string{
-				fmt.Sprintf("%d movements were Bristol type 1 or 2", type1and2Count),
-				"Bristol types 1-2 indicate hard, difficult-to-pass stools",
-				"Normal stool should typically be types 3-4",
-			},
-			Actions: []string{
+			Type:       "LIFESTYLE",
+			Category:   "Bowel Health",
+			Message:    "Constipation Pattern Detected - Over 50% of your bowel movements indicate hard stools",
+			Evidence:   fmt.Sprintf("%d out of %d movements were Bristol types 1-2, indicating constipation", type1and2Count, totalCount),
+			Priority:   "HIGH",
+			Confidence: 0.8,
+			ActionItems: []string{
 				"Increase fiber intake with fruits, vegetables, and whole grains",
 				"Drink more water throughout the day",
 				"Consider adding physical activity to your routine",
 				"Consult with a healthcare provider if pattern persists",
 			},
-			Context: map[string]interface{}{
-				"constipation_percentage": float64(type1and2Count) / float64(totalCount) * 100,
-				"total_movements":         totalCount,
-				"period_days":             7,
-			},
-			CreatedAt: time.Now(),
 		}
 	} else if float64(type6and7Count)/float64(totalCount) > 0.4 {
 		insight = &shared.InsightRecommendation{
-			ID:       fmt.Sprintf("bristol-diarrhea-%d", time.Now().Unix()),
-			Type:     "pattern",
-			Priority: "High",
-			Title:    "Loose Stool Pattern Detected",
-			Description: fmt.Sprintf("Over 40%% of your bowel movements (Bristol types 6-7) indicate loose stools. This pattern has been observed in %d out of %d recent movements.",
-				type6and7Count, totalCount),
-			Evidence: []string{
-				fmt.Sprintf("%d movements were Bristol type 6 or 7", type6and7Count),
-				"Bristol types 6-7 indicate loose or watery stools",
-				"This may indicate digestive sensitivity or other issues",
-			},
-			Actions: []string{
+			Type:       "LIFESTYLE",
+			Category:   "Bowel Health",
+			Message:    "Loose Stool Pattern Detected - Over 40% of your bowel movements indicate loose stools",
+			Evidence:   fmt.Sprintf("%d out of %d movements were Bristol types 6-7, indicating loose stools", type6and7Count, totalCount),
+			Priority:   "MEDIUM",
+			Confidence: 0.7,
+			ActionItems: []string{
 				"Keep a food diary to identify potential triggers",
 				"Consider reducing dairy, gluten, or spicy foods temporarily",
 				"Stay hydrated to replace lost fluids",
 				"Consult with a healthcare provider if pattern continues",
 			},
-			Context: map[string]interface{}{
-				"loose_stool_percentage": float64(type6and7Count) / float64(totalCount) * 100,
-				"total_movements":        totalCount,
-				"period_days":            7,
-			},
-			CreatedAt: time.Now(),
 		}
 	}
 

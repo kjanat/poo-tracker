@@ -3,19 +3,19 @@ package service
 import (
 	"context"
 	"fmt"
-	"strings"
+	"sort"
 	"time"
 
 	"github.com/kjanat/poo-tracker/backend/internal/domain/analytics"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/medication"
-	"github.com/kjanat/poo-tracker/backend/internal/domain/shared"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/aggregator"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/analyzer"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/calculator"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/insights"
+	analyticsSvc "github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/shared"
 	"go.uber.org/zap"
 )
 
@@ -254,17 +254,17 @@ func (s *AnalyticsService) GetTrendAnalysis(ctx context.Context, userID string, 
 	mealTrendLines := s.trendAnalyzer.CalculateMealTrends(mealValues, start, end)
 
 	// Convert trend lines to DataTrend format
-	bowelMovementTrends := s.convertTrendLinesToDataTrend(bowelTrendLines, "bowel_movement")
-	symptomTrends := s.convertTrendLinesToDataTrend(symptomTrendLines, "symptoms")
-	mealTrends := s.convertTrendLinesToDataTrend(mealTrendLines, "meals")
+	bowelMovementTrend := s.convertTrendLinesToDataTrend(bowelTrendLines, "bowel_movement")
+	symptomTrend := s.convertTrendLinesToDataTrend(symptomTrendLines, "symptoms")
+	mealTrend := s.convertTrendLinesToDataTrend(mealTrendLines, "meals")
 
 	// Determine overall trend direction
-	overallTrend := s.determineOverallTrendDirection(bowelMovementTrends, symptomTrends, mealTrends)
+	overallTrend := s.determineOverallTrendDirection(bowelMovementTrend, symptomTrend, mealTrend)
 
 	return &analytics.TrendAnalysis{
-		BowelMovementTrends: bowelMovementTrends,
-		SymptomTrends:       symptomTrends,
-		MealTrends:          mealTrends,
+		BowelMovementTrends: bowelMovementTrend,
+		SymptomTrends:       symptomTrend,
+		MealTrends:          mealTrend,
 		OverallTrend:        overallTrend,
 	}, nil
 }
@@ -411,27 +411,125 @@ func (s *AnalyticsService) GetRecommendations(ctx context.Context, userID string
 
 // TODO: These are stub implementations - replace with proper analytics components
 // Pattern analysis methods delegate to specialized analyzers
-func (s *AnalyticsService) analyzeEatingPatterns(meals []*meal.Meal) *shared.EatingPattern {
+func (s *AnalyticsService) analyzeEatingPatterns(meals []*meal.Meal) *analytics.EatingPattern {
 	mealValues := s.convertMealPointers(meals)
-	return s.trendAnalyzer.AnalyzeEatingPatterns(mealValues)
+	sharedPattern := s.trendAnalyzer.AnalyzeEatingPatterns(mealValues)
+	return s.convertSharedEatingPatternToDomain(sharedPattern)
 }
 
-func (s *AnalyticsService) analyzeBowelPatterns(movements []*bowelmovement.BowelMovement, meals []*meal.Meal) *shared.BowelPattern {
+func (s *AnalyticsService) analyzeBowelPatterns(movements []*bowelmovement.BowelMovement, meals []*meal.Meal) *analytics.BowelPattern {
 	bowelValues := s.convertBowelMovementPointers(movements)
 	mealValues := s.convertMealPointers(meals)
-	return s.trendAnalyzer.AnalyzeBowelPatterns(bowelValues, mealValues)
+	sharedPattern := s.trendAnalyzer.AnalyzeBowelPatterns(bowelValues, mealValues)
+	return s.convertSharedBowelPatternToDomain(sharedPattern)
 }
 
-func (s *AnalyticsService) analyzeSymptomPatterns(symptoms []*symptom.Symptom) *shared.SymptomPattern {
+func (s *AnalyticsService) analyzeSymptomPatterns(symptoms []*symptom.Symptom) *analytics.SymptomPattern {
 	symptomValues := s.convertSymptomPointers(symptoms)
-	return s.trendAnalyzer.AnalyzeSymptomPatterns(symptomValues)
+	sharedPattern := s.trendAnalyzer.AnalyzeSymptomPatterns(symptomValues)
+	return s.convertSharedSymptomPatternToDomain(sharedPattern)
 }
 
-func (s *AnalyticsService) analyzeLifestylePatterns(meals []*meal.Meal, movements []*bowelmovement.BowelMovement, symptoms []*symptom.Symptom) *shared.LifestylePattern {
+func (s *AnalyticsService) analyzeLifestylePatterns(meals []*meal.Meal, movements []*bowelmovement.BowelMovement, symptoms []*symptom.Symptom) *analytics.LifestylePattern {
 	bowelValues := s.convertBowelMovementPointers(movements)
 	mealValues := s.convertMealPointers(meals)
 	symptomValues := s.convertSymptomPointers(symptoms)
-	return s.trendAnalyzer.AnalyzeLifestylePatterns(mealValues, bowelValues, symptomValues)
+	sharedPattern := s.trendAnalyzer.AnalyzeLifestylePatterns(mealValues, bowelValues, symptomValues)
+	return s.convertSharedLifestylePatternToDomain(sharedPattern)
+}
+
+// Pattern conversion methods
+
+func (s *AnalyticsService) convertSharedEatingPatternToDomain(sharedPattern *analyticsSvc.EatingPattern) *analytics.EatingPattern {
+	if sharedPattern == nil {
+		return &analytics.EatingPattern{
+			MealTiming:           make(map[string]float64),
+			MealSizeDistribution: make(map[string]float64),
+			PreferredCuisines:    []string{},
+			DietaryConsistency:   0,
+		}
+	}
+
+	// Convert the shared pattern to domain pattern
+	// Since structures are different, we need to do a manual conversion
+	mealTiming := make(map[string]float64)
+	for _, timing := range sharedPattern.MealTimings {
+		hourKey := fmt.Sprintf("%d", timing.TimeOfDay.Hour)
+		mealTiming[hourKey] = float64(timing.Frequency)
+	}
+
+	return &analytics.EatingPattern{
+		MealTiming:           mealTiming,
+		MealSizeDistribution: make(map[string]float64),        // Not available in shared
+		PreferredCuisines:    sharedPattern.CommonIngredients, // Use common ingredients as proxy
+		DietaryConsistency:   0.8,                             // Default value
+	}
+}
+
+func (s *AnalyticsService) convertSharedBowelPatternToDomain(sharedPattern *analyticsSvc.BowelPattern) *analytics.BowelPattern {
+	if sharedPattern == nil {
+		return &analytics.BowelPattern{
+			PreferredTiming:     make(map[string]float64),
+			RegularityScore:     0,
+			ConsistencyPatterns: make(map[string]float64),
+			ResponseToMeals:     0,
+		}
+	}
+
+	return &analytics.BowelPattern{
+		PreferredTiming:     make(map[string]float64), // Not directly available in shared
+		RegularityScore:     sharedPattern.Frequency,  // Use frequency as proxy
+		ConsistencyPatterns: map[string]float64{"consistency": sharedPattern.Consistency},
+		ResponseToMeals:     sharedPattern.MealCorrelation * 24, // Convert correlation to hours
+	}
+}
+
+func (s *AnalyticsService) convertSharedSymptomPatternToDomain(sharedPattern *analyticsSvc.SymptomPattern) *analytics.SymptomPattern {
+	if sharedPattern == nil {
+		return &analytics.SymptomPattern{
+			SymptomTiming:     make(map[string]float64),
+			TriggerPatterns:   make(map[string]float64),
+			SeasonalVariation: make(map[string]float64),
+			CyclicalPatterns:  false,
+		}
+	}
+
+	// Convert common symptoms map to timing pattern
+	timingMap := make(map[string]float64)
+	for symptom, count := range sharedPattern.CommonSymptoms {
+		timingMap[symptom] = float64(count)
+	}
+
+	// Convert frequency to trigger patterns
+	triggerMap := make(map[string]float64)
+	for trigger, freq := range sharedPattern.Frequency {
+		triggerMap[trigger] = float64(freq)
+	}
+
+	return &analytics.SymptomPattern{
+		SymptomTiming:     timingMap,
+		TriggerPatterns:   triggerMap,
+		SeasonalVariation: make(map[string]float64),              // Not available in shared
+		CyclicalPatterns:  len(sharedPattern.CommonSymptoms) > 2, // Simple heuristic
+	}
+}
+
+func (s *AnalyticsService) convertSharedLifestylePatternToDomain(sharedPattern *analyticsSvc.LifestylePattern) *analytics.LifestylePattern {
+	if sharedPattern == nil {
+		return &analytics.LifestylePattern{
+			StressLevels:       make(map[string]float64),
+			SleepQuality:       make(map[string]float64),
+			ExerciseFrequency:  make(map[string]float64),
+			WeatherSensitivity: make(map[string]float64),
+		}
+	}
+
+	return &analytics.LifestylePattern{
+		StressLevels:       make(map[string]float64), // Not directly available in shared
+		SleepQuality:       make(map[string]float64), // Not directly available in shared
+		ExerciseFrequency:  make(map[string]float64), // Not directly available in shared
+		WeatherSensitivity: make(map[string]float64), // Not directly available in shared
+	}
 }
 
 func (s *AnalyticsService) generateKeyFindings(overview *analytics.HealthOverview, correlations *analytics.CorrelationAnalysis, patterns *analytics.BehaviorPatterns) []string {
@@ -501,8 +599,45 @@ func (s *AnalyticsService) calculateScoreFactors(overview *analytics.HealthOverv
 }
 
 func (s *AnalyticsService) generatePersonalizedRecommendations(insights *analytics.HealthInsights, healthScore *analytics.HealthScore) []*analytics.Recommendation {
-	// Use the insight engine to generate recommendations - simplified call for now
-	recommendations := s.insightEngine.GenerateRecommendations([]*shared.InsightRecommendation{})
+	// For now, return a simple set of recommendations based on the insights
+	recommendations := make([]*analytics.Recommendation, 0)
+
+	// Add recommendations based on alert level
+	if insights.AlertLevel == "HIGH" {
+		recommendations = append(recommendations, &analytics.Recommendation{
+			ID:             "high-alert-1",
+			Type:           "MEDICAL",
+			Category:       "Healthcare",
+			Title:          "Consult Healthcare Provider",
+			Description:    "Your health indicators suggest you should consult with a healthcare provider",
+			Priority:       "HIGH",
+			Confidence:     0.9,
+			Evidence:       insights.RiskFactors,
+			ActionSteps:    []string{"Schedule appointment", "Prepare health summary"},
+			ExpectedImpact: "Improved health management and early intervention",
+			Timeline:       "Within 1-2 weeks",
+			CreatedAt:      time.Now(),
+		})
+	}
+
+	// Add general recommendations based on score
+	if healthScore.OverallScore < 50 {
+		recommendations = append(recommendations, &analytics.Recommendation{
+			ID:             "low-score-1",
+			Type:           "LIFESTYLE",
+			Category:       "General Health",
+			Title:          "Improve Health Habits",
+			Description:    "Your overall health score could be improved with lifestyle changes",
+			Priority:       "MEDIUM",
+			Confidence:     0.7,
+			Evidence:       []string{fmt.Sprintf("Overall score: %.1f", healthScore.OverallScore)},
+			ActionSteps:    []string{"Review dietary patterns", "Monitor symptoms closely"},
+			ExpectedImpact: "Gradual improvement in overall health score",
+			Timeline:       "2-4 weeks",
+			CreatedAt:      time.Now(),
+		})
+	}
+
 	return recommendations
 }
 
@@ -789,4 +924,276 @@ func (s *AnalyticsService) calculateTriggerScore(meals []meal.Meal) float64 {
 		}
 	}
 	return float64(triggerCount) / float64(len(meals))
+}
+
+// Missing calculation methods for symptoms
+
+func (s *AnalyticsService) calculateAverageSeverity(symptoms []symptom.Symptom) float64 {
+	if len(symptoms) == 0 {
+		return 0
+	}
+	total := 0.0
+	for _, sym := range symptoms {
+		total += float64(sym.Severity)
+	}
+	return total / float64(len(symptoms))
+}
+
+func (s *AnalyticsService) findMostCommonCategory(symptoms []symptom.Symptom) string {
+	if len(symptoms) == 0 {
+		return ""
+	}
+	categoryCounts := make(map[string]int)
+	for _, sym := range symptoms {
+		if sym.Category != nil {
+			categoryCounts[string(*sym.Category)]++
+		}
+	}
+
+	maxCount := 0
+	mostCommonCategory := ""
+	for category, count := range categoryCounts {
+		if count > maxCount {
+			maxCount = count
+			mostCommonCategory = category
+		}
+	}
+	return mostCommonCategory
+}
+
+func (s *AnalyticsService) findMostCommonType(symptoms []symptom.Symptom) string {
+	if len(symptoms) == 0 {
+		return ""
+	}
+	typeCounts := make(map[string]int)
+	for _, sym := range symptoms {
+		if sym.Type != nil {
+			typeCounts[string(*sym.Type)]++
+		}
+	}
+
+	maxCount := 0
+	mostCommonType := ""
+	for symType, count := range typeCounts {
+		if count > maxCount {
+			maxCount = count
+			mostCommonType = symType
+		}
+	}
+	return mostCommonType
+}
+
+func (s *AnalyticsService) calculateSymptomTrendDirection(symptoms []symptom.Symptom) string {
+	if len(symptoms) < 2 {
+		return "STABLE"
+	}
+
+	// Sort symptoms by date
+	sortedSymptoms := make([]symptom.Symptom, len(symptoms))
+	copy(sortedSymptoms, symptoms)
+	sort.Slice(sortedSymptoms, func(i, j int) bool {
+		return sortedSymptoms[i].RecordedAt.Before(sortedSymptoms[j].RecordedAt)
+	})
+
+	// Compare first half with second half
+	midpoint := len(sortedSymptoms) / 2
+	firstHalf := sortedSymptoms[:midpoint]
+	secondHalf := sortedSymptoms[midpoint:]
+
+	firstHalfAvg := s.calculateAverageSeverity(firstHalf)
+	secondHalfAvg := s.calculateAverageSeverity(secondHalf)
+
+	if secondHalfAvg > firstHalfAvg+0.5 {
+		return "DECLINING" // Getting worse
+	} else if firstHalfAvg > secondHalfAvg+0.5 {
+		return "IMPROVING" // Getting better
+	}
+	return "STABLE"
+}
+
+// Missing calculation methods for medications
+
+func (s *AnalyticsService) countActiveMedications(medications []*medication.Medication) int64 {
+	count := int64(0)
+	for _, med := range medications {
+		if med != nil && med.IsActive {
+			count++
+		}
+	}
+	return count
+}
+
+func (s *AnalyticsService) calculateAdherenceScore(medications []*medication.Medication) float64 {
+	if len(medications) == 0 {
+		return 0
+	}
+
+	totalScore := 0.0
+	for _, med := range medications {
+		if med != nil && med.IsActive {
+			// Simple adherence calculation - in reality this would be more complex
+			// For now, assume 90% adherence if medication is active
+			totalScore += 0.9
+		}
+	}
+	return totalScore / float64(len(medications))
+}
+
+func (s *AnalyticsService) findMostCommonMedicationCategory(medications []*medication.Medication) string {
+	if len(medications) == 0 {
+		return ""
+	}
+
+	categoryCounts := make(map[string]int)
+	for _, med := range medications {
+		if med != nil && med.Category != nil {
+			categoryCounts[string(*med.Category)]++
+		}
+	}
+
+	maxCount := 0
+	mostCommonCategory := ""
+	for category, count := range categoryCounts {
+		if count > maxCount {
+			maxCount = count
+			mostCommonCategory = category
+		}
+	}
+	return mostCommonCategory
+}
+
+func (s *AnalyticsService) calculateMedicationComplexity(medications []*medication.Medication) float64 {
+	if len(medications) == 0 {
+		return 0
+	}
+
+	// Simple complexity score based on number of active medications
+	activeCount := float64(s.countActiveMedications(medications))
+
+	// Complexity increases with number of medications
+	// Scale from 0-1 where 1 is low complexity, 0 is high complexity
+	if activeCount <= 1 {
+		return 1.0 // Low complexity
+	} else if activeCount <= 3 {
+		return 0.7 // Medium complexity
+	} else if activeCount <= 5 {
+		return 0.4 // High complexity
+	}
+	return 0.1 // Very high complexity
+}
+
+// Missing trend calculation methods
+
+func (s *AnalyticsService) calculateTrendDirection(bowelMovements []bowelmovement.BowelMovement, meals []meal.Meal, symptoms []symptom.Symptom) string {
+	// Simple trend calculation based on recent data
+	bowelTrend := s.calculateBowelTrendDirection(bowelMovements)
+	symptomTrend := s.calculateSymptomTrendDirection(symptoms)
+
+	// Combine trends - if both are improving, overall is improving
+	if bowelTrend == "IMPROVING" && symptomTrend == "IMPROVING" {
+		return "IMPROVING"
+	} else if bowelTrend == "DECLINING" || symptomTrend == "DECLINING" {
+		return "DECLINING"
+	}
+	return "STABLE"
+}
+
+func (s *AnalyticsService) calculateBowelTrendDirection(bowelMovements []bowelmovement.BowelMovement) string {
+	if len(bowelMovements) < 2 {
+		return "STABLE"
+	}
+
+	// Sort movements by date
+	sortedMovements := make([]bowelmovement.BowelMovement, len(bowelMovements))
+	copy(sortedMovements, bowelMovements)
+	sort.Slice(sortedMovements, func(i, j int) bool {
+		return sortedMovements[i].RecordedAt.Before(sortedMovements[j].RecordedAt)
+	})
+
+	// Compare first half with second half regularity
+	midpoint := len(sortedMovements) / 2
+	firstHalf := sortedMovements[:midpoint]
+	secondHalf := sortedMovements[midpoint:]
+
+	firstHalfRegularity := s.calculateRegularityScore(firstHalf)
+	secondHalfRegularity := s.calculateRegularityScore(secondHalf)
+
+	if secondHalfRegularity > firstHalfRegularity+0.1 {
+		return "IMPROVING"
+	} else if firstHalfRegularity > secondHalfRegularity+0.1 {
+		return "DECLINING"
+	}
+	return "STABLE"
+}
+
+// Missing trend conversion methods
+
+func (s *AnalyticsService) convertTrendLinesToDataTrend(trendLines []*analyticsSvc.TrendLine, dataType string) *analytics.DataTrend {
+	if len(trendLines) == 0 {
+		return &analytics.DataTrend{
+			Direction:   "STABLE",
+			Slope:       0,
+			Confidence:  0,
+			TimePoints:  []time.Time{},
+			Values:      []float64{},
+			Seasonality: make(map[string]float64),
+		}
+	}
+
+	// Aggregate multiple trend lines into a single DataTrend
+	// For simplicity, take the first trend line as the primary trend
+	firstTrend := trendLines[0]
+	if firstTrend == nil {
+		return &analytics.DataTrend{
+			Direction:   "STABLE",
+			Slope:       0,
+			Confidence:  0,
+			TimePoints:  []time.Time{},
+			Values:      []float64{},
+			Seasonality: make(map[string]float64),
+		}
+	}
+
+	return &analytics.DataTrend{
+		Direction:   firstTrend.Direction,
+		Slope:       firstTrend.Slope,
+		Confidence:  firstTrend.Confidence,
+		TimePoints:  []time.Time{}, // TrendLine doesn't have TimePoints, so empty for now
+		Values:      []float64{},   // TrendLine doesn't have Values, so empty for now
+		Seasonality: make(map[string]float64),
+	}
+}
+
+func (s *AnalyticsService) determineOverallTrendDirection(bowelTrend, symptomTrend, mealTrend *analytics.DataTrend) string {
+	trends := []*analytics.DataTrend{bowelTrend, symptomTrend, mealTrend}
+
+	improvingCount := 0
+	decliningCount := 0
+	totalTrends := 0
+
+	for _, trend := range trends {
+		if trend != nil {
+			totalTrends++
+			switch trend.Direction {
+			case "IMPROVING":
+				improvingCount++
+			case "DECLINING":
+				decliningCount++
+			}
+		}
+	}
+
+	if totalTrends == 0 {
+		return "STABLE"
+	}
+
+	improvingRatio := float64(improvingCount) / float64(totalTrends)
+	decliningRatio := float64(decliningCount) / float64(totalTrends)
+
+	if improvingRatio > 0.6 {
+		return "IMPROVING"
+	} else if decliningRatio > 0.6 {
+		return "DECLINING"
+	}
+	return "STABLE"
 }

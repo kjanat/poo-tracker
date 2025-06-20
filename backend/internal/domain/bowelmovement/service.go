@@ -1,3 +1,20 @@
+// Package bowelmovement service interface and business logic models.
+// This file defines the Service interface for bowel movement operations
+// and related domain models for analytics and pattern analysis.
+//
+// Service Interface Methods:
+// - Create: Create new bowel movement entries with validation
+// - GetByID: Retrieve single bowel movement by ID
+// - GetByUser: Get all bowel movements for a user with pagination
+// - GetByDateRange: Date-filtered queries for analytics
+// - Update: Partial updates using pointer fields
+// - Delete: Soft or hard deletion
+// - GetStatistics: Basic aggregated statistics
+//
+// Analytics Support:
+// - BowelMovementStatistics: Aggregated metrics for health overview
+// - Date range queries for trend analysis
+// - User-specific analytics with privacy controls
 package bowelmovement
 
 import (

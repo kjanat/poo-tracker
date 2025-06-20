@@ -1,7 +1,6 @@
 package analytics
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/kjanat/poo-tracker/backend/internal/domain/analytics"

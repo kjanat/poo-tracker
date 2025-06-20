@@ -1,15 +1,154 @@
-# Poo Tracker Backend (Go)
+# Poo Tracker Backend
 
-This service implements the API for Poo Tracker using Go and the Gin framework. The previous Node.js backend has been fully rewritten in Go, with dependency injection and in-memory repositories for easy testing.
+A comprehensive health tracking application backend built in Go, following Domain-Driven Design (DDD) principles with clean architecture patterns.
+
+## Project Overview
+
+The Poo Tracker backend provides a REST API for comprehensive digestive health monitoring, including bowel movement tracking, meal logging, symptom monitoring, medication management, and advanced health analytics.
+
+## Architecture
+
+The project follows a clean architecture with clear separation of concerns:
+
+```
+backend/
+├── cmd/                    # Application entry points
+│   └── server/            # Main server application
+├── internal/              # Private application code
+│   ├── domain/           # Business logic and domain models
+│   ├── infrastructure/   # External dependencies and implementations
+│   └── app/             # Application services and orchestration
+├── server/               # HTTP server and API handlers
+├── docs/                # API documentation
+└── data/                # Database files (development)
+```
+
+## Domain Structure
+
+### Core Domains
+
+#### 1. Bowel Movement Domain (`internal/domain/bowelmovement/`)
+
+**Purpose**: Tracks bowel movements with comprehensive health metrics
+
+**Key Models**:
+
+- `BowelMovement`: Core tracking model with Bristol Stool Scale (1-7)
+- `BowelMovementDetails`: Extended metadata and descriptions
+- Pain, strain, satisfaction metrics (1-10 scale)
+- Duration tracking and urgency levels
+- Photo attachments and detailed notes
+
+**Service Operations**:
+
+- Create, read, update, delete bowel movement entries
+- Date range queries for analytics
+- User-specific data with privacy controls
+- Statistical aggregations
+
+#### 2. Meal Domain (`internal/domain/meal/`)
+
+**Purpose**: Comprehensive meal and nutrition tracking
+
+**Key Models**:
+
+- `Meal`: Nutritional tracking with calorie counting
+- Ingredient lists and dietary restrictions
+- Meal timing and portion sizes
+- Fiber content and dietary trigger tracking
+- Photo documentation
+
+**Service Operations**:
+
+- Meal logging with nutritional analysis
+- Dietary pattern analysis
+- Trigger food identification
+- Nutrition goal tracking
+
+#### 3. Symptom Domain (`internal/domain/symptom/`)
+
+**Purpose**: Symptom tracking and pattern recognition
+
+**Key Models**:
+
+- `Symptom`: Comprehensive symptom tracking
+- Severity scales (1-10) and duration tracking
+- Body part localization and symptom categorization
+- Trigger identification and correlation analysis
+
+**Service Operations**:
+
+- Symptom logging with severity tracking
+- Pattern recognition and trigger analysis
+- Correlation with meals and medications
+- Trend analysis over time
+
+#### 4. Medication Domain (`internal/domain/medication/`)
+
+**Purpose**: Medication management and adherence tracking
+
+**Key Models**:
+
+- `Medication`: Comprehensive medication tracking
+- Dosage, frequency, and administration tracking
+- Side effect monitoring and effectiveness assessment
+- Start/end dates and PRN (as-needed) medications
+
+**Service Operations**:
+
+- Medication schedule management
+- Adherence tracking and reporting
+- Side effect correlation analysis
+- Effectiveness assessment
+
+#### 5. Analytics Domain (`internal/domain/analytics/`)
+
+**Purpose**: Advanced health analytics and insights
+
+**Key Features**:
+
+- Cross-domain health overview generation
+- Correlation analysis between health factors
+- Trend analysis and pattern recognition
+- Personalized health scoring (0-100)
+- Evidence-based recommendations
+- Risk factor identification
+
+**Service Operations**:
+
+- `GetUserHealthOverview()`: Comprehensive health summary
+- `GetCorrelationAnalysis()`: Factor relationship analysis
+- `GetTrendAnalysis()`: Time-series health trends
+- `GetBehaviorPatterns()`: Behavioral pattern recognition
+- `GetHealthInsights()`: Actionable health insights
+- `GetHealthScore()`: Overall health scoring
+- `GetRecommendations()`: Personalized recommendations
 
 ## Development
 
 ```bash
 # Run the server
-go run ./backend
+go run ./cmd/server/main.go
 
 # Run tests
 go test ./...
+
+# Build for production
+go build -o bin/server ./cmd/server/main.go
+```
+
+### Quick Start
+
+```bash
+# Install dependencies
+go mod download
+
+# Set up environment
+cp .env.example .env
+# Edit .env with your configuration
+
+# Start development server
+go run cmd/server/main.go
 ```
 
 ### Architecture

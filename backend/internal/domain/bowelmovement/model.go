@@ -1,3 +1,19 @@
+// Package bowelmovement provides domain models for bowel movement tracking.
+// This file contains the core BowelMovement model and related data structures
+// for comprehensive digestive health monitoring.
+//
+// Key Models:
+// - BowelMovement: Core bowel movement tracking with Bristol stool scale
+// - BowelMovementDetails: Extended metadata and detailed descriptions
+// - BowelMovementUpdate: Update operations with pointer fields for partial updates
+//
+// Features:
+// - Bristol Stool Scale classification (1-7)
+// - Pain, strain, and satisfaction metrics (1-10 scale)
+// - Duration tracking and urgency levels
+// - Photo attachments and detailed notes
+// - User-specified timing vs system timestamps
+// - Performance-optimized with separate details storage
 package bowelmovement
 
 import (

@@ -1,3 +1,15 @@
+// Package analytics error definitions.
+// This file contains all domain-specific errors for the analytics service,
+// providing structured error handling for various analytics operation failures.
+//
+// Error Categories:
+// - Data Validation: ErrInsufficientData, ErrInvalidDateRange
+// - Analysis Failures: ErrCorrelationFailed, ErrTrendAnalysisFailed, ErrPredictionFailed
+// - Access Control: ErrUserNotAuthorized, ErrAnalysisNotAvailable
+// - Input Validation: ErrInvalidAnalysisType
+//
+// Custom Error Types:
+// - AnalysisError: Contextual error wrapper with additional metadata
 package analytics
 
 import (

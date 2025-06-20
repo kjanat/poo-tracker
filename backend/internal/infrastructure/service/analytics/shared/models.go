@@ -28,14 +28,19 @@ type DailyAggregation struct {
 	GlutenMealCount int
 }
 
+// TrendPoint represents a single data point in a trend analysis
+type TrendPoint struct {
+	Time  time.Time `json:"time"`
+	Value float64   `json:"value"`
+}
+
 // Use domain analytics types for shared structures
 type CorrelationPair = analytics.Correlation
-type TrendPoint = analytics.DataTrend
 type TrendLine = analytics.DataTrend
 type PatternMatch = analytics.Insight
 type HealthMetric = analytics.ScoreFactor
 type InsightRecommendation = analytics.Insight
-type StatisticalSummary = analytics.StatisticalSummary
+type StatisticalSummary = analytics.ScoreFactor
 type BowelMovementStats = analytics.BowelMovementSummary
 type MealStats = analytics.MealSummary
 type SymptomStats = analytics.SymptomSummary
