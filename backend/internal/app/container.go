@@ -1,6 +1,8 @@
 package app
 
 import (
+	"fmt"
+
 	"github.com/kjanat/poo-tracker/backend/internal/domain/analytics"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
@@ -43,6 +45,13 @@ func NewContainer() (*Container, error) {
 	db, err := database.NewDatabase(dbConfig)
 	if err != nil {
 		return nil, err
+	}
+
+	// Validate database connection
+	if sqlDB, err := db.GetDB().DB(); err != nil {
+		return nil, fmt.Errorf("failed to get underlying database connection: %w", err)
+	} else if err := sqlDB.Ping(); err != nil {
+		return nil, fmt.Errorf("database connection validation failed: %w", err)
 	}
 
 	// Run migrations

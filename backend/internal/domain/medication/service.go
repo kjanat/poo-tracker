@@ -84,7 +84,7 @@ type MedicationStats struct {
 	FormBreakdown       map[string]int `json:"formBreakdown"`
 	RouteBreakdown      map[string]int `json:"routeBreakdown"`
 	DosesThisPeriod     int64          `json:"dosesThisPeriod"`
-	AverageDoesPerDay   float64        `json:"averageDosesPerDay"`
+	AverageDosesPerDay  float64        `json:"averageDosesPerDay"`
 }
 
 // MedicationInsights represents insights from medication data
@@ -92,7 +92,7 @@ type MedicationInsights struct {
 	MostUsedCategory string  `json:"mostUsedCategory"`
 	MostCommonForm   string  `json:"mostCommonForm"`
 	MostCommonRoute  string  `json:"mostCommonRoute"`
-	AdhereanceScore  float64 `json:"adherenceScore"`   // 0-1 based on regular medication consistency
+	AdherenceScore   float64 `json:"adherenceScore"`   // 0-1 based on regular medication consistency
 	ComplexityScore  float64 `json:"complexityScore"`  // 0-1 based on number of medications and frequency
 	MedicationBurden int     `json:"medicationBurden"` // Total number of active medications
 	InteractionRisk  string  `json:"interactionRisk"`  // LOW, MEDIUM, HIGH

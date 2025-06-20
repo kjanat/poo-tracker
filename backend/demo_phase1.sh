@@ -9,7 +9,7 @@ echo
 
 echo "📁 Directory Structure:"
 echo "------------------------"
-cd /home/kjanat/Projects/poo-tracker/backend
+cd "$(dirname "$0")" || exit
 tree cmd internal -I "__pycache__|*.pyc" | head -20
 echo
 
@@ -17,7 +17,7 @@ echo "🔧 Build Test:"
 echo "---------------"
 echo "Building new server..."
 go build -o bin/server ./cmd/server
-if [ $? -eq 0 ]; then
+if [[ $? -eq 0 ]]; then
     echo "✅ Build successful!"
 else
     echo "❌ Build failed!"

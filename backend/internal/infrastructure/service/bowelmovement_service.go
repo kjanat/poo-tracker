@@ -110,7 +110,7 @@ func (s *BowelMovementService) GetByID(ctx context.Context, id string) (*bowelmo
 	bm, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return nil, bowelmovement.ErrNotFound
+			return nil, bowelmovement.ErrBowelMovementNotFound
 		}
 		return nil, fmt.Errorf("failed to get bowel movement: %w", err)
 	}
@@ -150,7 +150,7 @@ func (s *BowelMovementService) Update(ctx context.Context, id string, input *bow
 	_, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return nil, bowelmovement.ErrNotFound
+			return nil, bowelmovement.ErrBowelMovementNotFound
 		}
 		return nil, fmt.Errorf("failed to get bowel movement for update: %w", err)
 	}
@@ -182,7 +182,7 @@ func (s *BowelMovementService) Delete(ctx context.Context, id string) error {
 	_, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return bowelmovement.ErrNotFound
+			return bowelmovement.ErrBowelMovementNotFound
 		}
 		return fmt.Errorf("failed to verify bowel movement exists: %w", err)
 	}
@@ -208,7 +208,7 @@ func (s *BowelMovementService) CreateDetails(ctx context.Context, bowelMovementI
 	_, err := s.repo.GetByID(ctx, bowelMovementID)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return nil, bowelmovement.ErrNotFound
+			return nil, bowelmovement.ErrBowelMovementNotFound
 		}
 		return nil, fmt.Errorf("failed to verify bowel movement exists: %w", err)
 	}
@@ -253,7 +253,7 @@ func (s *BowelMovementService) GetDetails(ctx context.Context, bowelMovementID s
 	details, err := s.repo.GetDetailsByBowelMovementID(ctx, bowelMovementID)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return nil, bowelmovement.ErrNotFound
+			return nil, bowelmovement.ErrBowelMovementDetailsNotFound
 		}
 		return nil, fmt.Errorf("failed to get bowel movement details: %w", err)
 	}
@@ -271,7 +271,7 @@ func (s *BowelMovementService) UpdateDetails(ctx context.Context, bowelMovementI
 	_, err := s.repo.GetDetailsByBowelMovementID(ctx, bowelMovementID)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return nil, bowelmovement.ErrNotFound
+			return nil, bowelmovement.ErrBowelMovementDetailsNotFound
 		}
 		return nil, fmt.Errorf("failed to get bowel movement details for update: %w", err)
 	}
@@ -351,7 +351,7 @@ func (s *BowelMovementService) GetLatest(ctx context.Context, userID string) (*b
 	latest, err := s.repo.GetLatestByUserID(ctx, userID)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return nil, bowelmovement.ErrNotFound
+			return nil, bowelmovement.ErrBowelMovementNotFound
 		}
 		return nil, fmt.Errorf("failed to get latest bowel movement: %w", err)
 	}

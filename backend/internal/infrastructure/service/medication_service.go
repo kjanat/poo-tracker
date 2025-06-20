@@ -34,15 +34,15 @@ func (s *MedicationService) Create(ctx context.Context, userID string, input *me
 
 	// Validate required fields
 	if input.Name == "" {
-		return nil, medication.ErrMedicationNameRequired
+		return nil, medication.ErrInvalidMedicationName
 	}
 
 	if input.Dosage == "" {
-		return nil, medication.ErrDosageRequired
+		return nil, medication.ErrInvalidDosage
 	}
 
 	if input.Frequency == "" {
-		return nil, medication.ErrFrequencyRequired
+		return nil, medication.ErrInvalidFrequency
 	}
 
 	// Create the medication
@@ -416,7 +416,7 @@ func (s *MedicationService) GetMedicationStats(ctx context.Context, userID strin
 	stats.DosesThisPeriod = totalDoses
 	days := end.Sub(start).Hours() / 24
 	if days > 0 {
-		stats.AverageDoesPerDay = float64(totalDoses) / days
+		stats.AverageDosesPerDay = float64(totalDoses) / days
 	}
 
 	return stats, nil
@@ -473,9 +473,9 @@ func (s *MedicationService) GetMedicationInsights(ctx context.Context, userID st
 		// This is a simplified calculation - in a real system you'd track scheduled vs actual doses
 		expectedDoses := stats.RegularMedications * int64(end.Sub(start).Hours()/24) // Assuming once daily
 		if expectedDoses > 0 {
-			insights.AdhereanceScore = float64(stats.DosesThisPeriod) / float64(expectedDoses)
-			if insights.AdhereanceScore > 1.0 {
-				insights.AdhereanceScore = 1.0 // Cap at 100%
+			insights.AdherenceScore = float64(stats.DosesThisPeriod) / float64(expectedDoses)
+			if insights.AdherenceScore > 1.0 {
+				insights.AdherenceScore = 1.0 // Cap at 100%
 			}
 		}
 	}

@@ -86,7 +86,7 @@ func (s *MealService) GetByID(ctx context.Context, id string) (*meal.Meal, error
 	mealEntity, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return nil, meal.ErrNotFound
+			return nil, meal.ErrMealNotFound
 		}
 		return nil, fmt.Errorf("failed to get meal: %w", err)
 	}
@@ -126,7 +126,7 @@ func (s *MealService) Update(ctx context.Context, id string, input *meal.UpdateM
 	_, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return nil, meal.ErrNotFound
+			return nil, meal.ErrMealNotFound
 		}
 		return nil, fmt.Errorf("failed to get meal for update: %w", err)
 	}
@@ -158,7 +158,7 @@ func (s *MealService) Delete(ctx context.Context, id string) error {
 	_, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return meal.ErrNotFound
+			return meal.ErrMealNotFound
 		}
 		return fmt.Errorf("failed to verify meal exists: %w", err)
 	}
@@ -203,7 +203,7 @@ func (s *MealService) GetByCategory(ctx context.Context, userID string, category
 	}
 
 	if category == "" {
-		return nil, meal.ErrInvalidCategory
+		return nil, meal.ErrInvalidMealCategory
 	}
 
 	meals, err := s.repo.GetByCategory(ctx, userID, category)
@@ -223,7 +223,7 @@ func (s *MealService) GetLatest(ctx context.Context, userID string) (*meal.Meal,
 	latest, err := s.repo.GetLatestByUserID(ctx, userID)
 	if err != nil {
 		if errors.Is(err, shared.ErrNotFound) {
-			return nil, meal.ErrNotFound
+			return nil, meal.ErrMealNotFound
 		}
 		return nil, fmt.Errorf("failed to get latest meal: %w", err)
 	}
@@ -284,7 +284,7 @@ func (s *MealService) validateCreateInput(input *meal.CreateMealInput) error {
 	}
 
 	if input.Name == "" {
-		return meal.ErrInvalidName
+		return meal.ErrInvalidMealName
 	}
 
 	if input.Calories < 0 || input.Calories > 10000 {
@@ -299,7 +299,7 @@ func (s *MealService) validateCreateInput(input *meal.CreateMealInput) error {
 	if input.Category != nil {
 		cat := shared.MealCategory(*input.Category)
 		if !cat.IsValid() {
-			return meal.ErrInvalidCategory
+			return meal.ErrInvalidMealCategory
 		}
 	}
 
@@ -313,7 +313,7 @@ func (s *MealService) validateUpdateInput(input *meal.UpdateMealInput) error {
 	}
 
 	if input.Name != nil && *input.Name == "" {
-		return meal.ErrInvalidName
+		return meal.ErrInvalidMealName
 	}
 
 	if input.Calories != nil && (*input.Calories < 0 || *input.Calories > 10000) {
