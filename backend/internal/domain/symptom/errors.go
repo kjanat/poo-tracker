@@ -8,6 +8,7 @@ import (
 // Domain errors
 var (
 	ErrSymptomNotFound        = errors.New("symptom not found")
+	ErrSymptomNameRequired    = errors.New("symptom name is required")
 	ErrInvalidSymptomName     = errors.New("symptom name is required and must be 1-200 characters")
 	ErrInvalidSeverity        = errors.New("severity must be between 1 and 10")
 	ErrInvalidDuration        = errors.New("duration must be positive")

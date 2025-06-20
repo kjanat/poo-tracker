@@ -8,6 +8,9 @@ import (
 // Domain errors
 var (
 	ErrMedicationNotFound        = errors.New("medication not found")
+	ErrMedicationNameRequired    = errors.New("medication name is required")
+	ErrDosageRequired            = errors.New("dosage is required")
+	ErrFrequencyRequired         = errors.New("frequency is required")
 	ErrInvalidMedicationName     = errors.New("medication name is required and must be 1-200 characters")
 	ErrInvalidDosage             = errors.New("dosage is required and must be 1-100 characters")
 	ErrInvalidFrequency          = errors.New("frequency is required and must be 1-200 characters")
@@ -16,8 +19,10 @@ var (
 	ErrInvalidMedicationRoute    = errors.New("invalid medication route")
 	ErrInvalidDateRange          = errors.New("end date must be after start date")
 	ErrMedicationAlreadyActive   = errors.New("medication is already active")
+	ErrMedicationNotActive       = errors.New("medication is not active")
 	ErrMedicationAlreadyInactive = errors.New("medication is already inactive")
 	ErrDoseRecordNotFound        = errors.New("dose record not found")
+	ErrDoseTakenInFuture         = errors.New("dose taken time cannot be in the future")
 	ErrInvalidDoseTime           = errors.New("dose time cannot be in the future")
 	ErrUserNotAuthorized         = errors.New("user not authorized to access this medication")
 	ErrDuplicateMedication       = errors.New("duplicate medication entry detected")

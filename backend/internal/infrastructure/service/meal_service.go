@@ -449,14 +449,39 @@ func (s *MealService) calculateInsights(meals []*meal.Meal, start, end time.Time
 	if days <= 0 {
 		days = 1
 	}
-	frequencyPerDay := float64(totalMeals) / days
+	averageMealsPerDay := float64(totalMeals) / days
+
+	// Calculate meal time patterns (hour -> frequency)
+	mealTimePatterns := make(map[string]float64)
+	for _, m := range meals {
+		hour := m.MealTime.Hour()
+		hourStr := fmt.Sprintf("%d", hour)
+		mealTimePatterns[hourStr]++
+	}
+	// Normalize to percentages
+	for hour := range mealTimePatterns {
+		mealTimePatterns[hour] = mealTimePatterns[hour] / float64(totalMeals)
+	}
+
+	// Calculate simple health score based on fiber content
+	healthScore := 5.0 // default middle score
+	if totalMeals > 0 {
+		fiberRichCount := 0
+		for _, m := range meals {
+			if m.FiberRich {
+				fiberRichCount++
+			}
+		}
+		// Health score 1-10 based on fiber content
+		fiberRatio := float64(fiberRichCount) / float64(totalMeals)
+		healthScore = 1.0 + (fiberRatio * 9.0) // 1-10 scale
+	}
 
 	return &meal.MealInsights{
-		TotalMeals:           totalMeals,
-		FrequencyPerDay:      frequencyPerDay,
-		MostCommonCategory:   mostCommonCategory,
-		MostCommonCuisine:    mostCommonCuisine,
-		CategoryDistribution: categoryDistribution,
-		CuisineDistribution:  cuisineDistribution,
+		MostCommonCategory: mostCommonCategory,
+		MostCommonCuisine:  mostCommonCuisine,
+		AverageMealsPerDay: averageMealsPerDay,
+		MealTimePatterns:   mealTimePatterns,
+		HealthScore:        healthScore,
 	}
 }

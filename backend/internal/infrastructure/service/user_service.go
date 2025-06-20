@@ -269,6 +269,8 @@ func (s *UserService) Register(ctx context.Context, input *user.RegisterInput) (
 	if err := s.repo.CreateSettings(ctx, &userSettings); err != nil {
 		// Don't fail registration if settings creation fails, just log it
 		// In a real implementation, you'd want to log this error
+		// For now, we'll silently continue
+		_ = err
 	}
 
 	return userEntity, nil
