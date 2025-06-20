@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 	"time"
 
@@ -316,12 +317,13 @@ func TestSymptomAPI_GetSymptomsByDateRange(t *testing.T) {
 	startDate := yesterday.Add(-time.Hour).Format(time.RFC3339)
 	endDate := now.Add(time.Hour).Format(time.RFC3339)
 
-	req, _ := http.NewRequest("GET", "/symptoms/date-range?startDate="+startDate+"&endDate="+endDate, nil)
+	req, _ := http.NewRequest("GET", "/symptoms/date-range?startDate="+url.QueryEscape(startDate)+"&endDate="+url.QueryEscape(endDate), nil)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
-		t.Errorf("Expected status %d, got %d", http.StatusOK, w.Code)
+		t.Errorf("Expected status %d, got %d. Response body: %s", http.StatusOK, w.Code, w.Body.String())
+		return
 	}
 
 	var response map[string][]model.Symptom
