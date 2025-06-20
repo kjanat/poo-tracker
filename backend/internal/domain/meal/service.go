@@ -32,7 +32,7 @@ type CreateMealInput struct {
 	Category    *string   `json:"category,omitempty"`
 	Cuisine     string    `json:"cuisine,omitempty"`
 	Calories    int       `json:"calories,omitempty" binding:"omitempty,min=0,max=10000"`
-	SpicyLevel  *int      `json:"spicyLevel,omitempty" binding:"omitempty,min=1,max=10"`
+	SpicyLevel  *int      `json:"spicyLevel,omitempty" binding:"omitempty,min=0,max=10"`
 	FiberRich   bool      `json:"fiberRich"`
 	Dairy       bool      `json:"dairy"`
 	Gluten      bool      `json:"gluten"`
@@ -48,7 +48,7 @@ type UpdateMealInput struct {
 	Category    *string    `json:"category,omitempty"`
 	Cuisine     *string    `json:"cuisine,omitempty"`
 	Calories    *int       `json:"calories,omitempty" binding:"omitempty,min=0,max=10000"`
-	SpicyLevel  *int       `json:"spicyLevel,omitempty" binding:"omitempty,min=1,max=10"`
+	SpicyLevel  *int       `json:"spicyLevel,omitempty" binding:"omitempty,min=0,max=10"`
 	FiberRich   *bool      `json:"fiberRich,omitempty"`
 	Dairy       *bool      `json:"dairy,omitempty"`
 	Gluten      *bool      `json:"gluten,omitempty"`

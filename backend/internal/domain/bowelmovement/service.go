@@ -33,9 +33,9 @@ type CreateBowelMovementInput struct {
 	Color        *string   `json:"color,omitempty"`
 	Consistency  *string   `json:"consistency,omitempty"`
 	Floaters     bool      `json:"floaters"`
-	Pain         int       `json:"pain" binding:"min=1,max=10"`
-	Strain       int       `json:"strain" binding:"min=1,max=10"`
-	Satisfaction int       `json:"satisfaction" binding:"min=1,max=10"`
+	Pain         int       `json:"pain" binding:"min=0,max=10"`
+	Strain       int       `json:"strain" binding:"min=0,max=10"`
+	Satisfaction int       `json:"satisfaction" binding:"min=0,max=10"`
 	PhotoURL     string    `json:"photoUrl,omitempty"`
 	SmellLevel   *string   `json:"smellLevel,omitempty"`
 }
@@ -48,9 +48,9 @@ type UpdateBowelMovementInput struct {
 	Color        *string    `json:"color,omitempty"`
 	Consistency  *string    `json:"consistency,omitempty"`
 	Floaters     *bool      `json:"floaters,omitempty"`
-	Pain         *int       `json:"pain,omitempty" binding:"omitempty,min=1,max=10"`
-	Strain       *int       `json:"strain,omitempty" binding:"omitempty,min=1,max=10"`
-	Satisfaction *int       `json:"satisfaction,omitempty" binding:"omitempty,min=1,max=10"`
+	Pain         *int       `json:"pain,omitempty" binding:"omitempty,min=0,max=10"`
+	Strain       *int       `json:"strain,omitempty" binding:"omitempty,min=0,max=10"`
+	Satisfaction *int       `json:"satisfaction,omitempty" binding:"omitempty,min=0,max=10"`
 	PhotoURL     *string    `json:"photoUrl,omitempty"`
 	SmellLevel   *string    `json:"smellLevel,omitempty"`
 }
@@ -64,9 +64,9 @@ type CreateBowelMovementDetailsInput struct {
 	PostConditions    string   `json:"postConditions,omitempty"`
 	Tags              []string `json:"tags,omitempty"`
 	WeatherCondition  string   `json:"weatherCondition,omitempty"`
-	StressLevel       *int     `json:"stressLevel,omitempty" binding:"omitempty,min=1,max=10"`
-	SleepQuality      *int     `json:"sleepQuality,omitempty" binding:"omitempty,min=1,max=10"`
-	ExerciseIntensity *int     `json:"exerciseIntensity,omitempty" binding:"omitempty,min=1,max=10"`
+	StressLevel       *int     `json:"stressLevel,omitempty" binding:"omitempty,min=0,max=10"`
+	SleepQuality      *int     `json:"sleepQuality,omitempty" binding:"omitempty,min=0,max=10"`
+	ExerciseIntensity *int     `json:"exerciseIntensity,omitempty" binding:"omitempty,min=0,max=10"`
 }
 
 // UpdateBowelMovementDetailsInput represents input for updating bowel movement details
@@ -78,9 +78,9 @@ type UpdateBowelMovementDetailsInput struct {
 	PostConditions    *string  `json:"postConditions,omitempty"`
 	Tags              []string `json:"tags,omitempty"`
 	WeatherCondition  *string  `json:"weatherCondition,omitempty"`
-	StressLevel       *int     `json:"stressLevel,omitempty" binding:"omitempty,min=1,max=10"`
-	SleepQuality      *int     `json:"sleepQuality,omitempty" binding:"omitempty,min=1,max=10"`
-	ExerciseIntensity *int     `json:"exerciseIntensity,omitempty" binding:"omitempty,min=1,max=10"`
+	StressLevel       *int     `json:"stressLevel,omitempty" binding:"omitempty,min=0,max=10"`
+	SleepQuality      *int     `json:"sleepQuality,omitempty" binding:"omitempty,min=0,max=10"`
+	ExerciseIntensity *int     `json:"exerciseIntensity,omitempty" binding:"omitempty,min=0,max=10"`
 }
 
 // UserBowelMovementStats represents analytics data for a user

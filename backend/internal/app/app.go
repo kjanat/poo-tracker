@@ -38,10 +38,13 @@ func (a *App) Run() error {
 	// Setup Gin router
 	router := a.setupRouter()
 
-	// Create HTTP server
+	// Create HTTP server with security and performance timeouts
 	a.server = &http.Server{
-		Addr:    fmt.Sprintf("%s:%s", a.container.Config.Host, a.container.Config.Port),
-		Handler: router,
+		Addr:         fmt.Sprintf("%s:%s", a.container.Config.Host, a.container.Config.Port),
+		Handler:      router,
+		ReadTimeout:  15 * time.Second, // Maximum duration for reading the entire request
+		WriteTimeout: 15 * time.Second, // Maximum duration for writing the response
+		IdleTimeout:  60 * time.Second, // Maximum amount of time to wait for the next request when keep-alives are enabled
 	}
 
 	// Start server in goroutine
