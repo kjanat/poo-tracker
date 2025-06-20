@@ -171,10 +171,10 @@ func (r *BaseListRequest) GetDefaultSorting() (sortBy, sortDir string) {
 
 // Validate validates the BaseListRequest
 func (r *BaseListRequest) Validate() error {
-	if r.Page < 0 {
+	if r.Page < 1 {
 		return NewValidationError("page", "page must be greater than 0")
 	}
-	if r.PageSize < 0 || r.PageSize > 100 {
+	if r.PageSize < 1 || r.PageSize > 100 {
 		return NewValidationError("page_size", "page_size must be between 1 and 100")
 	}
 	return nil

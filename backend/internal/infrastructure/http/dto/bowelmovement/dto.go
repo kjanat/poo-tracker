@@ -9,23 +9,23 @@ import (
 
 // CreateBowelMovementRequest represents the HTTP request for creating a bowel movement
 type CreateBowelMovementRequest struct {
-	BristolType  int       `json:"bristolType" binding:"required,min=1,max=7"`
-	RecordedAt   time.Time `json:"recordedAt" binding:"required"`
+	BristolType  int       `json:"bristol_type" binding:"required,min=1,max=7"`
+	RecordedAt   time.Time `json:"recorded_at" binding:"required"`
 	Volume       *string   `json:"volume,omitempty"`
 	Color        *string   `json:"color,omitempty"`
 	Consistency  *string   `json:"consistency,omitempty"`
 	Floaters     bool      `json:"floaters"`
-	Pain         int       `json:"pain" binding:"min=1,max=10"`
-	Strain       int       `json:"strain" binding:"min=1,max=10"`
-	Satisfaction int       `json:"satisfaction" binding:"min=1,max=10"`
-	PhotoURL     string    `json:"photoUrl,omitempty"`
-	SmellLevel   *string   `json:"smellLevel,omitempty"`
+	Pain         int       `json:"pain" binding:"required,min=1,max=10"`
+	Strain       int       `json:"strain" binding:"required,min=1,max=10"`
+	Satisfaction int       `json:"satisfaction" binding:"required,min=1,max=10"`
+	PhotoURL     string    `json:"photo_url,omitempty"`
+	SmellLevel   *string   `json:"smell_level,omitempty"`
 }
 
 // UpdateBowelMovementRequest represents the HTTP request for updating a bowel movement
 type UpdateBowelMovementRequest struct {
-	BristolType  *int       `json:"bristolType,omitempty" binding:"omitempty,min=1,max=7"`
-	RecordedAt   *time.Time `json:"recordedAt,omitempty"`
+	BristolType  *int       `json:"bristol_type,omitempty" binding:"omitempty,min=1,max=7"`
+	RecordedAt   *time.Time `json:"recorded_at,omitempty"`
 	Volume       *string    `json:"volume,omitempty"`
 	Color        *string    `json:"color,omitempty"`
 	Consistency  *string    `json:"consistency,omitempty"`
@@ -33,47 +33,47 @@ type UpdateBowelMovementRequest struct {
 	Pain         *int       `json:"pain,omitempty" binding:"omitempty,min=1,max=10"`
 	Strain       *int       `json:"strain,omitempty" binding:"omitempty,min=1,max=10"`
 	Satisfaction *int       `json:"satisfaction,omitempty" binding:"omitempty,min=1,max=10"`
-	PhotoURL     *string    `json:"photoUrl,omitempty"`
-	SmellLevel   *string    `json:"smellLevel,omitempty"`
+	PhotoURL     *string    `json:"photo_url,omitempty"`
+	SmellLevel   *string    `json:"smell_level,omitempty"`
 }
 
 // CreateBowelMovementDetailsRequest represents the HTTP request for creating bowel movement details
 type CreateBowelMovementDetailsRequest struct {
 	Notes             string   `json:"notes,omitempty"`
-	DetailedNotes     string   `json:"detailedNotes,omitempty"`
+	DetailedNotes     string   `json:"detailed_notes,omitempty"`
 	Environment       string   `json:"environment,omitempty"`
-	PreConditions     string   `json:"preConditions,omitempty"`
-	PostConditions    string   `json:"postConditions,omitempty"`
+	PreConditions     string   `json:"pre_conditions,omitempty"`
+	PostConditions    string   `json:"post_conditions,omitempty"`
 	Tags              []string `json:"tags,omitempty"`
-	WeatherCondition  string   `json:"weatherCondition,omitempty"`
-	StressLevel       *int     `json:"stressLevel,omitempty" binding:"omitempty,min=1,max=10"`
-	SleepQuality      *int     `json:"sleepQuality,omitempty" binding:"omitempty,min=1,max=10"`
-	ExerciseIntensity *int     `json:"exerciseIntensity,omitempty" binding:"omitempty,min=1,max=10"`
+	WeatherCondition  string   `json:"weather_condition,omitempty"`
+	StressLevel       *int     `json:"stress_level,omitempty" binding:"omitempty,min=1,max=10"`
+	SleepQuality      *int     `json:"sleep_quality,omitempty" binding:"omitempty,min=1,max=10"`
+	ExerciseIntensity *int     `json:"exercise_intensity,omitempty" binding:"omitempty,min=1,max=10"`
 }
 
 // UpdateBowelMovementDetailsRequest represents the HTTP request for updating bowel movement details
 type UpdateBowelMovementDetailsRequest struct {
 	Notes             *string  `json:"notes,omitempty"`
-	DetailedNotes     *string  `json:"detailedNotes,omitempty"`
+	DetailedNotes     *string  `json:"detailed_notes,omitempty"`
 	Environment       *string  `json:"environment,omitempty"`
-	PreConditions     *string  `json:"preConditions,omitempty"`
-	PostConditions    *string  `json:"postConditions,omitempty"`
+	PreConditions     *string  `json:"pre_conditions,omitempty"`
+	PostConditions    *string  `json:"post_conditions,omitempty"`
 	Tags              []string `json:"tags,omitempty"`
-	WeatherCondition  *string  `json:"weatherCondition,omitempty"`
-	StressLevel       *int     `json:"stressLevel,omitempty" binding:"omitempty,min=1,max=10"`
-	SleepQuality      *int     `json:"sleepQuality,omitempty" binding:"omitempty,min=1,max=10"`
-	ExerciseIntensity *int     `json:"exerciseIntensity,omitempty" binding:"omitempty,min=1,max=10"`
+	WeatherCondition  *string  `json:"weather_condition,omitempty"`
+	StressLevel       *int     `json:"stress_level,omitempty" binding:"omitempty,min=1,max=10"`
+	SleepQuality      *int     `json:"sleep_quality,omitempty" binding:"omitempty,min=1,max=10"`
+	ExerciseIntensity *int     `json:"exercise_intensity,omitempty" binding:"omitempty,min=1,max=10"`
 }
 
 // BowelMovementResponse represents the HTTP response for a bowel movement
 type BowelMovementResponse struct {
 	ID         string    `json:"id"`
-	UserID     string    `json:"userId"`
-	CreatedAt  time.Time `json:"createdAt"`
-	UpdatedAt  time.Time `json:"updatedAt"`
-	RecordedAt time.Time `json:"recordedAt"`
+	UserID     string    `json:"user_id"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
+	RecordedAt time.Time `json:"recorded_at"`
 
-	BristolType  int                 `json:"bristolType"`
+	BristolType  int                 `json:"bristol_type"`
 	Volume       *shared.Volume      `json:"volume,omitempty"`
 	Color        *shared.Color       `json:"color,omitempty"`
 	Consistency  *shared.Consistency `json:"consistency,omitempty"`
@@ -81,47 +81,47 @@ type BowelMovementResponse struct {
 	Pain         int                 `json:"pain"`
 	Strain       int                 `json:"strain"`
 	Satisfaction int                 `json:"satisfaction"`
-	PhotoURL     string              `json:"photoUrl,omitempty"`
-	SmellLevel   *shared.SmellLevel  `json:"smellLevel,omitempty"`
-	HasDetails   bool                `json:"hasDetails"`
+	PhotoURL     string              `json:"photo_url,omitempty"`
+	SmellLevel   *shared.SmellLevel  `json:"smell_level,omitempty"`
+	HasDetails   bool                `json:"has_details"`
 }
 
 // BowelMovementDetailsResponse represents the HTTP response for bowel movement details
 type BowelMovementDetailsResponse struct {
 	ID              string    `json:"id"`
-	BowelMovementID string    `json:"bowelMovementId"`
-	CreatedAt       time.Time `json:"createdAt"`
-	UpdatedAt       time.Time `json:"updatedAt"`
+	BowelMovementID string    `json:"bowel_movement_id"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
 
 	Notes             string      `json:"notes,omitempty"`
-	DetailedNotes     string      `json:"detailedNotes,omitempty"`
+	DetailedNotes     string      `json:"detailed_notes,omitempty"`
 	Environment       string      `json:"environment,omitempty"`
-	PreConditions     string      `json:"preConditions,omitempty"`
-	PostConditions    string      `json:"postConditions,omitempty"`
-	AIAnalysis        interface{} `json:"aiAnalysis,omitempty"`
-	AIConfidence      *float64    `json:"aiConfidence,omitempty"`
-	AIRecommendations string      `json:"aiRecommendations,omitempty"`
+	PreConditions     string      `json:"pre_conditions,omitempty"`
+	PostConditions    string      `json:"post_conditions,omitempty"`
+	AIAnalysis        interface{} `json:"ai_analysis,omitempty"`
+	AIConfidence      *float64    `json:"ai_confidence,omitempty"`
+	AIRecommendations string      `json:"ai_recommendations,omitempty"`
 	Tags              []string    `json:"tags,omitempty"`
-	WeatherCondition  string      `json:"weatherCondition,omitempty"`
-	StressLevel       *int        `json:"stressLevel,omitempty"`
-	SleepQuality      *int        `json:"sleepQuality,omitempty"`
-	ExerciseIntensity *int        `json:"exerciseIntensity,omitempty"`
+	WeatherCondition  string      `json:"weather_condition,omitempty"`
+	StressLevel       *int        `json:"stress_level,omitempty"`
+	SleepQuality      *int        `json:"sleep_quality,omitempty"`
+	ExerciseIntensity *int        `json:"exercise_intensity,omitempty"`
 }
 
 // BowelMovementStatsResponse represents the HTTP response for bowel movement statistics
 type BowelMovementStatsResponse struct {
-	TotalCount          int64       `json:"totalCount"`
-	AveragePain         float64     `json:"averagePain"`
-	AverageStrain       float64     `json:"averageStrain"`
-	AverageSatisfaction float64     `json:"averageSatisfaction"`
-	MostCommonBristol   int         `json:"mostCommonBristol"`
-	FrequencyPerDay     float64     `json:"frequencyPerDay"`
-	BristolDistribution map[int]int `json:"bristolDistribution"`
+	TotalCount          int64       `json:"total_count"`
+	AveragePain         float64     `json:"average_pain"`
+	AverageStrain       float64     `json:"average_strain"`
+	AverageSatisfaction float64     `json:"average_satisfaction"`
+	MostCommonBristol   int         `json:"most_common_bristol"`
+	FrequencyPerDay     float64     `json:"frequency_per_day"`
+	BristolDistribution map[int]int `json:"bristol_distribution"`
 }
 
 // ListBowelMovementsResponse represents the HTTP response for listing bowel movements
 type ListBowelMovementsResponse struct {
-	BowelMovements []BowelMovementResponse `json:"bowelMovements"`
+	BowelMovements []BowelMovementResponse `json:"bowel_movements"`
 	Total          int64                   `json:"total"`
 	Limit          int                     `json:"limit"`
 	Offset         int                     `json:"offset"`

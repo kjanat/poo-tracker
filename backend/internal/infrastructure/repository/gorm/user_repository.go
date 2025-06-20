@@ -3,6 +3,7 @@ package gorm
 import (
 	"context"
 	"errors"
+	"time"
 
 	"gorm.io/gorm"
 
@@ -119,7 +120,7 @@ func (r *UserRepository) UpdateAuth(ctx context.Context, userID string, password
 }
 
 func (r *UserRepository) UpdateLastLogin(ctx context.Context, userID string) error {
-	return r.db.WithContext(ctx).Model(&user.UserAuth{}).Where("user_id = ?", userID).Update("last_login_at", "NOW()").Error
+	return r.db.WithContext(ctx).Model(&user.UserAuth{}).Where("user_id = ?", userID).Update("last_login_at", time.Now()).Error
 }
 
 func (r *UserRepository) DeactivateAuth(ctx context.Context, userID string) error {

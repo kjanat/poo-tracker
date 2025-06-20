@@ -31,15 +31,11 @@ func (r *UserRepository) Create(ctx context.Context, u *user.User) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	// Check if email already exists
+	// Check if email or username already exists in a single loop
 	for _, existingUser := range r.users {
 		if existingUser.Email == u.Email {
 			return user.ErrEmailAlreadyExists
 		}
-	}
-
-	// Check if username already exists
-	for _, existingUser := range r.users {
 		if existingUser.Username == u.Username {
 			return user.ErrUsernameAlreadyExists
 		}
@@ -156,6 +152,7 @@ func (r *UserRepository) Delete(ctx context.Context, id string) error {
 
 	delete(r.users, id)
 	delete(r.settings, id) // Also delete associated settings
+	delete(r.auths, id)    // Also delete associated auth record
 	return nil
 }
 
@@ -299,7 +296,7 @@ func (r *UserRepository) CreateAuth(ctx context.Context, auth *user.UserAuth) er
 	}
 
 	if _, exists := r.auths[auth.UserID]; exists {
-		return user.ErrEmailAlreadyExists // reuse existing error for duplicate auth
+		return user.ErrAuthAlreadyExists
 	}
 
 	r.auths[auth.UserID] = auth

@@ -35,6 +35,7 @@ var (
 	// Business rule errors
 	ErrEmailAlreadyExists    = errors.New("email already exists")
 	ErrUsernameAlreadyExists = errors.New("username already exists")
+	ErrAuthAlreadyExists     = errors.New("user authentication already exists")
 	ErrInvalidCredentials    = errors.New("invalid credentials")
 	ErrAccountDeactivated    = errors.New("account is deactivated")
 
