@@ -1,7 +1,15 @@
 package app
 
 import (
+	"github.com/kjanat/poo-tracker/backend/internal/domain/analytics"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/medication"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/user"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/database"
+	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/repository/memory"
+	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service"
 )
 
 // Container holds all application dependencies
@@ -9,15 +17,20 @@ type Container struct {
 	Config   *Config
 	Database database.Database
 
-	// Services will be added in later phases
-	// UserService     service.UserService
-	// MealService     service.MealService
-	// etc...
+	// Repositories
+	UserRepository          user.Repository
+	BowelMovementRepository bowelmovement.Repository
+	MealRepository          meal.Repository
+	MedicationRepository    medication.Repository
+	SymptomRepository       symptom.Repository
 
-	// Repositories will be added in later phases
-	// UserRepository     repository.UserRepository
-	// MealRepository     repository.MealRepository
-	// etc...
+	// Services
+	UserService          user.Service
+	BowelMovementService bowelmovement.Service
+	MealService          meal.Service
+	MedicationService    medication.Service
+	SymptomService       symptom.Service
+	AnalyticsService     analytics.Service
 }
 
 // NewContainer creates a new dependency injection container
@@ -42,7 +55,25 @@ func NewContainer() (*Container, error) {
 		Database: db,
 	}
 
-	// Initialize repositories and services will be added in later phases
+	// Initialize repositories
+	container.UserRepository = memory.NewUserRepository()
+	container.BowelMovementRepository = memory.NewBowelMovementRepository()
+	container.MealRepository = memory.NewMealRepository()
+	container.MedicationRepository = memory.NewMedicationRepository()
+	container.SymptomRepository = memory.NewSymptomRepository()
+
+	// Initialize services
+	container.UserService = service.NewUserService(container.UserRepository)
+	container.BowelMovementService = service.NewBowelMovementService(container.BowelMovementRepository)
+	container.MealService = service.NewMealService(container.MealRepository)
+	container.MedicationService = service.NewMedicationService(container.MedicationRepository)
+	container.SymptomService = service.NewSymptomService(container.SymptomRepository)
+	container.AnalyticsService = service.NewAnalyticsService(
+		container.BowelMovementService,
+		container.MealService,
+		container.SymptomService,
+		container.MedicationService,
+	)
 
 	return container, nil
 }
