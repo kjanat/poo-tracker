@@ -96,38 +96,95 @@ backend/
 
 ## Implementation Phases
 
-### Phase 1 - Infrastructure Setup ⏳ IN PROGRESS
+### Phase 1 - Infrastructure Setup + GORM Integration ⏳ IN PROGRESS
 
-**Priority: High** | **Started:** 2025-06-20 | **Estimated:** 2-3 hours
+**Priority: High** | **Started:** 2025-06-20 | **Estimated:** 3-4 hours
 
-#### Tasks:
+#### Tasks
 
 - [ ] Create new directory structure
+- [ ] Add GORM dependencies and database setup
+- [ ] Configure SQLite for development + PostgreSQL for production
 - [ ] Move existing files to appropriate locations
 - [ ] Create placeholder files for new architecture
+- [ ] Implement database connection strategy pattern
 - [ ] Update import paths for moved files
 - [ ] Ensure all tests still pass after file moves
 
-#### Files to Create:
+#### Database Strategy
+
+**Development Environment:**
+
+- SQLite database (`./data/poo-tracker.db`)
+- Zero configuration, fast startup
+- Perfect for testing and local development
+- No Docker dependency required
+
+**Production Environment:**
+
+- PostgreSQL (existing Docker setup)
+- Environment variable configuration
+- Connection pooling and optimizations
+- Same GORM models, different driver
+
+#### Files to Create
 
 - [ ] `cmd/server/main.go` (minimal main)
 - [ ] `internal/app/app.go` (application setup)
-- [ ] `internal/app/config.go` (configuration management)
+- [ ] `internal/app/config.go` (configuration management with DB config)
 - [ ] `internal/app/container.go` (dependency injection)
 - [ ] `internal/domain/*/` (domain package structure)
 - [ ] `internal/infrastructure/http/` (HTTP layer structure)
+- [ ] `internal/infrastructure/repository/gorm/` (GORM implementations)
+- [ ] `internal/infrastructure/database/` (DB connection setup)
 
-#### Migration Strategy:
+#### GORM Implementation Strategy
+
+```go
+// Database interface for strategy pattern
+type Database interface {
+    GetDB() *gorm.DB
+    Close() error
+    Migrate() error
+}
+
+// SQLite implementation
+type SQLiteDB struct {
+    db *gorm.DB
+}
+
+// PostgreSQL implementation
+type PostgresDB struct {
+    db *gorm.DB
+}
+
+// Factory function based on config
+func NewDatabase(config *Config) (Database, error) {
+    switch config.Database.Driver {
+    case "sqlite":
+        return NewSQLiteDB(config.Database.SQLite)
+    case "postgres":
+        return NewPostgresDB(config.Database.Postgres)
+    }
+}
+```
+
+#### Migration Strategy
 
 1. Create new structure alongside existing
-2. Copy files to new locations with updated imports
-3. Gradually migrate functionality
-4. Remove old files once everything works
+2. Implement GORM models matching current in-memory structure
+3. Copy files to new locations with updated imports
+4. Gradually migrate from memory repos to GORM repos
+5. Remove old files once everything works
 
 **Success Criteria:**
 
 - [ ] New directory structure exists
+- [ ] GORM setup with SQLite working
 - [ ] All existing functionality preserved
+- [ ] All tests pass
+- [ ] Build succeeds
+- [ ] Easy config switch between SQLite/PostgreSQL
 - [ ] All tests pass
 - [ ] Build succeeds
 
@@ -137,7 +194,7 @@ backend/
 
 **Priority: High** | **Dependencies:** Phase 1 ✅ | **Estimated:** 4-5 hours
 
-#### Tasks:
+#### Tasks
 
 - [ ] Extract domain models from current model package
 - [ ] Define repository interfaces in domain layer
@@ -145,7 +202,7 @@ backend/
 - [ ] Define domain-specific errors
 - [ ] Implement domain validation rules
 
-#### Domains to Extract:
+#### Domains to Extract
 
 - [ ] `domain/bowelmovement/` - Core bowel movement business logic
 - [ ] `domain/user/` - User management and authentication
@@ -168,7 +225,7 @@ backend/
 
 **Priority: High** | **Dependencies:** Phase 2 ✅ | **Estimated:** 3-4 hours
 
-#### Tasks:
+#### Tasks
 
 - [ ] Create request/response DTOs for each endpoint
 - [ ] Implement DTO validation
@@ -176,7 +233,7 @@ backend/
 - [ ] Restructure HTTP handlers by domain
 - [ ] Implement consistent error response format
 
-#### DTOs to Create:
+#### DTOs to Create
 
 - [ ] `http/dto/bowelmovement/` - BM request/response DTOs
 - [ ] `http/dto/user/` - User management DTOs
@@ -199,7 +256,7 @@ backend/
 
 **Priority: Medium** | **Dependencies:** Phase 2, 3 ✅ | **Estimated:** 4-5 hours
 
-#### Tasks:
+#### Tasks
 
 - [ ] Implement domain service interfaces
 - [ ] Move business logic from handlers to services
@@ -207,7 +264,7 @@ backend/
 - [ ] Add proper transaction handling
 - [ ] Implement domain events
 
-#### Services to Implement:
+#### Services to Implement
 
 - [ ] `bowelmovement.Service` - BM business logic
 - [ ] `user.Service` - User management
@@ -230,7 +287,7 @@ backend/
 
 **Priority: Medium** | **Dependencies:** Phase 4 ✅ | **Estimated:** 2-3 hours
 
-#### Tasks:
+#### Tasks
 
 - [ ] Implement dependency injection container
 - [ ] Create container builder pattern
@@ -238,7 +295,7 @@ backend/
 - [ ] Replace manual dependency creation
 - [ ] Add container validation
 
-#### Container Components:
+#### Container Components
 
 - [ ] `Container` struct with all dependencies
 - [ ] `NewContainer()` builder function
@@ -260,7 +317,7 @@ backend/
 
 **Priority: Low** | **Dependencies:** Phase 5 ✅ | **Estimated:** 2 hours
 
-#### Tasks:
+#### Tasks
 
 - [ ] Centralize configuration management
 - [ ] Environment variable handling
@@ -268,7 +325,7 @@ backend/
 - [ ] Default value management
 - [ ] Configuration documentation
 
-#### Configuration Areas:
+#### Configuration Areas
 
 - [ ] Server configuration (port, timeouts)
 - [ ] Database configuration
@@ -290,7 +347,7 @@ backend/
 
 **Priority: Medium** | **Dependencies:** Phase 5 ✅ | **Estimated:** 3-4 hours
 
-#### Tasks:
+#### Tasks
 
 - [ ] Update tests for new architecture
 - [ ] Implement mock repositories for unit tests
@@ -298,7 +355,7 @@ backend/
 - [ ] Add service layer tests
 - [ ] Enhance test coverage
 
-#### Testing Improvements:
+#### Testing Improvements
 
 - [ ] Domain service unit tests with mocks
 - [ ] HTTP handler integration tests
@@ -319,7 +376,7 @@ backend/
 
 **Priority: Low** | **Dependencies:** Phase 7 ✅ | **Estimated:** 1-2 hours
 
-#### Tasks:
+#### Tasks
 
 - [ ] Update documentation for new architecture
 - [ ] Create architecture decision records (ADRs)
@@ -327,7 +384,7 @@ backend/
 - [ ] Add code generation scripts if needed
 - [ ] Performance optimization
 
-#### Documentation:
+#### Documentation
 
 - [ ] Architecture overview
 - [ ] Package structure explanation
@@ -352,7 +409,7 @@ backend/
 - **Completed:** 0 (0%)
 - **In Progress:** 1 (12.5%)
 - **Pending:** 7 (87.5%)
-- **Estimated Total Time:** 20-25 hours
+- **Estimated Total Time:** 25-30 hours (increased due to GORM integration)
 
 ### 🎯 Current Focus
 
@@ -370,8 +427,9 @@ backend/
 - [ ] **Testability**: All services mockable, fast unit tests
 - [ ] **Modularity**: Clear separation of concerns
 - [ ] **Extensibility**: Easy to add new features
-- [ ] **Performance**: No regression in API response times
+- [ ] **Performance**: No regression in API response times + database optimization
 - [ ] **Documentation**: Clear architecture documentation
+- [ ] **Database Abstraction**: GORM with SQLite/PostgreSQL flexibility
 
 ---
 
