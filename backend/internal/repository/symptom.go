@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"sort"
 	"sync"
 	"time"
 
@@ -78,13 +79,9 @@ func (r *memorySymptomRepository) GetByUserID(ctx context.Context, userID string
 	}
 
 	// Sort by recorded time (newest first)
-	for i := 0; i < len(userSymptoms)-1; i++ {
-		for j := i + 1; j < len(userSymptoms); j++ {
-			if userSymptoms[i].RecordedAt.Before(userSymptoms[j].RecordedAt) {
-				userSymptoms[i], userSymptoms[j] = userSymptoms[j], userSymptoms[i]
-			}
-		}
-	}
+	sort.Slice(userSymptoms, func(i, j int) bool {
+		return userSymptoms[i].RecordedAt.After(userSymptoms[j].RecordedAt)
+	})
 
 	// Apply pagination
 	if offset >= len(userSymptoms) {
@@ -171,8 +168,8 @@ func (r *memorySymptomRepository) GetByUserIDAndDateRange(ctx context.Context, u
 	var symptoms []model.Symptom
 	for _, symptom := range r.symptoms {
 		if symptom.UserID == userID &&
-			symptom.RecordedAt.After(startDate.Add(-time.Second)) &&
-			symptom.RecordedAt.Before(endDate.Add(time.Second)) {
+			!symptom.RecordedAt.Before(startDate) &&
+			!symptom.RecordedAt.After(endDate) {
 			symptoms = append(symptoms, symptom)
 		}
 	}

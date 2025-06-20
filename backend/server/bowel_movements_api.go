@@ -335,6 +335,12 @@ func validateBowelMovementUpdateBristolType(update *model.BowelMovementUpdate) v
 		if err := validation.ValidateBristolType(*update.BristolType); err != nil {
 			if verr, ok := err.(validation.ValidationError); ok {
 				errs = append(errs, verr)
+			} else {
+				// Handle non-ValidationError types
+				errs = append(errs, validation.ValidationError{
+					Field:   "bristolType",
+					Message: err.Error(),
+				})
 			}
 		}
 	}
@@ -347,6 +353,12 @@ func validateBowelMovementUpdateScales(update *model.BowelMovementUpdate) valida
 		if err := validation.ValidateScale(*update.Pain, "pain"); err != nil {
 			if verr, ok := err.(validation.ValidationError); ok {
 				errs = append(errs, verr)
+			} else {
+				// Handle non-ValidationError types
+				errs = append(errs, validation.ValidationError{
+					Field:   "pain",
+					Message: err.Error(),
+				})
 			}
 		}
 	}
@@ -354,6 +366,12 @@ func validateBowelMovementUpdateScales(update *model.BowelMovementUpdate) valida
 		if err := validation.ValidateScale(*update.Strain, "strain"); err != nil {
 			if verr, ok := err.(validation.ValidationError); ok {
 				errs = append(errs, verr)
+			} else {
+				// Handle non-ValidationError types
+				errs = append(errs, validation.ValidationError{
+					Field:   "strain",
+					Message: err.Error(),
+				})
 			}
 		}
 	}
@@ -361,6 +379,12 @@ func validateBowelMovementUpdateScales(update *model.BowelMovementUpdate) valida
 		if err := validation.ValidateScale(*update.Satisfaction, "satisfaction"); err != nil {
 			if verr, ok := err.(validation.ValidationError); ok {
 				errs = append(errs, verr)
+			} else {
+				// Handle non-ValidationError types
+				errs = append(errs, validation.ValidationError{
+					Field:   "satisfaction",
+					Message: err.Error(),
+				})
 			}
 		}
 	}
@@ -373,6 +397,12 @@ func validateBowelMovementUpdateEnums(update *model.BowelMovementUpdate) validat
 		if err := validation.ValidateEnum(*update.Volume, "volume"); err != nil {
 			if verr, ok := err.(validation.ValidationError); ok {
 				errs = append(errs, verr)
+			} else {
+				// Handle non-ValidationError types
+				errs = append(errs, validation.ValidationError{
+					Field:   "volume",
+					Message: err.Error(),
+				})
 			}
 		}
 	}
@@ -380,6 +410,12 @@ func validateBowelMovementUpdateEnums(update *model.BowelMovementUpdate) validat
 		if err := validation.ValidateEnum(*update.Color, "color"); err != nil {
 			if verr, ok := err.(validation.ValidationError); ok {
 				errs = append(errs, verr)
+			} else {
+				// Handle non-ValidationError types
+				errs = append(errs, validation.ValidationError{
+					Field:   "color",
+					Message: err.Error(),
+				})
 			}
 		}
 	}
@@ -387,6 +423,12 @@ func validateBowelMovementUpdateEnums(update *model.BowelMovementUpdate) validat
 		if err := validation.ValidateEnum(*update.Consistency, "consistency"); err != nil {
 			if verr, ok := err.(validation.ValidationError); ok {
 				errs = append(errs, verr)
+			} else {
+				// Handle non-ValidationError types
+				errs = append(errs, validation.ValidationError{
+					Field:   "consistency",
+					Message: err.Error(),
+				})
 			}
 		}
 	}
@@ -394,6 +436,12 @@ func validateBowelMovementUpdateEnums(update *model.BowelMovementUpdate) validat
 		if err := validation.ValidateEnum(*update.SmellLevel, "smellLevel"); err != nil {
 			if verr, ok := err.(validation.ValidationError); ok {
 				errs = append(errs, verr)
+			} else {
+				// Handle non-ValidationError types
+				errs = append(errs, validation.ValidationError{
+					Field:   "smellLevel",
+					Message: err.Error(),
+				})
 			}
 		}
 	}
@@ -406,6 +454,12 @@ func validateBowelMovementUpdateOptionals(update *model.BowelMovementUpdate) val
 		if err := validation.ValidateURL(*update.PhotoURL, "photoUrl"); err != nil {
 			if verr, ok := err.(validation.ValidationError); ok {
 				errs = append(errs, verr)
+			} else {
+				// Handle non-ValidationError types
+				errs = append(errs, validation.ValidationError{
+					Field:   "photoUrl",
+					Message: err.Error(),
+				})
 			}
 		}
 	}
@@ -418,6 +472,12 @@ func validateBowelMovementDetailsFields(details model.BowelMovementDetails) vali
 		if err := validation.ValidateNotes(details.Notes, "notes"); err != nil {
 			if verr, ok := err.(validation.ValidationError); ok {
 				errs = append(errs, verr)
+			} else {
+				// Handle non-ValidationError types
+				errs = append(errs, validation.ValidationError{
+					Field:   "notes",
+					Message: err.Error(),
+				})
 			}
 		}
 	}
@@ -425,6 +485,12 @@ func validateBowelMovementDetailsFields(details model.BowelMovementDetails) vali
 		if err := validation.ValidateNotes(details.DetailedNotes, "detailedNotes"); err != nil {
 			if verr, ok := err.(validation.ValidationError); ok {
 				errs = append(errs, verr)
+			} else {
+				// Handle non-ValidationError types
+				errs = append(errs, validation.ValidationError{
+					Field:   "detailedNotes",
+					Message: err.Error(),
+				})
 			}
 		}
 	}
@@ -437,6 +503,12 @@ func validateBowelMovementDetailsUpdate(update model.BowelMovementDetailsUpdate)
 		if err := validation.ValidateNotes(*update.Notes, "notes"); err != nil {
 			if verr, ok := err.(validation.ValidationError); ok {
 				errs = append(errs, verr)
+			} else {
+				// Handle non-ValidationError types
+				errs = append(errs, validation.ValidationError{
+					Field:   "notes",
+					Message: err.Error(),
+				})
 			}
 		}
 	}
@@ -444,6 +516,12 @@ func validateBowelMovementDetailsUpdate(update model.BowelMovementDetailsUpdate)
 		if err := validation.ValidateNotes(*update.DetailedNotes, "detailedNotes"); err != nil {
 			if verr, ok := err.(validation.ValidationError); ok {
 				errs = append(errs, verr)
+			} else {
+				// Handle non-ValidationError types
+				errs = append(errs, validation.ValidationError{
+					Field:   "detailedNotes",
+					Message: err.Error(),
+				})
 			}
 		}
 	}

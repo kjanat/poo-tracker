@@ -26,24 +26,24 @@ func (a *App) listMeals(c *gin.Context) {
 type createMealRequest struct {
 	UserID      string              `json:"userId"`
 	Name        string              `json:"name"`
-	Description string              `json:"description,omitempty"`
+	Description *string             `json:"description,omitempty"`
 	MealTime    *time.Time          `json:"mealTime,omitempty"`
 	Category    *model.MealCategory `json:"category,omitempty"`
-	Cuisine     string              `json:"cuisine,omitempty"`
-	Calories    int                 `json:"calories,omitempty"`
+	Cuisine     *string             `json:"cuisine,omitempty"`
+	Calories    *int                `json:"calories,omitempty"`
 	SpicyLevel  *int                `json:"spicyLevel,omitempty"`
-	FiberRich   bool                `json:"fiberRich,omitempty"`
-	Dairy       bool                `json:"dairy,omitempty"`
-	Gluten      bool                `json:"gluten,omitempty"`
-	PhotoURL    string              `json:"photoUrl,omitempty"`
-	Notes       string              `json:"notes,omitempty"`
+	FiberRich   *bool               `json:"fiberRich,omitempty"`
+	Dairy       *bool               `json:"dairy,omitempty"`
+	Gluten      *bool               `json:"gluten,omitempty"`
+	PhotoURL    *string             `json:"photoUrl,omitempty"`
+	Notes       *string             `json:"notes,omitempty"`
 }
 
 // applyMealFields applies fields from the request to the meal
 func applyMealFields(meal *model.Meal, req *createMealRequest) {
 	meal.Name = req.Name
-	if req.Description != "" {
-		meal.Description = req.Description
+	if req.Description != nil {
+		meal.Description = *req.Description
 	}
 	if req.MealTime != nil {
 		meal.MealTime = *req.MealTime
@@ -51,23 +51,29 @@ func applyMealFields(meal *model.Meal, req *createMealRequest) {
 	if req.Category != nil {
 		meal.Category = req.Category
 	}
-	if req.Cuisine != "" {
-		meal.Cuisine = req.Cuisine
+	if req.Cuisine != nil {
+		meal.Cuisine = *req.Cuisine
 	}
-	if req.Calories > 0 {
-		meal.Calories = req.Calories
+	if req.Calories != nil {
+		meal.Calories = *req.Calories
 	}
 	if req.SpicyLevel != nil {
 		meal.SpicyLevel = req.SpicyLevel
 	}
-	meal.FiberRich = req.FiberRich
-	meal.Dairy = req.Dairy
-	meal.Gluten = req.Gluten
-	if req.PhotoURL != "" {
-		meal.PhotoURL = req.PhotoURL
+	if req.FiberRich != nil {
+		meal.FiberRich = *req.FiberRich
 	}
-	if req.Notes != "" {
-		meal.Notes = req.Notes
+	if req.Dairy != nil {
+		meal.Dairy = *req.Dairy
+	}
+	if req.Gluten != nil {
+		meal.Gluten = *req.Gluten
+	}
+	if req.PhotoURL != nil {
+		meal.PhotoURL = *req.PhotoURL
+	}
+	if req.Notes != nil {
+		meal.Notes = *req.Notes
 	}
 }
 
@@ -120,11 +126,10 @@ func (a *App) updateMeal(c *gin.Context) {
 		return
 	}
 
-	// For now, just do basic validation - TODO: implement ValidateMealUpdate
-	// if validationErrors := validation.ValidateMealUpdate(update); validationErrors.HasErrors() {
-	//     c.JSON(http.StatusBadRequest, gin.H{"error": validationErrors.Error()})
-	//     return
-	// }
+	if validationErrors := validation.ValidateMealUpdate(update); validationErrors.HasErrors() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": validationErrors.Error()})
+		return
+	}
 
 	updated, err := a.meals.Update(c.Request.Context(), id, update)
 	if err != nil {

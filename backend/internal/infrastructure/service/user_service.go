@@ -164,7 +164,7 @@ func (s *UserService) Update(ctx context.Context, id string, input *user.UpdateU
 	return s.repo.GetByID(ctx, id)
 }
 
-// Delete removes a user
+// Delete removes a user and all associated records (including auth and settings)
 func (s *UserService) Delete(ctx context.Context, id string) error {
 	if id == "" {
 		return user.ErrInvalidID
@@ -291,10 +291,9 @@ func (s *UserService) Register(ctx context.Context, input *user.RegisterInput) (
 	// Create default user settings
 	userSettings := user.NewUserSettings(userEntity.ID)
 	if err := s.repo.CreateSettings(ctx, &userSettings); err != nil {
-		// Don't fail registration if settings creation fails, just log it
-		// In a real implementation, you'd want to log this error
-		// For now, we'll silently continue
-		_ = err
+		// Clean up user and auth if settings creation fails
+		_ = s.repo.Delete(ctx, userEntity.ID)
+		return nil, fmt.Errorf("failed to create user settings: %w", err)
 	}
 
 	return userEntity, nil

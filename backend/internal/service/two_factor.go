@@ -5,9 +5,11 @@ import (
 	"crypto/rand"
 	"encoding/base32"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
+
+	"github.com/pquerna/otp"
+	"github.com/pquerna/otp/totp"
 
 	"github.com/kjanat/poo-tracker/backend/internal/model"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
@@ -166,12 +168,12 @@ func (s *TwoFactorService) generateBackupCodes() ([]string, error) {
 		bytes := make([]byte, 5) // 8 characters when base32 encoded
 		_, err := rand.Read(bytes)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to generate random bytes: %w", err)
 		}
-		// Format as XXX-XXX for readability
 		code := base32.StdEncoding.EncodeToString(bytes)
 		code = strings.ToUpper(code)[:8] // Take first 8 characters
-		codes[i] = code[:3] + "-" + code[3:]
+		// Format as XXXX-XXXX for readability
+		codes[i] = code[:4] + "-" + code[4:]
 	}
 	return codes, nil
 }
@@ -183,48 +185,16 @@ func (s *TwoFactorService) generateQRCodeURL(email string, secret string) string
 }
 
 // verifyTOTPToken verifies a TOTP token against a secret
-// This is a simplified implementation. In production, you'd use a library like "github.com/pquerna/otp"
 func (s *TwoFactorService) verifyTOTPToken(secret string, token string) bool {
-	// Convert token to integer
-	tokenInt, err := strconv.ParseInt(token, 10, 32)
+	// Use the pquerna/otp library's TOTP validation
+	valid, err := totp.ValidateCustom(token, secret, time.Now(), totp.ValidateOpts{
+		Period:    30, // Default period of 30 seconds
+		Skew:      1,  // Allow 1 period skew for clock drift
+		Digits:    6,  // Use 6 digit tokens
+		Algorithm: otp.AlgorithmSHA1,
+	})
 	if err != nil {
 		return false
 	}
-
-	// Get current time in 30-second intervals
-	now := time.Now().Unix() / 30
-
-	// Check current time window and previous/next windows for clock skew
-	for i := int64(-1); i <= 1; i++ {
-		timeStep := now + i
-		expectedToken := s.generateTOTPToken(secret, timeStep)
-		if expectedToken == int32(tokenInt) {
-			return true
-		}
-	}
-
-	return false
-}
-
-// generateTOTPToken generates a TOTP token for a given secret and time step
-// This is a simplified implementation for demonstration purposes
-func (s *TwoFactorService) generateTOTPToken(secret string, timeStep int64) int32 {
-	// This is a very simplified TOTP implementation
-	// In production, use a proper TOTP library like "github.com/pquerna/otp"
-
-	// Decode base32 secret
-	secretBytes, err := base32.StdEncoding.DecodeString(secret)
-	if err != nil {
-		return 0
-	}
-
-	// Simple hash-based calculation (not RFC 6238 compliant)
-	// This is just for demonstration - use a proper TOTP library in production
-	hash := int32(0)
-	for i, b := range secretBytes {
-		hash += int32(b) * int32(timeStep+int64(i))
-	}
-
-	// Return 6-digit token
-	return (hash % 1000000)
+	return valid
 }

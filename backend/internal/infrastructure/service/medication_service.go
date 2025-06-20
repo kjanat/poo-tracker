@@ -351,11 +351,28 @@ func (s *MedicationService) GetMedicationStats(ctx context.Context, userID strin
 	}
 
 	// Get medications for the period
-	medications, err := s.repo.GetByUserID(ctx, userID, 1000, 0) // Get all medications
-	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve medications for stats: %w", err)
-	}
+	const batchSize = 100 // Configurable batch size for efficient retrieval
+	var allMedications []*medication.Medication
+	offset := 0
 
+	for {
+		batch, err := s.repo.GetByUserID(ctx, userID, batchSize, offset)
+		if err != nil {
+			return nil, fmt.Errorf("failed to retrieve medications for stats: %w", err)
+		}
+
+		allMedications = append(allMedications, batch...)
+
+		if len(batch) < batchSize {
+			break // No more records to fetch
+		}
+
+		offset += batchSize
+	}
+	// If no medications found, return empty stats
+	medications := allMedications
+
+	// Filter medications by date range and active status
 	stats := &medication.MedicationStats{
 		CategoryBreakdown: make(map[string]int),
 		FormBreakdown:     make(map[string]int),

@@ -25,6 +25,10 @@ func NewMealRepository() meal.Repository {
 
 // Meal CRUD operations
 func (r *MealRepository) Create(ctx context.Context, m *meal.Meal) error {
+	if m.ID == "" {
+		return shared.ErrInvalidInput
+	}
+
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -45,6 +49,14 @@ func (r *MealRepository) GetByID(ctx context.Context, id string) (*meal.Meal, er
 }
 
 func (r *MealRepository) GetByUserID(ctx context.Context, userID string, limit, offset int) ([]*meal.Meal, error) {
+	// Validate pagination parameters
+	if offset < 0 {
+		offset = 0
+	}
+	if limit <= 0 {
+		limit = 10 // default limit
+	}
+
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 

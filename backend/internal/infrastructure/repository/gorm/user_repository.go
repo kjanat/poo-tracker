@@ -89,7 +89,23 @@ func (r *UserRepository) Update(ctx context.Context, id string, update *user.Use
 }
 
 func (r *UserRepository) Delete(ctx context.Context, id string) error {
-	return r.db.WithContext(ctx).Delete(&user.User{}, "id = ?", id).Error
+	// Start a transaction to ensure atomicity
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// Delete associated records first (will be handled by foreign key cascade in the database)
+		if err := tx.Where("user_id = ?", id).Delete(&user.UserAuth{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Where("user_id = ?", id).Delete(&user.UserSettings{}).Error; err != nil {
+			return err
+		}
+
+		// Delete the user
+		if err := tx.Delete(&user.User{}, "id = ?", id).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func (r *UserRepository) List(ctx context.Context, limit, offset int) ([]*user.User, error) {

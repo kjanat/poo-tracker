@@ -82,6 +82,10 @@ func NewContainer() (*Container, error) {
 		container.MealService,
 		container.SymptomService,
 		container.MedicationService,
+		service.AnalyticsConfig{
+			DefaultMedicationLimit: 1000,
+			MaxMedicationLimit:     5000,
+		},
 	)
 
 	return container, nil

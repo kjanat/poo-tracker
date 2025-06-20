@@ -1,0 +1,42 @@
+package shared
+
+import (
+	"time"
+
+	"github.com/kjanat/poo-tracker/backend/internal/domain/analytics"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/medication"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
+)
+
+// DailyAggregation represents aggregated data for a single day
+type DailyAggregation struct {
+	Date            time.Time
+	BowelMovements  []bowelmovement.BowelMovement
+	Meals           []meal.Meal
+	Symptoms        []symptom.Symptom
+	Medications     []medication.Medication
+	BristolAverage  float64
+	PainAverage     float64
+	StrainAverage   float64
+	SatisfactionAvg float64
+	MealCount       int
+	SymptomCount    int
+	SpicyMealCount  int
+	DairyMealCount  int
+	GlutenMealCount int
+}
+
+// Use domain analytics types for shared structures
+type CorrelationPair = analytics.Correlation
+type TrendPoint = analytics.DataTrend
+type TrendLine = analytics.DataTrend
+type PatternMatch = analytics.Insight
+type HealthMetric = analytics.ScoreFactor
+type InsightRecommendation = analytics.Insight
+type StatisticalSummary = analytics.StatisticalSummary
+type BowelMovementStats = analytics.BowelMovementSummary
+type MealStats = analytics.MealSummary
+type SymptomStats = analytics.SymptomSummary
+type MedicationStats = analytics.MedicationSummary

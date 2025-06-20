@@ -193,3 +193,4 @@ func (h *UserHandler) Login(c *gin.Context) {
 - Use interfaces for **all external concerns**
 - Wire dependencies in `main.go` cleanly — don’t hide it behind global context
 - Test at **unit level** by mocking interfaces, and **integration level** by spinning up test DB
+- I like green threads

@@ -547,3 +547,4 @@ login.json
 backend/bin/
 **/tmp/
 backend/backend
+**/*.deprecated
