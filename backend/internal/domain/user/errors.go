@@ -7,6 +7,17 @@ import (
 
 // Domain errors
 var (
+	// Core errors
+	ErrNotFound         = errors.New("user not found")
+	ErrInvalidID        = errors.New("invalid user ID")
+	ErrInvalidInput     = errors.New("invalid input")
+	ErrInvalidName      = errors.New("invalid name")
+	ErrInvalidPassword  = errors.New("invalid password")
+	ErrPasswordTooShort = errors.New("password too short")
+	ErrPasswordTooLong  = errors.New("password too long")
+	ErrSamePassword     = errors.New("new password must be different from current password")
+
+	// Existing errors
 	ErrUserNotFound          = errors.New("user not found")
 	ErrUserAuthNotFound      = errors.New("user authentication not found")
 	ErrUserSettingsNotFound  = errors.New("user settings not found")

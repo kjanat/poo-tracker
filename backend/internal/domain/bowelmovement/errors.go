@@ -7,6 +7,15 @@ import (
 
 // Domain errors
 var (
+	// Core errors
+	ErrNotFound          = errors.New("bowel movement not found")
+	ErrInvalidID         = errors.New("invalid bowel movement ID")
+	ErrInvalidUserID     = errors.New("invalid user ID")
+	ErrInvalidInput      = errors.New("invalid input")
+	ErrDateRangeTooLarge = errors.New("date range too large")
+	ErrInvalidDateRange  = errors.New("invalid date range")
+
+	// Existing errors
 	ErrBowelMovementNotFound        = errors.New("bowel movement not found")
 	ErrBowelMovementDetailsNotFound = errors.New("bowel movement details not found")
 	ErrInvalidBristolType           = errors.New("bristol type must be between 1 and 7")

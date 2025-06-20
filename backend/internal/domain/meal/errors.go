@@ -7,10 +7,21 @@ import (
 
 // Domain errors
 var (
+	// Core errors
+	ErrNotFound          = errors.New("meal not found")
+	ErrInvalidID         = errors.New("invalid meal ID")
+	ErrInvalidUserID     = errors.New("invalid user ID")
+	ErrInvalidInput      = errors.New("invalid input")
+	ErrInvalidName       = errors.New("invalid meal name")
+	ErrInvalidCategory   = errors.New("invalid meal category")
+	ErrInvalidCalories   = errors.New("calories must be between 0 and 10000")
+	ErrInvalidSpicyLevel = errors.New("spicy level must be between 1 and 10")
+	ErrDateRangeTooLarge = errors.New("date range too large")
+	ErrInvalidDateRange  = errors.New("invalid date range")
+
+	// Existing errors
 	ErrMealNotFound        = errors.New("meal not found")
 	ErrInvalidMealName     = errors.New("meal name is required and must be 1-200 characters")
-	ErrInvalidCalories     = errors.New("calories must be between 0 and 10000")
-	ErrInvalidSpicyLevel   = errors.New("spicy level must be between 1 and 10")
 	ErrInvalidMealCategory = errors.New("invalid meal category")
 	ErrMealTimeRequired    = errors.New("meal time is required")
 	ErrMealTimeInFuture    = errors.New("meal time cannot be in the future")
