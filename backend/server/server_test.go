@@ -23,7 +23,11 @@ func TestHealth(t *testing.T) {
 	}
 
 	detailsRepo := repository.NewMemoryBowelDetailsRepo(repo)
-	app := New(repo, detailsRepo, meals, service.AvgBristol{}, authService)
+	symptomRepo := repository.NewMemorySymptomRepository()
+	medicationRepo := repository.NewMemoryMedicationRepository()
+	mealBowelRelationRepo := repository.NewMemoryMealBowelMovementRelationRepository()
+	mealSymptomRelationRepo := repository.NewMemoryMealSymptomRelationRepository()
+	app := New(repo, detailsRepo, meals, symptomRepo, medicationRepo, mealBowelRelationRepo, mealSymptomRelationRepo, service.AvgBristol{}, authService)
 	req, _ := http.NewRequest(http.MethodGet, "/health", nil)
 	w := httptest.NewRecorder()
 	app.Engine.ServeHTTP(w, req)

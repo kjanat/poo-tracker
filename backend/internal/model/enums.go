@@ -203,6 +203,51 @@ func (m MealCategory) Value() (driver.Value, error) {
 	return string(m), nil
 }
 
+// SymptomCategory represents categories for symptoms
+type SymptomCategory string
+
+const (
+	SymptomCategoryDigestive    SymptomCategory = "DIGESTIVE"
+	SymptomCategoryAbdominal    SymptomCategory = "ABDOMINAL"
+	SymptomCategorySystemic     SymptomCategory = "SYSTEMIC"
+	SymptomCategoryNeurological SymptomCategory = "NEUROLOGICAL"
+	SymptomCategoryOther        SymptomCategory = "OTHER"
+)
+
+// AllSymptomCategories returns all valid SymptomCategory values
+func AllSymptomCategories() []SymptomCategory {
+	return []SymptomCategory{
+		SymptomCategoryDigestive,
+		SymptomCategoryAbdominal,
+		SymptomCategorySystemic,
+		SymptomCategoryNeurological,
+		SymptomCategoryOther,
+	}
+}
+
+// IsValid checks if the SymptomCategory value is valid
+func (sc SymptomCategory) IsValid() bool {
+	for _, valid := range AllSymptomCategories() {
+		if sc == valid {
+			return true
+		}
+	}
+	return false
+}
+
+// String returns the string representation
+func (sc SymptomCategory) String() string {
+	return string(sc)
+}
+
+// Value implements the driver.Valuer interface for database storage
+func (sc SymptomCategory) Value() (driver.Value, error) {
+	if !sc.IsValid() {
+		return nil, fmt.Errorf("invalid symptom category: %s", sc)
+	}
+	return string(sc), nil
+}
+
 // SymptomType represents different types of symptoms
 type SymptomType string
 
@@ -247,6 +292,196 @@ func (s SymptomType) Value() (driver.Value, error) {
 		return nil, fmt.Errorf("invalid symptom type: %s", s)
 	}
 	return string(s), nil
+}
+
+// MedicationCategory represents categories for medications
+type MedicationCategory string
+
+const (
+	MedicationCategoryGastrointestinal MedicationCategory = "GASTROINTESTINAL"
+	MedicationCategoryPainRelief       MedicationCategory = "PAIN_RELIEF"
+	MedicationCategoryAntibiotic       MedicationCategory = "ANTIBIOTIC"
+	MedicationCategoryProbiotics       MedicationCategory = "PROBIOTICS"
+	MedicationCategorySupplements      MedicationCategory = "SUPPLEMENTS"
+	MedicationCategoryAntiInflammatory MedicationCategory = "ANTI_INFLAMMATORY"
+	MedicationCategoryOtherMedication  MedicationCategory = "OTHER"
+)
+
+// AllMedicationCategories returns all valid MedicationCategory values
+func AllMedicationCategories() []MedicationCategory {
+	return []MedicationCategory{
+		MedicationCategoryGastrointestinal,
+		MedicationCategoryPainRelief,
+		MedicationCategoryAntibiotic,
+		MedicationCategoryProbiotics,
+		MedicationCategorySupplements,
+		MedicationCategoryAntiInflammatory,
+		MedicationCategoryOtherMedication,
+	}
+}
+
+// IsValid checks if the MedicationCategory value is valid
+func (mc MedicationCategory) IsValid() bool {
+	for _, valid := range AllMedicationCategories() {
+		if mc == valid {
+			return true
+		}
+	}
+	return false
+}
+
+// String returns the string representation
+func (mc MedicationCategory) String() string {
+	return string(mc)
+}
+
+// Value implements the driver.Valuer interface for database storage
+func (mc MedicationCategory) Value() (driver.Value, error) {
+	if !mc.IsValid() {
+		return nil, fmt.Errorf("invalid medication category: %s", mc)
+	}
+	return string(mc), nil
+}
+
+// MedicationForm represents forms of medications
+type MedicationForm string
+
+const (
+	MedicationFormTablet      MedicationForm = "TABLET"
+	MedicationFormCapsule     MedicationForm = "CAPSULE"
+	MedicationFormLiquid      MedicationForm = "LIQUID"
+	MedicationFormCream       MedicationForm = "CREAM"
+	MedicationFormPowder      MedicationForm = "POWDER"
+	MedicationFormInjection   MedicationForm = "INJECTION"
+	MedicationFormSuppository MedicationForm = "SUPPOSITORY"
+	MedicationFormOtherForm   MedicationForm = "OTHER"
+)
+
+// AllMedicationForms returns all valid MedicationForm values
+func AllMedicationForms() []MedicationForm {
+	return []MedicationForm{
+		MedicationFormTablet,
+		MedicationFormCapsule,
+		MedicationFormLiquid,
+		MedicationFormCream,
+		MedicationFormPowder,
+		MedicationFormInjection,
+		MedicationFormSuppository,
+		MedicationFormOtherForm,
+	}
+}
+
+// IsValid checks if the MedicationForm value is valid
+func (mf MedicationForm) IsValid() bool {
+	for _, valid := range AllMedicationForms() {
+		if mf == valid {
+			return true
+		}
+	}
+	return false
+}
+
+// String returns the string representation
+func (mf MedicationForm) String() string {
+	return string(mf)
+}
+
+// Value implements the driver.Valuer interface for database storage
+func (mf MedicationForm) Value() (driver.Value, error) {
+	if !mf.IsValid() {
+		return nil, fmt.Errorf("invalid medication form: %s", mf)
+	}
+	return string(mf), nil
+}
+
+// MedicationRoute represents routes of administration for medications
+type MedicationRoute string
+
+const (
+	MedicationRouteOral       MedicationRoute = "ORAL"
+	MedicationRouteTopical    MedicationRoute = "TOPICAL"
+	MedicationRouteRectal     MedicationRoute = "RECTAL"
+	MedicationRouteInjection  MedicationRoute = "INJECTION"
+	MedicationRouteInhalation MedicationRoute = "INHALATION"
+	MedicationRouteOtherRoute MedicationRoute = "OTHER"
+)
+
+// AllMedicationRoutes returns all valid MedicationRoute values
+func AllMedicationRoutes() []MedicationRoute {
+	return []MedicationRoute{
+		MedicationRouteOral,
+		MedicationRouteTopical,
+		MedicationRouteRectal,
+		MedicationRouteInjection,
+		MedicationRouteInhalation,
+		MedicationRouteOtherRoute,
+	}
+}
+
+// IsValid checks if the MedicationRoute value is valid
+func (mr MedicationRoute) IsValid() bool {
+	for _, valid := range AllMedicationRoutes() {
+		if mr == valid {
+			return true
+		}
+	}
+	return false
+}
+
+// String returns the string representation
+func (mr MedicationRoute) String() string {
+	return string(mr)
+}
+
+// Value implements the driver.Valuer interface for database storage
+func (mr MedicationRoute) Value() (driver.Value, error) {
+	if !mr.IsValid() {
+		return nil, fmt.Errorf("invalid medication route: %s", mr)
+	}
+	return string(mr), nil
+}
+
+// CorrelationType represents the type of correlation between entities
+type CorrelationType string
+
+const (
+	CorrelationPositive CorrelationType = "POSITIVE" // Meal causes/triggers the outcome
+	CorrelationNegative CorrelationType = "NEGATIVE" // Meal prevents/improves the outcome
+	CorrelationNeutral  CorrelationType = "NEUTRAL"  // No clear correlation
+	CorrelationUnknown  CorrelationType = "UNKNOWN"  // Not determined yet
+)
+
+// AllCorrelationTypes returns all valid CorrelationType values
+func AllCorrelationTypes() []CorrelationType {
+	return []CorrelationType{
+		CorrelationPositive,
+		CorrelationNegative,
+		CorrelationNeutral,
+		CorrelationUnknown,
+	}
+}
+
+// IsValid checks if the CorrelationType value is valid
+func (ct CorrelationType) IsValid() bool {
+	for _, valid := range AllCorrelationTypes() {
+		if ct == valid {
+			return true
+		}
+	}
+	return false
+}
+
+// String returns the string representation
+func (ct CorrelationType) String() string {
+	return string(ct)
+}
+
+// Value implements the driver.Valuer interface for database storage
+func (ct CorrelationType) Value() (driver.Value, error) {
+	if !ct.IsValid() {
+		return nil, fmt.Errorf("invalid correlation type: %s", ct)
+	}
+	return string(ct), nil
 }
 
 // AuditAction represents the type of action performed for audit logging
@@ -331,4 +566,29 @@ func ParseSymptomType(value string) (SymptomType, error) {
 // ParseAuditAction parses a string to AuditAction enum
 func ParseAuditAction(value string) (AuditAction, error) {
 	return ParseEnum(value, AllAuditActions())
+}
+
+// ParseSymptomCategory parses a string to SymptomCategory enum
+func ParseSymptomCategory(value string) (SymptomCategory, error) {
+	return ParseEnum(value, AllSymptomCategories())
+}
+
+// ParseMedicationCategory parses a string to MedicationCategory enum
+func ParseMedicationCategory(value string) (MedicationCategory, error) {
+	return ParseEnum(value, AllMedicationCategories())
+}
+
+// ParseMedicationForm parses a string to MedicationForm enum
+func ParseMedicationForm(value string) (MedicationForm, error) {
+	return ParseEnum(value, AllMedicationForms())
+}
+
+// ParseMedicationRoute parses a string to MedicationRoute enum
+func ParseMedicationRoute(value string) (MedicationRoute, error) {
+	return ParseEnum(value, AllMedicationRoutes())
+}
+
+// ParseCorrelationType parses a string to CorrelationType enum
+func ParseCorrelationType(value string) (CorrelationType, error) {
+	return ParseEnum(value, AllCorrelationTypes())
 }

@@ -28,7 +28,15 @@ func main() {
 	bowelRepo := repository.NewMemoryBowelRepo()
 	detailsRepo := repository.NewMemoryBowelDetailsRepo(bowelRepo)
 	mealRepo := repository.NewMemoryMealRepo()
-	app := server.New(bowelRepo, detailsRepo, mealRepo, service.AvgBristol{}, auth)
+	symptomRepo := repository.NewMemorySymptomRepository()
+	medicationRepo := repository.NewMemoryMedicationRepository()
+
+	// Relation repositories
+	mealBowelRelationRepo := repository.NewMemoryMealBowelMovementRelationRepository()
+	mealSymptomRelationRepo := repository.NewMemoryMealSymptomRelationRepository()
+
+	app := server.New(bowelRepo, detailsRepo, mealRepo, symptomRepo, medicationRepo,
+		mealBowelRelationRepo, mealSymptomRelationRepo, service.AvgBristol{}, auth)
 
 	log.Println("Starting Poo Tracker server...")
 	if err := app.Engine.Run(); err != nil {

@@ -26,7 +26,11 @@ func setup() *App {
 	}
 
 	detailsRepo := repository.NewMemoryBowelDetailsRepo(repo)
-	return New(repo, detailsRepo, meals, strategy, authService)
+	symptomRepo := repository.NewMemorySymptomRepository()
+	medicationRepo := repository.NewMemoryMedicationRepository()
+	mealBowelRelationRepo := repository.NewMemoryMealBowelMovementRelationRepository()
+	mealSymptomRelationRepo := repository.NewMemoryMealSymptomRelationRepository()
+	return New(repo, detailsRepo, meals, symptomRepo, medicationRepo, mealBowelRelationRepo, mealSymptomRelationRepo, strategy, authService)
 }
 
 func TestBowelMovementCRUD(t *testing.T) {
