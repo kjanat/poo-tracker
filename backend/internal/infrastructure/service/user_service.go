@@ -205,6 +205,30 @@ func (s *UserService) List(ctx context.Context, limit, offset int) ([]*user.User
 	return users, nil
 }
 
+// ListWithCount retrieves users with pagination and total count
+func (s *UserService) ListWithCount(ctx context.Context, limit, offset int) ([]*user.User, int64, error) {
+	// Apply business rules for pagination
+	if limit <= 0 || limit > 100 {
+		limit = 20 // default
+	}
+	if offset < 0 {
+		offset = 0
+	}
+
+	// Get users and total count concurrently would be better, but keeping it simple for now
+	users, err := s.repo.List(ctx, limit, offset)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to list users: %w", err)
+	}
+
+	totalCount, err := s.repo.GetUserCount(ctx)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to get user count: %w", err)
+	}
+
+	return users, totalCount, nil
+}
+
 // Register registers a new user with password
 func (s *UserService) Register(ctx context.Context, input *user.RegisterInput) (*user.User, error) {
 	// Validate input

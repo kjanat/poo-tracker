@@ -14,6 +14,7 @@ type Service interface {
 	Update(ctx context.Context, id string, input *UpdateUserInput) (*User, error)
 	Delete(ctx context.Context, id string) error
 	List(ctx context.Context, limit, offset int) ([]*User, error)
+	ListWithCount(ctx context.Context, limit, offset int) ([]*User, int64, error)
 
 	// Authentication operations
 	Register(ctx context.Context, input *RegisterInput) (*User, error)
