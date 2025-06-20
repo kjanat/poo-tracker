@@ -30,7 +30,8 @@ func setup() *App {
 	medicationRepo := repository.NewMemoryMedicationRepository()
 	mealBowelRelationRepo := repository.NewMemoryMealBowelMovementRelationRepository()
 	mealSymptomRelationRepo := repository.NewMemoryMealSymptomRelationRepository()
-	return New(repo, detailsRepo, meals, symptomRepo, medicationRepo, mealBowelRelationRepo, mealSymptomRelationRepo, strategy, authService)
+	twoFactorRepo := repository.NewMemoryUserTwoFactorRepository()
+	return New(repo, detailsRepo, meals, symptomRepo, medicationRepo, mealBowelRelationRepo, mealSymptomRelationRepo, strategy, authService, twoFactorRepo, userRepo)
 }
 
 func TestBowelMovementCRUD(t *testing.T) {

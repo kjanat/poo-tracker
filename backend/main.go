@@ -34,9 +34,10 @@ func main() {
 	// Relation repositories
 	mealBowelRelationRepo := repository.NewMemoryMealBowelMovementRelationRepository()
 	mealSymptomRelationRepo := repository.NewMemoryMealSymptomRelationRepository()
+	twoFactorRepo := repository.NewMemoryUserTwoFactorRepository()
 
 	app := server.New(bowelRepo, detailsRepo, mealRepo, symptomRepo, medicationRepo,
-		mealBowelRelationRepo, mealSymptomRelationRepo, service.AvgBristol{}, auth)
+		mealBowelRelationRepo, mealSymptomRelationRepo, service.AvgBristol{}, auth, twoFactorRepo, userRepo)
 
 	log.Println("Starting Poo Tracker server...")
 	if err := app.Engine.Run(); err != nil {

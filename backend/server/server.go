@@ -22,15 +22,17 @@ type App struct {
 	analytics                  *service.Service
 	authService                service.AuthService
 	auditService               *service.AuditService
+	twoFactorService           *service.TwoFactorService
 	userHandlers               *UserAPIHandlers
 	symptomHandler             *SymptomHandler
 	medicationHandler          *MedicationHandler
 	mealBowelRelationHandler   *MealBowelRelationHandler
 	mealSymptomRelationHandler *MealSymptomRelationHandler
 	relationCoordinatorHandler *RelationCoordinatorHandler
+	twoFactorHandler           *TwoFactorHandler
 }
 
-func New(repo repository.BowelMovementRepository, details repository.BowelMovementDetailsRepository, meals repository.MealRepository, symptoms repository.SymptomRepository, medications repository.MedicationRepository, mealBowelRelations repository.MealBowelMovementRelationRepository, mealSymptomRelations repository.MealSymptomRelationRepository, strategy service.AnalyticsStrategy, authService service.AuthService) *App {
+func New(repo repository.BowelMovementRepository, details repository.BowelMovementDetailsRepository, meals repository.MealRepository, symptoms repository.SymptomRepository, medications repository.MedicationRepository, mealBowelRelations repository.MealBowelMovementRelationRepository, mealSymptomRelations repository.MealSymptomRelationRepository, strategy service.AnalyticsStrategy, authService service.AuthService, twoFactorRepo repository.UserTwoFactorRepository, userRepo repository.UserRepository) *App {
 	engine := gin.Default()
 
 	// Add global middleware
@@ -41,12 +43,14 @@ func New(repo repository.BowelMovementRepository, details repository.BowelMoveme
 	auditService := service.NewAuditService()
 	engine.Use(middleware.AuditMiddleware(auditService))
 
+	twoFactorService := service.NewTwoFactorService(twoFactorRepo, userRepo, "PooTracker")
 	userHandlers := NewUserAPIHandlers(authService)
 	symptomHandler := NewSymptomHandler(symptoms)
 	medicationHandler := NewMedicationHandler(medications)
 	mealBowelRelationHandler := NewMealBowelRelationHandler(mealBowelRelations)
 	mealSymptomRelationHandler := NewMealSymptomRelationHandler(mealSymptomRelations)
 	relationCoordinatorHandler := NewRelationCoordinatorHandler(mealBowelRelations, mealSymptomRelations)
+	twoFactorHandler := NewTwoFactorHandler(twoFactorService)
 	app := &App{
 		Engine:                     engine,
 		repo:                       repo,
@@ -59,12 +63,14 @@ func New(repo repository.BowelMovementRepository, details repository.BowelMoveme
 		analytics:                  service.New(repo, strategy),
 		authService:                authService,
 		auditService:               auditService,
+		twoFactorService:           twoFactorService,
 		userHandlers:               userHandlers,
 		symptomHandler:             symptomHandler,
 		medicationHandler:          medicationHandler,
 		mealBowelRelationHandler:   mealBowelRelationHandler,
 		mealSymptomRelationHandler: mealSymptomRelationHandler,
 		relationCoordinatorHandler: relationCoordinatorHandler,
+		twoFactorHandler:           twoFactorHandler,
 	}
 
 	engine.GET("/health", func(c *gin.Context) {
@@ -150,4 +156,13 @@ func (a *App) registerRoutes() {
 	api.POST("/register", func(c *gin.Context) { a.userHandlers.RegisterHandler(c.Writer, c.Request) })
 	api.POST("/login", func(c *gin.Context) { a.userHandlers.LoginHandler(c.Writer, c.Request) })
 	api.GET("/profile", gin.WrapH(middleware.AuthMiddleware(a.userHandlers.AuthService)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { a.userHandlers.ProfileHandler(w, r) }))))
+
+	// Two-Factor Authentication routes
+	twoFA := api.Group("/2fa")
+	twoFA.Use(middleware.JWTAuthMiddleware(a.authService))
+	twoFA.GET("/status", a.twoFactorHandler.GetStatus)
+	twoFA.POST("/setup", a.twoFactorHandler.Setup)
+	twoFA.POST("/enable", a.twoFactorHandler.Enable)
+	twoFA.POST("/disable", a.twoFactorHandler.Disable)
+	twoFA.POST("/verify", a.twoFactorHandler.Verify)
 }
