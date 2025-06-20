@@ -151,6 +151,12 @@ cp .env.example .env
 go run cmd/server/main.go
 ```
 
+### Configuration
+
+All environment variables used by the backend are listed in `.env.example` with
+safe defaults. Copy this file to `.env` and adjust the values for your local or
+production setup.
+
 ### Architecture
 
 - `internal/model` – domain models
