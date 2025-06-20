@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -25,9 +26,11 @@ const (
 
 // Config holds database configuration
 type Config struct {
-	Type     DatabaseType
-	DSN      string
-	LogLevel logger.LogLevel
+	Type         DatabaseType
+	DSN          string
+	LogLevel     logger.LogLevel
+	MaxIdleConns int
+	MaxOpenConns int
 }
 
 // NewDatabase creates a new database instance based on configuration
@@ -82,15 +85,26 @@ func GetConfigFromEnv() Config {
 	}
 
 	return Config{
-		Type:     DatabaseType(dbType),
-		DSN:      dsn,
-		LogLevel: logLevel,
+		Type:         DatabaseType(dbType),
+		DSN:          dsn,
+		LogLevel:     logLevel,
+		MaxIdleConns: getEnvAsIntOrDefault("DB_MAX_IDLE_CONNS", 10),
+		MaxOpenConns: getEnvAsIntOrDefault("DB_MAX_OPEN_CONNS", 100),
 	}
 }
 
 func getEnvOrDefault(key, defaultValue string) string {
 	if value := os.Getenv(key); value != "" {
 		return value
+	}
+	return defaultValue
+}
+
+func getEnvAsIntOrDefault(key string, defaultValue int) int {
+	if value := os.Getenv(key); value != "" {
+		if intValue, err := strconv.Atoi(value); err == nil {
+			return intValue
+		}
 	}
 	return defaultValue
 }

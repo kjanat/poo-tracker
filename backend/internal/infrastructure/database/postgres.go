@@ -28,8 +28,8 @@ func NewPostgreSQLDatabase(config Config) (*PostgreSQLDatabase, error) {
 	}
 
 	// Set connection pool settings
-	sqlDB.SetMaxIdleConns(10)
-	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetMaxIdleConns(config.MaxIdleConns)
+	sqlDB.SetMaxOpenConns(config.MaxOpenConns)
 
 	return &PostgreSQLDatabase{db: db}, nil
 }
