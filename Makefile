@@ -72,7 +72,7 @@ format:
 	uv run ruff format ai-service
 
 format-backend:
-	gofmt -s -w backend/**/*.go
+	gofmt -s -w backend
 
 format-ai:
 	uv run ruff format ai-service
