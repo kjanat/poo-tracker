@@ -148,16 +148,8 @@ func (h *UserHandler) Login(c *gin.Context) {
 // @Router /api/v1/users/profile [get]
 func (h *UserHandler) GetProfile(c *gin.Context) {
 	// Get user ID from JWT context (will be set by auth middleware)
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "User not authenticated",
-		})
-		return
-	}
-	userIDStr, ok := userID.(string)
+	userIDStr, ok := extractUserID(c)
 	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 		return
 	}
 
@@ -197,16 +189,8 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 // @Router /api/v1/users/profile [put]
 func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	// Get user ID from JWT context
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "User not authenticated",
-		})
-		return
-	}
-	userIDStr, ok := userID.(string)
+	userIDStr, ok := extractUserID(c)
 	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 		return
 	}
 
@@ -269,16 +253,8 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 // @Router /api/v1/users/change-password [post]
 func (h *UserHandler) ChangePassword(c *gin.Context) {
 	// Get user ID from JWT context
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "User not authenticated",
-		})
-		return
-	}
-	userIDStr, ok := userID.(string)
+	userIDStr, ok := extractUserID(c)
 	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 		return
 	}
 
@@ -338,16 +314,8 @@ func (h *UserHandler) ChangePassword(c *gin.Context) {
 // @Router /api/v1/users/settings [get]
 func (h *UserHandler) GetSettings(c *gin.Context) {
 	// Get user ID from JWT context
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "User not authenticated",
-		})
-		return
-	}
-	userIDStr, ok := userID.(string)
+	userIDStr, ok := extractUserID(c)
 	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 		return
 	}
 
@@ -386,16 +354,8 @@ func (h *UserHandler) GetSettings(c *gin.Context) {
 // @Router /api/v1/users/settings [put]
 func (h *UserHandler) UpdateSettings(c *gin.Context) {
 	// Get user ID from JWT context
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "User not authenticated",
-		})
-		return
-	}
-	userIDStr, ok := userID.(string)
+	userIDStr, ok := extractUserID(c)
 	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 		return
 	}
 
