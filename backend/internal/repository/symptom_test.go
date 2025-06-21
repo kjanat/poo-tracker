@@ -5,14 +5,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
 )
 
 func TestSymptomRepository_Create(t *testing.T) {
 	repo := NewMemorySymptomRepository()
 	ctx := context.Background()
 
-	symptom := model.NewSymptom("user1", "Headache")
+	symptom := symptom.NewSymptom("user1", "Headache")
 	symptom.Severity = 7
 
 	created, err := repo.Create(ctx, symptom)
@@ -37,7 +37,7 @@ func TestSymptomRepository_GetByID(t *testing.T) {
 	repo := NewMemorySymptomRepository()
 	ctx := context.Background()
 
-	symptom := model.NewSymptom("user1", "Nausea")
+	symptom := symptom.NewSymptom("user1", "Nausea")
 	created, _ := repo.Create(ctx, symptom)
 
 	retrieved, err := repo.GetByID(ctx, created.ID)
@@ -69,9 +69,9 @@ func TestSymptomRepository_GetByUserID(t *testing.T) {
 	ctx := context.Background()
 
 	// Create symptoms for different users
-	symptom1 := model.NewSymptom("user1", "Headache")
-	symptom2 := model.NewSymptom("user1", "Nausea")
-	symptom3 := model.NewSymptom("user2", "Pain")
+	symptom1 := symptom.NewSymptom("user1", "Headache")
+	symptom2 := symptom.NewSymptom("user1", "Nausea")
+	symptom3 := symptom.NewSymptom("user2", "Pain")
 
 	// Create test data (ignore errors in test setup)
 	_, _ = repo.Create(ctx, symptom1)
@@ -99,10 +99,10 @@ func TestSymptomRepository_Update(t *testing.T) {
 	repo := NewMemorySymptomRepository()
 	ctx := context.Background()
 
-	symptom := model.NewSymptom("user1", "Original")
+	symptom := symptom.NewSymptom("user1", "Original")
 	created, _ := repo.Create(ctx, symptom)
 
-	updates := model.SymptomUpdate{
+	updates := symptom.SymptomUpdate{
 		Name:     stringPtr("Updated"),
 		Severity: intPtr(8),
 		Notes:    stringPtr("Updated notes"),
@@ -130,7 +130,7 @@ func TestSymptomRepository_Delete(t *testing.T) {
 	repo := NewMemorySymptomRepository()
 	ctx := context.Background()
 
-	symptom := model.NewSymptom("user1", "To Delete")
+	symptom := symptom.NewSymptom("user1", "To Delete")
 	created, _ := repo.Create(ctx, symptom)
 
 	err := repo.Delete(ctx, created.ID)
@@ -153,13 +153,13 @@ func TestSymptomRepository_GetByUserIDAndDateRange(t *testing.T) {
 	tomorrow := now.Add(24 * time.Hour)
 
 	// Create symptoms at different times
-	symptom1 := model.NewSymptom("user1", "Yesterday")
+	symptom1 := symptom.NewSymptom("user1", "Yesterday")
 	symptom1.RecordedAt = yesterday
 
-	symptom2 := model.NewSymptom("user1", "Today")
+	symptom2 := symptom.NewSymptom("user1", "Today")
 	symptom2.RecordedAt = now
 
-	symptom3 := model.NewSymptom("user1", "Tomorrow")
+	symptom3 := symptom.NewSymptom("user1", "Tomorrow")
 	symptom3.RecordedAt = tomorrow
 
 	_, _ = repo.Create(ctx, symptom1)
@@ -181,12 +181,12 @@ func TestSymptomRepository_GetByUserIDAndCategory(t *testing.T) {
 	repo := NewMemorySymptomRepository()
 	ctx := context.Background()
 
-	category := model.SymptomCategoryDigestive
+	category := symptom.SymptomCategoryDigestive
 
-	symptom1 := model.NewSymptom("user1", "Digestive Issue")
+	symptom1 := symptom.NewSymptom("user1", "Digestive Issue")
 	symptom1.Category = &category
 
-	symptom2 := model.NewSymptom("user1", "Other Issue")
+	symptom2 := symptom.NewSymptom("user1", "Other Issue")
 	// No category set
 
 	_, _ = repo.Create(ctx, symptom1)
@@ -210,12 +210,12 @@ func TestSymptomRepository_GetByUserIDAndType(t *testing.T) {
 	repo := NewMemorySymptomRepository()
 	ctx := context.Background()
 
-	symptomType := model.SymptomNausea
+	symptomType := symptom.SymptomNausea
 
-	symptom1 := model.NewSymptom("user1", "Nausea Symptom")
+	symptom1 := symptom.NewSymptom("user1", "Nausea Symptom")
 	symptom1.Type = &symptomType
 
-	symptom2 := model.NewSymptom("user1", "Other Symptom")
+	symptom2 := symptom.NewSymptom("user1", "Other Symptom")
 	// No type set
 
 	_, _ = repo.Create(ctx, symptom1)

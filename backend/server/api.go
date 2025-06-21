@@ -5,7 +5,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	bm "github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 	"github.com/kjanat/poo-tracker/backend/internal/validation"
 )
@@ -24,23 +25,23 @@ func (a *App) listMeals(c *gin.Context) {
 
 // createMealRequest defines the request structure for creating meals
 type createMealRequest struct {
-	UserID      string              `json:"userId"`
-	Name        string              `json:"name"`
-	Description *string             `json:"description,omitempty"`
-	MealTime    *time.Time          `json:"mealTime,omitempty"`
-	Category    *model.MealCategory `json:"category,omitempty"`
-	Cuisine     *string             `json:"cuisine,omitempty"`
-	Calories    *int                `json:"calories,omitempty"`
-	SpicyLevel  *int                `json:"spicyLevel,omitempty"`
-	FiberRich   *bool               `json:"fiberRich,omitempty"`
-	Dairy       *bool               `json:"dairy,omitempty"`
-	Gluten      *bool               `json:"gluten,omitempty"`
-	PhotoURL    *string             `json:"photoUrl,omitempty"`
-	Notes       *string             `json:"notes,omitempty"`
+	UserID      string             `json:"userId"`
+	Name        string             `json:"name"`
+	Description *string            `json:"description,omitempty"`
+	MealTime    *time.Time         `json:"mealTime,omitempty"`
+	Category    *meal.MealCategory `json:"category,omitempty"`
+	Cuisine     *string            `json:"cuisine,omitempty"`
+	Calories    *int               `json:"calories,omitempty"`
+	SpicyLevel  *int               `json:"spicyLevel,omitempty"`
+	FiberRich   *bool              `json:"fiberRich,omitempty"`
+	Dairy       *bool              `json:"dairy,omitempty"`
+	Gluten      *bool              `json:"gluten,omitempty"`
+	PhotoURL    *string            `json:"photoUrl,omitempty"`
+	Notes       *string            `json:"notes,omitempty"`
 }
 
 // applyMealFields applies fields from the request to the meal
-func applyMealFields(meal *model.Meal, req *createMealRequest) {
+func applyMealFields(meal *meal.Meal, req *createMealRequest) {
 	meal.Name = req.Name
 	if req.Description != nil {
 		meal.Description = *req.Description
@@ -85,7 +86,7 @@ func (a *App) createMeal(c *gin.Context) {
 	}
 
 	// Start with a new meal with defaults
-	meal := model.NewMeal(req.UserID, req.Name)
+	meal := meal.NewMeal(req.UserID, req.Name)
 
 	// Apply fields from request
 	applyMealFields(&meal, &req)
@@ -120,7 +121,7 @@ func (a *App) getMeal(c *gin.Context) {
 
 func (a *App) updateMeal(c *gin.Context) {
 	id := c.Param("id")
-	var update model.MealUpdate
+	var update meal.MealUpdate
 	if err := c.ShouldBindJSON(&update); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

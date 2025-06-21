@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/user"
 	"github.com/kjanat/poo-tracker/backend/internal/service"
 )
 
@@ -39,12 +39,12 @@ func JWTAuthMiddleware(auth service.AuthService) gin.HandlerFunc {
 	}
 }
 
-func ContextWithUser(ctx context.Context, user *model.User) context.Context {
+func ContextWithUser(ctx context.Context, user *user.User) context.Context {
 	return context.WithValue(ctx, userContextKey, user)
 }
 
-func UserFromContext(ctx context.Context) *model.User {
-	user, _ := ctx.Value(userContextKey).(*model.User)
+func UserFromContext(ctx context.Context) *user.User {
+	user, _ := ctx.Value(userContextKey).(*user.User)
 	return user
 }
 

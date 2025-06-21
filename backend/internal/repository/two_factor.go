@@ -6,14 +6,15 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+
+	"github.com/kjanat/poo-tracker/backend/internal/domain/user"
 )
 
 // UserTwoFactorRepository defines the interface for two-factor authentication operations
 type UserTwoFactorRepository interface {
-	Create(ctx context.Context, twoFactor *model.UserTwoFactor) error
-	GetByUserID(ctx context.Context, userID string) (*model.UserTwoFactor, error)
-	Update(ctx context.Context, twoFactor *model.UserTwoFactor) error
+	Create(ctx context.Context, twoFactor *user.UserTwoFactor) error
+	GetByUserID(ctx context.Context, userID string) (*user.UserTwoFactor, error)
+	Update(ctx context.Context, twoFactor *user.UserTwoFactor) error
 	Delete(ctx context.Context, userID string) error
 	UpdateLastUsed(ctx context.Context, userID string) error
 	RemoveBackupCode(ctx context.Context, userID string, code string) error
@@ -22,17 +23,17 @@ type UserTwoFactorRepository interface {
 // memoryUserTwoFactorRepository is the in-memory implementation
 type memoryUserTwoFactorRepository struct {
 	mu         sync.RWMutex
-	twoFactors map[string]*model.UserTwoFactor // userID -> UserTwoFactor
+	twoFactors map[string]*user.UserTwoFactor // userID -> UserTwoFactor
 }
 
 // NewMemoryUserTwoFactorRepository creates a new in-memory repository
 func NewMemoryUserTwoFactorRepository() UserTwoFactorRepository {
 	return &memoryUserTwoFactorRepository{
-		twoFactors: make(map[string]*model.UserTwoFactor),
+		twoFactors: make(map[string]*user.UserTwoFactor),
 	}
 }
 
-func (r *memoryUserTwoFactorRepository) Create(ctx context.Context, twoFactor *model.UserTwoFactor) error {
+func (r *memoryUserTwoFactorRepository) Create(ctx context.Context, twoFactor *user.UserTwoFactor) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -48,7 +49,7 @@ func (r *memoryUserTwoFactorRepository) Create(ctx context.Context, twoFactor *m
 	return nil
 }
 
-func (r *memoryUserTwoFactorRepository) GetByUserID(ctx context.Context, userID string) (*model.UserTwoFactor, error) {
+func (r *memoryUserTwoFactorRepository) GetByUserID(ctx context.Context, userID string) (*user.UserTwoFactor, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -60,7 +61,7 @@ func (r *memoryUserTwoFactorRepository) GetByUserID(ctx context.Context, userID 
 	return twoFactor, nil
 }
 
-func (r *memoryUserTwoFactorRepository) Update(ctx context.Context, twoFactor *model.UserTwoFactor) error {
+func (r *memoryUserTwoFactorRepository) Update(ctx context.Context, twoFactor *user.UserTwoFactor) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 

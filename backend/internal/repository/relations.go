@@ -6,29 +6,30 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+
+	rel "github.com/kjanat/poo-tracker/backend/internal/domain/relations"
 )
 
 // MealBowelMovementRelationRepository defines the interface for meal-bowel movement relation operations
 type MealBowelMovementRelationRepository interface {
-	Create(ctx context.Context, relation *model.MealBowelMovementRelation) error
-	GetByID(ctx context.Context, id, userID string) (*model.MealBowelMovementRelation, error)
-	GetByUserID(ctx context.Context, userID string, limit, offset int) ([]*model.MealBowelMovementRelation, error)
-	GetByMealID(ctx context.Context, mealID, userID string) ([]*model.MealBowelMovementRelation, error)
-	GetByBowelMovementID(ctx context.Context, bowelMovementID, userID string) ([]*model.MealBowelMovementRelation, error)
-	Update(ctx context.Context, relation *model.MealBowelMovementRelation) error
+	Create(ctx context.Context, relation *rel.MealBowelMovementRelation) error
+	GetByID(ctx context.Context, id, userID string) (*rel.MealBowelMovementRelation, error)
+	GetByUserID(ctx context.Context, userID string, limit, offset int) ([]*rel.MealBowelMovementRelation, error)
+	GetByMealID(ctx context.Context, mealID, userID string) ([]*rel.MealBowelMovementRelation, error)
+	GetByBowelMovementID(ctx context.Context, bowelMovementID, userID string) ([]*rel.MealBowelMovementRelation, error)
+	Update(ctx context.Context, relation *rel.MealBowelMovementRelation) error
 	Delete(ctx context.Context, id, userID string) error
 	Count(ctx context.Context, userID string) (int, error)
 }
 
 // MealSymptomRelationRepository defines the interface for meal-symptom relation operations
 type MealSymptomRelationRepository interface {
-	Create(ctx context.Context, relation *model.MealSymptomRelation) error
-	GetByID(ctx context.Context, id, userID string) (*model.MealSymptomRelation, error)
-	GetByUserID(ctx context.Context, userID string, limit, offset int) ([]*model.MealSymptomRelation, error)
-	GetByMealID(ctx context.Context, mealID, userID string) ([]*model.MealSymptomRelation, error)
-	GetBySymptomID(ctx context.Context, symptomID, userID string) ([]*model.MealSymptomRelation, error)
-	Update(ctx context.Context, relation *model.MealSymptomRelation) error
+	Create(ctx context.Context, relation *rel.MealSymptomRelation) error
+	GetByID(ctx context.Context, id, userID string) (*rel.MealSymptomRelation, error)
+	GetByUserID(ctx context.Context, userID string, limit, offset int) ([]*rel.MealSymptomRelation, error)
+	GetByMealID(ctx context.Context, mealID, userID string) ([]*rel.MealSymptomRelation, error)
+	GetBySymptomID(ctx context.Context, symptomID, userID string) ([]*rel.MealSymptomRelation, error)
+	Update(ctx context.Context, relation *rel.MealSymptomRelation) error
 	Delete(ctx context.Context, id, userID string) error
 	Count(ctx context.Context, userID string) (int, error)
 }
@@ -36,16 +37,16 @@ type MealSymptomRelationRepository interface {
 // Memory implementations
 type memoryMealBowelMovementRelationRepository struct {
 	mu        sync.RWMutex
-	relations map[string]*model.MealBowelMovementRelation
+	relations map[string]*rel.MealBowelMovementRelation
 }
 
 func NewMemoryMealBowelMovementRelationRepository() MealBowelMovementRelationRepository {
 	return &memoryMealBowelMovementRelationRepository{
-		relations: make(map[string]*model.MealBowelMovementRelation),
+		relations: make(map[string]*rel.MealBowelMovementRelation),
 	}
 }
 
-func (r *memoryMealBowelMovementRelationRepository) Create(ctx context.Context, relation *model.MealBowelMovementRelation) error {
+func (r *memoryMealBowelMovementRelationRepository) Create(ctx context.Context, relation *rel.MealBowelMovementRelation) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -70,7 +71,7 @@ func (r *memoryMealBowelMovementRelationRepository) Create(ctx context.Context, 
 	return nil
 }
 
-func (r *memoryMealBowelMovementRelationRepository) GetByID(ctx context.Context, id, userID string) (*model.MealBowelMovementRelation, error) {
+func (r *memoryMealBowelMovementRelationRepository) GetByID(ctx context.Context, id, userID string) (*rel.MealBowelMovementRelation, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -86,11 +87,11 @@ func (r *memoryMealBowelMovementRelationRepository) GetByID(ctx context.Context,
 	return relation, nil
 }
 
-func (r *memoryMealBowelMovementRelationRepository) GetByUserID(ctx context.Context, userID string, limit, offset int) ([]*model.MealBowelMovementRelation, error) {
+func (r *memoryMealBowelMovementRelationRepository) GetByUserID(ctx context.Context, userID string, limit, offset int) ([]*rel.MealBowelMovementRelation, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	var userRelations []*model.MealBowelMovementRelation
+	var userRelations []*rel.MealBowelMovementRelation
 	for _, relation := range r.relations {
 		if relation.UserID == userID {
 			userRelations = append(userRelations, relation)
@@ -99,7 +100,7 @@ func (r *memoryMealBowelMovementRelationRepository) GetByUserID(ctx context.Cont
 
 	// Apply pagination
 	if offset >= len(userRelations) {
-		return []*model.MealBowelMovementRelation{}, nil
+		return []*rel.MealBowelMovementRelation{}, nil
 	}
 
 	end := offset + limit
@@ -110,11 +111,11 @@ func (r *memoryMealBowelMovementRelationRepository) GetByUserID(ctx context.Cont
 	return userRelations[offset:end], nil
 }
 
-func (r *memoryMealBowelMovementRelationRepository) GetByMealID(ctx context.Context, mealID, userID string) ([]*model.MealBowelMovementRelation, error) {
+func (r *memoryMealBowelMovementRelationRepository) GetByMealID(ctx context.Context, mealID, userID string) ([]*rel.MealBowelMovementRelation, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	var relations []*model.MealBowelMovementRelation
+	var relations []*rel.MealBowelMovementRelation
 	for _, relation := range r.relations {
 		if relation.UserID == userID && relation.MealID == mealID {
 			relations = append(relations, relation)
@@ -124,11 +125,11 @@ func (r *memoryMealBowelMovementRelationRepository) GetByMealID(ctx context.Cont
 	return relations, nil
 }
 
-func (r *memoryMealBowelMovementRelationRepository) GetByBowelMovementID(ctx context.Context, bowelMovementID, userID string) ([]*model.MealBowelMovementRelation, error) {
+func (r *memoryMealBowelMovementRelationRepository) GetByBowelMovementID(ctx context.Context, bowelMovementID, userID string) ([]*rel.MealBowelMovementRelation, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	var relations []*model.MealBowelMovementRelation
+	var relations []*rel.MealBowelMovementRelation
 	for _, relation := range r.relations {
 		if relation.UserID == userID && relation.BowelMovementID == bowelMovementID {
 			relations = append(relations, relation)
@@ -138,7 +139,7 @@ func (r *memoryMealBowelMovementRelationRepository) GetByBowelMovementID(ctx con
 	return relations, nil
 }
 
-func (r *memoryMealBowelMovementRelationRepository) Update(ctx context.Context, relation *model.MealBowelMovementRelation) error {
+func (r *memoryMealBowelMovementRelationRepository) Update(ctx context.Context, relation *rel.MealBowelMovementRelation) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -190,16 +191,16 @@ func (r *memoryMealBowelMovementRelationRepository) Count(ctx context.Context, u
 // Memory implementation for MealSymptomRelation
 type memoryMealSymptomRelationRepository struct {
 	mu        sync.RWMutex
-	relations map[string]*model.MealSymptomRelation
+	relations map[string]*rel.MealSymptomRelation
 }
 
 func NewMemoryMealSymptomRelationRepository() MealSymptomRelationRepository {
 	return &memoryMealSymptomRelationRepository{
-		relations: make(map[string]*model.MealSymptomRelation),
+		relations: make(map[string]*rel.MealSymptomRelation),
 	}
 }
 
-func (r *memoryMealSymptomRelationRepository) Create(ctx context.Context, relation *model.MealSymptomRelation) error {
+func (r *memoryMealSymptomRelationRepository) Create(ctx context.Context, relation *rel.MealSymptomRelation) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -224,7 +225,7 @@ func (r *memoryMealSymptomRelationRepository) Create(ctx context.Context, relati
 	return nil
 }
 
-func (r *memoryMealSymptomRelationRepository) GetByID(ctx context.Context, id, userID string) (*model.MealSymptomRelation, error) {
+func (r *memoryMealSymptomRelationRepository) GetByID(ctx context.Context, id, userID string) (*rel.MealSymptomRelation, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -240,11 +241,11 @@ func (r *memoryMealSymptomRelationRepository) GetByID(ctx context.Context, id, u
 	return relation, nil
 }
 
-func (r *memoryMealSymptomRelationRepository) GetByUserID(ctx context.Context, userID string, limit, offset int) ([]*model.MealSymptomRelation, error) {
+func (r *memoryMealSymptomRelationRepository) GetByUserID(ctx context.Context, userID string, limit, offset int) ([]*rel.MealSymptomRelation, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	var userRelations []*model.MealSymptomRelation
+	var userRelations []*rel.MealSymptomRelation
 	for _, relation := range r.relations {
 		if relation.UserID == userID {
 			userRelations = append(userRelations, relation)
@@ -253,7 +254,7 @@ func (r *memoryMealSymptomRelationRepository) GetByUserID(ctx context.Context, u
 
 	// Apply pagination
 	if offset >= len(userRelations) {
-		return []*model.MealSymptomRelation{}, nil
+		return []*rel.MealSymptomRelation{}, nil
 	}
 
 	end := offset + limit
@@ -264,11 +265,11 @@ func (r *memoryMealSymptomRelationRepository) GetByUserID(ctx context.Context, u
 	return userRelations[offset:end], nil
 }
 
-func (r *memoryMealSymptomRelationRepository) GetByMealID(ctx context.Context, mealID, userID string) ([]*model.MealSymptomRelation, error) {
+func (r *memoryMealSymptomRelationRepository) GetByMealID(ctx context.Context, mealID, userID string) ([]*rel.MealSymptomRelation, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	var relations []*model.MealSymptomRelation
+	var relations []*rel.MealSymptomRelation
 	for _, relation := range r.relations {
 		if relation.UserID == userID && relation.MealID == mealID {
 			relations = append(relations, relation)
@@ -278,11 +279,11 @@ func (r *memoryMealSymptomRelationRepository) GetByMealID(ctx context.Context, m
 	return relations, nil
 }
 
-func (r *memoryMealSymptomRelationRepository) GetBySymptomID(ctx context.Context, symptomID, userID string) ([]*model.MealSymptomRelation, error) {
+func (r *memoryMealSymptomRelationRepository) GetBySymptomID(ctx context.Context, symptomID, userID string) ([]*rel.MealSymptomRelation, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	var relations []*model.MealSymptomRelation
+	var relations []*rel.MealSymptomRelation
 	for _, relation := range r.relations {
 		if relation.UserID == userID && relation.SymptomID == symptomID {
 			relations = append(relations, relation)
@@ -292,7 +293,7 @@ func (r *memoryMealSymptomRelationRepository) GetBySymptomID(ctx context.Context
 	return relations, nil
 }
 
-func (r *memoryMealSymptomRelationRepository) Update(ctx context.Context, relation *model.MealSymptomRelation) error {
+func (r *memoryMealSymptomRelationRepository) Update(ctx context.Context, relation *rel.MealSymptomRelation) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 

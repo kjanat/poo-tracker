@@ -1,10 +1,10 @@
 package service
 
-import "github.com/kjanat/poo-tracker/backend/internal/model"
+import bm "github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
 
 type AvgBristol struct{}
 
-func (AvgBristol) Summary(list []model.BowelMovement) map[string]any {
+func (AvgBristol) Summary(list []bm.BowelMovement) map[string]any {
 	if len(list) == 0 {
 		return map[string]any{
 			"total":      0,

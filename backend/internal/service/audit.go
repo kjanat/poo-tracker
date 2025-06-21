@@ -10,19 +10,20 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+
+	"github.com/kjanat/poo-tracker/backend/internal/domain/audit"
 )
 
 // AuditService handles audit logging for the application
 type AuditService struct {
 	mu   sync.RWMutex
-	logs []model.AuditLog
+	logs []audit.AuditLog
 }
 
 // NewAuditService creates a new audit service
 func NewAuditService() *AuditService {
 	return &AuditService{
-		logs: make([]model.AuditLog, 0),
+		logs: make([]audit.AuditLog, 0),
 	}
 }
 
@@ -30,13 +31,13 @@ func NewAuditService() *AuditService {
 func (s *AuditService) LogAction(
 	ctx context.Context,
 	userID, entityType, entityID string,
-	action model.AuditAction,
+	action audit.AuditAction,
 	oldData, newData interface{},
 ) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	auditLog := model.NewAuditLog(userID, entityType, entityID, action)
+	auditLog := audit.NewAuditLog(userID, entityType, entityID, action)
 	auditLog.ID = uuid.New().String()
 
 	if oldData != nil {
@@ -58,11 +59,11 @@ func (s *AuditService) LogAction(
 }
 
 // GetAuditLogs retrieves audit logs for a user
-func (s *AuditService) GetAuditLogs(ctx context.Context, userID string, limit, offset int) ([]model.AuditLog, error) {
+func (s *AuditService) GetAuditLogs(ctx context.Context, userID string, limit, offset int) ([]audit.AuditLog, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	var userLogs []model.AuditLog
+	var userLogs []audit.AuditLog
 
 	for _, log := range s.logs {
 		if log.UserID == userID {
@@ -77,7 +78,7 @@ func (s *AuditService) GetAuditLogs(ctx context.Context, userID string, limit, o
 
 	// Apply pagination
 	if offset >= len(userLogs) {
-		return []model.AuditLog{}, nil
+		return []audit.AuditLog{}, nil
 	}
 
 	end := offset + limit
@@ -89,11 +90,11 @@ func (s *AuditService) GetAuditLogs(ctx context.Context, userID string, limit, o
 }
 
 // GetAuditLogsByEntityType retrieves audit logs for a specific entity type
-func (s *AuditService) GetAuditLogsByEntityType(ctx context.Context, userID, entityType string) ([]model.AuditLog, error) {
+func (s *AuditService) GetAuditLogsByEntityType(ctx context.Context, userID, entityType string) ([]audit.AuditLog, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	var logs []model.AuditLog
+	var logs []audit.AuditLog
 
 	for _, log := range s.logs {
 		if log.UserID == userID && log.EntityType == entityType {
@@ -105,11 +106,11 @@ func (s *AuditService) GetAuditLogsByEntityType(ctx context.Context, userID, ent
 }
 
 // GetAuditLogsByEntity retrieves audit logs for a specific entity
-func (s *AuditService) GetAuditLogsByEntity(ctx context.Context, userID, entityType, entityID string) ([]model.AuditLog, error) {
+func (s *AuditService) GetAuditLogsByEntity(ctx context.Context, userID, entityType, entityID string) ([]audit.AuditLog, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	var logs []model.AuditLog
+	var logs []audit.AuditLog
 
 	for _, log := range s.logs {
 		if log.UserID == userID && log.EntityType == entityType && log.EntityID == entityID {
@@ -127,7 +128,7 @@ func (s *AuditService) CleanupOldLogs(ctx context.Context, maxAge time.Duration)
 
 	cutoff := time.Now().Add(-maxAge)
 
-	var filteredLogs []model.AuditLog
+	var filteredLogs []audit.AuditLog
 	for _, log := range s.logs {
 		if log.CreatedAt.After(cutoff) {
 			filteredLogs = append(filteredLogs, log)

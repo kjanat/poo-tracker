@@ -6,7 +6,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/user"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -14,9 +14,9 @@ import (
 // UserAuth represents authentication data for a user
 // UserAuth is used for password hash storage, not User struct.
 type AuthService interface {
-	Register(email, password, name string) (*model.User, string, error)
-	Login(email, password string) (*model.User, string, error)
-	ValidateToken(token string) (*model.User, error)
+	Register(email, password, name string) (*user.User, string, error)
+	Login(email, password string) (*user.User, string, error)
+	ValidateToken(token string) (*user.User, error)
 }
 
 type JWTAuthService struct {
@@ -25,7 +25,7 @@ type JWTAuthService struct {
 	Expiry   time.Duration
 }
 
-func (a *JWTAuthService) Register(email, password, name string) (*model.User, string, error) {
+func (a *JWTAuthService) Register(email, password, name string) (*user.User, string, error) {
 	// Check if email is already registered, distinguishing between not found and other errors
 	_, err := a.UserRepo.GetUserByEmail(email)
 	if err == nil {
@@ -40,7 +40,7 @@ func (a *JWTAuthService) Register(email, password, name string) (*model.User, st
 	if err != nil {
 		return nil, "", err
 	}
-	user := &model.User{
+	user := &user.User{
 		ID:        uuid.NewString(),
 		Email:     email,
 		Name:      name,
@@ -55,7 +55,7 @@ func (a *JWTAuthService) Register(email, password, name string) (*model.User, st
 	}
 
 	// Create auth data - if this fails, we should clean up the user
-	auth := &model.UserAuth{
+	auth := &user.UserAuth{
 		UserID:       user.ID,
 		PasswordHash: string(hash),
 		Provider:     "local",
@@ -77,7 +77,7 @@ func (a *JWTAuthService) Register(email, password, name string) (*model.User, st
 	return user, token, nil
 }
 
-func (a *JWTAuthService) Login(email, password string) (*model.User, string, error) {
+func (a *JWTAuthService) Login(email, password string) (*user.User, string, error) {
 	user, err := a.UserRepo.GetUserByEmail(email)
 	if err != nil {
 		return nil, "", errors.New("invalid credentials")
@@ -96,7 +96,7 @@ func (a *JWTAuthService) Login(email, password string) (*model.User, string, err
 	return user, token, nil
 }
 
-func (a *JWTAuthService) ValidateToken(tokenStr string) (*model.User, error) {
+func (a *JWTAuthService) ValidateToken(tokenStr string) (*user.User, error) {
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 		// Validate the signing algorithm to prevent algorithm confusion attacks
 		if token.Method.Alg() != "HS256" {
@@ -118,7 +118,7 @@ func (a *JWTAuthService) ValidateToken(tokenStr string) (*model.User, error) {
 	return a.UserRepo.GetUserByID(userID)
 }
 
-func (a *JWTAuthService) generateToken(user *model.User) (string, error) {
+func (a *JWTAuthService) generateToken(user *user.User) (string, error) {
 	claims := jwt.MapClaims{
 		"sub":   user.ID,
 		"email": user.Email,

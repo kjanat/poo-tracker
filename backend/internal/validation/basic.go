@@ -3,7 +3,7 @@ package validation
 import (
 	"fmt"
 
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	rel "github.com/kjanat/poo-tracker/backend/internal/domain/relations"
 )
 
 // BristolTypeRange defines valid Bristol Stool Chart range (1-7)
@@ -53,6 +53,6 @@ func ValidateEnum[T interface{ IsValid() bool }](value T, fieldName string) erro
 
 // IsValidCorrelationType validates a correlation type
 func IsValidCorrelationType(correlationType string) bool {
-	ct := model.CorrelationType(correlationType)
+	ct := rel.CorrelationType(correlationType)
 	return ct.IsValid()
 }

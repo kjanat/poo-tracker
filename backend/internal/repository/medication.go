@@ -7,36 +7,37 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+
+	"github.com/kjanat/poo-tracker/backend/internal/domain/medication"
 )
 
 // MedicationRepository defines the interface for medication data operations
 type MedicationRepository interface {
-	Create(ctx context.Context, medication model.Medication) (model.Medication, error)
-	GetByID(ctx context.Context, id string) (model.Medication, error)
-	GetByUserID(ctx context.Context, userID string, limit, offset int) ([]model.Medication, error)
-	Update(ctx context.Context, id string, updates model.MedicationUpdate) (model.Medication, error)
+	Create(ctx context.Context, medication medication.Medication) (medication.Medication, error)
+	GetByID(ctx context.Context, id string) (medication.Medication, error)
+	GetByUserID(ctx context.Context, userID string, limit, offset int) ([]medication.Medication, error)
+	Update(ctx context.Context, id string, updates medication.MedicationUpdate) (medication.Medication, error)
 	Delete(ctx context.Context, id string) error
-	GetActiveByUserID(ctx context.Context, userID string) ([]model.Medication, error)
-	GetByUserIDAndCategory(ctx context.Context, userID string, category model.MedicationCategory) ([]model.Medication, error)
+	GetActiveByUserID(ctx context.Context, userID string) ([]medication.Medication, error)
+	GetByUserIDAndCategory(ctx context.Context, userID string, category medication.MedicationCategory) ([]medication.Medication, error)
 	MarkAsTaken(ctx context.Context, id string, takenAt time.Time) error
 }
 
 // memoryMedicationRepository implements MedicationRepository using in-memory storage
 type memoryMedicationRepository struct {
 	mu          sync.RWMutex
-	medications map[string]model.Medication
+	medications map[string]medication.Medication
 }
 
 // NewMemoryMedicationRepository creates a new in-memory medication repository
 func NewMemoryMedicationRepository() MedicationRepository {
 	return &memoryMedicationRepository{
-		medications: make(map[string]model.Medication),
+		medications: make(map[string]medication.Medication),
 	}
 }
 
 // Create creates a new medication
-func (r *memoryMedicationRepository) Create(ctx context.Context, medication model.Medication) (model.Medication, error) {
+func (r *memoryMedicationRepository) Create(ctx context.Context, medication medication.Medication) (medication.Medication, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -53,24 +54,24 @@ func (r *memoryMedicationRepository) Create(ctx context.Context, medication mode
 }
 
 // GetByID retrieves a medication by ID
-func (r *memoryMedicationRepository) GetByID(ctx context.Context, id string) (model.Medication, error) {
+func (r *memoryMedicationRepository) GetByID(ctx context.Context, id string) (medication.Medication, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
 	medication, exists := r.medications[id]
 	if !exists {
-		return model.Medication{}, fmt.Errorf("medication not found")
+		return medication.Medication{}, fmt.Errorf("medication not found")
 	}
 
 	return medication, nil
 }
 
 // GetByUserID retrieves medications for a specific user with pagination
-func (r *memoryMedicationRepository) GetByUserID(ctx context.Context, userID string, limit, offset int) ([]model.Medication, error) {
+func (r *memoryMedicationRepository) GetByUserID(ctx context.Context, userID string, limit, offset int) ([]medication.Medication, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	var userMedications []model.Medication
+	var userMedications []medication.Medication
 	for _, medication := range r.medications {
 		if medication.UserID == userID {
 			userMedications = append(userMedications, medication)
@@ -88,7 +89,7 @@ func (r *memoryMedicationRepository) GetByUserID(ctx context.Context, userID str
 
 	// Apply pagination
 	if offset >= len(userMedications) {
-		return []model.Medication{}, nil
+		return []medication.Medication{}, nil
 	}
 
 	end := offset + limit
@@ -100,13 +101,13 @@ func (r *memoryMedicationRepository) GetByUserID(ctx context.Context, userID str
 }
 
 // Update updates an existing medication
-func (r *memoryMedicationRepository) Update(ctx context.Context, id string, updates model.MedicationUpdate) (model.Medication, error) {
+func (r *memoryMedicationRepository) Update(ctx context.Context, id string, updates medication.MedicationUpdate) (medication.Medication, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
 	medication, exists := r.medications[id]
 	if !exists {
-		return model.Medication{}, fmt.Errorf("medication not found")
+		return medication.Medication{}, fmt.Errorf("medication not found")
 	}
 
 	// Apply updates
@@ -185,11 +186,11 @@ func (r *memoryMedicationRepository) Delete(ctx context.Context, id string) erro
 }
 
 // GetActiveByUserID retrieves active medications for a user
-func (r *memoryMedicationRepository) GetActiveByUserID(ctx context.Context, userID string) ([]model.Medication, error) {
+func (r *memoryMedicationRepository) GetActiveByUserID(ctx context.Context, userID string) ([]medication.Medication, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	var medications []model.Medication
+	var medications []medication.Medication
 	for _, medication := range r.medications {
 		if medication.UserID == userID && medication.IsActive {
 			medications = append(medications, medication)
@@ -200,11 +201,11 @@ func (r *memoryMedicationRepository) GetActiveByUserID(ctx context.Context, user
 }
 
 // GetByUserIDAndCategory retrieves medications for a user by category
-func (r *memoryMedicationRepository) GetByUserIDAndCategory(ctx context.Context, userID string, category model.MedicationCategory) ([]model.Medication, error) {
+func (r *memoryMedicationRepository) GetByUserIDAndCategory(ctx context.Context, userID string, category medication.MedicationCategory) ([]medication.Medication, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	var medications []model.Medication
+	var medications []medication.Medication
 	for _, medication := range r.medications {
 		if medication.UserID == userID && medication.Category != nil && *medication.Category == category {
 			medications = append(medications, medication)

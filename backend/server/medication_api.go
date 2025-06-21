@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/medication"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 	"github.com/kjanat/poo-tracker/backend/internal/validation"
 )
@@ -30,23 +30,23 @@ func (h *MedicationHandler) CreateMedication(c *gin.Context) {
 	}
 
 	var req struct {
-		Name        string                    `json:"name" binding:"required"`
-		GenericName string                    `json:"genericName"`
-		Brand       string                    `json:"brand"`
-		Category    *model.MedicationCategory `json:"category"`
-		Dosage      string                    `json:"dosage" binding:"required"`
-		Form        *model.MedicationForm     `json:"form"`
-		Frequency   string                    `json:"frequency" binding:"required"`
-		Route       *model.MedicationRoute    `json:"route"`
-		StartDate   *time.Time                `json:"startDate"`
-		EndDate     *time.Time                `json:"endDate"`
-		Purpose     string                    `json:"purpose"`
-		Prescriber  string                    `json:"prescriber"`
-		Pharmacy    string                    `json:"pharmacy"`
-		Notes       string                    `json:"notes"`
-		IsActive    *bool                     `json:"isActive"`
-		IsPRN       *bool                     `json:"isPRN"`
-		SideEffects []string                  `json:"sideEffects"`
+		Name        string                         `json:"name" binding:"required"`
+		GenericName string                         `json:"genericName"`
+		Brand       string                         `json:"brand"`
+		Category    *medication.MedicationCategory `json:"category"`
+		Dosage      string                         `json:"dosage" binding:"required"`
+		Form        *medication.MedicationForm     `json:"form"`
+		Frequency   string                         `json:"frequency" binding:"required"`
+		Route       *medication.MedicationRoute    `json:"route"`
+		StartDate   *time.Time                     `json:"startDate"`
+		EndDate     *time.Time                     `json:"endDate"`
+		Purpose     string                         `json:"purpose"`
+		Prescriber  string                         `json:"prescriber"`
+		Pharmacy    string                         `json:"pharmacy"`
+		Notes       string                         `json:"notes"`
+		IsActive    *bool                          `json:"isActive"`
+		IsPRN       *bool                          `json:"isPRN"`
+		SideEffects []string                       `json:"sideEffects"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -55,7 +55,7 @@ func (h *MedicationHandler) CreateMedication(c *gin.Context) {
 	}
 
 	// Create medication with defaults
-	medication := model.NewMedication(userID, req.Name, req.Dosage, req.Frequency)
+	medication := medication.NewMedication(userID, req.Name, req.Dosage, req.Frequency)
 	medication.GenericName = req.GenericName
 	medication.Brand = req.Brand
 	medication.Category = req.Category
@@ -194,7 +194,7 @@ func (h *MedicationHandler) UpdateMedication(c *gin.Context) {
 		return
 	}
 
-	var updates model.MedicationUpdate
+	var updates medication.MedicationUpdate
 	if err := c.ShouldBindJSON(&updates); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": validation.FormatValidationError(err)})
 		return
@@ -304,7 +304,7 @@ func (h *MedicationHandler) GetMedicationsByCategory(c *gin.Context) {
 	}
 
 	categoryStr := c.Param("category")
-	category, err := model.ParseMedicationCategory(categoryStr)
+	category, err := medication.ParseMedicationCategory(categoryStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid medication category"})
 		return

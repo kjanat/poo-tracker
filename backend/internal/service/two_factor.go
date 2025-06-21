@@ -11,7 +11,7 @@ import (
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
 
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/user"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 )
 
@@ -32,7 +32,7 @@ func NewTwoFactorService(repo repository.UserTwoFactorRepository, userRepo repos
 }
 
 // GenerateSecret generates a new TOTP secret for a user
-func (s *TwoFactorService) GenerateSecret(ctx context.Context, userID string) (*model.UserTwoFactorSetupResponse, error) {
+func (s *TwoFactorService) GenerateSecret(ctx context.Context, userID string) (*user.UserTwoFactorSetupResponse, error) {
 	// Generate a random secret
 	secret, err := s.generateRandomSecret()
 	if err != nil {
@@ -54,7 +54,7 @@ func (s *TwoFactorService) GenerateSecret(ctx context.Context, userID string) (*
 	// Generate QR code URL
 	qrCodeURL := s.generateQRCodeURL(user.Email, secret)
 
-	return &model.UserTwoFactorSetupResponse{
+	return &user.UserTwoFactorSetupResponse{
 		Secret:      secret,
 		BackupCodes: backupCodes,
 		QRCodeURL:   qrCodeURL,
@@ -69,7 +69,7 @@ func (s *TwoFactorService) EnableTwoFactor(ctx context.Context, userID string, t
 	}
 
 	// Create or update the 2FA record
-	twoFactor := &model.UserTwoFactor{
+	twoFactor := &user.UserTwoFactor{
 		UserID:      userID,
 		Secret:      secret,
 		IsEnabled:   true,
@@ -132,11 +132,11 @@ func (s *TwoFactorService) VerifyToken(ctx context.Context, userID string, token
 }
 
 // GetStatus returns the 2FA status for a user
-func (s *TwoFactorService) GetStatus(ctx context.Context, userID string) (*model.UserTwoFactorStatus, error) {
+func (s *TwoFactorService) GetStatus(ctx context.Context, userID string) (*user.UserTwoFactorStatus, error) {
 	twoFactor, err := s.repo.GetByUserID(ctx, userID)
 	if err != nil {
 		if err == repository.ErrNotFound {
-			return &model.UserTwoFactorStatus{
+			return &user.UserTwoFactorStatus{
 				IsEnabled:        false,
 				BackupCodesCount: 0,
 			}, nil
@@ -144,7 +144,7 @@ func (s *TwoFactorService) GetStatus(ctx context.Context, userID string) (*model
 		return nil, fmt.Errorf("failed to get 2FA settings: %w", err)
 	}
 
-	return &model.UserTwoFactorStatus{
+	return &user.UserTwoFactorStatus{
 		IsEnabled:        twoFactor.IsEnabled,
 		LastUsedAt:       twoFactor.LastUsedAt,
 		BackupCodesCount: len(twoFactor.BackupCodes),

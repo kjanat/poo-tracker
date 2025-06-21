@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/user"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 	"github.com/kjanat/poo-tracker/backend/internal/service"
 )
@@ -21,7 +21,7 @@ func TestAuthMiddleware(t *testing.T) {
 	}
 
 	// Create a test user and get a valid token
-	var testUser *model.User
+	var testUser *user.User
 	var validToken string
 	var err error
 	testUser, validToken, err = authService.Register("test@example.com", "password123", "Test User")

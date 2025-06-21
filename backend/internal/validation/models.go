@@ -1,9 +1,13 @@
 package validation
 
-import "github.com/kjanat/poo-tracker/backend/internal/model"
+import (
+	bm "github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
+)
 
 // ValidateBowelMovement validates a complete BowelMovement model
-func ValidateBowelMovement(bm model.BowelMovement) ValidationErrors {
+func ValidateBowelMovement(bm bm.BowelMovement) ValidationErrors {
 	var errors ValidationErrors
 
 	errors = append(errors, validateBowelMovementRequired(bm)...)  // Required fields
@@ -14,7 +18,7 @@ func ValidateBowelMovement(bm model.BowelMovement) ValidationErrors {
 	return errors
 }
 
-func validateBowelMovementRequired(bm model.BowelMovement) ValidationErrors {
+func validateBowelMovementRequired(bm bm.BowelMovement) ValidationErrors {
 	var errors ValidationErrors
 	if err := ValidateUserID(bm.UserID); err != nil {
 		safeAppendValidationError(&errors, err)
@@ -25,7 +29,7 @@ func validateBowelMovementRequired(bm model.BowelMovement) ValidationErrors {
 	return errors
 }
 
-func validateBowelMovementEnums(bm model.BowelMovement) ValidationErrors {
+func validateBowelMovementEnums(bm bm.BowelMovement) ValidationErrors {
 	var errors ValidationErrors
 	if bm.Volume != nil {
 		if err := ValidateEnum(*bm.Volume, "volume"); err != nil {
@@ -50,7 +54,7 @@ func validateBowelMovementEnums(bm model.BowelMovement) ValidationErrors {
 	return errors
 }
 
-func validateBowelMovementScales(bm model.BowelMovement) ValidationErrors {
+func validateBowelMovementScales(bm bm.BowelMovement) ValidationErrors {
 	var errors ValidationErrors
 	if err := ValidateScale(bm.Pain, "pain"); err != nil {
 		errors = append(errors, err.(ValidationError))
@@ -64,7 +68,7 @@ func validateBowelMovementScales(bm model.BowelMovement) ValidationErrors {
 	return errors
 }
 
-func validateBowelMovementOptionals(bm model.BowelMovement) ValidationErrors {
+func validateBowelMovementOptionals(bm bm.BowelMovement) ValidationErrors {
 	var errors ValidationErrors
 	if err := ValidateURL(bm.PhotoURL, "photoUrl"); err != nil {
 		errors = append(errors, err.(ValidationError))
@@ -74,7 +78,7 @@ func validateBowelMovementOptionals(bm model.BowelMovement) ValidationErrors {
 }
 
 // ValidateMeal validates a complete Meal model
-func ValidateMeal(meal model.Meal) ValidationErrors {
+func ValidateMeal(meal meal.Meal) ValidationErrors {
 	var errors ValidationErrors
 
 	// Required fields

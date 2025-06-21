@@ -8,36 +8,37 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+
+	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
 )
 
 // SymptomRepository defines the interface for symptom data operations
 type SymptomRepository interface {
-	Create(ctx context.Context, symptom model.Symptom) (model.Symptom, error)
-	GetByID(ctx context.Context, id string) (model.Symptom, error)
-	GetByUserID(ctx context.Context, userID string, limit, offset int) ([]model.Symptom, error)
-	Update(ctx context.Context, id string, updates model.SymptomUpdate) (model.Symptom, error)
+	Create(ctx context.Context, symptom symptom.Symptom) (symptom.Symptom, error)
+	GetByID(ctx context.Context, id string) (symptom.Symptom, error)
+	GetByUserID(ctx context.Context, userID string, limit, offset int) ([]symptom.Symptom, error)
+	Update(ctx context.Context, id string, updates symptom.SymptomUpdate) (symptom.Symptom, error)
 	Delete(ctx context.Context, id string) error
-	GetByUserIDAndDateRange(ctx context.Context, userID string, startDate, endDate time.Time) ([]model.Symptom, error)
-	GetByUserIDAndCategory(ctx context.Context, userID string, category model.SymptomCategory) ([]model.Symptom, error)
-	GetByUserIDAndType(ctx context.Context, userID string, symptomType model.SymptomType) ([]model.Symptom, error)
+	GetByUserIDAndDateRange(ctx context.Context, userID string, startDate, endDate time.Time) ([]symptom.Symptom, error)
+	GetByUserIDAndCategory(ctx context.Context, userID string, category symptom.SymptomCategory) ([]symptom.Symptom, error)
+	GetByUserIDAndType(ctx context.Context, userID string, symptomType symptom.SymptomType) ([]symptom.Symptom, error)
 }
 
 // memorySymptomRepository implements SymptomRepository using in-memory storage
 type memorySymptomRepository struct {
 	mu       sync.RWMutex
-	symptoms map[string]model.Symptom
+	symptoms map[string]symptom.Symptom
 }
 
 // NewMemorySymptomRepository creates a new in-memory symptom repository
 func NewMemorySymptomRepository() SymptomRepository {
 	return &memorySymptomRepository{
-		symptoms: make(map[string]model.Symptom),
+		symptoms: make(map[string]symptom.Symptom),
 	}
 }
 
 // Create creates a new symptom
-func (r *memorySymptomRepository) Create(ctx context.Context, symptom model.Symptom) (model.Symptom, error) {
+func (r *memorySymptomRepository) Create(ctx context.Context, symptom symptom.Symptom) (symptom.Symptom, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -54,24 +55,24 @@ func (r *memorySymptomRepository) Create(ctx context.Context, symptom model.Symp
 }
 
 // GetByID retrieves a symptom by ID
-func (r *memorySymptomRepository) GetByID(ctx context.Context, id string) (model.Symptom, error) {
+func (r *memorySymptomRepository) GetByID(ctx context.Context, id string) (symptom.Symptom, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
 	symptom, exists := r.symptoms[id]
 	if !exists {
-		return model.Symptom{}, fmt.Errorf("symptom not found")
+		return symptom.Symptom{}, fmt.Errorf("symptom not found")
 	}
 
 	return symptom, nil
 }
 
 // GetByUserID retrieves symptoms for a specific user with pagination
-func (r *memorySymptomRepository) GetByUserID(ctx context.Context, userID string, limit, offset int) ([]model.Symptom, error) {
+func (r *memorySymptomRepository) GetByUserID(ctx context.Context, userID string, limit, offset int) ([]symptom.Symptom, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	var userSymptoms []model.Symptom
+	var userSymptoms []symptom.Symptom
 	for _, symptom := range r.symptoms {
 		if symptom.UserID == userID {
 			userSymptoms = append(userSymptoms, symptom)
@@ -85,7 +86,7 @@ func (r *memorySymptomRepository) GetByUserID(ctx context.Context, userID string
 
 	// Apply pagination
 	if offset >= len(userSymptoms) {
-		return []model.Symptom{}, nil
+		return []symptom.Symptom{}, nil
 	}
 
 	end := offset + limit
@@ -97,13 +98,13 @@ func (r *memorySymptomRepository) GetByUserID(ctx context.Context, userID string
 }
 
 // Update updates an existing symptom
-func (r *memorySymptomRepository) Update(ctx context.Context, id string, updates model.SymptomUpdate) (model.Symptom, error) {
+func (r *memorySymptomRepository) Update(ctx context.Context, id string, updates symptom.SymptomUpdate) (symptom.Symptom, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
 	symptom, exists := r.symptoms[id]
 	if !exists {
-		return model.Symptom{}, fmt.Errorf("symptom not found")
+		return symptom.Symptom{}, fmt.Errorf("symptom not found")
 	}
 
 	// Apply updates
@@ -161,11 +162,11 @@ func (r *memorySymptomRepository) Delete(ctx context.Context, id string) error {
 }
 
 // GetByUserIDAndDateRange retrieves symptoms for a user within a date range
-func (r *memorySymptomRepository) GetByUserIDAndDateRange(ctx context.Context, userID string, startDate, endDate time.Time) ([]model.Symptom, error) {
+func (r *memorySymptomRepository) GetByUserIDAndDateRange(ctx context.Context, userID string, startDate, endDate time.Time) ([]symptom.Symptom, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	var symptoms []model.Symptom
+	var symptoms []symptom.Symptom
 	for _, symptom := range r.symptoms {
 		if symptom.UserID == userID &&
 			!symptom.RecordedAt.Before(startDate) &&
@@ -178,11 +179,11 @@ func (r *memorySymptomRepository) GetByUserIDAndDateRange(ctx context.Context, u
 }
 
 // GetByUserIDAndCategory retrieves symptoms for a user by category
-func (r *memorySymptomRepository) GetByUserIDAndCategory(ctx context.Context, userID string, category model.SymptomCategory) ([]model.Symptom, error) {
+func (r *memorySymptomRepository) GetByUserIDAndCategory(ctx context.Context, userID string, category symptom.SymptomCategory) ([]symptom.Symptom, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	var symptoms []model.Symptom
+	var symptoms []symptom.Symptom
 	for _, symptom := range r.symptoms {
 		if symptom.UserID == userID && symptom.Category != nil && *symptom.Category == category {
 			symptoms = append(symptoms, symptom)
@@ -193,11 +194,11 @@ func (r *memorySymptomRepository) GetByUserIDAndCategory(ctx context.Context, us
 }
 
 // GetByUserIDAndType retrieves symptoms for a user by type
-func (r *memorySymptomRepository) GetByUserIDAndType(ctx context.Context, userID string, symptomType model.SymptomType) ([]model.Symptom, error) {
+func (r *memorySymptomRepository) GetByUserIDAndType(ctx context.Context, userID string, symptomType symptom.SymptomType) ([]symptom.Symptom, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	var symptoms []model.Symptom
+	var symptoms []symptom.Symptom
 	for _, symptom := range r.symptoms {
 		if symptom.UserID == userID && symptom.Type != nil && *symptom.Type == symptomType {
 			symptoms = append(symptoms, symptom)
