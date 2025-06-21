@@ -320,7 +320,7 @@ func (ie *InsightEngine) prioritizeRecommendations(recommendations []*shared.Ins
 		switch p {
 		case "HIGH":
 			return 1
-		case "MEDIUM", "Medium":
+		case "MEDIUM":
 			return 2
 		default:
 			return 3

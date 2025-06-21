@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -78,7 +79,7 @@ func (h *TwoFactorHandler) Enable(c *gin.Context) {
 
 	err := h.service.EnableTwoFactor(c.Request.Context(), userID.(string), req.Token, req.Secret, req.BackupCodes)
 	if err != nil {
-		if err.Error() == "invalid token" {
+		if errors.Is(err, service.ErrInvalidToken) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid verification token"})
 			return
 		}

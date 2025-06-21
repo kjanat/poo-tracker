@@ -3,9 +3,12 @@ package server
 import (
 	"context"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	rel "github.com/kjanat/poo-tracker/backend/internal/domain/relations"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 )
 
@@ -35,18 +38,42 @@ func (h *RelationCoordinatorHandler) GetRelationsByMeal(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Meal ID is required"})
 		return
 	}
+	if _, err := uuid.Parse(mealID); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid meal ID format"})
+		return
+	}
 
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
 	defer cancel()
 
-	bowelRelations, err := h.mealBowelRepo.GetByMealID(ctx, mealID, userID)
-	if err != nil {
+	var (
+		bowelRelations   []*rel.MealBowelMovementRelation
+		symptomRelations []*rel.MealSymptomRelation
+		bowelErr         error
+		symptomErr       error
+	)
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		bowelRelations, bowelErr = h.mealBowelRepo.GetByMealID(ctx, mealID, userID)
+	}()
+
+	go func() {
+		defer wg.Done()
+		symptomRelations, symptomErr = h.mealSymptomRepo.GetByMealID(ctx, mealID, userID)
+	}()
+
+	wg.Wait()
+
+	if bowelErr != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch bowel movement relations"})
 		return
 	}
 
-	symptomRelations, err := h.mealSymptomRepo.GetByMealID(ctx, mealID, userID)
-	if err != nil {
+	if symptomErr != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch symptom relations"})
 		return
 	}

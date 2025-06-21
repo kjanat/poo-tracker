@@ -12,6 +12,8 @@ import (
 	"github.com/kjanat/poo-tracker/backend/internal/validation"
 )
 
+const maxSymptomLimit = 100
+
 // SymptomHandler handles symptom-related HTTP requests
 type SymptomHandler struct {
 	repo repository.SymptomRepository
@@ -124,14 +126,22 @@ func (h *SymptomHandler) GetSymptoms(c *gin.Context) {
 	offset := 0
 
 	if l := c.Query("limit"); l != "" {
-		if parsedLimit, err := strconv.Atoi(l); err == nil && parsedLimit > 0 {
-			limit = parsedLimit
+		if parsedLimit, err := strconv.Atoi(l); err == nil {
+			if parsedLimit > 0 {
+				limit = parsedLimit
+			}
 		}
 	}
 
+	if limit > maxSymptomLimit {
+		limit = maxSymptomLimit
+	}
+
 	if o := c.Query("offset"); o != "" {
-		if parsedOffset, err := strconv.Atoi(o); err == nil && parsedOffset >= 0 {
-			offset = parsedOffset
+		if parsedOffset, err := strconv.Atoi(o); err == nil {
+			if parsedOffset >= 0 {
+				offset = parsedOffset
+			}
 		}
 	}
 

@@ -177,7 +177,7 @@ func (ie *InsightEngine) analyzeMealTimingPatterns(meals []meal.Meal) *shared.In
 		return &shared.InsightRecommendation{
 			ID:       fmt.Sprintf("meal-timing-%d", time.Now().Unix()),
 			Type:     "pattern",
-			Priority: "Medium",
+			Priority: "MEDIUM",
 			Title:    "Irregular Meal Timing Pattern",
 			Description: fmt.Sprintf("Your meal times appear inconsistent across %d meals. Regular meal timing can improve digestive health.",
 				len(meals)),
@@ -232,7 +232,7 @@ func (ie *InsightEngine) analyzeSymptomClustering(symptoms []symptom.Symptom) *s
 		return &shared.InsightRecommendation{
 			ID:       fmt.Sprintf("symptom-clustering-%d", time.Now().Unix()),
 			Type:     "pattern",
-			Priority: "Medium",
+			Priority: "MEDIUM",
 			Title:    "Symptom Clustering Detected",
 			Description: fmt.Sprintf("Multiple symptoms occurring together on %d days, with up to %d symptoms in a single day.",
 				clusterDays, maxSymptomsInDay),
@@ -277,9 +277,9 @@ func (ie *InsightEngine) generateCorrelationInsights(correlations []*analytics.C
 }
 
 func (ie *InsightEngine) createCorrelationInsight(corr *analytics.Correlation) *shared.InsightRecommendation {
-	priority := "Medium"
+	priority := "MEDIUM"
 	if corr.Confidence > 0.8 {
-		priority = "High"
+		priority = "HIGH"
 	}
 
 	return &shared.InsightRecommendation{
@@ -360,9 +360,9 @@ func (ie *InsightEngine) generateTrendInsights(trends []*shared.TrendLine) []*sh
 }
 
 func (ie *InsightEngine) createTrendInsight(trend *shared.TrendLine) *shared.InsightRecommendation {
-	priority := "Medium"
+	priority := "MEDIUM"
 	if trend.Confidence > 0.8 {
-		priority = "High"
+		priority = "HIGH"
 	}
 
 	return &shared.InsightRecommendation{
@@ -440,7 +440,7 @@ func (ie *InsightEngine) generateMedicationInsights(
 			insight := &shared.InsightRecommendation{
 				ID:       fmt.Sprintf("medication-adherence-%d", time.Now().Unix()),
 				Type:     "medication",
-				Priority: "High",
+				Priority: "HIGH",
 				Title:    "Low Medication Adherence Detected",
 				Description: fmt.Sprintf("Only %.1f%% of your medications are currently active. Medication adherence is important for treatment effectiveness.",
 					adherencePercent),
@@ -484,16 +484,16 @@ func (ie *InsightEngine) convertInsightToRecommendation(insight *shared.InsightR
 }
 
 func (ie *InsightEngine) sortInsightsByPriority(insights []*shared.InsightRecommendation) {
-	// Simple sorting: High -> Medium -> Low
+	// Simple sorting: HIGH -> MEDIUM -> LOW
 	highPriority := make([]*shared.InsightRecommendation, 0)
 	mediumPriority := make([]*shared.InsightRecommendation, 0)
 	lowPriority := make([]*shared.InsightRecommendation, 0)
 
 	for _, insight := range insights {
 		switch insight.Priority {
-		case "High":
+		case "HIGH":
 			highPriority = append(highPriority, insight)
-		case "Medium":
+		case "MEDIUM":
 			mediumPriority = append(mediumPriority, insight)
 		default:
 			lowPriority = append(lowPriority, insight)

@@ -94,12 +94,15 @@ func (h *MealSymptomRelationHandler) GetMealSymptomRelations(c *gin.Context) {
 		return
 	}
 
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
-	if limit <= 0 || limit > 100 {
+	limitStr := c.DefaultQuery("limit", "20")
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil || limit <= 0 || limit > 100 {
 		limit = 20
 	}
-	offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
-	if offset < 0 {
+
+	offsetStr := c.DefaultQuery("offset", "0")
+	offset, err := strconv.Atoi(offsetStr)
+	if err != nil || offset < 0 {
 		offset = 0
 	}
 
