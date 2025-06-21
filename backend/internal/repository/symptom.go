@@ -60,12 +60,12 @@ func (r *memorySymptomRepository) GetByID(ctx context.Context, id string) (sympt
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	symptom, exists := r.symptoms[id]
+	s, exists := r.symptoms[id]
 	if !exists {
 		return symptom.Symptom{}, fmt.Errorf("symptom not found")
 	}
 
-	return symptom, nil
+	return s, nil
 }
 
 // GetByUserID retrieves symptoms for a specific user with pagination
@@ -103,50 +103,50 @@ func (r *memorySymptomRepository) Update(ctx context.Context, id string, updates
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	symptom, exists := r.symptoms[id]
+	s, exists := r.symptoms[id]
 	if !exists {
 		return symptom.Symptom{}, fmt.Errorf("symptom not found")
 	}
 
 	// Apply updates
 	if updates.Name != nil {
-		symptom.Name = *updates.Name
+		s.Name = *updates.Name
 	}
 	if updates.Description != nil {
-		symptom.Description = *updates.Description
+		s.Description = *updates.Description
 	}
 	if updates.RecordedAt != nil {
-		symptom.RecordedAt = *updates.RecordedAt
+		s.RecordedAt = *updates.RecordedAt
 	}
 	if updates.Category != nil {
-		symptom.Category = updates.Category
+		s.Category = updates.Category
 	}
 	if updates.Severity != nil {
-		symptom.Severity = *updates.Severity
+		s.Severity = *updates.Severity
 	}
 	if updates.Duration != nil {
-		symptom.Duration = updates.Duration
+		s.Duration = updates.Duration
 	}
 	if updates.BodyPart != nil {
-		symptom.BodyPart = *updates.BodyPart
+		s.BodyPart = *updates.BodyPart
 	}
 	if updates.Type != nil {
-		symptom.Type = updates.Type
+		s.Type = updates.Type
 	}
 	if updates.Triggers != nil {
-		symptom.Triggers = updates.Triggers
+		s.Triggers = updates.Triggers
 	}
 	if updates.Notes != nil {
-		symptom.Notes = *updates.Notes
+		s.Notes = *updates.Notes
 	}
 	if updates.PhotoURL != nil {
-		symptom.PhotoURL = *updates.PhotoURL
+		s.PhotoURL = *updates.PhotoURL
 	}
 
-	symptom.UpdatedAt = time.Now()
-	r.symptoms[id] = symptom
+	s.UpdatedAt = time.Now()
+	r.symptoms[id] = s
 
-	return symptom, nil
+	return s, nil
 }
 
 // Delete removes a symptom

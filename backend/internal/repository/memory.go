@@ -9,7 +9,6 @@ import (
 
 	bm "github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
-	rel "github.com/kjanat/poo-tracker/backend/internal/domain/relations"
 )
 
 var (
@@ -98,12 +97,12 @@ func (m *memoryBowelRepo) Create(ctx context.Context, bm bm.BowelMovement) (bm.B
 
 func (m *memoryBowelRepo) Get(ctx context.Context, id string) (bm.BowelMovement, error) {
 	m.mu.RLock()
-	bm, ok := m.bmStore[id]
+	entry, ok := m.bmStore[id]
 	m.mu.RUnlock()
 	if !ok {
 		return bm.BowelMovement{}, ErrNotFound
 	}
-	return bm, nil
+	return entry, nil
 }
 
 func (m *memoryBowelRepo) Update(ctx context.Context, id string, update bm.BowelMovementUpdate) (bm.BowelMovement, error) {
@@ -213,12 +212,12 @@ func (m *memoryMealRepo) Create(ctx context.Context, meal meal.Meal) (meal.Meal,
 
 func (m *memoryMealRepo) Get(ctx context.Context, id string) (meal.Meal, error) {
 	m.mu.RLock()
-	meal, ok := m.mealStore[id]
+	entry, ok := m.mealStore[id]
 	m.mu.RUnlock()
 	if !ok {
 		return meal.Meal{}, ErrNotFound
 	}
-	return meal, nil
+	return entry, nil
 }
 
 func (m *memoryMealRepo) Update(ctx context.Context, id string, update meal.MealUpdate) (meal.Meal, error) {

@@ -59,12 +59,12 @@ func (r *memoryMedicationRepository) GetByID(ctx context.Context, id string) (me
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	medication, exists := r.medications[id]
+	med, exists := r.medications[id]
 	if !exists {
 		return medication.Medication{}, fmt.Errorf("medication not found")
 	}
 
-	return medication, nil
+	return med, nil
 }
 
 // GetByUserID retrieves medications for a specific user with pagination
@@ -106,62 +106,61 @@ func (r *memoryMedicationRepository) Update(ctx context.Context, id string, upda
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	medication, exists := r.medications[id]
+	med, exists := r.medications[id]
 	if !exists {
 		return medication.Medication{}, fmt.Errorf("medication not found")
 	}
 
 	// Apply updates
 	if updates.Name != nil {
-		medication.Name = *updates.Name
+		med.Name = *updates.Name
 	}
 	if updates.GenericName != nil {
-		medication.GenericName = *updates.GenericName
+		med.GenericName = *updates.GenericName
 	}
 	if updates.Brand != nil {
-		medication.Brand = *updates.Brand
+		med.Brand = *updates.Brand
 	}
 	if updates.Category != nil {
-		medication.Category = updates.Category
+		med.Category = updates.Category
 	}
 	if updates.Dosage != nil {
-		medication.Dosage = *updates.Dosage
+		med.Dosage = *updates.Dosage
 	}
 	if updates.Form != nil {
-		medication.Form = updates.Form
+		med.Form = updates.Form
 	}
 	if updates.Frequency != nil {
-		medication.Frequency = *updates.Frequency
+		med.Frequency = *updates.Frequency
 	}
 	if updates.Route != nil {
-		medication.Route = updates.Route
+		med.Route = updates.Route
 	}
 	if updates.StartDate != nil {
-		medication.StartDate = updates.StartDate
+		med.StartDate = updates.StartDate
 	}
 	if updates.EndDate != nil {
-		medication.EndDate = updates.EndDate
+		med.EndDate = updates.EndDate
 	}
 	if updates.TakenAt != nil {
-		medication.TakenAt = updates.TakenAt
+		med.TakenAt = updates.TakenAt
 	}
 	if updates.Purpose != nil {
-		medication.Purpose = *updates.Purpose
+		med.Purpose = *updates.Purpose
 	}
 	if updates.Notes != nil {
-		medication.Notes = *updates.Notes
+		med.Notes = *updates.Notes
 	}
 	if updates.IsActive != nil {
-		medication.IsActive = *updates.IsActive
+		med.IsActive = *updates.IsActive
 	}
 	if updates.SideEffects != nil {
-		medication.SideEffects = updates.SideEffects
+		med.SideEffects = updates.SideEffects
 	}
+	med.UpdatedAt = time.Now()
+	r.medications[id] = med
 
-	medication.UpdatedAt = time.Now()
-	r.medications[id] = medication
-
-	return medication, nil
+	return med, nil
 }
 
 // Delete removes a medication

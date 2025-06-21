@@ -13,9 +13,9 @@ func TestMedicationRepository_Create(t *testing.T) {
 	repo := NewMemoryMedicationRepository()
 	ctx := context.Background()
 
-	medication := medication.NewMedication("user1", "Ibuprofen", "200mg", "twice daily")
+	med := medication.NewMedication("user1", "Ibuprofen", "200mg", "twice daily")
 
-	created, err := repo.Create(ctx, medication)
+	created, err := repo.Create(ctx, med)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -41,8 +41,8 @@ func TestMedicationRepository_GetByID(t *testing.T) {
 	repo := NewMemoryMedicationRepository()
 	ctx := context.Background()
 
-	medication := medication.NewMedication("user1", "Aspirin", "100mg", "daily")
-	created, _ := repo.Create(ctx, medication)
+	med := medication.NewMedication("user1", "Aspirin", "100mg", "daily")
+	created, _ := repo.Create(ctx, med)
 
 	retrieved, err := repo.GetByID(ctx, created.ID)
 	if err != nil {
@@ -103,8 +103,8 @@ func TestMedicationRepository_Update(t *testing.T) {
 	repo := NewMemoryMedicationRepository()
 	ctx := context.Background()
 
-	medication := medication.NewMedication("user1", "Original", "10mg", "daily")
-	created, _ := repo.Create(ctx, medication)
+	med := medication.NewMedication("user1", "Original", "10mg", "daily")
+	created, _ := repo.Create(ctx, med)
 
 	updates := medication.MedicationUpdate{
 		Name:     stringPtr("Updated"),
@@ -139,8 +139,8 @@ func TestMedicationRepository_Delete(t *testing.T) {
 	repo := NewMemoryMedicationRepository()
 	ctx := context.Background()
 
-	medication := medication.NewMedication("user1", "To Delete", "10mg", "daily")
-	created, _ := repo.Create(ctx, medication)
+	med := medication.NewMedication("user1", "To Delete", "10mg", "daily")
+	created, _ := repo.Create(ctx, med)
 
 	err := repo.Delete(ctx, created.ID)
 	if err != nil {
@@ -214,8 +214,8 @@ func TestMedicationRepository_MarkAsTaken(t *testing.T) {
 	repo := NewMemoryMedicationRepository()
 	ctx := context.Background()
 
-	medication := medication.NewMedication("user1", "Test Med", "10mg", "daily")
-	created, _ := repo.Create(ctx, medication)
+	med := medication.NewMedication("user1", "Test Med", "10mg", "daily")
+	created, _ := repo.Create(ctx, med)
 
 	takenTime := time.Now()
 	err := repo.MarkAsTaken(ctx, created.ID, takenTime)

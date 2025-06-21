@@ -10,7 +10,7 @@ import (
 // float64 values. The slice is copied and sorted internally. If the slice is
 // empty, the function returns 0. If it contains a single element, that value is
 // returned. Percentile should be provided as a decimal (e.g., 0.25 for 25%).
-func calculatePercentile(values []float64, percentile float64) float64 {
+func calculatePercentileSorted(values []float64, percentile float64) float64 {
 	if len(values) == 0 {
 		return 0
 	}
