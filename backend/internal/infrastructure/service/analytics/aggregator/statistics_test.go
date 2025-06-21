@@ -36,6 +36,12 @@ func TestCalculateConsistencyScore(t *testing.T) {
 func TestCalculateRegularityScore(t *testing.T) {
 	da := &DataAggregator{}
 	now := time.Now()
+	if score := da.calculateRegularityScore(nil); score != 0 {
+		t.Errorf("expected 0 for nil slice, got %f", score)
+	}
+	if score := da.calculateRegularityScore([]bowelmovement.BowelMovement{{RecordedAt: now}}); score != 0 {
+		t.Errorf("expected 0 for single movement, got %f", score)
+	}
 	regular := []bowelmovement.BowelMovement{
 		{RecordedAt: now},
 		{RecordedAt: now.Add(24 * time.Hour)},
@@ -104,6 +110,11 @@ func TestCalculateEffectivenessScores(t *testing.T) {
 	}
 	if scores["overall"] != 0.5 {
 		t.Errorf("expected overall 0.5, got %f", scores["overall"])
+	}
+
+	empty := da.calculateEffectivenessScores(nil)
+	if len(empty) != 0 {
+		t.Errorf("expected empty map, got %v", empty)
 	}
 }
 
