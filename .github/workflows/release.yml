@@ -169,7 +169,7 @@ jobs:
             ```bash
             git clone https://github.com/${{ github.repository }}.git
             cd poo-tracker
-            pnpm --filter @poo-tracker/frontend install
+            make init
             make docker-up
             make dev
             ```

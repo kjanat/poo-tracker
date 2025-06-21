@@ -115,7 +115,7 @@ lint-backend: ## Lint backend code
 
 lint-ai: ## Lint AI service code
 	@echo "🔍 Linting AI service..."
-	uv run ruff check $(AI_DIR)
+	uvx ruff check $(AI_DIR)
 
 # =============================================================================
 # LINT FIX
@@ -133,7 +133,7 @@ lint-fix-backend: ## Fix backend linting issues
 
 lint-fix-ai: ## Fix AI service linting issues
 	@echo "🔧 Fixing AI service lint issues..."
-	uv run ruff check $(AI_DIR) --fix
+	uvx ruff check $(AI_DIR) --fix
 
 # =============================================================================
 # TESTING
@@ -183,7 +183,7 @@ format-backend: ## Format backend code
 
 format-ai: ## Format AI service code
 	@echo "✨ Formatting AI service code..."
-	uv run ruff format $(AI_DIR)
+	uvx ruff format $(AI_DIR)
 
 # =============================================================================
 # CLEANUP
