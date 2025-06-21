@@ -13,8 +13,8 @@ func TestBowelDetailsRepo_CRUD(t *testing.T) {
 	ctx := context.Background()
 
 	// First create a bowel movement
-    initialBM := bm.BowelMovement{
-        UserID:      "user1",
+	movement := bm.BowelMovement{
+	createdBM, err := bowelRepo.Create(ctx, movement)
         BristolType: 4,
     }
     createdBM, err := bowelRepo.Create(ctx, initialBM)
