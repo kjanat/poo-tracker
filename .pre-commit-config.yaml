@@ -74,14 +74,16 @@ repos:
     hooks:
       # Run the linter.
       - id: ruff-check
-        args: [--fix]
+        args: ['--fix', 'ai-service/']
       # Run the formatter.
       - id: ruff-format
+        args: ['ai-service/']
 
   - repo: https://github.com/psf/black-pre-commit-mirror
     rev: 25.1.0
     hooks:
       - id: black
+        args: ['ai-service/']
 
   - repo: https://github.com/pre-commit/mirrors-isort
     rev: v5.10.1
