@@ -243,9 +243,9 @@ func (da *DataAggregator) GroupMealsByType(meals []meal.Meal) map[string][]meal.
 	return groups
 }
 
-// GetMedicationAdherenceRate calculates medication adherence rate
-func (da *DataAggregator) GetMedicationAdherenceRate(medications []medication.Medication, days int) float64 {
-	if len(medications) == 0 || days == 0 {
+// GetActiveMedicationPercentage returns the percentage of currently active medications.
+func (da *DataAggregator) GetActiveMedicationPercentage(medications []medication.Medication) float64 {
+	if len(medications) == 0 {
 		return 0
 	}
 
