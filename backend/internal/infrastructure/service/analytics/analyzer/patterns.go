@@ -11,6 +11,11 @@ import (
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/shared"
 )
 
+const (
+	minSpicyLevel        = 7
+	highCalorieThreshold = 700
+)
+
 // AnalyzeEatingPatterns identifies patterns in eating habits and their potential impacts
 func (ta *TrendAnalyzer) AnalyzeEatingPatterns(meals []meal.Meal) *shared.EatingPattern {
 	// TODO: Remove this early return once methods are implemented
@@ -208,10 +213,10 @@ func (ta *TrendAnalyzer) analyzeDietaryHabits(meals []meal.Meal) []shared.Dietar
 		if m.Gluten {
 			habits["gluten"].count++
 		}
-		if m.SpicyLevel != nil && *m.SpicyLevel >= 7 {
+		if m.SpicyLevel != nil && *m.SpicyLevel >= minSpicyLevel {
 			habits["spicy"].count++
 		}
-		if m.Calories > 700 {
+		if m.Calories > highCalorieThreshold {
 			habits["calorie"].count++
 		}
 	}
@@ -248,7 +253,9 @@ func (ta *TrendAnalyzer) analyzeBowelRegularity(movements []bowelmovement.BowelM
 	}
 	groups := shared.GroupByDay(times)
 	if len(groups) <= 1 {
-		return freq
+		// With data from a single day we can't measure variability.
+		// Assume perfect regularity.
+		return 1
 	}
 
 	counts := make([]float64, 0, len(groups))
@@ -291,7 +298,7 @@ func (ta *TrendAnalyzer) analyzeSymptomTriggers(symptoms []symptom.Symptom, meal
 		if m.Gluten {
 			keys = append(keys, "Gluten")
 		}
-		if m.SpicyLevel != nil && *m.SpicyLevel >= 7 {
+		if m.SpicyLevel != nil && *m.SpicyLevel >= minSpicyLevel {
 			keys = append(keys, "Spicy")
 		}
 
@@ -325,7 +332,6 @@ func (ta *TrendAnalyzer) analyzeSymptomTriggers(symptoms []symptom.Symptom, meal
 		rate := float64(c.triggered) / float64(c.total)
 		result = append(result, shared.SymptomTrigger{
 			TriggerType: k,
-			Ingredient:  "",
 			Confidence:  rate * confidence,
 		})
 	}

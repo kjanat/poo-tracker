@@ -71,9 +71,9 @@ type DietaryHabit struct {
 	Impact      float64
 }
 
-// SymptomTrigger represents identified triggers for symptoms
+// SymptomTrigger represents identified triggers for symptoms.
+// The Ingredient field was removed because it duplicated TriggerType.
 type SymptomTrigger struct {
 	TriggerType string
-	Ingredient  string
 	Confidence  float64
 }
