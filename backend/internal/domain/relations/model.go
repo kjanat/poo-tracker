@@ -81,7 +81,15 @@ func NewMealBowelMovementRelation(userID, mealID, bowelMovementID string, timeGa
 }
 
 // NewMealSymptomRelation creates a new meal-symptom relation
+// Default strength is set to 5 (neutral on 1-10 scale)
 func NewMealSymptomRelation(userID, mealID, symptomID string, timeGapHours float64) MealSymptomRelation {
+	if userID == "" || mealID == "" || symptomID == "" {
+		panic("userID, mealID, and symptomID cannot be empty")
+	}
+	if timeGapHours < 0 {
+		panic("timeGapHours cannot be negative")
+	}
+
 	now := time.Now()
 	return MealSymptomRelation{
 		UserID:       userID,
