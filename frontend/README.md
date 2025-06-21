@@ -40,7 +40,7 @@ The frontend is a responsive, type-safe React application built with modern web 
 
 ```bash
 # From the root directory
-pnpm install
+pnpm --filter @poo-tracker/frontend install
 
 # Start development server
 pnpm --filter @poo-tracker/frontend dev
@@ -56,7 +56,7 @@ pnpm dev:frontend
 cd frontend
 
 # Install dependencies
-pnpm install
+pnpm --filter @poo-tracker/frontend install
 
 # Start development server
 pnpm dev

@@ -18,7 +18,7 @@ echo "🚀 Setting up Poo Tracker development environment..."
 
 # Install Node.js dependencies (frontend)
 echo "📦 Installing Node.js dependencies..."
-pnpm install
+pnpm --filter @poo-tracker/frontend install
 
 # Install Python dependencies for AI service
 echo "🐍 Installing Python dependencies..."
@@ -33,7 +33,7 @@ fi
 
 # Start Docker services
 echo "🐳 Starting Docker services..."
-pnpm docker:up
+make docker-up
 
 # Wait for PostgreSQL to be ready using pg_isready
 echo "⏳ Waiting for PostgreSQL to be ready..."
@@ -44,7 +44,7 @@ done
 
 # No automatic migrations for Go backend
 
-echo "✅ Setup complete! Run 'pnpm dev:full' to start all services"
+echo "✅ Setup complete! Run 'make dev' to start all services"
 echo ""
 echo "🌐 Services will be available at:"
 echo "  Frontend:      http://localhost:5173"

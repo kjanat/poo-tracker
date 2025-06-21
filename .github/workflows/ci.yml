@@ -39,16 +39,16 @@ jobs:
           node-version: 22
 
       - name: 📦 Install dependencies
-        run: pnpm install
+        run: pnpm --filter @poo-tracker/frontend install
 
       - name: 🔍 Type check
-        run: pnpm type-check:frontend
+        run: pnpm --filter @poo-tracker/frontend run type-check
 
       - name: 🧹 Lint
-        run: pnpm lint:frontend
+        run: pnpm --filter @poo-tracker/frontend run lint
 
       - name: 🧪 Test
-        run: pnpm test:frontend
+        run: pnpm --filter @poo-tracker/frontend run test
 
       - name: Upload results to Trunk
         # Run this step even if the test step ahead fails
@@ -64,7 +64,7 @@ jobs:
         continue-on-error: true
 
       - name: 🏗️ Build
-        run: pnpm build:frontend
+        run: pnpm --filter @poo-tracker/frontend run build
 
   test-backend:
     name: 🚀 Backend Tests
@@ -95,7 +95,7 @@ jobs:
           go-version: ${{ matrix.go-version }}
 
       - name: 📦 Install dependencies
-        run: pnpm install
+        run: pnpm --filter @poo-tracker/frontend install
 
       - name: 🔍 Lint
         uses: golangci/golangci-lint-action@v8
@@ -104,7 +104,7 @@ jobs:
           working-directory: backend
 
       - name: 🧪 Test
-        run: pnpm test:backend
+        run: go test -C backend ./...
 
       - name: Upload results to Trunk
         # Run this step even if the test step ahead fails
@@ -120,7 +120,7 @@ jobs:
         continue-on-error: true
 
       - name: 🏗️ Build
-        run: pnpm build:backend
+        run: go build -C backend -o bin/server .
 
   test-ai-service:
     name: 🤖 AI Service Tests
