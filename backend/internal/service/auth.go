@@ -40,7 +40,7 @@ func (a *JWTAuthService) Register(email, password, name string) (*user.User, str
 	if err != nil {
 		return nil, "", err
 	}
-	user := &user.User{
+	u := &user.User{
 		ID:        uuid.NewString(),
 		Email:     email,
 		Name:      name,
@@ -49,14 +49,14 @@ func (a *JWTAuthService) Register(email, password, name string) (*user.User, str
 	}
 
 	// Create user first
-	err = a.UserRepo.CreateUser(user)
+	err = a.UserRepo.CreateUser(u)
 	if err != nil {
 		return nil, "", err
 	}
 
 	// Create auth data - if this fails, we should clean up the user
 	auth := &user.UserAuth{
-		UserID:       user.ID,
+		UserID:       u.ID,
 		PasswordHash: string(hash),
 		Provider:     "local",
 		IsActive:     true,
@@ -66,15 +66,15 @@ func (a *JWTAuthService) Register(email, password, name string) (*user.User, str
 	err = a.UserRepo.CreateUserAuth(auth)
 	if err != nil {
 		// Clean up the user if auth creation fails
-		_ = a.UserRepo.DeleteUser(user.ID)
+		_ = a.UserRepo.DeleteUser(u.ID)
 		return nil, "", err
 	}
 
-	token, err := a.generateToken(user)
+	token, err := a.generateToken(u)
 	if err != nil {
 		return nil, "", err
 	}
-	return user, token, nil
+	return u, token, nil
 }
 
 func (a *JWTAuthService) Login(email, password string) (*user.User, string, error) {
