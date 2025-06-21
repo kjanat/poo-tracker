@@ -30,13 +30,22 @@ type DailyAggregation struct {
 
 // TrendPoint represents a single data point in a trend analysis
 type TrendPoint struct {
-	Time  time.Time `json:"time"`
+	Date  time.Time `json:"date"`
 	Value float64   `json:"value"`
+}
+
+// TrendLine represents a calculated data trend
+type TrendLine struct {
+	Name         string       `json:"name"`
+	Points       []TrendPoint `json:"points"`
+	Direction    string       `json:"direction"`
+	Slope        float64      `json:"slope"`
+	Confidence   float64      `json:"confidence"`
+	Significance string       `json:"significance"`
 }
 
 // Use domain analytics types for shared structures
 type CorrelationPair = analytics.Correlation
-type TrendLine = analytics.DataTrend
 type PatternMatch = analytics.Insight
 type HealthMetric = analytics.ScoreFactor
 

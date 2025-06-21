@@ -62,7 +62,11 @@ func (ie *InsightEngine) GetRecommendationStrings(
 	recs := ie.GenerateRecommendations(bowelValues, mealValues, symptomValues)
 	var result []string
 	for _, rec := range recs {
-		result = append(result, rec.Message)
+		if rec.Description != "" {
+			result = append(result, rec.Description)
+		} else {
+			result = append(result, rec.Title)
+		}
 	}
 	return result
 }
