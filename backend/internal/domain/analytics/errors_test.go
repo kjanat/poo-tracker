@@ -18,3 +18,16 @@ func TestNewAnalysisError(t *testing.T) {
 		t.Errorf("unexpected Error string: %s", e.Error())
 	}
 }
+
+func TestNewAnalysisErrorEdgeCases(t *testing.T) {
+	e := NewAnalysisError("", "", "")
+	if e.Type != "" || e.Message != "" || e.Context != "" {
+		t.Error("empty strings not handled correctly")
+	}
+
+	e2 := NewAnalysisError("TYPE/SPECIAL", "message with 'quotes'", "ctx:value")
+	expectedErr := "analysis error 'TYPE/SPECIAL': message with 'quotes' (context: ctx:value)"
+	if e2.Error() != expectedErr {
+		t.Errorf("special characters not handled correctly: %s", e2.Error())
+	}
+}

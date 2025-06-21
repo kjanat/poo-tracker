@@ -2,10 +2,12 @@ package audit
 
 import "testing"
 
+const expectedAuditActionCount = 3
+
 func TestAllAuditActions(t *testing.T) {
 	actions := AllAuditActions()
-	if len(actions) != 3 {
-		t.Fatalf("expected 3 actions, got %d", len(actions))
+	if len(actions) != expectedAuditActionCount {
+		t.Fatalf("expected %d actions, got %d", expectedAuditActionCount, len(actions))
 	}
 	m := map[AuditAction]bool{}
 	for _, a := range actions {

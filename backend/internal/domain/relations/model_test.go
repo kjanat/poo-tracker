@@ -2,10 +2,12 @@ package relations
 
 import "testing"
 
+const expectedCorrelationTypeCount = 4
+
 func TestAllCorrelationTypes(t *testing.T) {
 	types := AllCorrelationTypes()
-	if len(types) != 4 {
-		t.Fatalf("expected 4 types, got %d", len(types))
+	if len(types) != expectedCorrelationTypeCount {
+		t.Fatalf("expected %d types, got %d", expectedCorrelationTypeCount, len(types))
 	}
 	m := make(map[CorrelationType]bool)
 	for _, ct := range types {
