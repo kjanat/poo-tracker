@@ -196,6 +196,18 @@ func (ie *InsightEngine) analyzeSymptoms(symptoms []symptom.Symptom) []*shared.I
 	var recommendations []*shared.InsightRecommendation
 
 	if len(symptoms) == 0 {
+		now := time.Now()
+		recommendations = append(recommendations, &shared.InsightRecommendation{
+			ID:          "symptom_tracking_start",
+			Type:        "TRACKING",
+			Priority:    "HIGH",
+			Title:       "Track Symptoms",
+			Description: "Start tracking your symptoms to get personalized recommendations",
+			Evidence:    []string{},
+			Actions:     []string{"Open symptom form", "Add first symptom"},
+			Context:     make(map[string]any),
+			CreatedAt:   now,
+		})
 		return recommendations
 	}
 
