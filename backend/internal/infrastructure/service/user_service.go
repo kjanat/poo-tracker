@@ -501,7 +501,26 @@ func (s *UserService) ValidatePassword(password string) error {
 	if len(password) > 128 {
 		return user.ErrPasswordTooLong
 	}
-	// Add more password validation rules as needed
+
+	var hasUpper, hasLower, hasDigit, hasSpecial bool
+	for _, ch := range password {
+		switch {
+		case ch >= 'A' && ch <= 'Z':
+			hasUpper = true
+		case ch >= 'a' && ch <= 'z':
+			hasLower = true
+		case ch >= '0' && ch <= '9':
+			hasDigit = true
+		default:
+			// treat any other character as special
+			hasSpecial = true
+		}
+	}
+
+	if !hasUpper || !hasLower || !hasDigit || !hasSpecial {
+		return user.ErrWeakPassword
+	}
+
 	return nil
 }
 

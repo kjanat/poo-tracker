@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -297,4 +298,33 @@ func TestUserService_Login_InvalidCredentials(t *testing.T) {
 	assert.True(t, errors.Is(err, user.ErrInvalidCredentials))
 
 	mockRepo.AssertExpectations(t)
+}
+
+func TestUserService_ValidatePassword(t *testing.T) {
+	service := NewUserService(nil)
+
+	tests := []struct {
+		name     string
+		password string
+		wantErr  error
+	}{
+		{"short", "Ab1!", user.ErrPasswordTooShort},
+		{"long", strings.Repeat("a", 129), user.ErrPasswordTooLong},
+		{"no uppercase", "password123!", user.ErrWeakPassword},
+		{"no lowercase", "PASSWORD123!", user.ErrWeakPassword},
+		{"no digit", "Password!", user.ErrWeakPassword},
+		{"no special", "Password123", user.ErrWeakPassword},
+		{"valid", "Valid1!", nil},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := service.ValidatePassword(tt.password)
+			if tt.wantErr != nil {
+				assert.ErrorIs(t, err, tt.wantErr)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
 }
