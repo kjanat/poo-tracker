@@ -40,12 +40,6 @@ jobs:
         with:
           go-version-file: 'backend/go.mod'
 
-      - name: 🔍 Lint
-        uses: golangci/golangci-lint-action@v8
-        with:
-          version: latest
-          working-directory: backend
-
       - name: 📦 Install uv and 🐍 Python
         uses: astral-sh/setup-uv@v6
         with:
@@ -53,50 +47,11 @@ jobs:
           python-version: 3.13
           version: latest
 
-      - name: 📦 Install dependencies
-        run: |
-          command -v pnpm >/dev/null || { echo "❌ pnpm not found"; exit 1; }
-          command -v uv >/dev/null || { echo "❌ uv not found"; exit 1; }
+      - name: 📦 Install all dependencies
+        run: make init
 
-          pnpm --filter @poo-tracker/frontend install || { echo "❌ Failed to run pnpm install"; exit 1; }
-
-          [[ -d ai-service ]] || { echo "❌ Directory 'ai-service' not found"; exit 1; }
-          cd ai-service || exit 1
-
-          if [[ -f pyproject.toml ]]; then
-            uv sync --group dev 2>/dev/null || uv pip install -e . --system 2>/dev/null
-            status=$?
-          else
-            echo "⚠️  No pyproject.toml found — skipping uv sync and editable install"
-            status=1
-          fi
-
-          if [[ $status -ne 0 ]]; then
-            if [[ -f requirements.txt ]]; then
-              uv pip install -r requirements.txt --system || { echo "❌ uv install from requirements.txt failed"; exit 1; }
-            else
-              echo "❌ No valid pyproject.toml or requirements.txt found to install from"
-              exit 1
-            fi
-          fi
-
-          echo "✅ All done."
-
-      - name: 🎨 Format TypeScript/JavaScript
-        run: |
-          pnpm --filter @poo-tracker/frontend run lint:fix || true
-          golangci-lint run ./backend/... --fix || true
-
-      - name: 🎨 Format Python
-        run: |
-          uvx black ai-service
-          uvx isort ai-service
-
-      - name: 🦀 Format with Ruff
-        run: |
-          cd ai-service
-          uv run ruff format .
-          uv run ruff check . --fix
+      - name: 🎨 Format & Lint All
+        run: make format && make lint-fix
 
       - name: 📝 Check for changes
         id: verify-changed-files
@@ -117,7 +72,7 @@ jobs:
           git config --local user.email 41898282+github-actions[bot]@users.noreply.github.com
           git config --local user.name github-actions[bot]
           git add .
-          git commit -m "🎨 Auto-fix formatting and linting issues
+          git commit -m "🎨 Auto-fix formatting and linting issues"
 
       - name: 🚀 Push changes
         if: success() && steps.verify-changed-files.outputs.changed == 'true'
@@ -154,44 +109,8 @@ jobs:
           python-version: 3.13
           version: latest
 
-      - name: 📦 Install dependencies
-        run: |
-          command -v pnpm >/dev/null || { echo "❌ pnpm not found"; exit 1; }
-          command -v uv >/dev/null || { echo "❌ uv not found"; exit 1; }
+      - name: 📦 Install all dependencies
+        run: make init
 
-          pnpm --filter @poo-tracker/frontend install || { echo "❌ Failed to run pnpm install"; exit 1; }
-
-          [[ -d ai-service ]] || { echo "❌ Directory 'ai-service' not found"; exit 1; }
-          cd ai-service || exit 1
-
-          if [[ -f pyproject.toml ]]; then
-            uv sync --group dev 2>/dev/null || uv pip install -e . --system 2>/dev/null
-            status=$?
-          else
-            echo "⚠️  No pyproject.toml found — skipping uv sync and editable install"
-            status=1
-          fi
-
-          if [[ $status -ne 0 ]]; then
-            if [[ -f requirements.txt ]]; then
-              uv pip install -r requirements.txt --system || { echo "❌ uv install from requirements.txt failed"; exit 1; }
-            else
-              echo "❌ No valid pyproject.toml or requirements.txt found to install from"
-              exit 1
-            fi
-          fi
-
-          echo "✅ All done."
-
-      - name: 🧹 Lint Frontend
-        run: pnpm --filter @poo-tracker/frontend run lint
-
-      - name: 🧹 Lint Backend
-        run: golangci-lint run ./backend/...
-
-      - name: 🧹 Lint Python
-        run: |
-          uvx ruff check ai-service
-          uvx ruff format ai-service --check
-          uvx black ai-service --check
-          uvx isort ai-service --check-only
+      - name: 🧹 Lint All
+        run: make lint
