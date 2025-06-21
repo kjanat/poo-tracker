@@ -116,9 +116,16 @@ type BowelMovementDetailsUpdate struct {
 }
 
 // NewBowelMovement creates a new BowelMovement with sensible defaults.
-func NewBowelMovement(userID string, bristolType int) BowelMovement {
+// NewBowelMovement creates a new BowelMovement with sensible defaults. If the
+// provided Bristol type is outside the valid range (1-7), ErrInvalidBristolType
+// is returned.
+func NewBowelMovement(userID string, bristolType int) (BowelMovement, error) {
+	if bristolType < 1 || bristolType > 7 {
+		return BowelMovement{}, ErrInvalidBristolType
+	}
+
 	now := time.Now()
-	return BowelMovement{
+	bm := BowelMovement{
 		UserID:       userID,
 		BristolType:  bristolType,
 		CreatedAt:    now,
@@ -129,6 +136,7 @@ func NewBowelMovement(userID string, bristolType int) BowelMovement {
 		Satisfaction: 5, // Default: neutral satisfaction
 		Floaters:     false,
 	}
+	return bm, nil
 }
 
 // NewBowelMovementDetails creates a new BowelMovementDetails with defaults.

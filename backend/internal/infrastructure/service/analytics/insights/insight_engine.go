@@ -116,13 +116,14 @@ func (ie *InsightEngine) analyzeBristolConsistency(movements []bowelmovement.Bow
 
 	if float64(type1and2Count)/float64(totalCount) > 0.5 {
 		insight = &shared.InsightRecommendation{
-			Type:       "LIFESTYLE",
-			Category:   "Bowel Health",
-			Message:    "Constipation Pattern Detected - Over 50% of your bowel movements indicate hard stools",
-			Evidence:   fmt.Sprintf("%d out of %d movements were Bristol types 1-2, indicating constipation", type1and2Count, totalCount),
-			Priority:   "HIGH",
-			Confidence: 0.8,
-			ActionItems: []string{
+			Type:        "LIFESTYLE",
+			Category:    "Bowel Health",
+			Title:       "Constipation Pattern Detected",
+			Description: "Over 50% of your bowel movements indicate hard stools",
+			Evidence:    []string{fmt.Sprintf("%d out of %d movements were Bristol types 1-2, indicating constipation", type1and2Count, totalCount)},
+			Priority:    "HIGH",
+			Confidence:  0.8,
+			Actions: []string{
 				"Increase fiber intake with fruits, vegetables, and whole grains",
 				"Drink more water throughout the day",
 				"Consider adding physical activity to your routine",
@@ -131,13 +132,14 @@ func (ie *InsightEngine) analyzeBristolConsistency(movements []bowelmovement.Bow
 		}
 	} else if float64(type6and7Count)/float64(totalCount) > 0.4 {
 		insight = &shared.InsightRecommendation{
-			Type:       "LIFESTYLE",
-			Category:   "Bowel Health",
-			Message:    "Loose Stool Pattern Detected - Over 40% of your bowel movements indicate loose stools",
-			Evidence:   fmt.Sprintf("%d out of %d movements were Bristol types 6-7, indicating loose stools", type6and7Count, totalCount),
-			Priority:   "MEDIUM",
-			Confidence: 0.7,
-			ActionItems: []string{
+			Type:        "LIFESTYLE",
+			Category:    "Bowel Health",
+			Title:       "Loose Stool Pattern Detected",
+			Description: "Over 40% of your bowel movements indicate loose stools",
+			Evidence:    []string{fmt.Sprintf("%d out of %d movements were Bristol types 6-7, indicating loose stools", type6and7Count, totalCount)},
+			Priority:    "MEDIUM",
+			Confidence:  0.7,
+			Actions: []string{
 				"Keep a food diary to identify potential triggers",
 				"Consider reducing dairy, gluten, or spicy foods temporarily",
 				"Stay hydrated to replace lost fluids",
@@ -283,25 +285,14 @@ func (ie *InsightEngine) createCorrelationInsight(corr *analytics.Correlation) *
 	}
 
 	return &shared.InsightRecommendation{
-		ID:          fmt.Sprintf("correlation-%s-%d", corr.Factor, time.Now().Unix()),
-		Type:        "correlation",
-		Priority:    priority,
-		Title:       fmt.Sprintf("Strong Correlation: %s and %s", corr.Factor, corr.Outcome),
+		Type:        "CORRELATION",
+		Category:    "Data",
+		Title:       fmt.Sprintf("Correlation: %s vs %s", corr.Factor, corr.Outcome),
 		Description: corr.Description,
-		Evidence: []string{
-			fmt.Sprintf("Correlation strength: %.3f", corr.Strength),
-			fmt.Sprintf("Confidence level: %.1f%%", corr.Confidence*100),
-			fmt.Sprintf("Based on %d data points", corr.SampleSize),
-		},
-		Actions: ie.generateCorrelationActions(corr),
-		Context: map[string]interface{}{
-			"factor":      corr.Factor,
-			"outcome":     corr.Outcome,
-			"strength":    corr.Strength,
-			"confidence":  corr.Confidence,
-			"sample_size": corr.SampleSize,
-		},
-		CreatedAt: time.Now(),
+		Evidence:    []string{fmt.Sprintf("r=%.2f, confidence %.1f%%, %d samples", corr.Strength, corr.Confidence*100, corr.SampleSize)},
+		Priority:    priority,
+		Confidence:  corr.Confidence,
+		Actions:     ie.generateCorrelationActions(corr),
 	}
 }
 
@@ -438,12 +429,11 @@ func (ie *InsightEngine) generateMedicationInsights(
 
 		if adherencePercent < 80 {
 			insight := &shared.InsightRecommendation{
-				ID:       fmt.Sprintf("medication-adherence-%d", time.Now().Unix()),
-				Type:     "medication",
-				Priority: "HIGH",
-				Title:    "Low Medication Adherence Detected",
-				Description: fmt.Sprintf("Only %.1f%% of your medications are currently active. Medication adherence is important for treatment effectiveness.",
-					adherencePercent),
+				ID:          fmt.Sprintf("medication-adherence-%d", time.Now().Unix()),
+				Type:        "MEDICATION",
+				Category:    "Adherence",
+				Title:       "Low Medication Adherence Detected",
+				Description: fmt.Sprintf("Only %.1f%% of your medications are currently active.", adherencePercent),
 				Evidence: []string{
 					fmt.Sprintf("%d of %d medications are inactive", inactiveCount, len(medications)),
 					"Low adherence may affect treatment outcomes",
