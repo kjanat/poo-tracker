@@ -206,9 +206,7 @@ pnpm install
 # Check database is running
 docker-compose ps
 
-# Reset database
-cd backend
-pnpm prisma migrate reset
+# Backend written in Go - reset via SQL scripts if needed
 ```
 
 #### Development Issues
@@ -225,9 +223,9 @@ pnpm prisma migrate reset
 - Ensure all environment variables are set
 - Try clearing build cache
 
-**Test failures:**
+- **Test failures:**
 
-- Run tests in isolation: `pnpm test -- --run`
+- Run tests in isolation: `pnpm --filter @poo-tracker/frontend run test -- --run`
 - Check test database configuration
 - Make sure test data is properly cleaned up
 

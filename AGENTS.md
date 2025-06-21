@@ -133,21 +133,21 @@ pnpm add -Dw prettier eslint
 
 # Run scripts on specific workspace
 pnpm --filter @poo-tracker/frontend run build
-pnpm dev:ai  # Runs AI service via uv
+make dev-ai  # Runs AI service via uv
 
 # Run scripts on all workspaces
-pnpm --parallel run dev
-pnpm --recursive run build
+make dev
+make build
 ```
 
 **Backend** (Go modules):
 
 ```bash
 # Backend operations (from root or backend directory)
-pnpm dev:backend      # go run -C backend .
-pnpm build:backend    # go build -C backend -o bin/server .
-pnpm test:backend     # go test -C backend ./...
-pnpm lint:backend     # golangci-lint run in backend
+make dev-backend      # go run -C backend .
+make build-backend    # go build -C backend -o bin/server .
+make test-backend     # go test -C backend ./...
+make lint-backend     # golangci-lint run in backend
 
 # Go dependencies (in backend directory)
 cd backend
@@ -255,7 +255,7 @@ uvx mypy main.py          # Type checking
 - PostgreSQL for primary database
 - Redis for caching and session storage
 - MinIO for S3-compatible file storage
-- Workspace commands: `pnpm docker:up`, `pnpm docker:down`
+- Workspace commands: `make docker-up`, `make docker-down`
 
 ---
 
@@ -383,7 +383,7 @@ chore: update dependencies
 
 - **NEVER use `cd` in scripts** - Use `pnpm --filter` instead
 - **Respect package scoping** - `@poo-tracker/frontend`, `@poo-tracker/backend`
-- **Use workspace scripts** - `pnpm dev`, `pnpm build`, `pnpm test`
+- **Use workspace scripts** - `make dev`, `make build`, `make test`
 - **Share common configs** - TypeScript, Prettier, ESLint in root when possible
 - **Python isolation** - Keep Python dependencies in [`ai-service/pyproject.toml`](ai-service/pyproject.toml) and use `uv` for management
 

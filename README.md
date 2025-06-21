@@ -45,11 +45,10 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
    ```bash
    # Start database and supporting services
-   pnpm docker:up
+   make docker-up
 
    # Start all development servers (frontend + Go backend + AI)
-   pnpm dev:frontend & pnpm dev:backend & pnpm dev:ai
-   wait
+   make dev
    ```
 
 5. **Set up the database:**
@@ -57,7 +56,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
    Start the PostgreSQL database using Docker Compose:
 
    ```bash
-   pnpm docker:up
+   make docker-up
    ```
 
    A sample set of credentials for API testing is provided in
@@ -105,35 +104,37 @@ These example files contain **sample credentials only**. Replace them with your 
 
 ### Available Scripts
 
+
 ```bash
 # Development - All Services
-pnpm dev:full         # Start frontend, Go backend and AI service
-pnpm dev:frontend     # Start frontend only
-pnpm dev:backend      # Start Go backend only
-pnpm dev:ai           # Start AI service only
+make dev              # Start frontend, Go backend and AI service
+make dev-frontend     # Start frontend only
+make dev-backend      # Start Go backend only
+make dev-ai           # Start AI service only
 
 # Building
-pnpm build            # Build all projects
-pnpm build:frontend   # Build frontend only
-pnpm build:backend    # Build Go backend only
+make build            # Build all projects
+make build-frontend   # Build frontend only
+make build-backend    # Build Go backend only
 
 # Database Operations
 # (Database migrations handled via SQL scripts in Go backend)
 
 # Docker Services
-pnpm docker:up        # Start PostgreSQL, Redis, MinIO
-pnpm docker:down      # Stop all Docker services
+make docker-up        # Start PostgreSQL, Redis, MinIO
+make docker-down      # Stop all Docker services
 
 # Testing & Quality
-pnpm test             # Run all tests (frontend + backend)
-pnpm test:watch       # Run tests in watch mode
-pnpm lint             # Run linters on all projects
-pnpm lint:fix         # Auto-fix linting issues
-pnpm clean            # Clean all build artifacts
+make test             # Run all tests (frontend + backend)
+pnpm --filter @poo-tracker/frontend run test:watch   # Frontend watch mode
+make lint             # Run linters on all projects
+make lint-fix         # Auto-fix linting issues
+make clean            # Clean all build artifacts
 
 # Code Formatting
-pnpm prettier         # Format all files
-pnpm prettier:watch   # Watch and format on changes
+make format           # Format backend and AI service
+pnpm format:prettier  # Format all files
+pnpm format:prettier:watch   # Watch and format on changes
 ```
 
 ### Project Structure
@@ -310,11 +311,11 @@ table below lists the most relevant options. See
 
 ```bash
 # Build all projects
-pnpm build
+make build
 
 # Or build individually
-pnpm build:frontend
-pnpm build:backend    # Build Go backend only
+make build-frontend
+make build-backend    # Build Go backend only
 
 # AI service
 uv run uvicorn ai_service.main:app

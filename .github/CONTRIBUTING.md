@@ -40,12 +40,10 @@ cp .env.example .env
 # Start development services
 docker-compose up -d
 
-# Run database migrations
-cd backend
-pnpm prisma migrate dev
+# Backend written in Go - no migrations via pnpm
 
 # Start all services
-pnpm dev
+make dev
 ```
 
 ### Project Structure
@@ -257,20 +255,21 @@ test: add unit tests for poo analytics service
 ### Running Tests
 
 ```bash
+
 # Run all tests
-pnpm test
+make test
 
 # Frontend tests only
-cd frontend && pnpm test
+pnpm --filter @poo-tracker/frontend run test
 
 # Backend tests only
-cd backend && pnpm test
+go test -C backend ./...
 
 # AI service tests only
 cd ai-service && python -m pytest
 
 # Watch mode for development
-pnpm test:watch
+pnpm --filter @poo-tracker/frontend run test:watch
 ```
 
 ### Test Requirements

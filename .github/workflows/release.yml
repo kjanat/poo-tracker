@@ -75,12 +75,13 @@ jobs:
 
       - name: 🧪 Run tests
         run: |
-          pnpm run test
+          pnpm --filter @poo-tracker/frontend run test
           cd ai-service && python -m pytest
 
       - name: 🏗️ Build applications
         run: |
-          pnpm run build
+          pnpm --filter @poo-tracker/frontend run build
+          go build -C backend -o bin/server .
 
       - name: 📦 Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -199,8 +200,8 @@ jobs:
             git clone https://github.com/${{ github.repository }}.git
             cd poo-tracker
             pnpm install
-            pnpm run docker:up
-            pnpm run dev
+            make docker-up
+            make dev
             ```
 
             ## 📖 Documentation

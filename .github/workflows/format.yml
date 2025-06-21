@@ -84,8 +84,8 @@ jobs:
 
       - name: 🎨 Format TypeScript/JavaScript
         run: |
-          pnpm lint:fix:frontend || true
-          pnpm lint:fix:backend || true
+          pnpm --filter @poo-tracker/frontend run lint:fix || true
+          golangci-lint run ./backend/... --fix || true
 
       - name: 🎨 Format Python
         run: |
@@ -184,10 +184,10 @@ jobs:
           echo "✅ All done."
 
       - name: 🧹 Lint Frontend
-        run: pnpm lint:frontend
+        run: pnpm --filter @poo-tracker/frontend run lint
 
       - name: 🧹 Lint Backend
-        run: pnpm lint:backend
+        run: golangci-lint run ./backend/...
 
       - name: 🧹 Lint Python
         run: |
