@@ -1,6 +1,7 @@
 package aggregator
 
 import (
+	"math"
 	"sort"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/kjanat/poo-tracker/backend/internal/domain/medication"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics"
+	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/shared"
 )
 
 // AggregateBowelMovements calculates statistics for bowel movements
@@ -192,26 +194,153 @@ func (da *DataAggregator) AggregateMedications(medications []*medication.Medicat
 
 // Helper methods for score calculations
 func (da *DataAggregator) calculateConsistencyScore(movements []bowelmovement.BowelMovement) float64 {
-	// Implementation for calculating consistency score
-	return 0.0
+	if len(movements) == 0 {
+		return 0
+	}
+
+	sort.Slice(movements, func(i, j int) bool { return movements[i].RecordedAt.Before(movements[j].RecordedAt) })
+
+	freq := make(map[int]int)
+	changes := 0
+	for i, m := range movements {
+		freq[m.BristolType]++
+		if i > 0 && m.BristolType != movements[i-1].BristolType {
+			changes++
+		}
+	}
+
+	healthyCount := 0
+	for _, t := range []int{3, 4, 5} {
+		healthyCount += freq[t]
+	}
+
+	healthRatio := float64(healthyCount) / float64(len(movements))
+	changeRatio := 0.0
+	if len(movements) > 1 {
+		changeRatio = float64(changes) / float64(len(movements)-1)
+	}
+
+	score := healthRatio * (1 - changeRatio)
+	if score < 0 {
+		score = 0
+	} else if score > 1 {
+		score = 1
+	}
+
+	return shared.RoundToDecimalPlaces(score, 2)
 }
 
 func (da *DataAggregator) calculateRegularityScore(movements []bowelmovement.BowelMovement) float64 {
-	// Implementation for calculating regularity score
-	return 0.0
+	if len(movements) < 2 {
+		return 0
+	}
+
+	sort.Slice(movements, func(i, j int) bool { return movements[i].RecordedAt.Before(movements[j].RecordedAt) })
+
+	var totalVariance float64
+	last := movements[0].RecordedAt
+	for i := 1; i < len(movements); i++ {
+		interval := movements[i].RecordedAt.Sub(last).Hours()
+		diff := interval - 24
+		totalVariance += diff * diff
+		last = movements[i].RecordedAt
+	}
+
+	avgVariance := totalVariance / float64(len(movements)-1)
+	maxVariance := 24.0
+	score := 1 - (avgVariance / (maxVariance * maxVariance))
+	if score < 0 {
+		score = 0
+	} else if score > 1 {
+		score = 1
+	}
+	return shared.RoundToDecimalPlaces(score, 2)
 }
 
 func (da *DataAggregator) calculateNutritionScore(meals []meal.Meal) float64 {
-	// Implementation for calculating nutrition score
-	return 0.0
+	if len(meals) == 0 {
+		return 0
+	}
+
+	totalCalories := 0
+	fiberRich := 0
+	for _, m := range meals {
+		totalCalories += m.Calories
+		if m.FiberRich {
+			fiberRich++
+		}
+	}
+
+	avgCalories := float64(totalCalories) / float64(len(meals))
+	ideal := 600.0
+	calorieScore := 1 - math.Abs(avgCalories-ideal)/ideal
+	if calorieScore < 0 {
+		calorieScore = 0
+	}
+	fiberScore := float64(fiberRich) / float64(len(meals))
+	score := 0.7*calorieScore + 0.3*fiberScore
+	if score < 0 {
+		score = 0
+	} else if score > 1 {
+		score = 1
+	}
+	return shared.RoundToDecimalPlaces(score, 2)
 }
 
 func (da *DataAggregator) calculateComplianceScore(medications []*medication.Medication) float64 {
-	// Implementation for calculating medication compliance score
-	return 0.0
+	if len(medications) == 0 {
+		return 0
+	}
+
+	now := time.Now()
+	adhered := 0
+	for _, med := range medications {
+		if med == nil || !med.IsActive {
+			continue
+		}
+		if med.TakenAt == nil || now.Sub(*med.TakenAt).Hours() <= 36 {
+			adhered++
+		}
+	}
+
+	score := float64(adhered) / float64(len(medications))
+	if score < 0 {
+		score = 0
+	} else if score > 1 {
+		score = 1
+	}
+
+	return shared.RoundToDecimalPlaces(score, 2)
 }
 
 func (da *DataAggregator) calculateEffectivenessScores(medications []*medication.Medication) map[string]float64 {
-	// Implementation for calculating medication effectiveness scores
-	return make(map[string]float64)
+	scores := make(map[string]float64)
+	if len(medications) == 0 {
+		return scores
+	}
+
+	now := time.Now()
+	total := 0.0
+	count := 0
+	for _, med := range medications {
+		if med == nil {
+			continue
+		}
+		score := 0.0
+		if med.IsActive {
+			score = 0.7
+			if med.TakenAt != nil && now.Sub(*med.TakenAt).Hours() <= 36 {
+				score = 1.0
+			}
+		}
+		scores[med.Name] = shared.RoundToDecimalPlaces(score, 2)
+		total += score
+		count++
+	}
+
+	if count > 0 {
+		scores["overall"] = shared.RoundToDecimalPlaces(total/float64(count), 2)
+	}
+
+	return scores
 }
