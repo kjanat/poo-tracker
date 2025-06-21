@@ -7,21 +7,22 @@ import (
 	"github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
+	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/aggregator"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/shared"
 )
 
 // AnalyzeEatingPatterns identifies patterns in eating habits and their potential impacts
 func (ta *TrendAnalyzer) AnalyzeEatingPatterns(meals []meal.Meal) *shared.EatingPattern {
-	// TODO: Remove this early return once methods are implemented
+	pattern := &shared.EatingPattern{}
+
 	if len(meals) == 0 {
-		return &shared.EatingPattern{}
+		return pattern
 	}
 
-	pattern := &shared.EatingPattern{
-		MealTimings:        []shared.MealTiming{}, // TODO: Implement analyzeMealTimings
-		CommonIngredients:  []string{},            // TODO: Implement identifyCommonIngredients
-		ProblemIngredients: []string{},            // TODO: Implement identifyProblemIngredients
-	}
+	pattern.MealTimings = ta.analyzeMealTimings(meals)
+	pattern.CommonIngredients = ta.identifyCommonIngredients(meals)
+	pattern.ProblemIngredients = ta.identifyProblemIngredients(meals)
+
 	return pattern
 }
 
@@ -80,6 +81,62 @@ func (ta *TrendAnalyzer) analyzeMealTimings(meals []meal.Meal) []shared.MealTimi
 	})
 
 	return timings
+}
+
+// identifyCommonIngredients returns a sorted list of frequently occurring meal
+// attributes. The current model doesn't store detailed ingredient lists, so we
+// approximate ingredients using boolean flags and characteristics such as
+// Dairy, Gluten, FiberRich and SpicyLevel.
+func (ta *TrendAnalyzer) identifyCommonIngredients(meals []meal.Meal) []string {
+	if len(meals) == 0 {
+		return []string{}
+	}
+
+	counts := make(map[string]int)
+	for _, m := range meals {
+		if m.Dairy {
+			counts["dairy"]++
+		}
+		if m.Gluten {
+			counts["gluten"]++
+		}
+		if m.FiberRich {
+			counts["fiber"]++
+		}
+		if m.SpicyLevel != nil && *m.SpicyLevel > aggregator.SpicyThreshold {
+			counts["spicy"]++
+		}
+	}
+
+	type pair struct {
+		name  string
+		count int
+	}
+	pairs := make([]pair, 0, len(counts))
+	for k, v := range counts {
+		pairs = append(pairs, pair{name: k, count: v})
+	}
+	sort.Slice(pairs, func(i, j int) bool {
+		if pairs[i].count == pairs[j].count {
+			return pairs[i].name < pairs[j].name
+		}
+		return pairs[i].count > pairs[j].count
+	})
+
+	result := make([]string, 0, len(pairs))
+	for _, p := range pairs {
+		result = append(result, p.name)
+	}
+
+	return result
+}
+
+// identifyProblemIngredients attempts to determine ingredients that may cause
+// issues for the user. This requires correlation with symptoms which is not yet
+// implemented, so the function currently returns an empty slice.
+func (ta *TrendAnalyzer) identifyProblemIngredients(meals []meal.Meal) []string {
+	// TODO: implement ingredient-symptom correlation analysis
+	return []string{}
 }
 
 func (ta *TrendAnalyzer) identifyCommonSymptomMap(symptoms []symptom.Symptom) map[string]int {
