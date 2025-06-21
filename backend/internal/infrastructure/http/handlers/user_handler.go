@@ -150,14 +150,17 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 	// Get user ID from JWT context (will be set by auth middleware)
 	userID, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "User not authenticated",
-		})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+	userIDStr, ok := userID.(string)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 		return
 	}
 
 	// Get user by ID
-	userEntity, err := h.userService.GetByID(c.Request.Context(), userID.(string))
+	userEntity, err := h.userService.GetByID(c.Request.Context(), userIDStr)
 	if err != nil {
 		switch err {
 		case user.ErrUserNotFound:
@@ -194,9 +197,12 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	// Get user ID from JWT context
 	userID, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "User not authenticated",
-		})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+	userIDStr, ok := userID.(string)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 		return
 	}
 
@@ -213,7 +219,7 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	input := req.ToUpdateUserInput()
 
 	// Update user
-	userEntity, err := h.userService.Update(c.Request.Context(), userID.(string), input)
+	userEntity, err := h.userService.Update(c.Request.Context(), userIDStr, input)
 	if err != nil {
 		switch err {
 		case user.ErrUserNotFound:
@@ -261,9 +267,12 @@ func (h *UserHandler) ChangePassword(c *gin.Context) {
 	// Get user ID from JWT context
 	userID, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "User not authenticated",
-		})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+	userIDStr, ok := userID.(string)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 		return
 	}
 
@@ -283,7 +292,7 @@ func (h *UserHandler) ChangePassword(c *gin.Context) {
 	}
 
 	// Change password
-	err := h.userService.ChangePassword(c.Request.Context(), userID.(string), input)
+	err := h.userService.ChangePassword(c.Request.Context(), userIDStr, input)
 	if err != nil {
 		switch err {
 		case user.ErrUserNotFound:
@@ -325,14 +334,17 @@ func (h *UserHandler) GetSettings(c *gin.Context) {
 	// Get user ID from JWT context
 	userID, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "User not authenticated",
-		})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+	userIDStr, ok := userID.(string)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 		return
 	}
 
 	// Get user settings
-	settings, err := h.userService.GetSettings(c.Request.Context(), userID.(string))
+	settings, err := h.userService.GetSettings(c.Request.Context(), userIDStr)
 	if err != nil {
 		switch err {
 		case user.ErrUserSettingsNotFound:
@@ -368,9 +380,12 @@ func (h *UserHandler) UpdateSettings(c *gin.Context) {
 	// Get user ID from JWT context
 	userID, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "User not authenticated",
-		})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+	userIDStr, ok := userID.(string)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 		return
 	}
 
@@ -387,7 +402,7 @@ func (h *UserHandler) UpdateSettings(c *gin.Context) {
 	input := req.ToUpdateSettingsInput()
 
 	// Update settings
-	settings, err := h.userService.UpdateSettings(c.Request.Context(), userID.(string), input)
+	settings, err := h.userService.UpdateSettings(c.Request.Context(), userIDStr, input)
 	if err != nil {
 		switch err {
 		case user.ErrUserNotFound:

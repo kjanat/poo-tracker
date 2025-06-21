@@ -293,7 +293,7 @@ func (ie *InsightEngine) createCorrelationInsight(corr *analytics.Correlation) *
 			fmt.Sprintf("Confidence level: %.1f%%", corr.Confidence*100),
 			fmt.Sprintf("Based on %d data points", corr.SampleSize),
 		},
-		Actions: ie.generateCorrelationActions(corr),
+		ActionSteps: ie.generateCorrelationActions(corr),
 		Context: map[string]interface{}{
 			"factor":      corr.Factor,
 			"outcome":     corr.Outcome,
@@ -449,7 +449,7 @@ func (ie *InsightEngine) generateMedicationInsights(
 					"Low adherence may affect treatment outcomes",
 					"Regular medication use is often necessary for optimal results",
 				},
-				Actions: []string{
+				ActionSteps: []string{
 					"Review inactive medications with healthcare provider",
 					"Set medication reminders if forgetfulness is an issue",
 					"Discuss any side effects or concerns about medications",
@@ -477,7 +477,7 @@ func (ie *InsightEngine) convertInsightToRecommendation(insight *shared.InsightR
 		Priority:    insight.Priority,
 		Title:       insight.Title,
 		Description: insight.Description,
-		ActionSteps: insight.Actions,
+		ActionSteps: insight.ActionSteps,
 		Confidence:  0.8, // Default confidence for high-priority insights
 		Evidence:    insight.Evidence,
 	}

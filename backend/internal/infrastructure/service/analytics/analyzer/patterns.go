@@ -7,6 +7,7 @@ import (
 	"github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
+	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/aggregator"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/shared"
 )
 
@@ -83,17 +84,17 @@ func (ta *TrendAnalyzer) analyzeMealTimings(meals []meal.Meal) []shared.MealTimi
 }
 
 func (ta *TrendAnalyzer) identifyCommonSymptomMap(symptoms []symptom.Symptom) map[string]int {
-    if symptoms == nil {
-        return make(map[string]int)
-    }
+	if symptoms == nil {
+		return make(map[string]int)
+	}
 
-    // Convert symptom list to frequency map
-    freq := make(map[string]int)
-    for _, s := range symptoms {
-        symptomType := s.Type.String()
-        freq[symptomType]++
-    }
-    return freq
+	// Convert symptom list to frequency map
+	freq := make(map[string]int)
+	for _, s := range symptoms {
+		symptomType := s.Type.String()
+		freq[symptomType]++
+	}
+	return freq
 }
 
 func (ta *TrendAnalyzer) analyzeBowelFrequency(movements []bowelmovement.BowelMovement) float64 {
@@ -176,7 +177,58 @@ func (ta *TrendAnalyzer) analyzeSymptomSeverity(symptoms []symptom.Symptom) map[
 }
 
 func (ta *TrendAnalyzer) analyzeDietaryHabits(meals []meal.Meal) []shared.DietaryHabit {
-	return []shared.DietaryHabit{}
+	habits := []shared.DietaryHabit{}
+	if len(meals) == 0 {
+		return habits
+	}
+
+	spicy, dairy, gluten, fiber := 0, 0, 0, 0
+	for _, m := range meals {
+		if m.SpicyLevel != nil && *m.SpicyLevel >= aggregator.SpicyThreshold {
+			spicy++
+		}
+		if m.Dairy {
+			dairy++
+		}
+		if m.Gluten {
+			gluten++
+		}
+		if m.FiberRich {
+			fiber++
+		}
+	}
+
+	total := len(meals)
+	if spicy > 0 {
+		habits = append(habits, shared.DietaryHabit{
+			Description: "Frequent spicy meals",
+			Frequency:   spicy,
+			Impact:      float64(spicy) / float64(total),
+		})
+	}
+	if dairy > 0 {
+		habits = append(habits, shared.DietaryHabit{
+			Description: "Regular dairy consumption",
+			Frequency:   dairy,
+			Impact:      float64(dairy) / float64(total),
+		})
+	}
+	if gluten > 0 {
+		habits = append(habits, shared.DietaryHabit{
+			Description: "Regular gluten consumption",
+			Frequency:   gluten,
+			Impact:      float64(gluten) / float64(total),
+		})
+	}
+	if fiber > 0 {
+		habits = append(habits, shared.DietaryHabit{
+			Description: "Fiber rich meals",
+			Frequency:   fiber,
+			Impact:      float64(fiber) / float64(total),
+		})
+	}
+
+	return habits
 }
 
 func (ta *TrendAnalyzer) analyzeBowelRegularity(movements []bowelmovement.BowelMovement) float64 {
@@ -184,5 +236,41 @@ func (ta *TrendAnalyzer) analyzeBowelRegularity(movements []bowelmovement.BowelM
 }
 
 func (ta *TrendAnalyzer) analyzeSymptomTriggers(symptoms []symptom.Symptom, meals []meal.Meal) []shared.SymptomTrigger {
-	return []shared.SymptomTrigger{}
+	triggers := []shared.SymptomTrigger{}
+	if len(symptoms) == 0 || len(meals) == 0 {
+		return triggers
+	}
+
+	counts := map[string]int{}
+	total := 0
+	for _, s := range symptoms {
+		for _, m := range meals {
+			diff := s.CreatedAt.Sub(m.MealTime)
+			if diff < 0 {
+				diff = -diff
+			}
+			if diff <= 4*time.Hour {
+				if m.Dairy {
+					counts["dairy"]++
+				}
+				if m.Gluten {
+					counts["gluten"]++
+				}
+				if m.SpicyLevel != nil && *m.SpicyLevel >= aggregator.SpicyThreshold {
+					counts["spicy"]++
+				}
+				total++
+			}
+		}
+	}
+
+	for k, c := range counts {
+		triggers = append(triggers, shared.SymptomTrigger{
+			TriggerType: "food",
+			Ingredient:  k,
+			Confidence:  float64(c) / float64(total),
+		})
+	}
+
+	return triggers
 }

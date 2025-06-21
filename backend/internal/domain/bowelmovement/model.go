@@ -116,7 +116,10 @@ type BowelMovementDetailsUpdate struct {
 }
 
 // NewBowelMovement creates a new BowelMovement with sensible defaults.
-func NewBowelMovement(userID string, bristolType int) BowelMovement {
+func NewBowelMovement(userID string, bristolType int) (BowelMovement, error) {
+	if bristolType < 1 || bristolType > 7 {
+		return BowelMovement{}, ErrInvalidBristolType
+	}
 	now := time.Now()
 	return BowelMovement{
 		UserID:       userID,
@@ -128,7 +131,7 @@ func NewBowelMovement(userID string, bristolType int) BowelMovement {
 		Strain:       1, // Default: minimal strain
 		Satisfaction: 5, // Default: neutral satisfaction
 		Floaters:     false,
-	}
+	}, nil
 }
 
 // NewBowelMovementDetails creates a new BowelMovementDetails with defaults.

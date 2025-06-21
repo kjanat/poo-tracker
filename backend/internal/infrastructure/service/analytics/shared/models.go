@@ -39,7 +39,10 @@ type CorrelationPair = analytics.Correlation
 type TrendLine = analytics.DataTrend
 type PatternMatch = analytics.Insight
 type HealthMetric = analytics.ScoreFactor
-type InsightRecommendation = analytics.Insight
+
+// InsightRecommendation represents a personalized recommendation.
+// It mirrors analytics.Recommendation for use across infrastructure packages.
+type InsightRecommendation = analytics.Recommendation
 
 // StatisticalSummary represents basic summary statistics for a data set.
 type StatisticalSummary struct {

@@ -63,18 +63,22 @@ func (a *App) createBowelMovement(c *gin.Context) {
 	}
 
 	// Start with a new bowel movement with defaults
-	bm := bm.NewBowelMovement(req.UserID, req.BristolType)
+	movement, err := bm.NewBowelMovement(req.UserID, req.BristolType)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	// Apply optional fields
-	applyOptionalFields(&bm, &req)
+	applyOptionalFields(&movement, &req)
 
 	// Validate the complete bowel movement
-	if validationErrors := validation.ValidateBowelMovement(bm); validationErrors.HasErrors() {
+	if validationErrors := validation.ValidateBowelMovement(movement); validationErrors.HasErrors() {
 		c.JSON(http.StatusBadRequest, gin.H{"error": validationErrors.Error()})
 		return
 	}
 
-	created, err := a.repo.Create(c.Request.Context(), bm)
+	created, err := a.repo.Create(c.Request.Context(), movement)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

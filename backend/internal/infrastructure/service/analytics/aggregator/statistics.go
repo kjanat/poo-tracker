@@ -1,6 +1,7 @@
 package aggregator
 
 import (
+	"math"
 	"sort"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/kjanat/poo-tracker/backend/internal/domain/medication"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics"
+	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/shared"
 )
 
 // AggregateBowelMovements calculates statistics for bowel movements
@@ -192,26 +194,104 @@ func (da *DataAggregator) AggregateMedications(medications []*medication.Medicat
 
 // Helper methods for score calculations
 func (da *DataAggregator) calculateConsistencyScore(movements []bowelmovement.BowelMovement) float64 {
-	// Implementation for calculating consistency score
-	return 0.0
+	if len(movements) == 0 {
+		return 0
+	}
+
+	var diffSum float64
+	for _, m := range movements {
+		diff := math.Abs(float64(m.BristolType) - 4)
+		diffSum += diff
+	}
+
+	avgDiff := diffSum / float64(len(movements))
+	score := 1 - (avgDiff / 3)
+	if score < 0 {
+		score = 0
+	}
+	if score > 1 {
+		score = 1
+	}
+	return shared.RoundToDecimalPlaces(score, 2)
 }
 
 func (da *DataAggregator) calculateRegularityScore(movements []bowelmovement.BowelMovement) float64 {
-	// Implementation for calculating regularity score
-	return 0.0
+	if len(movements) < 2 {
+		return 0
+	}
+
+	sort.Slice(movements, func(i, j int) bool { return movements[i].RecordedAt.Before(movements[j].RecordedAt) })
+
+	intervals := make([]float64, 0, len(movements)-1)
+	for i := 1; i < len(movements); i++ {
+		hours := movements[i].RecordedAt.Sub(movements[i-1].RecordedAt).Hours()
+		intervals = append(intervals, hours)
+	}
+
+	stats := shared.CalculateStatistics(intervals)
+	if stats.Mean == 0 {
+		return 0
+	}
+
+	score := 1 - (stats.StdDev / stats.Mean)
+	if score < 0 {
+		score = 0
+	}
+	if score > 1 {
+		score = 1
+	}
+	return shared.RoundToDecimalPlaces(score, 2)
 }
 
 func (da *DataAggregator) calculateNutritionScore(meals []meal.Meal) float64 {
-	// Implementation for calculating nutrition score
-	return 0.0
+	if len(meals) == 0 {
+		return 0
+	}
+
+	fiberCount := 0
+	healthyCalories := 0
+	for _, m := range meals {
+		if m.FiberRich {
+			fiberCount++
+		}
+		if m.Calories <= HealthyMaxCalories {
+			healthyCalories++
+		}
+	}
+
+	fiberRatio := float64(fiberCount) / float64(len(meals))
+	healthyRatio := float64(healthyCalories) / float64(len(meals))
+
+	score := (fiberRatio*0.6 + healthyRatio*0.4) * 100
+	return shared.RoundToDecimalPlaces(score, 2)
 }
 
 func (da *DataAggregator) calculateComplianceScore(medications []*medication.Medication) float64 {
-	// Implementation for calculating medication compliance score
-	return 0.0
+	if len(medications) == 0 {
+		return 0
+	}
+
+	active := 0
+	for _, m := range medications {
+		if m.IsActive {
+			active++
+		}
+	}
+	return shared.RoundToDecimalPlaces(float64(active)/float64(len(medications))*100, 2)
 }
 
 func (da *DataAggregator) calculateEffectivenessScores(medications []*medication.Medication) map[string]float64 {
-	// Implementation for calculating medication effectiveness scores
-	return make(map[string]float64)
+	scores := make(map[string]float64)
+	if len(medications) == 0 {
+		return scores
+	}
+
+	active := 0
+	for _, m := range medications {
+		if m.IsActive {
+			active++
+		}
+	}
+	scores["overall"] = shared.RoundToDecimalPlaces(float64(active)/float64(len(medications))*100, 2)
+	return scores
 }
