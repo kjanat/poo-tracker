@@ -11,8 +11,11 @@ func TestAllCorrelationTypes(t *testing.T) {
 	for _, ct := range types {
 		m[ct] = true
 	}
-	if !m[CorrelationPositive] || !m[CorrelationNegative] || !m[CorrelationNeutral] || !m[CorrelationUnknown] {
-		t.Error("missing expected correlation types")
+	expectedTypes := []CorrelationType{CorrelationPositive, CorrelationNegative, CorrelationNeutral, CorrelationUnknown}
+	for _, expected := range expectedTypes {
+		if !m[expected] {
+			t.Errorf("missing expected correlation type: %s", expected)
+		}
 	}
 }
 
