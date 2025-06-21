@@ -71,13 +71,7 @@ type HealthMetrics struct {
 }
 
 // Correlation represents a correlation between two factors
-type Correlation struct {
-	Factor1     string    `json:"factor1"`
-	Factor2     string    `json:"factor2"`
-	Strength    float64   `json:"strength"`   // -1 to 1
-	Confidence  float64   `json:"confidence"` // 0 to 1
-	LastUpdated time.Time `json:"lastUpdated"`
-}
+type Correlation = analytics.Correlation
 
 // TriggerAnalysis represents analysis of triggering factors
 type TriggerAnalysis struct {
@@ -106,23 +100,7 @@ type HealthScore struct {
 }
 
 // HealthInsights represents health insights and recommendations
-type HealthInsights struct {
-	Period          string   `json:"period"`
-	KeyFindings     []string `json:"keyFindings"`
-	RiskFactors     []string `json:"riskFactors"`
-	Recommendations []string `json:"recommendations"`
-}
+type HealthInsights = analytics.HealthInsights
 
 // Recommendation represents a health recommendation
-type Recommendation struct {
-	ID             string     `json:"id"`
-	Type           string     `json:"type"`
-	Title          string     `json:"title"`
-	Description    string     `json:"description"`
-	Priority       string     `json:"priority"`
-	Evidence       []string   `json:"evidence"`
-	Actions        []string   `json:"actions"`
-	ExpectedImpact string     `json:"expectedImpact"`
-	CreatedAt      time.Time  `json:"createdAt"`
-	ExpiresAt      *time.Time `json:"expiresAt,omitempty"`
-}
+type Recommendation = analytics.Recommendation

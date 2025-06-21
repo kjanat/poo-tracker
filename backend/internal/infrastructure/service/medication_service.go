@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"sort"
 	"time"
 
 	"github.com/google/uuid"
@@ -201,15 +202,10 @@ func (s *MedicationService) Update(ctx context.Context, id string, input *medica
 	}
 
 	// Return updated medication
-	updated, err := s.repo.GetByID(ctx, id)
-	if err != nil {
-		// If we can't get the updated record, return the original with basic updates applied
-		if input.Name != nil {
-			existing.Name = *input.Name
-		}
-		existing.UpdatedAt = time.Now()
-		return existing, nil
-	}
+    updated, err := s.repo.GetByID(ctx, id)
+    if err != nil {
+        return nil, fmt.Errorf("failed to retrieve updated medication: %w", err)
+    }
 
 	return updated, nil
 }
