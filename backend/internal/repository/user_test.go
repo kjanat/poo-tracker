@@ -12,7 +12,7 @@ func TestMemoryUserRepository(t *testing.T) {
 	repo := NewMemoryUserRepository()
 
 	t.Run("Create and Get User", func(t *testing.T) {
-		user := &user.User{
+		usr := &user.User{
 			ID:        "1",
 			Email:     "test@example.com",
 			Name:      "Test User",
@@ -20,7 +20,7 @@ func TestMemoryUserRepository(t *testing.T) {
 			UpdatedAt: time.Now(),
 		}
 
-		if err := repo.CreateUser(user); err != nil {
+		if err := repo.CreateUser(usr); err != nil {
 			t.Fatalf("CreateUser failed: %v", err)
 		}
 
@@ -37,7 +37,7 @@ func TestMemoryUserRepository(t *testing.T) {
 	})
 
 	t.Run("Get User by Email", func(t *testing.T) {
-		user := &user.User{
+		usr := &user.User{
 			ID:        "2",
 			Email:     "email@example.com",
 			Name:      "Email User",
@@ -45,7 +45,7 @@ func TestMemoryUserRepository(t *testing.T) {
 			UpdatedAt: time.Now(),
 		}
 
-		if err := repo.CreateUser(user); err != nil {
+		if err := repo.CreateUser(usr); err != nil {
 			t.Fatalf("CreateUser failed: %v", err)
 		}
 
@@ -108,7 +108,7 @@ func TestMemoryUserRepository(t *testing.T) {
 	})
 
 	t.Run("Update User", func(t *testing.T) {
-		user := &user.User{
+		usr := &user.User{
 			ID:        "5",
 			Email:     "update@example.com",
 			Name:      "Original Name",
@@ -116,15 +116,15 @@ func TestMemoryUserRepository(t *testing.T) {
 			UpdatedAt: time.Now(),
 		}
 
-		if err := repo.CreateUser(user); err != nil {
+		if err := repo.CreateUser(usr); err != nil {
 			t.Fatalf("CreateUser failed: %v", err)
 		}
 
 		// Update user
-		user.Name = "Updated Name"
-		user.UpdatedAt = time.Now()
+		usr.Name = "Updated Name"
+		usr.UpdatedAt = time.Now()
 
-		if err := repo.UpdateUser(user); err != nil {
+		if err := repo.UpdateUser(usr); err != nil {
 			t.Fatalf("UpdateUser failed: %v", err)
 		}
 
@@ -138,20 +138,20 @@ func TestMemoryUserRepository(t *testing.T) {
 	})
 
 	t.Run("Update Non-existent User", func(t *testing.T) {
-		user := &user.User{
+		usr := &user.User{
 			ID:    "nonexistent",
 			Email: "test@example.com",
 			Name:  "Test",
 		}
 
-		err := repo.UpdateUser(user)
+		err := repo.UpdateUser(usr)
 		if err != ErrNotFound {
 			t.Errorf("Expected ErrNotFound, got %v", err)
 		}
 	})
 
 	t.Run("Delete User", func(t *testing.T) {
-		user := &user.User{
+		usr := &user.User{
 			ID:        "6",
 			Email:     "delete@example.com",
 			Name:      "Delete User",
@@ -159,7 +159,7 @@ func TestMemoryUserRepository(t *testing.T) {
 			UpdatedAt: time.Now(),
 		}
 
-		if err := repo.CreateUser(user); err != nil {
+		if err := repo.CreateUser(usr); err != nil {
 			t.Fatalf("CreateUser failed: %v", err)
 		}
 
@@ -202,7 +202,7 @@ func TestMemoryUserRepository(t *testing.T) {
 	})
 
 	t.Run("User Auth Operations", func(t *testing.T) {
-		user := &user.User{
+		usr := &user.User{
 			ID:        "7",
 			Email:     "auth@example.com",
 			Name:      "Auth User",
@@ -219,7 +219,7 @@ func TestMemoryUserRepository(t *testing.T) {
 			UpdatedAt:    time.Now(),
 		}
 
-		if err := repo.CreateUser(user); err != nil {
+		if err := repo.CreateUser(usr); err != nil {
 			t.Fatalf("CreateUser failed: %v", err)
 		}
 
@@ -269,7 +269,7 @@ func TestMemoryUserRepository(t *testing.T) {
 			go func(id int) {
 				defer wg.Done()
 
-				user := &user.User{
+				usr := &user.User{
 					ID:        string(rune('a' + id)),
 					Email:     "concurrent" + string(rune('0'+id)) + "@example.com",
 					Name:      "Concurrent User " + string(rune('0'+id)),
@@ -277,19 +277,19 @@ func TestMemoryUserRepository(t *testing.T) {
 					UpdatedAt: time.Now(),
 				}
 
-				if err := repo.CreateUser(user); err != nil {
+				if err := repo.CreateUser(usr); err != nil {
 					t.Errorf("Concurrent CreateUser failed: %v", err)
 					return
 				}
 
 				// Read the user back
-				got, err := repo.GetUserByID(user.ID)
+				got, err := repo.GetUserByID(usr.ID)
 				if err != nil {
 					t.Errorf("Concurrent GetUserByID failed: %v", err)
 					return
 				}
-				if got.Email != user.Email {
-					t.Errorf("Concurrent read mismatch: expected %s, got %s", user.Email, got.Email)
+				if got.Email != usr.Email {
+					t.Errorf("Concurrent read mismatch: expected %s, got %s", usr.Email, got.Email)
 				}
 			}(i)
 		}
