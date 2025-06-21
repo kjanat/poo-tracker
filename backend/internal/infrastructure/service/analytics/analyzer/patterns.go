@@ -82,11 +82,15 @@ func (ta *TrendAnalyzer) analyzeMealTimings(meals []meal.Meal) []shared.MealTimi
 }
 
 func (ta *TrendAnalyzer) identifyCommonSymptomMap(symptoms []symptom.Symptom) map[string]int {
-	// Convert symptom list to frequency map
-	freq := make(map[string]int)
-	for _, s := range symptoms {
-		symptomType := s.Type.String()
-		freq[symptomType]++
-	}
-	return freq
+    if symptoms == nil {
+        return make(map[string]int)
+    }
+
+    // Convert symptom list to frequency map
+    freq := make(map[string]int)
+    for _, s := range symptoms {
+        symptomType := s.Type.String()
+        freq[symptomType]++
+    }
+    return freq
 }
