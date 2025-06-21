@@ -247,8 +247,8 @@ func (da *DataAggregator) GroupMealsByType(meals []meal.Meal) map[string][]meal.
 //
 // This function is a simplified metric and does not track individual dose adherence.
 // It merely reflects how many medications are marked active versus the total count.
-func (da *DataAggregator) GetActiveMedicationPercentage(medications []medication.Medication, days int) float64 {
-	if len(medications) == 0 || days == 0 {
+func (da *DataAggregator) GetActiveMedicationPercentage(medications []medication.Medication) float64 {
+	if len(medications) == 0 {
 		return 0
 	}
 
