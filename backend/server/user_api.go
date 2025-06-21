@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kjanat/poo-tracker/backend/internal/domain/user"
+	userDto "github.com/kjanat/poo-tracker/backend/internal/infrastructure/http/dto/user"
 	"github.com/kjanat/poo-tracker/backend/internal/middleware"
 	"github.com/kjanat/poo-tracker/backend/internal/service"
 	"github.com/kjanat/poo-tracker/backend/internal/validation"
@@ -24,7 +24,7 @@ func NewUserAPIHandlers(authService service.AuthService) *UserAPIHandlers {
 }
 
 func (h *UserAPIHandlers) RegisterHandler(w http.ResponseWriter, r *http.Request) {
-	var req user.CreateUserRequest
+	var req userDto.CreateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "invalid request format", http.StatusBadRequest)
 		return
@@ -57,7 +57,7 @@ func (h *UserAPIHandlers) RegisterHandler(w http.ResponseWriter, r *http.Request
 
 	// Calculate actual token expiration time (24 hours from now)
 	expiresAt := time.Now().Add(24 * time.Hour).Unix()
-	resp := user.LoginResponse{User: *user, Token: token, ExpiresAt: expiresAt}
+	resp := userDto.LoginResponse{User: *user, Token: token, ExpiresAt: expiresAt}
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(resp); err != nil {
@@ -67,7 +67,7 @@ func (h *UserAPIHandlers) RegisterHandler(w http.ResponseWriter, r *http.Request
 }
 
 func (h *UserAPIHandlers) LoginHandler(w http.ResponseWriter, r *http.Request) {
-	var req user.LoginRequest
+	var req userDto.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "invalid request format", http.StatusBadRequest)
 		return
@@ -89,7 +89,7 @@ func (h *UserAPIHandlers) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Calculate actual token expiration time
 	expiresAt := time.Now().Add(24 * time.Hour).Unix()
-	resp := user.LoginResponse{User: *user, Token: token, ExpiresAt: expiresAt}
+	resp := userDto.LoginResponse{User: *user, Token: token, ExpiresAt: expiresAt}
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(resp); err != nil {

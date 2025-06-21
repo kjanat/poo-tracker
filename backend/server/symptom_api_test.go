@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/shared"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 )
@@ -344,7 +345,7 @@ func TestSymptomAPI_GetSymptomsByCategory(t *testing.T) {
 	repo := repository.NewMemorySymptomRepository()
 	handler := NewSymptomHandler(repo)
 
-	category := symptom.SymptomCategoryDigestive
+	category := shared.SymptomCategoryDigestive
 
 	symptom1 := symptom.NewSymptom("test-user", "Digestive")
 	symptom1.Category = &category

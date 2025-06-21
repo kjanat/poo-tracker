@@ -3,7 +3,6 @@ package validation
 import (
 	bm "github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
-	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
 )
 
 // ValidateBowelMovement validates a complete BowelMovement model

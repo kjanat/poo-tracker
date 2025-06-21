@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/kjanat/poo-tracker/backend/internal/domain/medication"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/shared"
 )
 
 // MedicationRepository defines the interface for medication data operations
@@ -19,7 +20,7 @@ type MedicationRepository interface {
 	Update(ctx context.Context, id string, updates medication.MedicationUpdate) (medication.Medication, error)
 	Delete(ctx context.Context, id string) error
 	GetActiveByUserID(ctx context.Context, userID string) ([]medication.Medication, error)
-	GetByUserIDAndCategory(ctx context.Context, userID string, category medication.MedicationCategory) ([]medication.Medication, error)
+	GetByUserIDAndCategory(ctx context.Context, userID string, category shared.MedicationCategory) ([]medication.Medication, error)
 	MarkAsTaken(ctx context.Context, id string, takenAt time.Time) error
 }
 
@@ -147,20 +148,11 @@ func (r *memoryMedicationRepository) Update(ctx context.Context, id string, upda
 	if updates.Purpose != nil {
 		medication.Purpose = *updates.Purpose
 	}
-	if updates.Prescriber != nil {
-		medication.Prescriber = *updates.Prescriber
-	}
-	if updates.Pharmacy != nil {
-		medication.Pharmacy = *updates.Pharmacy
-	}
 	if updates.Notes != nil {
 		medication.Notes = *updates.Notes
 	}
 	if updates.IsActive != nil {
 		medication.IsActive = *updates.IsActive
-	}
-	if updates.IsPRN != nil {
-		medication.IsPRN = *updates.IsPRN
 	}
 	if updates.SideEffects != nil {
 		medication.SideEffects = updates.SideEffects
@@ -201,7 +193,7 @@ func (r *memoryMedicationRepository) GetActiveByUserID(ctx context.Context, user
 }
 
 // GetByUserIDAndCategory retrieves medications for a user by category
-func (r *memoryMedicationRepository) GetByUserIDAndCategory(ctx context.Context, userID string, category medication.MedicationCategory) ([]medication.Medication, error) {
+func (r *memoryMedicationRepository) GetByUserIDAndCategory(ctx context.Context, userID string, category shared.MedicationCategory) ([]medication.Medication, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 

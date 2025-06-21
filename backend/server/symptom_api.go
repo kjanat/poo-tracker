@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/shared"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 	"github.com/kjanat/poo-tracker/backend/internal/validation"
@@ -30,17 +31,17 @@ func (h *SymptomHandler) CreateSymptom(c *gin.Context) {
 	}
 
 	var req struct {
-		Name        string                   `json:"name" binding:"required"`
-		Description string                   `json:"description"`
-		RecordedAt  *time.Time               `json:"recordedAt"`
-		Category    *symptom.SymptomCategory `json:"category"`
-		Severity    int                      `json:"severity" binding:"min=1,max=10"`
-		Duration    *int                     `json:"duration"`
-		BodyPart    string                   `json:"bodyPart"`
-		Type        *symptom.SymptomType     `json:"type"`
-		Triggers    []string                 `json:"triggers"`
-		Notes       string                   `json:"notes"`
-		PhotoURL    string                   `json:"photoUrl"`
+		Name        string                  `json:"name" binding:"required"`
+		Description string                  `json:"description"`
+		RecordedAt  *time.Time              `json:"recordedAt"`
+		Category    *shared.SymptomCategory `json:"category"`
+		Severity    int                     `json:"severity" binding:"min=1,max=10"`
+		Duration    *int                    `json:"duration"`
+		BodyPart    string                  `json:"bodyPart"`
+		Type        *shared.SymptomType     `json:"type"`
+		Triggers    []string                `json:"triggers"`
+		Notes       string                  `json:"notes"`
+		PhotoURL    string                  `json:"photoUrl"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -268,7 +269,7 @@ func (h *SymptomHandler) GetSymptomsByCategory(c *gin.Context) {
 	}
 
 	categoryStr := c.Param("category")
-	category, err := symptom.ParseSymptomCategory(categoryStr)
+	category, err := shared.ParseSymptomCategory(categoryStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid symptom category"})
 		return
@@ -292,7 +293,7 @@ func (h *SymptomHandler) GetSymptomsByType(c *gin.Context) {
 	}
 
 	typeStr := c.Param("type")
-	symptomType, err := symptom.ParseSymptomType(typeStr)
+	symptomType, err := shared.ParseSymptomType(typeStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid symptom type"})
 		return

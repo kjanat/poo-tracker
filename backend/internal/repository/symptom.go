@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/kjanat/poo-tracker/backend/internal/domain/shared"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
 )
 
@@ -20,8 +21,8 @@ type SymptomRepository interface {
 	Update(ctx context.Context, id string, updates symptom.SymptomUpdate) (symptom.Symptom, error)
 	Delete(ctx context.Context, id string) error
 	GetByUserIDAndDateRange(ctx context.Context, userID string, startDate, endDate time.Time) ([]symptom.Symptom, error)
-	GetByUserIDAndCategory(ctx context.Context, userID string, category symptom.SymptomCategory) ([]symptom.Symptom, error)
-	GetByUserIDAndType(ctx context.Context, userID string, symptomType symptom.SymptomType) ([]symptom.Symptom, error)
+	GetByUserIDAndCategory(ctx context.Context, userID string, category shared.SymptomCategory) ([]symptom.Symptom, error)
+	GetByUserIDAndType(ctx context.Context, userID string, symptomType shared.SymptomType) ([]symptom.Symptom, error)
 }
 
 // memorySymptomRepository implements SymptomRepository using in-memory storage
@@ -179,7 +180,7 @@ func (r *memorySymptomRepository) GetByUserIDAndDateRange(ctx context.Context, u
 }
 
 // GetByUserIDAndCategory retrieves symptoms for a user by category
-func (r *memorySymptomRepository) GetByUserIDAndCategory(ctx context.Context, userID string, category symptom.SymptomCategory) ([]symptom.Symptom, error) {
+func (r *memorySymptomRepository) GetByUserIDAndCategory(ctx context.Context, userID string, category shared.SymptomCategory) ([]symptom.Symptom, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -194,7 +195,7 @@ func (r *memorySymptomRepository) GetByUserIDAndCategory(ctx context.Context, us
 }
 
 // GetByUserIDAndType retrieves symptoms for a user by type
-func (r *memorySymptomRepository) GetByUserIDAndType(ctx context.Context, userID string, symptomType symptom.SymptomType) ([]symptom.Symptom, error) {
+func (r *memorySymptomRepository) GetByUserIDAndType(ctx context.Context, userID string, symptomType shared.SymptomType) ([]symptom.Symptom, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 

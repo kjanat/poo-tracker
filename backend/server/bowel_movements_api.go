@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	bm "github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
 	rel "github.com/kjanat/poo-tracker/backend/internal/domain/relations"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/shared"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 	"github.com/kjanat/poo-tracker/backend/internal/validation"
 )
@@ -15,17 +16,17 @@ import (
 
 // createBowelMovementRequest defines the request structure for creating bowel movements
 type createBowelMovementRequest struct {
-	UserID       string          `json:"userId"`
-	BristolType  int             `json:"bristolType"`
-	Volume       *bm.Volume      `json:"volume,omitempty"`
-	Color        *bm.Color       `json:"color,omitempty"`
-	Consistency  *bm.Consistency `json:"consistency,omitempty"`
-	Floaters     *bool           `json:"floaters,omitempty"`
-	Pain         *int            `json:"pain,omitempty"`
-	Strain       *int            `json:"strain,omitempty"`
-	Satisfaction *int            `json:"satisfaction,omitempty"`
-	PhotoURL     *string         `json:"photoUrl,omitempty"`
-	SmellLevel   *bm.SmellLevel  `json:"smellLevel,omitempty"`
+	UserID       string              `json:"userId"`
+	BristolType  int                 `json:"bristolType"`
+	Volume       *shared.Volume      `json:"volume,omitempty"`
+	Color        *shared.Color       `json:"color,omitempty"`
+	Consistency  *shared.Consistency `json:"consistency,omitempty"`
+	Floaters     *bool               `json:"floaters,omitempty"`
+	Pain         *int                `json:"pain,omitempty"`
+	Strain       *int                `json:"strain,omitempty"`
+	Satisfaction *int                `json:"satisfaction,omitempty"`
+	PhotoURL     *string             `json:"photoUrl,omitempty"`
+	SmellLevel   *shared.SmellLevel  `json:"smellLevel,omitempty"`
 }
 
 // createBowelMovementDetailsRequest defines the request structure for creating bowel movement details

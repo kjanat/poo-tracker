@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kjanat/poo-tracker/backend/internal/domain/shared"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
 )
 
@@ -181,7 +182,7 @@ func TestSymptomRepository_GetByUserIDAndCategory(t *testing.T) {
 	repo := NewMemorySymptomRepository()
 	ctx := context.Background()
 
-	category := symptom.SymptomCategoryDigestive
+	category := shared.SymptomCategoryDigestive
 
 	symptom1 := symptom.NewSymptom("user1", "Digestive Issue")
 	symptom1.Category = &category

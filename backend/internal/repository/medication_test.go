@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/kjanat/poo-tracker/backend/internal/domain/medication"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/shared"
 )
 
 func TestMedicationRepository_Create(t *testing.T) {
@@ -184,7 +185,7 @@ func TestMedicationRepository_GetByUserIDAndCategory(t *testing.T) {
 	repo := NewMemoryMedicationRepository()
 	ctx := context.Background()
 
-	category := medication.MedicationCategoryPainRelief
+	category := shared.MedicationCategoryPainRelief
 
 	med1 := medication.NewMedication("user1", "Pain Med", "10mg", "daily")
 	med1.Category = &category

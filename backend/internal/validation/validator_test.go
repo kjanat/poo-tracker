@@ -6,7 +6,7 @@ import (
 
 	bm "github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
-	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/shared"
 )
 
 func TestValidateBristolType(t *testing.T) {
@@ -342,20 +342,20 @@ func TestValidateMeal(t *testing.T) {
 
 func TestValidateEnum(t *testing.T) {
 	// Valid enum
-	volume := bm.VolumeSmall
+	volume := shared.VolumeSmall
 	err := ValidateEnum(volume, "volume")
 	if err != nil {
 		t.Errorf("Valid enum should not have error, got: %v", err)
 	}
 
 	// Test with different valid enums
-	color := bm.ColorBrown
+	color := shared.ColorBrown
 	err = ValidateEnum(color, "color")
 	if err != nil {
 		t.Errorf("Valid color enum should not have error, got: %v", err)
 	}
 
-	consistency := bm.ConsistencySoft
+	consistency := shared.ConsistencySoft
 	err = ValidateEnum(consistency, "consistency")
 	if err != nil {
 		t.Errorf("Valid consistency enum should not have error, got: %v", err)

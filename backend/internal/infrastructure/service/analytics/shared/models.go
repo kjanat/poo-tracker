@@ -40,7 +40,18 @@ type TrendLine = analytics.DataTrend
 type PatternMatch = analytics.Insight
 type HealthMetric = analytics.ScoreFactor
 type InsightRecommendation = analytics.Insight
-type StatisticalSummary = analytics.ScoreFactor
+
+// StatisticalSummary represents basic summary statistics for a data set.
+type StatisticalSummary struct {
+	Count        int
+	Mean         float64
+	Median       float64
+	StdDev       float64
+	Min          float64
+	Max          float64
+	Percentile25 float64
+	Percentile75 float64
+}
 type BowelMovementStats = analytics.BowelMovementSummary
 type MealStats = analytics.MealSummary
 type SymptomStats = analytics.SymptomSummary
