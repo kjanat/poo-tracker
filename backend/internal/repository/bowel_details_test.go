@@ -13,10 +13,11 @@ func TestBowelDetailsRepo_CRUD(t *testing.T) {
 	ctx := context.Background()
 
 	// First create a bowel movement
-	bm := bm.BowelMovement{
-		UserID:      "user1",
-		BristolType: 4,
-	}
+    initialBM := bm.BowelMovement{
+        UserID:      "user1",
+        BristolType: 4,
+    }
+    createdBM, err := bowelRepo.Create(ctx, initialBM)
 	createdBM, err := bowelRepo.Create(ctx, bm)
 	if err != nil {
 		t.Fatalf("Failed to create bowel movement: %v", err)
