@@ -7,7 +7,7 @@ func TestAllCorrelationTypes(t *testing.T) {
 	if len(types) != 4 {
 		t.Fatalf("expected 4 types, got %d", len(types))
 	}
-	m := map[CorrelationType]bool{}
+	m := make(map[CorrelationType]bool)
 	for _, ct := range types {
 		m[ct] = true
 	}
