@@ -59,8 +59,7 @@ func (ie *InsightEngine) analyzeBowelHealth(movements []bowelmovement.BowelMovem
 			Title:       "Track Bowel Movements",
 			Description: "Start tracking your bowel movements to get personalized recommendations",
 			Evidence:    []string{},
-			Actions:     []string{"Open tracking form", "Add first entry"},
-			Context:     make(map[string]any),
+			ActionSteps: []string{"Open tracking form", "Add first entry"},
 			CreatedAt:   now,
 		})
 		return recommendations
@@ -91,11 +90,10 @@ func (ie *InsightEngine) analyzeBowelHealth(movements []bowelmovement.BowelMovem
 			Title:       "High Bowel Movement Pain",
 			Description: fmt.Sprintf("Average pain level %.1f detected in recent bowel movements", avgPain),
 			Evidence:    []string{fmt.Sprintf("Average pain: %.1f", avgPain)},
-			Actions: []string{
+			ActionSteps: []string{
 				"Review diet for potential triggers",
 				"Discuss pain management with a professional",
 			},
-			Context:   make(map[string]any),
 			CreatedAt: now,
 		})
 	}
@@ -108,11 +106,10 @@ func (ie *InsightEngine) analyzeBowelHealth(movements []bowelmovement.BowelMovem
 			Title:       "Low Bowel Movement Satisfaction",
 			Description: fmt.Sprintf("Average satisfaction %.1f suggests discomfort", avgSatisfaction),
 			Evidence:    []string{fmt.Sprintf("Average satisfaction: %.1f", avgSatisfaction)},
-			Actions: []string{
+			ActionSteps: []string{
 				"Increase fiber and hydration",
 				"Track meals leading to low satisfaction",
 			},
-			Context:   make(map[string]any),
 			CreatedAt: now,
 		})
 	}
@@ -132,8 +129,7 @@ func (ie *InsightEngine) analyzeDiet(meals []meal.Meal) []*shared.InsightRecomme
 			Title:       "Track Meals",
 			Description: "Start tracking your meals to get personalized dietary recommendations",
 			Evidence:    []string{},
-			Actions:     []string{"Open meal form", "Add first meal"},
-			Context:     make(map[string]any),
+			ActionSteps: []string{"Open meal form", "Add first meal"},
 			CreatedAt:   now,
 		})
 		return recommendations
@@ -164,10 +160,9 @@ func (ie *InsightEngine) analyzeDiet(meals []meal.Meal) []*shared.InsightRecomme
 			Title:       "Increase Fiber Intake",
 			Description: "Your recent meals appear low in fiber which can impact digestion",
 			Evidence:    []string{fmt.Sprintf("Only %.0f%% of meals were fiber rich", fiberRatio*100)},
-			Actions: []string{
+			ActionSteps: []string{
 				"Add more whole grains, fruits and vegetables",
 			},
-			Context:   make(map[string]any),
 			CreatedAt: now,
 		})
 	}
@@ -180,11 +175,10 @@ func (ie *InsightEngine) analyzeDiet(meals []meal.Meal) []*shared.InsightRecomme
 			Title:       "High Average Meal Calories",
 			Description: fmt.Sprintf("Average calories per meal is %.0f which may be high", avgCalories),
 			Evidence:    []string{fmt.Sprintf("Average calories: %.0f", avgCalories)},
-			Actions: []string{
+			ActionSteps: []string{
 				"Consider reducing portion sizes",
 				"Balance meals with vegetables",
 			},
-			Context:   make(map[string]any),
 			CreatedAt: now,
 		})
 	}
@@ -204,8 +198,7 @@ func (ie *InsightEngine) analyzeSymptoms(symptoms []symptom.Symptom) []*shared.I
 			Title:       "Track Symptoms",
 			Description: "Start tracking your symptoms to get personalized recommendations",
 			Evidence:    []string{},
-			Actions:     []string{"Open symptom form", "Add first symptom"},
-			Context:     make(map[string]any),
+			ActionSteps: []string{"Open symptom form", "Add first symptom"},
 			CreatedAt:   now,
 		})
 		return recommendations
@@ -240,11 +233,10 @@ func (ie *InsightEngine) analyzeSymptoms(symptoms []symptom.Symptom) []*shared.I
 			Title:       "High Symptom Severity",
 			Description: fmt.Sprintf("Average symptom severity is %.1f", avgSeverity),
 			Evidence:    []string{fmt.Sprintf("Common symptom: %s", common)},
-			Actions: []string{
+			ActionSteps: []string{
 				"Review potential triggers",
 				"Consult a healthcare professional",
 			},
-			Context:   make(map[string]any),
 			CreatedAt: now,
 		})
 	}
@@ -315,11 +307,10 @@ func (ie *InsightEngine) analyzeCorrelations(
 			Title:       "Spicy Food Linked to Pain",
 			Description: "Higher spicy food levels correlate with increased bowel movement pain",
 			Evidence:    []string{fmt.Sprintf("Correlation coefficient %.2f", coeff)},
-			Actions: []string{
+			ActionSteps: []string{
 				"Reduce spicy food intake",
 				"Monitor pain levels when avoiding spicy meals",
 			},
-			Context:   make(map[string]any),
 			CreatedAt: now,
 		})
 	}

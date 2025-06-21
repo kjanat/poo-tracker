@@ -186,16 +186,11 @@ func (ie *InsightEngine) analyzeMealTimingPatterns(meals []meal.Meal) *shared.In
 				fmt.Sprintf("Only %d regular meal times identified", len(regularHours)),
 				"Irregular eating can affect digestion and gut health",
 			},
-			Actions: []string{
+			ActionSteps: []string{
 				"Try to eat meals at consistent times each day",
 				"Aim for 3 main meals with 4-6 hour intervals",
 				"Set meal reminders if needed",
 				"Plan meals in advance to maintain routine",
-			},
-			Context: map[string]interface{}{
-				"irregular_times": len(irregularHours),
-				"regular_times":   len(regularHours),
-				"total_meals":     len(meals),
 			},
 			CreatedAt: time.Now(),
 		}
@@ -241,16 +236,11 @@ func (ie *InsightEngine) analyzeSymptomClustering(symptoms []symptom.Symptom) *s
 				fmt.Sprintf("Maximum %d symptoms in one day", maxSymptomsInDay),
 				"Symptom clustering may indicate trigger events",
 			},
-			Actions: []string{
+			ActionSteps: []string{
 				"Look for common triggers on high-symptom days",
 				"Track what you ate 6-24 hours before symptom clusters",
 				"Note stress levels, sleep quality, and activity on these days",
 				"Consider discussing pattern with healthcare provider",
-			},
-			Context: map[string]interface{}{
-				"cluster_days":       clusterDays,
-				"max_daily_symptoms": maxSymptomsInDay,
-				"total_symptom_days": len(dailySymptoms),
 			},
 			CreatedAt: time.Now(),
 		}
@@ -293,15 +283,8 @@ func (ie *InsightEngine) createCorrelationInsight(corr *analytics.Correlation) *
 			fmt.Sprintf("Confidence level: %.1f%%", corr.Confidence*100),
 			fmt.Sprintf("Based on %d data points", corr.SampleSize),
 		},
-		Actions: ie.generateCorrelationActions(corr),
-		Context: map[string]interface{}{
-			"factor":      corr.Factor,
-			"outcome":     corr.Outcome,
-			"strength":    corr.Strength,
-			"confidence":  corr.Confidence,
-			"sample_size": corr.SampleSize,
-		},
-		CreatedAt: time.Now(),
+		ActionSteps: ie.generateCorrelationActions(corr),
+		CreatedAt:   time.Now(),
 	}
 }
 
@@ -377,15 +360,8 @@ func (ie *InsightEngine) createTrendInsight(trend *shared.TrendLine) *shared.Ins
 			fmt.Sprintf("Confidence: %.1f%%", trend.Confidence*100),
 			fmt.Sprintf("Based on %d data points", len(trend.Points)),
 		},
-		Actions: ie.generateTrendActions(trend),
-		Context: map[string]interface{}{
-			"trend_name":   trend.Name,
-			"direction":    trend.Direction,
-			"slope":        trend.Slope,
-			"confidence":   trend.Confidence,
-			"significance": trend.Significance,
-		},
-		CreatedAt: time.Now(),
+		ActionSteps: ie.generateTrendActions(trend),
+		CreatedAt:   time.Now(),
 	}
 }
 
@@ -449,16 +425,11 @@ func (ie *InsightEngine) generateMedicationInsights(
 					"Low adherence may affect treatment outcomes",
 					"Regular medication use is often necessary for optimal results",
 				},
-				Actions: []string{
+				ActionSteps: []string{
 					"Review inactive medications with healthcare provider",
 					"Set medication reminders if forgetfulness is an issue",
 					"Discuss any side effects or concerns about medications",
 					"Consider pill organizers or medication tracking apps",
-				},
-				Context: map[string]interface{}{
-					"adherence_percent": adherencePercent,
-					"inactive_count":    inactiveCount,
-					"total_medications": len(medications),
 				},
 				CreatedAt: time.Now(),
 			}
@@ -477,7 +448,7 @@ func (ie *InsightEngine) convertInsightToRecommendation(insight *shared.InsightR
 		Priority:    insight.Priority,
 		Title:       insight.Title,
 		Description: insight.Description,
-		ActionSteps: insight.Actions,
+		ActionSteps: insight.ActionSteps,
 		Confidence:  0.8, // Default confidence for high-priority insights
 		Evidence:    insight.Evidence,
 	}

@@ -39,7 +39,10 @@ type CorrelationPair = analytics.Correlation
 type TrendLine = analytics.DataTrend
 type PatternMatch = analytics.Insight
 type HealthMetric = analytics.ScoreFactor
-type InsightRecommendation = analytics.Insight
+
+// InsightRecommendation references the domain Recommendation type for
+// actionable advice returned by the insight engine.
+type InsightRecommendation = analytics.Recommendation
 
 // StatisticalSummary represents basic summary statistics for a data set.
 type StatisticalSummary struct {
