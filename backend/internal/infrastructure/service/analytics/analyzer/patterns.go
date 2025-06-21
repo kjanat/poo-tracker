@@ -1,6 +1,7 @@
 package analyzer
 
 import (
+	"math"
 	"sort"
 	"time"
 
@@ -47,11 +48,15 @@ func (ta *TrendAnalyzer) AnalyzeSymptomPatterns(symptoms []symptom.Symptom) *sha
 
 // AnalyzeLifestylePatterns identifies patterns in overall lifestyle and health indicators
 func (ta *TrendAnalyzer) AnalyzeLifestylePatterns(meals []meal.Meal, movements []bowelmovement.BowelMovement, symptoms []symptom.Symptom) *shared.LifestylePattern {
-	pattern := &shared.LifestylePattern{
-		DietaryHabits:   ta.analyzeDietaryHabits(meals),
-		BowelRegularity: ta.analyzeBowelRegularity(movements),
-		SymptomTriggers: ta.analyzeSymptomTriggers(symptoms, meals),
-	}
+	// Helper methods currently never fail, but this structure allows future
+	// implementations to surface errors without changing callers.
+
+	pattern := &shared.LifestylePattern{}
+
+	pattern.DietaryHabits = ta.analyzeDietaryHabits(meals)
+	pattern.BowelRegularity = ta.analyzeBowelRegularity(movements)
+	pattern.SymptomTriggers = ta.analyzeSymptomTriggers(symptoms, meals)
+
 	return pattern
 }
 
@@ -83,17 +88,17 @@ func (ta *TrendAnalyzer) analyzeMealTimings(meals []meal.Meal) []shared.MealTimi
 }
 
 func (ta *TrendAnalyzer) identifyCommonSymptomMap(symptoms []symptom.Symptom) map[string]int {
-    if symptoms == nil {
-        return make(map[string]int)
-    }
+	if symptoms == nil {
+		return make(map[string]int)
+	}
 
-    // Convert symptom list to frequency map
-    freq := make(map[string]int)
-    for _, s := range symptoms {
-        symptomType := s.Type.String()
-        freq[symptomType]++
-    }
-    return freq
+	// Convert symptom list to frequency map
+	freq := make(map[string]int)
+	for _, s := range symptoms {
+		symptomType := s.Type.String()
+		freq[symptomType]++
+	}
+	return freq
 }
 
 func (ta *TrendAnalyzer) analyzeBowelFrequency(movements []bowelmovement.BowelMovement) float64 {
@@ -176,13 +181,155 @@ func (ta *TrendAnalyzer) analyzeSymptomSeverity(symptoms []symptom.Symptom) map[
 }
 
 func (ta *TrendAnalyzer) analyzeDietaryHabits(meals []meal.Meal) []shared.DietaryHabit {
-	return []shared.DietaryHabit{}
+	if len(meals) == 0 {
+		return []shared.DietaryHabit{}
+	}
+
+	type habitData struct {
+		desc  string
+		count int
+	}
+
+	habits := map[string]*habitData{
+		"fiber":   {desc: "Fiber-rich meals"},
+		"dairy":   {desc: "Dairy consumption"},
+		"gluten":  {desc: "Gluten consumption"},
+		"spicy":   {desc: "Spicy meals"},
+		"calorie": {desc: "High calorie meals"},
+	}
+
+	for _, m := range meals {
+		if m.FiberRich {
+			habits["fiber"].count++
+		}
+		if m.Dairy {
+			habits["dairy"].count++
+		}
+		if m.Gluten {
+			habits["gluten"].count++
+		}
+		if m.SpicyLevel != nil && *m.SpicyLevel >= 7 {
+			habits["spicy"].count++
+		}
+		if m.Calories > 700 {
+			habits["calorie"].count++
+		}
+	}
+
+	results := make([]shared.DietaryHabit, 0, len(habits))
+	for _, h := range habits {
+		if h.count == 0 {
+			continue
+		}
+		results = append(results, shared.DietaryHabit{
+			Description: h.desc,
+			Frequency:   h.count,
+			Impact:      float64(h.count) / float64(len(meals)),
+		})
+	}
+
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].Frequency > results[j].Frequency
+	})
+
+	return results
 }
 
 func (ta *TrendAnalyzer) analyzeBowelRegularity(movements []bowelmovement.BowelMovement) float64 {
-	return ta.analyzeBowelFrequency(movements)
+	if len(movements) == 0 {
+		return 0
+	}
+
+	freq := ta.analyzeBowelFrequency(movements)
+
+	times := make([]time.Time, 0, len(movements))
+	for _, m := range movements {
+		times = append(times, m.RecordedAt)
+	}
+	groups := shared.GroupByDay(times)
+	if len(groups) <= 1 {
+		return freq
+	}
+
+	counts := make([]float64, 0, len(groups))
+	for _, ts := range groups {
+		counts = append(counts, float64(len(ts)))
+	}
+
+	var sum float64
+	for _, c := range counts {
+		diff := c - freq
+		sum += diff * diff
+	}
+	stdDev := math.Sqrt(sum / float64(len(counts)))
+
+	if stdDev == 0 {
+		return 1
+	}
+
+	return 1 / (1 + stdDev)
 }
 
 func (ta *TrendAnalyzer) analyzeSymptomTriggers(symptoms []symptom.Symptom, meals []meal.Meal) []shared.SymptomTrigger {
-	return []shared.SymptomTrigger{}
+	if len(symptoms) == 0 || len(meals) == 0 {
+		return []shared.SymptomTrigger{}
+	}
+
+	type counter struct {
+		total     int
+		triggered int
+	}
+
+	trig := map[string]*counter{}
+	window := 6 * time.Hour
+
+	for _, m := range meals {
+		keys := []string{}
+		if m.Dairy {
+			keys = append(keys, "Dairy")
+		}
+		if m.Gluten {
+			keys = append(keys, "Gluten")
+		}
+		if m.SpicyLevel != nil && *m.SpicyLevel >= 7 {
+			keys = append(keys, "Spicy")
+		}
+
+		if len(keys) == 0 {
+			continue
+		}
+
+		for _, k := range keys {
+			c, ok := trig[k]
+			if !ok {
+				c = &counter{}
+				trig[k] = c
+			}
+			c.total++
+
+			for _, s := range symptoms {
+				if s.RecordedAt.After(m.MealTime) && s.RecordedAt.Sub(m.MealTime) <= window {
+					c.triggered++
+					break
+				}
+			}
+		}
+	}
+
+	result := make([]shared.SymptomTrigger, 0, len(trig))
+	for k, c := range trig {
+		if c.total == 0 {
+			continue
+		}
+		confidence := shared.CalculateConfidenceScore(c.total)
+		rate := float64(c.triggered) / float64(c.total)
+		result = append(result, shared.SymptomTrigger{
+			TriggerType: k,
+			Ingredient:  "",
+			Confidence:  rate * confidence,
+		})
+	}
+
+	sort.Slice(result, func(i, j int) bool { return result[i].Confidence > result[j].Confidence })
+	return result
 }
