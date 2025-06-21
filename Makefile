@@ -50,7 +50,7 @@ test-frontend:
 	pnpm --filter @poo-tracker/frontend run test
 
 test-backend:
-	go test -C backend ./internal/service
+	go test -C backend \
 	./internal/domain/... \
 	./internal/repository/... \
 	./internal/service/...
