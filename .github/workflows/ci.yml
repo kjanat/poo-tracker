@@ -39,16 +39,18 @@ jobs:
           node-version: 22
 
       - name: 📦 Install dependencies
-        run: pnpm --filter @poo-tracker/frontend install
+        run: make init
 
       - name: 🔍 Type check
-        run: pnpm --filter @poo-tracker/frontend run type-check
+        run: |
+          cd frontend && \
+            pnpm type-check
 
       - name: 🧹 Lint
-        run: pnpm --filter @poo-tracker/frontend run lint
+        run: make lint-frontend
 
       - name: 🧪 Test
-        run: pnpm --filter @poo-tracker/frontend run test
+        run: make test-frontend
 
       - name: Upload results to Trunk
         # Run this step even if the test step ahead fails
@@ -64,7 +66,7 @@ jobs:
         continue-on-error: true
 
       - name: 🏗️ Build
-        run: pnpm --filter @poo-tracker/frontend run build
+        run: make build-frontend
 
   test-backend:
     name: 🚀 Backend Tests

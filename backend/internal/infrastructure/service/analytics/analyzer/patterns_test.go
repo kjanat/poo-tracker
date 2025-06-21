@@ -57,7 +57,7 @@ func TestIdentifyProblemIngredients(t *testing.T) {
 	// Test with insufficient data
 	meals := []meal.Meal{{Dairy: true}}
 	assert.Empty(t, ta.identifyProblemIngredients(meals))
-	
+
 	// Test with problem correlation data (if available)
 	// This would require mock data showing correlation between ingredients and symptoms
 }

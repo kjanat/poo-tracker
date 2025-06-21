@@ -217,7 +217,7 @@ func (da *DataAggregator) GroupMealsByType(meals []meal.Meal) map[string][]meal.
 	}
 
 	for _, meal := range meals {
-        if meal.SpicyLevel != nil && *meal.SpicyLevel >= SpicyThreshold {
+		if meal.SpicyLevel != nil && *meal.SpicyLevel >= SpicyThreshold {
 			groups["spicy"] = append(groups["spicy"], meal)
 		}
 

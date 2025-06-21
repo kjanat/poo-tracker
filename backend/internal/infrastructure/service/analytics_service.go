@@ -13,7 +13,6 @@ import (
 	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/aggregator"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/analyzer"
-	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/calculator"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/insights"
 	analyticsSvc "github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/shared"
 	"go.uber.org/zap"
@@ -40,7 +39,7 @@ type AnalyticsService struct {
 	config *AnalyticsServiceConfig
 
 	// Core submodules
-	healthScoreCalculator *calculator.HealthScoreCalculator
+	HealthScoreCalculator *analytics.HealthScore
 	correlationAnalyzer   *analyzer.CorrelationAnalyzer
 	trendAnalyzer         *analyzer.TrendAnalyzer
 	dataAggregator        *aggregator.DataAggregator
@@ -75,11 +74,10 @@ func NewAnalyticsService(
 		config: config,
 
 		// Initialize submodules
-		healthScoreCalculator: calculator.NewHealthScoreCalculator(),
-		correlationAnalyzer:   analyzer.NewCorrelationAnalyzer(),
-		trendAnalyzer:         analyzer.NewTrendAnalyzer(),
-		dataAggregator:        aggregator.NewDataAggregator(),
-		insightEngine:         insights.NewInsightEngine(),
+		correlationAnalyzer: analyzer.NewCorrelationAnalyzer(),
+		trendAnalyzer:       analyzer.NewTrendAnalyzer(),
+		dataAggregator:      aggregator.NewDataAggregator(),
+		insightEngine:       insights.NewInsightEngine(),
 
 		// Store dependencies
 		bowelMovementRepo: bowelMovementRepo,
@@ -165,7 +163,6 @@ func (s *AnalyticsService) GetUserHealthOverview(ctx context.Context, userID str
 		MealStats:          mStats,
 		SymptomStats:       sStats,
 		MedicationStats:    medStats,
-		OverallHealthScore: s.healthScoreCalculator.CalculateOverallHealthScore(bmStats, mStats, sStats, medStats),
 		TrendDirection:     s.calculateTrendDirection(bowelValues, mealValues, symptomValues),
 	}
 

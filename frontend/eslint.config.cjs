@@ -21,8 +21,7 @@ module.exports = [
       '**/*.d.ts',
       '**/branding/',
       '**/out/',
-      '**/.next/',
-      'ai-service/'
+      '**/.next/'
     ]
   },
 
@@ -85,36 +84,15 @@ module.exports = [
       },
       'import/resolver': {
         typescript: {
-          project: ['./frontend/tsconfig.json', './backend/tsconfig.json']
+          project: ['./tsconfig.json', './backend/tsconfig.json']
         }
       }
     }
   },
 
-  // Backend-specific configuration (no React)
-  {
-    files: ['backend/**/*.ts', 'backend/**/*.tsx'],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-        ...globals.es2024 // Backend also gets ES2024 globals
-      }
-    },
-    settings: {
-      react: {
-        version: '999.999.999' // Disable React detection for backend
-      }
-    },
-    rules: {
-      // Backend can be stricter about React
-      'react/jsx-uses-react': 'off',
-      'react/jsx-uses-vars': 'off'
-    }
-  },
-
   // Frontend-specific configuration
   {
-    files: ['frontend/**/*.ts', 'frontend/**/*.tsx'],
+    files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
       globals: {
         ...globals.browser,
