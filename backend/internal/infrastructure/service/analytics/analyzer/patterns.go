@@ -2,6 +2,7 @@ package analyzer
 
 import (
 	"sort"
+	"time"
 
 	"github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
@@ -93,4 +94,95 @@ func (ta *TrendAnalyzer) identifyCommonSymptomMap(symptoms []symptom.Symptom) ma
         freq[symptomType]++
     }
     return freq
+}
+
+func (ta *TrendAnalyzer) analyzeBowelFrequency(movements []bowelmovement.BowelMovement) float64 {
+	if len(movements) == 0 {
+		return 0
+	}
+
+	days := make(map[string]struct{})
+	for _, m := range movements {
+		day := m.RecordedAt.Format("2006-01-02")
+		days[day] = struct{}{}
+	}
+
+	if len(days) == 0 {
+		return 0
+	}
+
+	return float64(len(movements)) / float64(len(days))
+}
+
+func (ta *TrendAnalyzer) analyzeBowelConsistency(movements []bowelmovement.BowelMovement) float64 {
+	if len(movements) == 0 {
+		return 0
+	}
+
+	total := 0
+	for _, m := range movements {
+		total += m.BristolType
+	}
+
+	return float64(total) / float64(len(movements))
+}
+
+func (ta *TrendAnalyzer) analyzeMealCorrelation(movements []bowelmovement.BowelMovement, meals []meal.Meal) float64 {
+	if len(movements) == 0 || len(meals) == 0 {
+		return 0
+	}
+
+	correlated := 0
+	for _, bm := range movements {
+		for _, m := range meals {
+			diff := bm.RecordedAt.Sub(m.MealTime)
+			if diff < 0 {
+				diff = -diff
+			}
+			if diff <= 4*time.Hour {
+				correlated++
+				break
+			}
+		}
+	}
+
+	return float64(correlated) / float64(len(movements))
+}
+
+func (ta *TrendAnalyzer) analyzeSymptomFrequency(symptoms []symptom.Symptom) map[string]int {
+	freq := make(map[string]int)
+	for _, s := range symptoms {
+		freq[s.Type.String()]++
+	}
+	return freq
+}
+
+func (ta *TrendAnalyzer) analyzeSymptomSeverity(symptoms []symptom.Symptom) map[string]float64 {
+	totals := make(map[string]int)
+	counts := make(map[string]int)
+
+	for _, s := range symptoms {
+		st := s.Type.String()
+		totals[st] += s.Severity
+		counts[st]++
+	}
+
+	result := make(map[string]float64)
+	for t, total := range totals {
+		result[t] = float64(total) / float64(counts[t])
+	}
+
+	return result
+}
+
+func (ta *TrendAnalyzer) analyzeDietaryHabits(meals []meal.Meal) []shared.DietaryHabit {
+	return []shared.DietaryHabit{}
+}
+
+func (ta *TrendAnalyzer) analyzeBowelRegularity(movements []bowelmovement.BowelMovement) float64 {
+	return ta.analyzeBowelFrequency(movements)
+}
+
+func (ta *TrendAnalyzer) analyzeSymptomTriggers(symptoms []symptom.Symptom, meals []meal.Meal) []shared.SymptomTrigger {
+	return []shared.SymptomTrigger{}
 }

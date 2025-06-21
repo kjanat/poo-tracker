@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base32"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -21,6 +22,8 @@ type TwoFactorService struct {
 	userRepo repository.UserRepository
 	issuer   string // The name of your application for TOTP
 }
+
+var ErrInvalidToken = errors.New("invalid token")
 
 // NewTwoFactorService creates a new TwoFactorService
 func NewTwoFactorService(repo repository.UserTwoFactorRepository, userRepo repository.UserRepository, issuer string) *TwoFactorService {
@@ -65,7 +68,7 @@ func (s *TwoFactorService) GenerateSecret(ctx context.Context, userID string) (*
 func (s *TwoFactorService) EnableTwoFactor(ctx context.Context, userID string, token string, secret string, backupCodes []string) error {
 	// Verify the token before enabling
 	if !s.verifyTOTPToken(secret, token) {
-		return fmt.Errorf("invalid token")
+		return ErrInvalidToken
 	}
 
 	// Create or update the 2FA record
