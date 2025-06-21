@@ -51,7 +51,10 @@ test-frontend:
 	pnpm --filter @poo-tracker/frontend run test
 
 test-backend:
-	go test -C backend -tags test ./internal/domain/... ./internal/repository/... ./internal/service/...
+	go test -C backend -tags test \
+	./internal/domain/... \
+	./internal/repository/... \
+	./internal/service/...
 
 test-ai:
 	uv run pytest ai-service
@@ -67,7 +70,6 @@ docker-down:
 format:
 	gofmt -s -w backend/**/*.go
 	uv run ruff format ai-service
-
 
 format-backend:
 	gofmt -s -w backend/**/*.go
