@@ -537,6 +537,11 @@ func (ta *TrendAnalyzer) groupSymptomsByWeek(
 		})
 	}
 
+	// Sort results by date for consistent trend calculation
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Date.Before(result[j].Date)
+	})
+
 	return result
 }
 
