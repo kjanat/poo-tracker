@@ -32,7 +32,7 @@ git clone https://github.com/YOUR_USERNAME/poo-tracker.git
 cd poo-tracker
 
 # Install dependencies
-pnpm install
+pnpm --filter @poo-tracker/frontend install
 
 # Copy environment file
 cp .env.example .env

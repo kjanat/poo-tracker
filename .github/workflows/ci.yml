@@ -39,7 +39,7 @@ jobs:
           node-version: 22
 
       - name: 📦 Install dependencies
-        run: pnpm install
+        run: pnpm --filter @poo-tracker/frontend install
 
       - name: 🔍 Type check
         run: pnpm --filter @poo-tracker/frontend run type-check
@@ -95,7 +95,7 @@ jobs:
           go-version: ${{ matrix.go-version }}
 
       - name: 📦 Install dependencies
-        run: pnpm install
+        run: pnpm --filter @poo-tracker/frontend install
 
       - name: 🔍 Lint
         uses: golangci/golangci-lint-action@v8

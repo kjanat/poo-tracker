@@ -18,7 +18,7 @@ echo "🚀 Setting up Poo Tracker development environment..."
 
 # Install Node.js dependencies (frontend)
 echo "📦 Installing Node.js dependencies..."
-pnpm install
+pnpm --filter @poo-tracker/frontend install
 
 # Install Python dependencies for AI service
 echo "🐍 Installing Python dependencies..."

@@ -26,7 +26,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
    ```bash
    # Install Node.js dependencies (frontend only - backend now uses Go)
-   pnpm install
+   pnpm --filter @poo-tracker/frontend install
 
    # Install Python dependencies for AI service
    cd ai-service && uv sync && cd ..

@@ -197,7 +197,7 @@ docker-compose up -d
 ```bash
 # Clear cache and reinstall
 rm -rf node_modules pnpm-lock.yaml
-pnpm install
+pnpm --filter @poo-tracker/frontend install
 ```
 
 **Database connection issues:**

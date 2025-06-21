@@ -49,7 +49,7 @@ jobs:
           command -v pnpm >/dev/null || { echo "❌ pnpm not found"; exit 1; }
           command -v uv >/dev/null || { echo "❌ uv not found"; exit 1; }
 
-          pnpm install || { echo "❌ Failed to run pnpm install"; exit 1; }
+          pnpm --filter @poo-tracker/frontend install || { echo "❌ Failed to run pnpm install"; exit 1; }
 
           [[ -d ai-service ]] || { echo "❌ Directory 'ai-service' not found"; exit 1; }
           cd ai-service || exit 1
@@ -76,6 +76,7 @@ jobs:
       - name: 🧪 Run tests
         run: |
           pnpm --filter @poo-tracker/frontend run test
+          go test -C backend ./...
           cd ai-service && python -m pytest
 
       - name: 🏗️ Build applications
@@ -199,7 +200,7 @@ jobs:
             ```bash
             git clone https://github.com/${{ github.repository }}.git
             cd poo-tracker
-            pnpm install
+            pnpm --filter @poo-tracker/frontend install
             make docker-up
             make dev
             ```
