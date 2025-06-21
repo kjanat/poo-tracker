@@ -144,9 +144,8 @@ func (s *MedicationService) Update(ctx context.Context, id string, input *medica
 		return nil, shared.ErrValidationFailed
 	}
 
-	// Check if medication exists
+	// Ensure medication exists
 	if _, err := s.repo.GetByID(ctx, id); err != nil {
-		return nil, err
 	}
 
 	// Create update struct

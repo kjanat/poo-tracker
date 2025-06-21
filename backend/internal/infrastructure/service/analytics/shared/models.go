@@ -34,7 +34,18 @@ type TrendPoint struct {
 	Value float64   `json:"value"`
 }
 
+
+// TrendLine represents a line in a trend analysis with additional context.
 type TrendLine struct {
+	Name         string       `json:"name"`
+	Points       []TrendPoint `json:"points"`
+	Direction    string       `json:"direction"`
+	Slope        float64      `json:"slope"`
+	Confidence   float64      `json:"confidence"`
+	Significance string       `json:"significance"`
+}
+
+	Message     string                 `json:"message"`
 	Name         string       `json:"name"`
 	Points       []TrendPoint `json:"points"`
 	Direction    string       `json:"direction"`

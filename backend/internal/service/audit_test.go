@@ -18,10 +18,14 @@ func TestAuditService_LogAction(t *testing.T) {
 
 	svc.LogAction(ctx, "user1", "Bowel", "1", audit.AuditUpdate, oldData, newData)
 
-	if len(svc.logs) != 1 {
-		t.Fatalf("expected 1 log, got %d", len(svc.logs))
+	logs, err := svc.GetAuditLogs(ctx, "user1", 10, 0)
+	if err != nil {
+		t.Fatalf("GetAuditLogs failed: %v", err)
 	}
-	log := svc.logs[0]
+	if len(logs) != 1 {
+		t.Fatalf("expected 1 log, got %d", len(logs))
+	}
+	log := logs[0]
 	if log.ID == "" {
 		t.Error("expected ID to be set")
 	}
@@ -133,10 +137,14 @@ func TestAuditService_CleanupOldLogs(t *testing.T) {
 	if err := svc.CleanupOldLogs(ctx, 2*time.Hour); err != nil {
 		t.Fatalf("CleanupOldLogs failed: %v", err)
 	}
-	if len(svc.logs) != 1 {
-		t.Fatalf("expected 1 log after cleanup, got %d", len(svc.logs))
+	logs, err := svc.GetAuditLogs(ctx, "user1", 10, 0)
+	if err != nil {
+		t.Fatalf("GetAuditLogs failed: %v", err)
 	}
-	if svc.logs[0].EntityID != "new" {
-		t.Errorf("expected remaining log to have entityID 'new', got %s", svc.logs[0].EntityID)
+	if len(logs) != 1 {
+		t.Fatalf("expected 1 log after cleanup, got %d", len(logs))
+	}
+	if logs[0].EntityID != "new" {
+		t.Errorf("expected remaining log to have entityID 'new', got %s", logs[0].EntityID)
 	}
 }
