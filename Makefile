@@ -68,7 +68,7 @@ docker-down:
 
 ## Formatting
 format:
-	gofmt -s -w backend/**/*.go
+	gofmt -s -w backend
 	uv run ruff format ai-service
 
 format-backend:
