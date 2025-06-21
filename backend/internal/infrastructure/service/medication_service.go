@@ -565,14 +565,10 @@ func (s *MedicationService) GetSideEffectAnalysis(ctx context.Context, userID st
 		sideEffects = append(sideEffects, sideEffectInfo{effect, count})
 	}
 
-	// Simple sort by count (descending)
-	for i := 0; i < len(sideEffects)-1; i++ {
-		for j := i + 1; j < len(sideEffects); j++ {
-			if sideEffects[j].count > sideEffects[i].count {
-				sideEffects[i], sideEffects[j] = sideEffects[j], sideEffects[i]
-			}
-		}
-	}
+	// Sort by count (descending) using standard library
+	sort.Slice(sideEffects, func(i, j int) bool {
+		return sideEffects[i].count > sideEffects[j].count
+	})
 
 	// Take top 10
 	limit := 10
