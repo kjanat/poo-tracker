@@ -8,8 +8,7 @@ import (
 	"github.com/google/uuid"
 
 	bm "github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
-	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
-	rel "github.com/kjanat/poo-tracker/backend/internal/domain/relations"
+	meal "github.com/kjanat/poo-tracker/backend/internal/domain/meal"
 )
 
 var (
@@ -98,12 +97,12 @@ func (m *memoryBowelRepo) Create(ctx context.Context, bm bm.BowelMovement) (bm.B
 
 func (m *memoryBowelRepo) Get(ctx context.Context, id string) (bm.BowelMovement, error) {
 	m.mu.RLock()
-	bm, ok := m.bmStore[id]
+	movement, ok := m.bmStore[id]
 	m.mu.RUnlock()
 	if !ok {
 		return bm.BowelMovement{}, ErrNotFound
 	}
-	return bm, nil
+	return movement, nil
 }
 
 func (m *memoryBowelRepo) Update(ctx context.Context, id string, update bm.BowelMovementUpdate) (bm.BowelMovement, error) {
@@ -192,33 +191,33 @@ func (m *memoryMealRepo) List(ctx context.Context) ([]meal.Meal, error) {
 	return res, nil
 }
 
-func (m *memoryMealRepo) Create(ctx context.Context, meal meal.Meal) (meal.Meal, error) {
-	if meal.ID == "" {
-		meal.ID = uuid.NewString()
+func (m *memoryMealRepo) Create(ctx context.Context, mval meal.Meal) (meal.Meal, error) {
+	if mval.ID == "" {
+		mval.ID = uuid.NewString()
 	}
 	now := time.Now().UTC()
-	meal.CreatedAt = now
-	meal.UpdatedAt = now
+	mval.CreatedAt = now
+	mval.UpdatedAt = now
 
 	// Set MealTime to now if not provided
-	if meal.MealTime.IsZero() {
-		meal.MealTime = now
+	if mval.MealTime.IsZero() {
+		mval.MealTime = now
 	}
 
 	m.mu.Lock()
-	m.mealStore[meal.ID] = meal
+	m.mealStore[mval.ID] = mval
 	m.mu.Unlock()
-	return meal, nil
+	return mval, nil
 }
 
 func (m *memoryMealRepo) Get(ctx context.Context, id string) (meal.Meal, error) {
 	m.mu.RLock()
-	meal, ok := m.mealStore[id]
+	mval, ok := m.mealStore[id]
 	m.mu.RUnlock()
 	if !ok {
 		return meal.Meal{}, ErrNotFound
 	}
-	return meal, nil
+	return mval, nil
 }
 
 func (m *memoryMealRepo) Update(ctx context.Context, id string, update meal.MealUpdate) (meal.Meal, error) {

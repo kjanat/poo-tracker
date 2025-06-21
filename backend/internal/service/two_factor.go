@@ -49,13 +49,13 @@ func (s *TwoFactorService) GenerateSecret(ctx context.Context, userID string) (*
 	}
 
 	// Get user for QR code generation
-	user, err := s.userRepo.GetUserByID(userID)
+	usr, err := s.userRepo.GetUserByID(userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
 
 	// Generate QR code URL
-	qrCodeURL := s.generateQRCodeURL(user.Email, secret)
+	qrCodeURL := s.generateQRCodeURL(usr.Email, secret)
 
 	return &user.UserTwoFactorSetupResponse{
 		Secret:      secret,
