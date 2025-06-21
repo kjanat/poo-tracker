@@ -9,7 +9,6 @@ import (
 
 	bm "github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
-	rel "github.com/kjanat/poo-tracker/backend/internal/domain/relations"
 )
 
 var (
@@ -66,44 +65,44 @@ func (m *memoryBowelRepo) List(ctx context.Context) ([]bm.BowelMovement, error) 
 	return res, nil
 }
 
-func (m *memoryBowelRepo) Create(ctx context.Context, bm bm.BowelMovement) (bm.BowelMovement, error) {
-	if bm.ID == "" {
-		bm.ID = uuid.NewString()
+func (m *memoryBowelRepo) Create(ctx context.Context, movement bm.BowelMovement) (bm.BowelMovement, error) {
+	if movement.ID == "" {
+		movement.ID = uuid.NewString()
 	}
 	now := time.Now().UTC()
-	bm.CreatedAt = now
-	bm.UpdatedAt = now
+	movement.CreatedAt = now
+	movement.UpdatedAt = now
 
 	// Set RecordedAt to now if not provided
-	if bm.RecordedAt.IsZero() {
-		bm.RecordedAt = now
+	if movement.RecordedAt.IsZero() {
+		movement.RecordedAt = now
 	}
 
 	// Set default values for experience scales if not provided
-	if bm.Pain == 0 {
-		bm.Pain = 1 // Default: minimal pain
+	if movement.Pain == 0 {
+		movement.Pain = 1 // Default: minimal pain
 	}
-	if bm.Strain == 0 {
-		bm.Strain = 1 // Default: minimal strain
+	if movement.Strain == 0 {
+		movement.Strain = 1 // Default: minimal strain
 	}
-	if bm.Satisfaction == 0 {
-		bm.Satisfaction = 5 // Default: neutral satisfaction
+	if movement.Satisfaction == 0 {
+		movement.Satisfaction = 5 // Default: neutral satisfaction
 	}
 
 	m.mu.Lock()
-	m.bmStore[bm.ID] = bm
+	m.bmStore[movement.ID] = movement
 	m.mu.Unlock()
-	return bm, nil
+	return movement, nil
 }
 
 func (m *memoryBowelRepo) Get(ctx context.Context, id string) (bm.BowelMovement, error) {
 	m.mu.RLock()
-	bm, ok := m.bmStore[id]
+	movement, ok := m.bmStore[id]
 	m.mu.RUnlock()
 	if !ok {
 		return bm.BowelMovement{}, ErrNotFound
 	}
-	return bm, nil
+	return movement, nil
 }
 
 func (m *memoryBowelRepo) Update(ctx context.Context, id string, update bm.BowelMovementUpdate) (bm.BowelMovement, error) {
@@ -192,33 +191,33 @@ func (m *memoryMealRepo) List(ctx context.Context) ([]meal.Meal, error) {
 	return res, nil
 }
 
-func (m *memoryMealRepo) Create(ctx context.Context, meal meal.Meal) (meal.Meal, error) {
-	if meal.ID == "" {
-		meal.ID = uuid.NewString()
+func (m *memoryMealRepo) Create(ctx context.Context, entry meal.Meal) (meal.Meal, error) {
+	if entry.ID == "" {
+		entry.ID = uuid.NewString()
 	}
 	now := time.Now().UTC()
-	meal.CreatedAt = now
-	meal.UpdatedAt = now
+	entry.CreatedAt = now
+	entry.UpdatedAt = now
 
 	// Set MealTime to now if not provided
-	if meal.MealTime.IsZero() {
-		meal.MealTime = now
+	if entry.MealTime.IsZero() {
+		entry.MealTime = now
 	}
 
 	m.mu.Lock()
-	m.mealStore[meal.ID] = meal
+	m.mealStore[entry.ID] = entry
 	m.mu.Unlock()
-	return meal, nil
+	return entry, nil
 }
 
 func (m *memoryMealRepo) Get(ctx context.Context, id string) (meal.Meal, error) {
 	m.mu.RLock()
-	meal, ok := m.mealStore[id]
+	entry, ok := m.mealStore[id]
 	m.mu.RUnlock()
 	if !ok {
 		return meal.Meal{}, ErrNotFound
 	}
-	return meal, nil
+	return entry, nil
 }
 
 func (m *memoryMealRepo) Update(ctx context.Context, id string, update meal.MealUpdate) (meal.Meal, error) {
