@@ -64,7 +64,7 @@ docker-down:
 	docker compose down
 
 ## Formatting
-format: clean
+format:
 	gofmt -s -w backend/**/*.go
 	uv run ruff format ai-service
 
