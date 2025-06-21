@@ -52,9 +52,9 @@ test-frontend:
 
 test-backend:
 	go test -C backend -tags test \
-    ./internal/domain/... \
-    ./internal/repository/... \
-    ./internal/service/...
+	./internal/domain/... \
+	./internal/repository/... \
+	./internal/service/...
 
 test-ai:
 	uv run pytest ai-service
