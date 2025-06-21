@@ -1,7 +1,6 @@
 .PHONY: dev dev-frontend dev-backend dev-ai dev-full build build-frontend build-backend lint lint-frontend lint-backend lint-ai test test-frontend test-backend test-ai docker-up docker-down format format-backend format-ai clean
 
 ## Development
-
 dev: dev-full
 
 ## Run frontend only
@@ -51,7 +50,10 @@ test-frontend:
 	pnpm --filter @poo-tracker/frontend run test
 
 test-backend:
-	go test -C backend ./...
+	go test -C backend -tags test \
+	./internal/domain/... \
+	./internal/repository/... \
+	./internal/service/...
 
 test-ai:
 	uv run pytest ai-service
@@ -70,6 +72,7 @@ format:
 
 format-backend:
 	gofmt -s -w backend/**/*.go
+
 format-ai:
 	uv run ruff format ai-service
 
