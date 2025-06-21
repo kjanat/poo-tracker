@@ -16,7 +16,6 @@
     "clean": "pnpm --package=rimraf dlx rimraf dist node_modules",
     "type-check": "tsc --noEmit",
     "format:frontend": "prettier --write frontend",
-    "format:backend": "gofmt -s -w backend/**/*.go",
     "format:ai": "uv run ruff format ai-service",
     "format:ai:check": "uv run ruff format ai-service --check",
     "format:prettier": "prettier --write .",
