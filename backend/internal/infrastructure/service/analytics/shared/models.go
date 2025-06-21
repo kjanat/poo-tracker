@@ -39,7 +39,22 @@ type CorrelationPair = analytics.Correlation
 type TrendLine = analytics.DataTrend
 type PatternMatch = analytics.Insight
 type HealthMetric = analytics.ScoreFactor
-type InsightRecommendation = analytics.Insight
+
+// InsightRecommendation represents a recommendation produced by the analytics
+// engine before it is converted to a domain Recommendation.
+type InsightRecommendation struct {
+	ID          string                 `json:"id"`
+	Type        string                 `json:"type"`
+	Category    string                 `json:"category,omitempty"`
+	Title       string                 `json:"title"`
+	Description string                 `json:"description"`
+	Priority    string                 `json:"priority"`
+	Confidence  float64                `json:"confidence,omitempty"`
+	Evidence    []string               `json:"evidence"`
+	Actions     []string               `json:"actions"`
+	Context     map[string]interface{} `json:"context,omitempty"`
+	CreatedAt   time.Time              `json:"createdAt"`
+}
 
 // StatisticalSummary represents basic summary statistics for a data set.
 type StatisticalSummary struct {
