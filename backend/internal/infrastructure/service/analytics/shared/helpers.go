@@ -6,6 +6,34 @@ import (
 	"time"
 )
 
+// calculatePercentile returns the value at the given percentile from a slice of
+// float64 values. The slice is copied and sorted internally. If the slice is
+// empty, the function returns 0. If it contains a single element, that value is
+// returned. Percentile should be provided as a decimal (e.g., 0.25 for 25%).
+func calculatePercentile(values []float64, percentile float64) float64 {
+	if len(values) == 0 {
+		return 0
+	}
+	if len(values) == 1 {
+		return values[0]
+	}
+
+	sorted := make([]float64, len(values))
+	copy(sorted, values)
+	sort.Float64s(sorted)
+
+	rank := percentile * float64(len(sorted)-1)
+	lower := int(math.Floor(rank))
+	upper := int(math.Ceil(rank))
+
+	if lower == upper {
+		return sorted[lower]
+	}
+
+	weight := rank - float64(lower)
+	return sorted[lower]*(1-weight) + sorted[upper]*weight
+}
+
 // CalculateStatistics computes basic statistical metrics for a slice of float64 values
 func CalculateStatistics(values []float64) StatisticalSummary {
 	if len(values) == 0 {
@@ -39,8 +67,8 @@ func CalculateStatistics(values []float64) StatisticalSummary {
 	stdDev := math.Sqrt(varianceSum / float64(len(values)))
 
 	// Calculate percentiles
-	p25Index := int(float64(len(sortedValues)) * 0.25)
-	p75Index := int(float64(len(sortedValues)) * 0.75)
+	p25 := calculatePercentile(sortedValues, 0.25)
+	p75 := calculatePercentile(sortedValues, 0.75)
 
 	return StatisticalSummary{
 		Count:        len(values),
@@ -49,8 +77,8 @@ func CalculateStatistics(values []float64) StatisticalSummary {
 		StdDev:       stdDev,
 		Min:          sortedValues[0],
 		Max:          sortedValues[len(sortedValues)-1],
-		Percentile25: sortedValues[p25Index],
-		Percentile75: sortedValues[p75Index],
+		Percentile25: p25,
+		Percentile75: p75,
 	}
 }
 
