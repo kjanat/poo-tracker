@@ -259,6 +259,7 @@ func (ie *InsightEngine) analyzeCorrelations(
 	dailySpice := make(map[string]float64)
 	dailyPain := make(map[string]float64)
 	dailyCount := make(map[string]int)
+	dailyMovementCount := make(map[string]int)
 
 	for _, m := range meals {
 		if m.SpicyLevel != nil {
@@ -271,6 +272,7 @@ func (ie *InsightEngine) analyzeCorrelations(
 	for _, bm := range movements {
 		key := bm.RecordedAt.Format("2006-01-02")
 		dailyPain[key] += float64(bm.Pain)
+		dailyMovementCount[key]++
 	}
 
 	var spiceVals, painVals []float64
@@ -278,9 +280,11 @@ func (ie *InsightEngine) analyzeCorrelations(
 		if c, ok := dailyCount[day]; ok && c > 0 {
 			avgSpice := spice / float64(c)
 			if pain, exists := dailyPain[day]; exists {
-				avgPain := pain / float64(c)
-				spiceVals = append(spiceVals, avgSpice)
-				painVals = append(painVals, avgPain)
+				if mc, ok := dailyMovementCount[day]; ok && mc > 0 {
+					avgPain := pain / float64(mc)
+					spiceVals = append(spiceVals, avgSpice)
+					painVals = append(painVals, avgPain)
+				}
 			}
 		}
 	}
