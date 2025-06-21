@@ -73,11 +73,13 @@ docker compose down
 
 ## Formatting
 
-format: format-backend format-ai
+format: format-frontend format-backend format-ai
+
+format-frontend:
+pnpm --filter @poo-tracker/frontend exec prettier --write frontend
 
 format-backend:
 gofmt -s -w backend/**/*.go
-
 format-ai:
 uv run ruff format ai-service
 
