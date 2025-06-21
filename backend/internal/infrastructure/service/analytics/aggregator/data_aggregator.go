@@ -243,14 +243,18 @@ func (da *DataAggregator) GroupMealsByType(meals []meal.Meal) map[string][]meal.
 	return groups
 }
 
-// GetActiveMedicationPercentage returns the percentage of currently active medications.
-func (da *DataAggregator) GetActiveMedicationPercentage(medications []medication.Medication) float64 {
-	if len(medications) == 0 {
+// GetActiveMedicationPercentage returns the percentage of medications that are currently active.
+//
+// This function is a simplified metric and does not track individual dose adherence.
+// It merely reflects how many medications are marked active versus the total count.
+func (da *DataAggregator) GetActiveMedicationPercentage(medications []medication.Medication, days int) float64 {
+	if len(medications) == 0 || days == 0 {
 		return 0
 	}
 
-	// Since the medication model doesn't have doses per day or adherence score fields,
-	// we'll calculate a simplified adherence rate based on active medications
+	// Since the medication model doesn't have dose tracking fields,
+	// this calculation is a rough estimate based solely on the number of
+	// medications marked as active.
 	totalMedications := len(medications)
 	activeMedications := 0
 
