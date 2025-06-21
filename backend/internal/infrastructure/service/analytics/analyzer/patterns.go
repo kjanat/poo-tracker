@@ -83,17 +83,17 @@ func (ta *TrendAnalyzer) analyzeMealTimings(meals []meal.Meal) []shared.MealTimi
 }
 
 func (ta *TrendAnalyzer) identifyCommonSymptomMap(symptoms []symptom.Symptom) map[string]int {
-    if symptoms == nil {
-        return make(map[string]int)
-    }
+	if symptoms == nil {
+		return make(map[string]int)
+	}
 
-    // Convert symptom list to frequency map
-    freq := make(map[string]int)
-    for _, s := range symptoms {
-        symptomType := s.Type.String()
-        freq[symptomType]++
-    }
-    return freq
+	// Convert symptom list to frequency map
+	freq := make(map[string]int)
+	for _, s := range symptoms {
+		symptomType := s.Type.String()
+		freq[symptomType]++
+	}
+	return freq
 }
 
 func (ta *TrendAnalyzer) analyzeBowelFrequency(movements []bowelmovement.BowelMovement) float64 {
@@ -176,7 +176,50 @@ func (ta *TrendAnalyzer) analyzeSymptomSeverity(symptoms []symptom.Symptom) map[
 }
 
 func (ta *TrendAnalyzer) analyzeDietaryHabits(meals []meal.Meal) []shared.DietaryHabit {
-	return []shared.DietaryHabit{}
+	if len(meals) == 0 {
+		return nil
+	}
+
+	counts := map[string]int{
+		"spicy meals":  0,
+		"large meals":  0,
+		"fiber rich":   0,
+		"dairy meals":  0,
+		"gluten meals": 0,
+	}
+
+	for _, m := range meals {
+		if m.SpicyLevel != nil && *m.SpicyLevel > 0 {
+			counts["spicy meals"]++
+		}
+		if m.Calories > 800 {
+			counts["large meals"]++
+		}
+		if m.FiberRich {
+			counts["fiber rich"]++
+		}
+		if m.Dairy {
+			counts["dairy meals"]++
+		}
+		if m.Gluten {
+			counts["gluten meals"]++
+		}
+	}
+
+	habits := make([]shared.DietaryHabit, 0, len(counts))
+	for desc, freq := range counts {
+		if freq == 0 {
+			continue
+		}
+		habits = append(habits, shared.DietaryHabit{
+			Description: desc,
+			Frequency:   freq,
+			Impact:      0,
+		})
+	}
+
+	sort.Slice(habits, func(i, j int) bool { return habits[i].Frequency > habits[j].Frequency })
+	return habits
 }
 
 func (ta *TrendAnalyzer) analyzeBowelRegularity(movements []bowelmovement.BowelMovement) float64 {
@@ -184,5 +227,31 @@ func (ta *TrendAnalyzer) analyzeBowelRegularity(movements []bowelmovement.BowelM
 }
 
 func (ta *TrendAnalyzer) analyzeSymptomTriggers(symptoms []symptom.Symptom, meals []meal.Meal) []shared.SymptomTrigger {
-	return []shared.SymptomTrigger{}
+	if len(symptoms) == 0 || len(meals) == 0 {
+		return nil
+	}
+
+	triggerCounts := make(map[string]int)
+	for _, s := range symptoms {
+		for _, m := range meals {
+			if s.RecordedAt.After(m.MealTime) {
+				if s.RecordedAt.Sub(m.MealTime) <= 6*time.Hour {
+					triggerCounts[m.Name]++
+				}
+			}
+		}
+	}
+
+	triggers := make([]shared.SymptomTrigger, 0, len(triggerCounts))
+	for ing, count := range triggerCounts {
+		confidence := float64(count) / float64(len(symptoms))
+		triggers = append(triggers, shared.SymptomTrigger{
+			TriggerType: "meal",
+			Ingredient:  ing,
+			Confidence:  confidence,
+		})
+	}
+
+	sort.Slice(triggers, func(i, j int) bool { return triggers[i].Confidence > triggers[j].Confidence })
+	return triggers
 }

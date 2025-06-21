@@ -155,9 +155,14 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 		})
 		return
 	}
+	userIDStr, ok := userID.(string)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user token"})
+		return
+	}
 
 	// Get user by ID
-	userEntity, err := h.userService.GetByID(c.Request.Context(), userID.(string))
+	userEntity, err := h.userService.GetByID(c.Request.Context(), userIDStr)
 	if err != nil {
 		switch err {
 		case user.ErrUserNotFound:
@@ -213,7 +218,7 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	input := req.ToUpdateUserInput()
 
 	// Update user
-	userEntity, err := h.userService.Update(c.Request.Context(), userID.(string), input)
+	userEntity, err := h.userService.Update(c.Request.Context(), userIDStr, input)
 	if err != nil {
 		switch err {
 		case user.ErrUserNotFound:
@@ -283,7 +288,7 @@ func (h *UserHandler) ChangePassword(c *gin.Context) {
 	}
 
 	// Change password
-	err := h.userService.ChangePassword(c.Request.Context(), userID.(string), input)
+	err := h.userService.ChangePassword(c.Request.Context(), userIDStr, input)
 	if err != nil {
 		switch err {
 		case user.ErrUserNotFound:
@@ -330,9 +335,14 @@ func (h *UserHandler) GetSettings(c *gin.Context) {
 		})
 		return
 	}
+	userIDStr, ok := userID.(string)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user token"})
+		return
+	}
 
 	// Get user settings
-	settings, err := h.userService.GetSettings(c.Request.Context(), userID.(string))
+	settings, err := h.userService.GetSettings(c.Request.Context(), userIDStr)
 	if err != nil {
 		switch err {
 		case user.ErrUserSettingsNotFound:
@@ -387,7 +397,7 @@ func (h *UserHandler) UpdateSettings(c *gin.Context) {
 	input := req.ToUpdateSettingsInput()
 
 	// Update settings
-	settings, err := h.userService.UpdateSettings(c.Request.Context(), userID.(string), input)
+	settings, err := h.userService.UpdateSettings(c.Request.Context(), userIDStr, input)
 	if err != nil {
 		switch err {
 		case user.ErrUserNotFound:

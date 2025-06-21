@@ -63,7 +63,11 @@ func (a *App) createBowelMovement(c *gin.Context) {
 	}
 
 	// Start with a new bowel movement with defaults
-	bm := bm.NewBowelMovement(req.UserID, req.BristolType)
+	bm, err := bm.NewBowelMovement(req.UserID, req.BristolType)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	// Apply optional fields
 	applyOptionalFields(&bm, &req)

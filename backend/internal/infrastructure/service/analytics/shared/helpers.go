@@ -82,6 +82,36 @@ func CalculateStatistics(values []float64) StatisticalSummary {
 	}
 }
 
+// calculatePercentile computes the percentile value using linear interpolation.
+// values must be pre-sorted in ascending order. The percentile should be
+// between 0 and 1 inclusive.
+func calculatePercentile(values []float64, percentile float64) float64 {
+	if len(values) == 0 {
+		return 0
+	}
+
+	if len(values) == 1 {
+		return values[0]
+	}
+
+	if percentile <= 0 {
+		return values[0]
+	}
+	if percentile >= 1 {
+		return values[len(values)-1]
+	}
+
+	pos := percentile * float64(len(values)-1)
+	lower := int(math.Floor(pos))
+	upper := int(math.Ceil(pos))
+	if lower == upper {
+		return values[lower]
+	}
+
+	weight := pos - float64(lower)
+	return values[lower]*(1-weight) + values[upper]*weight
+}
+
 // CalculateCorrelation computes Pearson correlation coefficient between two variables
 func CalculateCorrelation(x, y []float64) float64 {
 	if len(x) != len(y) || len(x) == 0 {
