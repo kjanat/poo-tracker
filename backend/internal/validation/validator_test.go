@@ -4,7 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	bm "github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/shared"
 )
 
 func TestValidateBristolType(t *testing.T) {
@@ -268,7 +270,7 @@ func TestValidationErrors(t *testing.T) {
 
 func TestValidateBowelMovement(t *testing.T) {
 	// Valid bowel movement
-	validBM := model.BowelMovement{
+	validBM := bm.BowelMovement{
 		UserID:       "user123",
 		BristolType:  4,
 		Pain:         3,
@@ -285,7 +287,7 @@ func TestValidateBowelMovement(t *testing.T) {
 	}
 
 	// Invalid bowel movement
-	invalidBM := model.BowelMovement{
+	invalidBM := bm.BowelMovement{
 		UserID:       "", // Invalid: empty
 		BristolType:  8,  // Invalid: out of range
 		Pain:         11, // Invalid: out of range
@@ -307,7 +309,7 @@ func TestValidateBowelMovement(t *testing.T) {
 
 func TestValidateMeal(t *testing.T) {
 	// Valid meal
-	validMeal := model.Meal{
+	validMeal := meal.Meal{
 		UserID:    "user123",
 		Name:      "Test Meal",
 		CreatedAt: time.Now(),
@@ -321,7 +323,7 @@ func TestValidateMeal(t *testing.T) {
 	}
 
 	// Invalid meal
-	invalidMeal := model.Meal{
+	invalidMeal := meal.Meal{
 		UserID: "", // Invalid: empty
 		Name:   "", // Invalid: empty
 	}
@@ -340,20 +342,20 @@ func TestValidateMeal(t *testing.T) {
 
 func TestValidateEnum(t *testing.T) {
 	// Valid enum
-	volume := model.VolumeSmall
+	volume := shared.VolumeSmall
 	err := ValidateEnum(volume, "volume")
 	if err != nil {
 		t.Errorf("Valid enum should not have error, got: %v", err)
 	}
 
 	// Test with different valid enums
-	color := model.ColorBrown
+	color := shared.ColorBrown
 	err = ValidateEnum(color, "color")
 	if err != nil {
 		t.Errorf("Valid color enum should not have error, got: %v", err)
 	}
 
-	consistency := model.ConsistencySoft
+	consistency := shared.ConsistencySoft
 	err = ValidateEnum(consistency, "consistency")
 	if err != nil {
 		t.Errorf("Valid consistency enum should not have error, got: %v", err)

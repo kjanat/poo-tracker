@@ -159,7 +159,7 @@ production setup.
 
 ### Architecture
 
-- `internal/model` – domain models
+- `internal/domain` – domain models
 - `internal/repository` – repository interfaces and implementations
 - `internal/service` – business logic with pluggable analytics strategies
 - `server` – HTTP handlers and routing

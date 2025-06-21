@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/user"
 	"github.com/kjanat/poo-tracker/backend/internal/service"
 )
 
@@ -98,7 +98,7 @@ func (h *TwoFactorHandler) Disable(c *gin.Context) {
 		return
 	}
 
-	var req model.UserTwoFactorVerifyRequest
+	var req user.UserTwoFactorVerifyRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request format"})
 		return
@@ -134,7 +134,7 @@ func (h *TwoFactorHandler) Verify(c *gin.Context) {
 		return
 	}
 
-	var req model.UserTwoFactorVerifyRequest
+	var req user.UserTwoFactorVerifyRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request format"})
 		return

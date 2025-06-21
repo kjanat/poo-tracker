@@ -3,40 +3,40 @@ package repository
 import (
 	"sync"
 
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/user"
 )
 
 type UserRepository interface {
-	CreateUser(user *model.User) error
-	GetUserByID(id string) (*model.User, error)
-	GetUserByEmail(email string) (*model.User, error)
-	UpdateUser(user *model.User) error
+	CreateUser(user *user.User) error
+	GetUserByID(id string) (*user.User, error)
+	GetUserByEmail(email string) (*user.User, error)
+	UpdateUser(user *user.User) error
 	DeleteUser(id string) error
 
 	// UserAuth methods
-	CreateUserAuth(auth *model.UserAuth) error
-	GetUserAuthByUserID(userID string) (*model.UserAuth, error)
-	GetUserAuthByEmail(email string) (*model.UserAuth, error)
-	UpdateUserAuth(auth *model.UserAuth) error
+	CreateUserAuth(auth *user.UserAuth) error
+	GetUserAuthByUserID(userID string) (*user.UserAuth, error)
+	GetUserAuthByEmail(email string) (*user.UserAuth, error)
+	UpdateUserAuth(auth *user.UserAuth) error
 }
 
 // MemoryUserRepository is an in-memory implementation for testing.
 type MemoryUserRepository struct {
 	mu        sync.RWMutex
-	users     map[string]*model.User
-	auths     map[string]*model.UserAuth // keyed by userID
+	users     map[string]*user.User
+	auths     map[string]*user.UserAuth // keyed by userID
 	emailToID map[string]string
 }
 
 func NewMemoryUserRepository() *MemoryUserRepository {
 	return &MemoryUserRepository{
-		users:     make(map[string]*model.User),
-		auths:     make(map[string]*model.UserAuth),
+		users:     make(map[string]*user.User),
+		auths:     make(map[string]*user.UserAuth),
 		emailToID: make(map[string]string),
 	}
 }
 
-func (r *MemoryUserRepository) CreateUser(user *model.User) error {
+func (r *MemoryUserRepository) CreateUser(user *user.User) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -45,7 +45,7 @@ func (r *MemoryUserRepository) CreateUser(user *model.User) error {
 	return nil
 }
 
-func (r *MemoryUserRepository) GetUserByID(id string) (*model.User, error) {
+func (r *MemoryUserRepository) GetUserByID(id string) (*user.User, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -56,7 +56,7 @@ func (r *MemoryUserRepository) GetUserByID(id string) (*model.User, error) {
 	return user, nil
 }
 
-func (r *MemoryUserRepository) GetUserByEmail(email string) (*model.User, error) {
+func (r *MemoryUserRepository) GetUserByEmail(email string) (*user.User, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -71,7 +71,7 @@ func (r *MemoryUserRepository) GetUserByEmail(email string) (*model.User, error)
 	return user, nil
 }
 
-func (r *MemoryUserRepository) UpdateUser(user *model.User) error {
+func (r *MemoryUserRepository) UpdateUser(user *user.User) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -97,7 +97,7 @@ func (r *MemoryUserRepository) DeleteUser(id string) error {
 	return nil
 }
 
-func (r *MemoryUserRepository) CreateUserAuth(auth *model.UserAuth) error {
+func (r *MemoryUserRepository) CreateUserAuth(auth *user.UserAuth) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -105,7 +105,7 @@ func (r *MemoryUserRepository) CreateUserAuth(auth *model.UserAuth) error {
 	return nil
 }
 
-func (r *MemoryUserRepository) GetUserAuthByUserID(userID string) (*model.UserAuth, error) {
+func (r *MemoryUserRepository) GetUserAuthByUserID(userID string) (*user.UserAuth, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -116,7 +116,7 @@ func (r *MemoryUserRepository) GetUserAuthByUserID(userID string) (*model.UserAu
 	return auth, nil
 }
 
-func (r *MemoryUserRepository) GetUserAuthByEmail(email string) (*model.UserAuth, error) {
+func (r *MemoryUserRepository) GetUserAuthByEmail(email string) (*user.UserAuth, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -131,7 +131,7 @@ func (r *MemoryUserRepository) GetUserAuthByEmail(email string) (*model.UserAuth
 	return auth, nil
 }
 
-func (r *MemoryUserRepository) UpdateUserAuth(auth *model.UserAuth) error {
+func (r *MemoryUserRepository) UpdateUserAuth(auth *user.UserAuth) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 

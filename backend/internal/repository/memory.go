@@ -6,7 +6,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+
+	bm "github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
+	rel "github.com/kjanat/poo-tracker/backend/internal/domain/relations"
 )
 
 var (
@@ -19,51 +22,51 @@ var (
 
 type memoryBowelRepo struct {
 	mu      sync.RWMutex
-	bmStore map[string]model.BowelMovement
+	bmStore map[string]bm.BowelMovement
 }
 
 type memoryBowelDetailsRepo struct {
 	mu           sync.RWMutex
-	detailsStore map[string]model.BowelMovementDetails // keyed by BowelMovementID
-	bowelRepo    *memoryBowelRepo                      // reference to update HasDetails flag
+	detailsStore map[string]bm.BowelMovementDetails // keyed by BowelMovementID
+	bowelRepo    *memoryBowelRepo                   // reference to update HasDetails flag
 }
 
 type memoryMealRepo struct {
 	mu        sync.RWMutex
-	mealStore map[string]model.Meal
+	mealStore map[string]meal.Meal
 }
 
 func NewMemoryBowelRepo() *memoryBowelRepo {
 	return &memoryBowelRepo{
-		bmStore: make(map[string]model.BowelMovement),
+		bmStore: make(map[string]bm.BowelMovement),
 	}
 }
 
 func NewMemoryBowelDetailsRepo(bowelRepo *memoryBowelRepo) *memoryBowelDetailsRepo {
 	return &memoryBowelDetailsRepo{
-		detailsStore: make(map[string]model.BowelMovementDetails),
+		detailsStore: make(map[string]bm.BowelMovementDetails),
 		bowelRepo:    bowelRepo,
 	}
 }
 
 func NewMemoryMealRepo() *memoryMealRepo {
 	return &memoryMealRepo{
-		mealStore: make(map[string]model.Meal),
+		mealStore: make(map[string]meal.Meal),
 	}
 }
 
 // BowelMovementRepository methods for memoryBowelRepo
-func (m *memoryBowelRepo) List(ctx context.Context) ([]model.BowelMovement, error) {
+func (m *memoryBowelRepo) List(ctx context.Context) ([]bm.BowelMovement, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	res := make([]model.BowelMovement, 0, len(m.bmStore))
+	res := make([]bm.BowelMovement, 0, len(m.bmStore))
 	for _, v := range m.bmStore {
 		res = append(res, v)
 	}
 	return res, nil
 }
 
-func (m *memoryBowelRepo) Create(ctx context.Context, bm model.BowelMovement) (model.BowelMovement, error) {
+func (m *memoryBowelRepo) Create(ctx context.Context, bm bm.BowelMovement) (bm.BowelMovement, error) {
 	if bm.ID == "" {
 		bm.ID = uuid.NewString()
 	}
@@ -93,22 +96,22 @@ func (m *memoryBowelRepo) Create(ctx context.Context, bm model.BowelMovement) (m
 	return bm, nil
 }
 
-func (m *memoryBowelRepo) Get(ctx context.Context, id string) (model.BowelMovement, error) {
+func (m *memoryBowelRepo) Get(ctx context.Context, id string) (bm.BowelMovement, error) {
 	m.mu.RLock()
 	bm, ok := m.bmStore[id]
 	m.mu.RUnlock()
 	if !ok {
-		return model.BowelMovement{}, ErrNotFound
+		return bm.BowelMovement{}, ErrNotFound
 	}
 	return bm, nil
 }
 
-func (m *memoryBowelRepo) Update(ctx context.Context, id string, update model.BowelMovementUpdate) (model.BowelMovement, error) {
+func (m *memoryBowelRepo) Update(ctx context.Context, id string, update bm.BowelMovementUpdate) (bm.BowelMovement, error) {
 	m.mu.Lock()
 	existing, ok := m.bmStore[id]
 	if !ok {
 		m.mu.Unlock()
-		return model.BowelMovement{}, ErrNotFound
+		return bm.BowelMovement{}, ErrNotFound
 	}
 
 	// Only update fields that are explicitly provided (non-nil pointers)
@@ -179,17 +182,17 @@ func (m *memoryBowelRepo) Delete(ctx context.Context, id string) error {
 }
 
 // MealRepository methods for memoryMealRepo
-func (m *memoryMealRepo) List(ctx context.Context) ([]model.Meal, error) {
+func (m *memoryMealRepo) List(ctx context.Context) ([]meal.Meal, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	res := make([]model.Meal, 0, len(m.mealStore))
+	res := make([]meal.Meal, 0, len(m.mealStore))
 	for _, v := range m.mealStore {
 		res = append(res, v)
 	}
 	return res, nil
 }
 
-func (m *memoryMealRepo) Create(ctx context.Context, meal model.Meal) (model.Meal, error) {
+func (m *memoryMealRepo) Create(ctx context.Context, meal meal.Meal) (meal.Meal, error) {
 	if meal.ID == "" {
 		meal.ID = uuid.NewString()
 	}
@@ -208,22 +211,22 @@ func (m *memoryMealRepo) Create(ctx context.Context, meal model.Meal) (model.Mea
 	return meal, nil
 }
 
-func (m *memoryMealRepo) Get(ctx context.Context, id string) (model.Meal, error) {
+func (m *memoryMealRepo) Get(ctx context.Context, id string) (meal.Meal, error) {
 	m.mu.RLock()
 	meal, ok := m.mealStore[id]
 	m.mu.RUnlock()
 	if !ok {
-		return model.Meal{}, ErrNotFound
+		return meal.Meal{}, ErrNotFound
 	}
 	return meal, nil
 }
 
-func (m *memoryMealRepo) Update(ctx context.Context, id string, update model.MealUpdate) (model.Meal, error) {
+func (m *memoryMealRepo) Update(ctx context.Context, id string, update meal.MealUpdate) (meal.Meal, error) {
 	m.mu.Lock()
 	existing, ok := m.mealStore[id]
 	if !ok {
 		m.mu.Unlock()
-		return model.Meal{}, ErrNotFound
+		return meal.Meal{}, ErrNotFound
 	}
 
 	// Only update fields that are explicitly provided (non-nil pointers)
@@ -281,7 +284,7 @@ func (m *memoryMealRepo) Delete(ctx context.Context, id string) error {
 }
 
 // BowelMovementDetailsRepository methods for memoryBowelDetailsRepo
-func (r *memoryBowelDetailsRepo) Create(ctx context.Context, details model.BowelMovementDetails) (model.BowelMovementDetails, error) {
+func (r *memoryBowelDetailsRepo) Create(ctx context.Context, details bm.BowelMovementDetails) (bm.BowelMovementDetails, error) {
 	if details.ID == "" {
 		details.ID = uuid.NewString()
 	}
@@ -300,22 +303,22 @@ func (r *memoryBowelDetailsRepo) Create(ctx context.Context, details model.Bowel
 	return details, nil
 }
 
-func (r *memoryBowelDetailsRepo) Get(ctx context.Context, bowelMovementID string) (model.BowelMovementDetails, error) {
+func (r *memoryBowelDetailsRepo) Get(ctx context.Context, bowelMovementID string) (bm.BowelMovementDetails, error) {
 	r.mu.RLock()
 	details, ok := r.detailsStore[bowelMovementID]
 	r.mu.RUnlock()
 	if !ok {
-		return model.BowelMovementDetails{}, ErrNotFound
+		return bm.BowelMovementDetails{}, ErrNotFound
 	}
 	return details, nil
 }
 
-func (r *memoryBowelDetailsRepo) Update(ctx context.Context, bowelMovementID string, update model.BowelMovementDetailsUpdate) (model.BowelMovementDetails, error) {
+func (r *memoryBowelDetailsRepo) Update(ctx context.Context, bowelMovementID string, update bm.BowelMovementDetailsUpdate) (bm.BowelMovementDetails, error) {
 	r.mu.Lock()
 	existing, ok := r.detailsStore[bowelMovementID]
 	if !ok {
 		r.mu.Unlock()
-		return model.BowelMovementDetails{}, ErrNotFound
+		return bm.BowelMovementDetails{}, ErrNotFound
 	}
 
 	// Apply updates

@@ -28,16 +28,34 @@ func (da *DataAggregator) AggregateBowelMovements(movements []bowelmovement.Bowe
 		totalDays = 1
 	}
 
-	stats := &analytics.BowelMovementStats{
-		TotalCount:    len(movements),
-		AveragePerDay: float64(len(movements)) / totalDays,
-		LastMovement:  movements[len(movements)-1].RecordedAt,
+	// Collect statistics
+	bristolFreq := make(map[int]int)
+	var painSum, strainSum, satisfactionSum float64
+	for _, m := range movements {
+		bristolFreq[m.BristolType]++
+		painSum += float64(m.Pain)
+		strainSum += float64(m.Strain)
+		satisfactionSum += float64(m.Satisfaction)
 	}
 
-	stats.ConsistencyScore = da.calculateConsistencyScore(movements)
-	stats.RegularityScore = da.calculateRegularityScore(movements)
+	mostBristol := 0
+	maxCount := 0
+	for b, count := range bristolFreq {
+		if count > maxCount {
+			maxCount = count
+			mostBristol = b
+		}
+	}
 
-	return stats
+	return &analytics.BowelMovementStats{
+		TotalCount:          int64(len(movements)),
+		AveragePerDay:       float64(len(movements)) / totalDays,
+		MostCommonBristol:   mostBristol,
+		AveragePain:         painSum / float64(len(movements)),
+		AverageStrain:       strainSum / float64(len(movements)),
+		AverageSatisfaction: satisfactionSum / float64(len(movements)),
+		RegularityScore:     da.calculateRegularityScore(movements),
+	}
 }
 
 // AggregateMeals calculates statistics for meals
@@ -57,48 +75,29 @@ func (da *DataAggregator) AggregateMeals(meals []meal.Meal) *analytics.MealStats
 		totalDays = 1
 	}
 
-	ingredientFreq := make(map[string]int)
-	// Ingredients processing is skipped for now - we'll implement it later
-	// when the meal model is updated
-
-	// Get most common ingredients
-	type ingredientCount struct {
-		name  string
-		count int
-	}
-	var ingredients []ingredientCount
-	for ing, count := range ingredientFreq {
-		ingredients = append(ingredients, ingredientCount{ing, count})
-	}
-	sort.Slice(ingredients, func(i, j int) bool {
-		return ingredients[i].count > ingredients[j].count
-	})
-
-	// Take top 5 common ingredients
-	commonIngredients := make([]string, 0, 5)
-	for i := 0; i < len(ingredients) && i < 5; i++ {
-		commonIngredients = append(commonIngredients, ingredients[i].name)
+	var calorieSum int
+	fiberRich := 0
+	for _, m := range meals {
+		calorieSum += m.Calories
+		if m.FiberRich {
+			fiberRich++
+		}
 	}
 
-	stats := &analytics.MealStats{
-		TotalCount:        len(meals),
-		AveragePerDay:     float64(len(meals)) / totalDays,
-		CommonIngredients: commonIngredients,
-		LastMeal:          meals[len(meals)-1].CreatedAt,
+	return &analytics.MealStats{
+		TotalMeals:       int64(len(meals)),
+		AveragePerDay:    float64(len(meals)) / totalDays,
+		TotalCalories:    calorieSum,
+		AverageCalories:  float64(calorieSum) / float64(len(meals)),
+		FiberRichPercent: float64(fiberRich) / float64(len(meals)) * 100,
+		HealthScore:      da.calculateNutritionScore(meals),
 	}
-
-	stats.NutritionScore = da.calculateNutritionScore(meals)
-
-	return stats
 }
 
 // AggregateSymptoms calculates statistics for symptoms
 func (da *DataAggregator) AggregateSymptoms(symptoms []symptom.Symptom) *analytics.SymptomStats {
 	if len(symptoms) == 0 {
-		return &analytics.SymptomStats{
-			CommonSymptoms: make(map[string]int),
-			SeverityTrends: make(map[string]float64),
-		}
+		return &analytics.SymptomStats{}
 	}
 
 	// Sort symptoms by time
@@ -112,39 +111,51 @@ func (da *DataAggregator) AggregateSymptoms(symptoms []symptom.Symptom) *analyti
 		totalDays = 1
 	}
 
-	symptomFreq := make(map[string]int)
-	severitySum := make(map[string]float64)
-	severityCount := make(map[string]int)
-
+	var severityTotal float64
+	catFreq := make(map[string]int)
+	typeFreq := make(map[string]int)
 	for _, s := range symptoms {
-		symptomType := s.Type.String() // Assuming Type is an enum with String() method
-		symptomFreq[symptomType]++
-		severitySum[symptomType] += float64(s.Severity)
-		severityCount[symptomType]++
+		severityTotal += float64(s.Severity)
+		if s.Category != nil {
+			catFreq[s.Category.String()]++
+		}
+		if s.Type != nil {
+			typeFreq[s.Type.String()]++
+		}
 	}
 
-	// Calculate average severity for each symptom
-	severityTrends := make(map[string]float64)
-	for sType, sum := range severitySum {
-		severityTrends[sType] = sum / float64(severityCount[sType])
+	mostCat := ""
+	mostCatCount := 0
+	for c, count := range catFreq {
+		if count > mostCatCount {
+			mostCat = c
+			mostCatCount = count
+		}
+	}
+
+	mostType := ""
+	mostTypeCount := 0
+	for t, count := range typeFreq {
+		if count > mostTypeCount {
+			mostType = t
+			mostTypeCount = count
+		}
 	}
 
 	return &analytics.SymptomStats{
-		TotalCount:      len(symptoms),
-		AveragePerDay:   float64(len(symptoms)) / totalDays,
-		CommonSymptoms:  symptomFreq,
-		SeverityTrends:  severityTrends,
-		LastSymptomTime: symptoms[len(symptoms)-1].CreatedAt,
+		TotalSymptoms:      int64(len(symptoms)),
+		AveragePerDay:      float64(len(symptoms)) / totalDays,
+		AverageSeverity:    severityTotal / float64(len(symptoms)),
+		MostCommonCategory: mostCat,
+		MostCommonType:     mostType,
+		TrendDirection:     "stable",
 	}
 }
 
 // AggregateMedications calculates statistics for medications
 func (da *DataAggregator) AggregateMedications(medications []*medication.Medication) *analytics.MedicationStats {
 	if len(medications) == 0 {
-		return &analytics.MedicationStats{
-			ActiveMedications:  make([]string, 0),
-			EffectivenessScore: make(map[string]float64),
-		}
+		return &analytics.MedicationStats{}
 	}
 
 	// Get active medications
@@ -155,15 +166,28 @@ func (da *DataAggregator) AggregateMedications(medications []*medication.Medicat
 			activeMeds = append(activeMeds, med.Name)
 		}
 	}
-	stats := &analytics.MedicationStats{
-		TotalCount:        len(medications),
-		ActiveMedications: activeMeds,
+	categoryFreq := make(map[string]int)
+	for _, med := range medications {
+		if med.Category != nil {
+			categoryFreq[med.Category.String()]++
+		}
+	}
+	mostCat := ""
+	mostCount := 0
+	for c, count := range categoryFreq {
+		if count > mostCount {
+			mostCat = c
+			mostCount = count
+		}
 	}
 
-	stats.ComplianceScore = da.calculateComplianceScore(medications)
-	stats.EffectivenessScore = da.calculateEffectivenessScores(medications)
-
-	return stats
+	return &analytics.MedicationStats{
+		TotalMedications:   int64(len(medications)),
+		ActiveMedications:  int64(len(activeMeds)),
+		AdherenceScore:     da.calculateComplianceScore(medications),
+		MostCommonCategory: mostCat,
+		ComplexityScore:    da.calculateEffectivenessScores(medications)["overall"],
+	}
 }
 
 // Helper methods for score calculations

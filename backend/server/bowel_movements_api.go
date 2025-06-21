@@ -4,7 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	bm "github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
+	rel "github.com/kjanat/poo-tracker/backend/internal/domain/relations"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/shared"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 	"github.com/kjanat/poo-tracker/backend/internal/validation"
 )
@@ -14,17 +16,17 @@ import (
 
 // createBowelMovementRequest defines the request structure for creating bowel movements
 type createBowelMovementRequest struct {
-	UserID       string             `json:"userId"`
-	BristolType  int                `json:"bristolType"`
-	Volume       *model.Volume      `json:"volume,omitempty"`
-	Color        *model.Color       `json:"color,omitempty"`
-	Consistency  *model.Consistency `json:"consistency,omitempty"`
-	Floaters     *bool              `json:"floaters,omitempty"`
-	Pain         *int               `json:"pain,omitempty"`
-	Strain       *int               `json:"strain,omitempty"`
-	Satisfaction *int               `json:"satisfaction,omitempty"`
-	PhotoURL     *string            `json:"photoUrl,omitempty"`
-	SmellLevel   *model.SmellLevel  `json:"smellLevel,omitempty"`
+	UserID       string              `json:"userId"`
+	BristolType  int                 `json:"bristolType"`
+	Volume       *shared.Volume      `json:"volume,omitempty"`
+	Color        *shared.Color       `json:"color,omitempty"`
+	Consistency  *shared.Consistency `json:"consistency,omitempty"`
+	Floaters     *bool               `json:"floaters,omitempty"`
+	Pain         *int                `json:"pain,omitempty"`
+	Strain       *int                `json:"strain,omitempty"`
+	Satisfaction *int                `json:"satisfaction,omitempty"`
+	PhotoURL     *string             `json:"photoUrl,omitempty"`
+	SmellLevel   *shared.SmellLevel  `json:"smellLevel,omitempty"`
 }
 
 // createBowelMovementDetailsRequest defines the request structure for creating bowel movement details
@@ -61,7 +63,7 @@ func (a *App) createBowelMovement(c *gin.Context) {
 	}
 
 	// Start with a new bowel movement with defaults
-	bm := model.NewBowelMovement(req.UserID, req.BristolType)
+	bm := bm.NewBowelMovement(req.UserID, req.BristolType)
 
 	// Apply optional fields
 	applyOptionalFields(&bm, &req)
@@ -96,7 +98,7 @@ func (a *App) getBowelMovement(c *gin.Context) {
 
 func (a *App) updateBowelMovement(c *gin.Context) {
 	id := c.Param("id")
-	var update model.BowelMovementUpdate
+	var update bm.BowelMovementUpdate
 	if err := c.ShouldBindJSON(&update); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -176,7 +178,7 @@ func (a *App) createBowelMovementDetails(c *gin.Context) {
 	}
 
 	// Create new details
-	details := model.NewBowelMovementDetails(bowelMovementID)
+	details := bm.NewBowelMovementDetails(bowelMovementID)
 
 	// Apply optional fields
 	applyBowelMovementDetailsFields(&details, &req)
@@ -212,7 +214,7 @@ func (a *App) getBowelMovementDetails(c *gin.Context) {
 func (a *App) updateBowelMovementDetails(c *gin.Context) {
 	bowelMovementID := c.Param("id")
 
-	var update model.BowelMovementDetailsUpdate
+	var update bm.BowelMovementDetailsUpdate
 	if err := c.ShouldBindJSON(&update); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -252,7 +254,7 @@ func (a *App) deleteBowelMovementDetails(c *gin.Context) {
 // Helper functions
 
 // applyOptionalFields applies optional fields from the request to the bowel movement
-func applyOptionalFields(bm *model.BowelMovement, req *createBowelMovementRequest) {
+func applyOptionalFields(bm *bm.BowelMovement, req *createBowelMovementRequest) {
 	if req.Volume != nil {
 		bm.Volume = req.Volume
 	}
@@ -282,7 +284,7 @@ func applyOptionalFields(bm *model.BowelMovement, req *createBowelMovementReques
 	}
 }
 
-func applyBowelMovementDetailsFields(details *model.BowelMovementDetails, req *createBowelMovementDetailsRequest) {
+func applyBowelMovementDetailsFields(details *bm.BowelMovementDetails, req *createBowelMovementDetailsRequest) {
 	if req.Notes != nil {
 		details.Notes = *req.Notes
 	}
@@ -320,7 +322,7 @@ func applyBowelMovementDetailsFields(details *model.BowelMovementDetails, req *c
 
 // Validation functions
 
-func validateBowelMovementUpdateFields(update *model.BowelMovementUpdate) validation.ValidationErrors {
+func validateBowelMovementUpdateFields(update *bm.BowelMovementUpdate) validation.ValidationErrors {
 	var validationErrors validation.ValidationErrors
 	validationErrors = append(validationErrors, validateBowelMovementUpdateBristolType(update)...) // BristolType
 	validationErrors = append(validationErrors, validateBowelMovementUpdateScales(update)...)      // Scales
@@ -329,7 +331,7 @@ func validateBowelMovementUpdateFields(update *model.BowelMovementUpdate) valida
 	return validationErrors
 }
 
-func validateBowelMovementUpdateBristolType(update *model.BowelMovementUpdate) validation.ValidationErrors {
+func validateBowelMovementUpdateBristolType(update *bm.BowelMovementUpdate) validation.ValidationErrors {
 	var errs validation.ValidationErrors
 	if update.BristolType != nil {
 		if err := validation.ValidateBristolType(*update.BristolType); err != nil {
@@ -347,7 +349,7 @@ func validateBowelMovementUpdateBristolType(update *model.BowelMovementUpdate) v
 	return errs
 }
 
-func validateBowelMovementUpdateScales(update *model.BowelMovementUpdate) validation.ValidationErrors {
+func validateBowelMovementUpdateScales(update *bm.BowelMovementUpdate) validation.ValidationErrors {
 	var errs validation.ValidationErrors
 	if update.Pain != nil {
 		if err := validation.ValidateScale(*update.Pain, "pain"); err != nil {
@@ -391,7 +393,7 @@ func validateBowelMovementUpdateScales(update *model.BowelMovementUpdate) valida
 	return errs
 }
 
-func validateBowelMovementUpdateEnums(update *model.BowelMovementUpdate) validation.ValidationErrors {
+func validateBowelMovementUpdateEnums(update *bm.BowelMovementUpdate) validation.ValidationErrors {
 	var errs validation.ValidationErrors
 	if update.Volume != nil {
 		if err := validation.ValidateEnum(*update.Volume, "volume"); err != nil {
@@ -448,7 +450,7 @@ func validateBowelMovementUpdateEnums(update *model.BowelMovementUpdate) validat
 	return errs
 }
 
-func validateBowelMovementUpdateOptionals(update *model.BowelMovementUpdate) validation.ValidationErrors {
+func validateBowelMovementUpdateOptionals(update *bm.BowelMovementUpdate) validation.ValidationErrors {
 	var errs validation.ValidationErrors
 	if update.PhotoURL != nil {
 		if err := validation.ValidateURL(*update.PhotoURL, "photoUrl"); err != nil {
@@ -466,7 +468,7 @@ func validateBowelMovementUpdateOptionals(update *model.BowelMovementUpdate) val
 	return errs
 }
 
-func validateBowelMovementDetailsFields(details model.BowelMovementDetails) validation.ValidationErrors {
+func validateBowelMovementDetailsFields(details bm.BowelMovementDetails) validation.ValidationErrors {
 	var errs validation.ValidationErrors
 	if details.Notes != "" {
 		if err := validation.ValidateNotes(details.Notes, "notes"); err != nil {
@@ -497,7 +499,7 @@ func validateBowelMovementDetailsFields(details model.BowelMovementDetails) vali
 	return errs
 }
 
-func validateBowelMovementDetailsUpdate(update model.BowelMovementDetailsUpdate) validation.ValidationErrors {
+func validateBowelMovementDetailsUpdate(update bm.BowelMovementDetailsUpdate) validation.ValidationErrors {
 	var errs validation.ValidationErrors
 	if update.Notes != nil {
 		if err := validation.ValidateNotes(*update.Notes, "notes"); err != nil {

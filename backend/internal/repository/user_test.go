@@ -5,14 +5,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/user"
 )
 
 func TestMemoryUserRepository(t *testing.T) {
 	repo := NewMemoryUserRepository()
 
 	t.Run("Create and Get User", func(t *testing.T) {
-		user := &model.User{
+		user := &user.User{
 			ID:        "1",
 			Email:     "test@example.com",
 			Name:      "Test User",
@@ -37,7 +37,7 @@ func TestMemoryUserRepository(t *testing.T) {
 	})
 
 	t.Run("Get User by Email", func(t *testing.T) {
-		user := &model.User{
+		user := &user.User{
 			ID:        "2",
 			Email:     "email@example.com",
 			Name:      "Email User",
@@ -71,7 +71,7 @@ func TestMemoryUserRepository(t *testing.T) {
 	})
 
 	t.Run("Create Duplicate Users", func(t *testing.T) {
-		user1 := &model.User{
+		user1 := &user.User{
 			ID:        "3",
 			Email:     "duplicate@example.com",
 			Name:      "User 1",
@@ -79,7 +79,7 @@ func TestMemoryUserRepository(t *testing.T) {
 			UpdatedAt: time.Now(),
 		}
 
-		user2 := &model.User{
+		user2 := &user.User{
 			ID:        "4",
 			Email:     "duplicate@example.com", // Same email
 			Name:      "User 2",
@@ -108,7 +108,7 @@ func TestMemoryUserRepository(t *testing.T) {
 	})
 
 	t.Run("Update User", func(t *testing.T) {
-		user := &model.User{
+		user := &user.User{
 			ID:        "5",
 			Email:     "update@example.com",
 			Name:      "Original Name",
@@ -138,7 +138,7 @@ func TestMemoryUserRepository(t *testing.T) {
 	})
 
 	t.Run("Update Non-existent User", func(t *testing.T) {
-		user := &model.User{
+		user := &user.User{
 			ID:    "nonexistent",
 			Email: "test@example.com",
 			Name:  "Test",
@@ -151,7 +151,7 @@ func TestMemoryUserRepository(t *testing.T) {
 	})
 
 	t.Run("Delete User", func(t *testing.T) {
-		user := &model.User{
+		user := &user.User{
 			ID:        "6",
 			Email:     "delete@example.com",
 			Name:      "Delete User",
@@ -164,7 +164,7 @@ func TestMemoryUserRepository(t *testing.T) {
 		}
 
 		// Also create auth for this user
-		auth := &model.UserAuth{
+		auth := &user.UserAuth{
 			UserID:       "6",
 			PasswordHash: "hashed_password",
 			Provider:     "local",
@@ -202,7 +202,7 @@ func TestMemoryUserRepository(t *testing.T) {
 	})
 
 	t.Run("User Auth Operations", func(t *testing.T) {
-		user := &model.User{
+		user := &user.User{
 			ID:        "7",
 			Email:     "auth@example.com",
 			Name:      "Auth User",
@@ -210,7 +210,7 @@ func TestMemoryUserRepository(t *testing.T) {
 			UpdatedAt: time.Now(),
 		}
 
-		auth := &model.UserAuth{
+		auth := &user.UserAuth{
 			UserID:       "7",
 			PasswordHash: "hashed_password",
 			Provider:     "local",
@@ -269,7 +269,7 @@ func TestMemoryUserRepository(t *testing.T) {
 			go func(id int) {
 				defer wg.Done()
 
-				user := &model.User{
+				user := &user.User{
 					ID:        string(rune('a' + id)),
 					Email:     "concurrent" + string(rune('0'+id)) + "@example.com",
 					Name:      "Concurrent User " + string(rune('0'+id)),

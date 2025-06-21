@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	bm "github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
 )
 
 func TestMemoryRepo_UpdateWithZeroValues(t *testing.T) {
@@ -12,7 +12,7 @@ func TestMemoryRepo_UpdateWithZeroValues(t *testing.T) {
 	ctx := context.Background()
 
 	// Create initial bowel movement
-	initial := model.BowelMovement{
+	initial := bm.BowelMovement{
 		UserID:      "user1",
 		BristolType: 5,
 	}
@@ -24,7 +24,7 @@ func TestMemoryRepo_UpdateWithZeroValues(t *testing.T) {
 	// Test updating to zero values - this should work now
 	bristolZero := 0
 	painZero := 0
-	update := model.BowelMovementUpdate{
+	update := bm.BowelMovementUpdate{
 		BristolType: &bristolZero,
 		Pain:        &painZero,
 	}
@@ -44,7 +44,7 @@ func TestMemoryRepo_UpdateWithZeroValues(t *testing.T) {
 
 	// Test partial update - only update BristolType, leave Pain as is
 	newBristol := 3
-	partialUpdate := model.BowelMovementUpdate{
+	partialUpdate := bm.BowelMovementUpdate{
 		BristolType: &newBristol,
 		// Pain is nil, so it should not be updated
 	}
@@ -64,7 +64,7 @@ func TestMemoryRepo_UpdateWithZeroValues(t *testing.T) {
 
 	// Test updating Pain back to non-zero while keeping BristolType
 	newPain := 5
-	painUpdate := model.BowelMovementUpdate{
+	painUpdate := bm.BowelMovementUpdate{
 		Pain: &newPain,
 		// BristolType is nil, so it should not be updated
 	}

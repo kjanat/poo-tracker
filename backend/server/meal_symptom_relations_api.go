@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	rel "github.com/kjanat/poo-tracker/backend/internal/domain/relations"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 	"github.com/kjanat/poo-tracker/backend/internal/validation"
 )
@@ -57,17 +57,17 @@ func (h *MealSymptomRelationHandler) CreateMealSymptomRelation(c *gin.Context) {
 	}
 
 	// Validate correlation type if provided
-	var correlationType *model.CorrelationType
+	var correlationType *rel.CorrelationType
 	if req.UserCorrelation != nil {
 		if !validation.IsValidCorrelationType(*req.UserCorrelation) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid correlation type"})
 			return
 		}
-		ct := model.CorrelationType(*req.UserCorrelation)
+		ct := rel.CorrelationType(*req.UserCorrelation)
 		correlationType = &ct
 	}
 
-	relation := model.NewMealSymptomRelation(userID, req.MealID, req.SymptomID, req.TimeGapHours)
+	relation := rel.NewMealSymptomRelation(userID, req.MealID, req.SymptomID, req.TimeGapHours)
 	relation.Strength = req.Strength
 	relation.Notes = req.Notes
 	relation.UserCorrelation = correlationType
@@ -192,7 +192,7 @@ func (h *MealSymptomRelationHandler) UpdateMealSymptomRelation(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid correlation type"})
 			return
 		}
-		ct := model.CorrelationType(*req.UserCorrelation)
+		ct := rel.CorrelationType(*req.UserCorrelation)
 		relation.UserCorrelation = &ct
 	}
 

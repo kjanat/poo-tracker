@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/audit"
 	"github.com/kjanat/poo-tracker/backend/internal/service"
 )
 
@@ -79,7 +79,7 @@ func AuditMiddleware(auditService *service.AuditService) gin.HandlerFunc {
 				// Ignore JSON parsing errors for audit logging
 				if err := json.Unmarshal(writer.body.Bytes(), &responseData); err == nil {
 					switch action {
-					case model.AuditCreate, model.AuditUpdate:
+					case audit.AuditCreate, audit.AuditUpdate:
 						newData = responseData
 					}
 				}
@@ -110,22 +110,22 @@ func shouldSkipAudit(path string) bool {
 }
 
 // determineAuditInfo extracts audit information from the request
-func determineAuditInfo(c *gin.Context) (model.AuditAction, string, string) {
+func determineAuditInfo(c *gin.Context) (audit.AuditAction, string, string) {
 	method := c.Request.Method
 	path := c.Request.URL.Path
 	id := c.Param("id")
 
-	var action model.AuditAction
+	var action audit.AuditAction
 	var entityType string
 
 	// Determine action from HTTP method
 	switch method {
 	case "POST":
-		action = model.AuditCreate
+		action = audit.AuditCreate
 	case "PUT", "PATCH":
-		action = model.AuditUpdate
+		action = audit.AuditUpdate
 	case "DELETE":
-		action = model.AuditDelete
+		action = audit.AuditDelete
 	default:
 		return "", "", "" // Don't audit GET requests
 	}

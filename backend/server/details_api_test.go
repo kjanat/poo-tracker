@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	bm "github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
 )
 
 func TestBowelMovementDetailsAPI(t *testing.T) {
@@ -25,7 +25,7 @@ func TestBowelMovementDetailsAPI(t *testing.T) {
 		t.Fatalf("expected status 201, got %d", w.Code)
 	}
 
-	var createdBM model.BowelMovement
+	var createdBM bm.BowelMovement
 	if err := json.Unmarshal(w.Body.Bytes(), &createdBM); err != nil {
 		t.Fatalf("Failed to unmarshal response: %v", err)
 	}
@@ -48,7 +48,7 @@ func TestBowelMovementDetailsAPI(t *testing.T) {
 		t.Fatalf("expected status 201 for details creation, got %d", w.Code)
 	}
 
-	var createdDetails model.BowelMovementDetails
+	var createdDetails bm.BowelMovementDetails
 	if err := json.Unmarshal(w.Body.Bytes(), &createdDetails); err != nil {
 		t.Fatalf("Failed to unmarshal details response: %v", err)
 	}
@@ -79,7 +79,7 @@ func TestBowelMovementDetailsAPI(t *testing.T) {
 		t.Fatalf("expected status 200 for getting details, got %d", w.Code)
 	}
 
-	var retrievedDetails model.BowelMovementDetails
+	var retrievedDetails bm.BowelMovementDetails
 	if err := json.Unmarshal(w.Body.Bytes(), &retrievedDetails); err != nil {
 		t.Fatalf("Failed to unmarshal retrieved details: %v", err)
 	}
@@ -103,7 +103,7 @@ func TestBowelMovementDetailsAPI(t *testing.T) {
 		t.Fatalf("expected status 200 for updating details, got %d", w.Code)
 	}
 
-	var updatedDetails model.BowelMovementDetails
+	var updatedDetails bm.BowelMovementDetails
 	if err := json.Unmarshal(w.Body.Bytes(), &updatedDetails); err != nil {
 		t.Fatalf("Failed to unmarshal updated details: %v", err)
 	}

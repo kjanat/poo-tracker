@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	bm "github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
 )
 
 func TestBowelDetailsRepo_CRUD(t *testing.T) {
@@ -13,10 +13,11 @@ func TestBowelDetailsRepo_CRUD(t *testing.T) {
 	ctx := context.Background()
 
 	// First create a bowel movement
-	bm := model.BowelMovement{
-		UserID:      "user1",
-		BristolType: 4,
-	}
+	movement := bm.BowelMovement{
+	createdBM, err := bowelRepo.Create(ctx, movement)
+        BristolType: 4,
+    }
+    createdBM, err := bowelRepo.Create(ctx, initialBM)
 	createdBM, err := bowelRepo.Create(ctx, bm)
 	if err != nil {
 		t.Fatalf("Failed to create bowel movement: %v", err)
@@ -28,7 +29,7 @@ func TestBowelDetailsRepo_CRUD(t *testing.T) {
 	}
 
 	// Test Create
-	details := model.NewBowelMovementDetails(createdBM.ID)
+	details := bm.NewBowelMovementDetails(createdBM.ID)
 	details.Notes = "Test notes"
 	details.DetailedNotes = "Very detailed notes"
 	details.Environment = "Private bathroom"
@@ -77,7 +78,7 @@ func TestBowelDetailsRepo_CRUD(t *testing.T) {
 	// Test Update
 	newNotes := "Updated notes"
 	newEnvironment := "Public bathroom"
-	update := model.BowelMovementDetailsUpdate{
+	update := bm.BowelMovementDetailsUpdate{
 		Notes:       &newNotes,
 		Environment: &newEnvironment,
 	}
@@ -140,7 +141,7 @@ func TestBowelDetailsRepo_NotFound(t *testing.T) {
 	}
 
 	// Test Update with non-existent ID
-	update := model.BowelMovementDetailsUpdate{
+	update := bm.BowelMovementDetailsUpdate{
 		Notes: &[]string{"test"}[0],
 	}
 	_, err = detailsRepo.Update(ctx, "nonexistent", update)

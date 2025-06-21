@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
+	userDto "github.com/kjanat/poo-tracker/backend/internal/infrastructure/http/dto/user"
 	"github.com/kjanat/poo-tracker/backend/internal/middleware"
-	"github.com/kjanat/poo-tracker/backend/internal/model"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 	"github.com/kjanat/poo-tracker/backend/internal/service"
 )
@@ -28,7 +28,7 @@ func createTestUserHandlers() *UserAPIHandlers {
 func TestRegisterHandler_Success(t *testing.T) {
 	userHandlers := createTestUserHandlers()
 
-	reqBody := model.CreateUserRequest{
+	reqBody := userDto.CreateUserRequest{
 		Email:    "test@example.com",
 		Password: "password123",
 		Name:     "Test User",
@@ -44,7 +44,7 @@ func TestRegisterHandler_Success(t *testing.T) {
 		t.Errorf("Expected status 200, got %d", w.Code)
 	}
 
-	var resp model.LoginResponse
+	var resp userDto.LoginResponse
 	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
 		t.Fatal("Failed to decode response")
 	}
@@ -63,7 +63,7 @@ func TestRegisterHandler_Success(t *testing.T) {
 func TestRegisterHandler_InvalidEmail(t *testing.T) {
 	userHandlers := createTestUserHandlers()
 
-	reqBody := model.CreateUserRequest{
+	reqBody := userDto.CreateUserRequest{
 		Email:    "invalid-email",
 		Password: "password123",
 		Name:     "Test User",
@@ -83,7 +83,7 @@ func TestRegisterHandler_InvalidEmail(t *testing.T) {
 func TestRegisterHandler_MissingFields(t *testing.T) {
 	userHandlers := createTestUserHandlers()
 
-	reqBody := model.CreateUserRequest{
+	reqBody := userDto.CreateUserRequest{
 		Email: "test2@example.com",
 		// Missing password and name
 	}
@@ -108,7 +108,7 @@ func TestLoginHandler_Success(t *testing.T) {
 		t.Fatal("Failed to register user for login test")
 	}
 
-	reqBody := model.LoginRequest{
+	reqBody := userDto.LoginRequest{
 		Email:    "login@example.com",
 		Password: "password123",
 	}
@@ -123,7 +123,7 @@ func TestLoginHandler_Success(t *testing.T) {
 		t.Errorf("Expected status 200, got %d", w.Code)
 	}
 
-	var resp model.LoginResponse
+	var resp userDto.LoginResponse
 	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
 		t.Fatal("Failed to decode response")
 	}
@@ -136,7 +136,7 @@ func TestLoginHandler_Success(t *testing.T) {
 func TestLoginHandler_InvalidCredentials(t *testing.T) {
 	userHandlers := createTestUserHandlers()
 
-	reqBody := model.LoginRequest{
+	reqBody := userDto.LoginRequest{
 		Email:    "nonexistent@example.com",
 		Password: "wrongpassword",
 	}
@@ -155,7 +155,7 @@ func TestLoginHandler_InvalidCredentials(t *testing.T) {
 func TestProfileHandler_Success(t *testing.T) {
 	userHandlers := createTestUserHandlers()
 
-	user := &model.User{
+	user := &user.User{
 		ID:    "test-user-id",
 		Email: "profile@example.com",
 		Name:  "Profile User",
@@ -171,7 +171,7 @@ func TestProfileHandler_Success(t *testing.T) {
 		t.Errorf("Expected status 200, got %d", w.Code)
 	}
 
-	var respUser model.User
+	var respUser user.User
 	if err := json.NewDecoder(w.Body).Decode(&respUser); err != nil {
 		t.Fatal("Failed to decode response")
 	}

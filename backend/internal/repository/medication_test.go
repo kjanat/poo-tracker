@@ -5,14 +5,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/medication"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/shared"
 )
 
 func TestMedicationRepository_Create(t *testing.T) {
 	repo := NewMemoryMedicationRepository()
 	ctx := context.Background()
 
-	medication := model.NewMedication("user1", "Ibuprofen", "200mg", "twice daily")
+	medication := medication.NewMedication("user1", "Ibuprofen", "200mg", "twice daily")
 
 	created, err := repo.Create(ctx, medication)
 	if err != nil {
@@ -40,7 +41,7 @@ func TestMedicationRepository_GetByID(t *testing.T) {
 	repo := NewMemoryMedicationRepository()
 	ctx := context.Background()
 
-	medication := model.NewMedication("user1", "Aspirin", "100mg", "daily")
+	medication := medication.NewMedication("user1", "Aspirin", "100mg", "daily")
 	created, _ := repo.Create(ctx, medication)
 
 	retrieved, err := repo.GetByID(ctx, created.ID)
@@ -72,9 +73,9 @@ func TestMedicationRepository_GetByUserID(t *testing.T) {
 	ctx := context.Background()
 
 	// Create medications for different users
-	med1 := model.NewMedication("user1", "Medication 1", "10mg", "daily")
-	med2 := model.NewMedication("user1", "Medication 2", "20mg", "twice daily")
-	med3 := model.NewMedication("user2", "Medication 3", "30mg", "weekly")
+	med1 := medication.NewMedication("user1", "Medication 1", "10mg", "daily")
+	med2 := medication.NewMedication("user1", "Medication 2", "20mg", "twice daily")
+	med3 := medication.NewMedication("user2", "Medication 3", "30mg", "weekly")
 
 	// Create test medications (ignore errors in test setup)
 	_, _ = repo.Create(ctx, med1)
@@ -102,10 +103,10 @@ func TestMedicationRepository_Update(t *testing.T) {
 	repo := NewMemoryMedicationRepository()
 	ctx := context.Background()
 
-	medication := model.NewMedication("user1", "Original", "10mg", "daily")
+	medication := medication.NewMedication("user1", "Original", "10mg", "daily")
 	created, _ := repo.Create(ctx, medication)
 
-	updates := model.MedicationUpdate{
+	updates := medication.MedicationUpdate{
 		Name:     stringPtr("Updated"),
 		Dosage:   stringPtr("20mg"),
 		Notes:    stringPtr("Updated notes"),
@@ -138,7 +139,7 @@ func TestMedicationRepository_Delete(t *testing.T) {
 	repo := NewMemoryMedicationRepository()
 	ctx := context.Background()
 
-	medication := model.NewMedication("user1", "To Delete", "10mg", "daily")
+	medication := medication.NewMedication("user1", "To Delete", "10mg", "daily")
 	created, _ := repo.Create(ctx, medication)
 
 	err := repo.Delete(ctx, created.ID)
@@ -157,10 +158,10 @@ func TestMedicationRepository_GetActiveByUserID(t *testing.T) {
 	ctx := context.Background()
 
 	// Create active and inactive medications
-	activeMed := model.NewMedication("user1", "Active Med", "10mg", "daily")
+	activeMed := medication.NewMedication("user1", "Active Med", "10mg", "daily")
 	activeMed.IsActive = true
 
-	inactiveMed := model.NewMedication("user1", "Inactive Med", "20mg", "daily")
+	inactiveMed := medication.NewMedication("user1", "Inactive Med", "20mg", "daily")
 	inactiveMed.IsActive = false
 
 	_, _ = repo.Create(ctx, activeMed)
@@ -184,12 +185,12 @@ func TestMedicationRepository_GetByUserIDAndCategory(t *testing.T) {
 	repo := NewMemoryMedicationRepository()
 	ctx := context.Background()
 
-	category := model.MedicationCategoryPainRelief
+	category := shared.MedicationCategoryPainRelief
 
-	med1 := model.NewMedication("user1", "Pain Med", "10mg", "daily")
+	med1 := medication.NewMedication("user1", "Pain Med", "10mg", "daily")
 	med1.Category = &category
 
-	med2 := model.NewMedication("user1", "Other Med", "20mg", "daily")
+	med2 := medication.NewMedication("user1", "Other Med", "20mg", "daily")
 	// No category set
 
 	_, _ = repo.Create(ctx, med1)
@@ -213,7 +214,7 @@ func TestMedicationRepository_MarkAsTaken(t *testing.T) {
 	repo := NewMemoryMedicationRepository()
 	ctx := context.Background()
 
-	medication := model.NewMedication("user1", "Test Med", "10mg", "daily")
+	medication := medication.NewMedication("user1", "Test Med", "10mg", "daily")
 	created, _ := repo.Create(ctx, medication)
 
 	takenTime := time.Now()

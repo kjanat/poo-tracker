@@ -6,7 +6,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kjanat/poo-tracker/backend/internal/model"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/shared"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 	"github.com/kjanat/poo-tracker/backend/internal/validation"
 )
@@ -30,17 +31,17 @@ func (h *SymptomHandler) CreateSymptom(c *gin.Context) {
 	}
 
 	var req struct {
-		Name        string                 `json:"name" binding:"required"`
-		Description string                 `json:"description"`
-		RecordedAt  *time.Time             `json:"recordedAt"`
-		Category    *model.SymptomCategory `json:"category"`
-		Severity    int                    `json:"severity" binding:"min=1,max=10"`
-		Duration    *int                   `json:"duration"`
-		BodyPart    string                 `json:"bodyPart"`
-		Type        *model.SymptomType     `json:"type"`
-		Triggers    []string               `json:"triggers"`
-		Notes       string                 `json:"notes"`
-		PhotoURL    string                 `json:"photoUrl"`
+		Name        string                  `json:"name" binding:"required"`
+		Description string                  `json:"description"`
+		RecordedAt  *time.Time              `json:"recordedAt"`
+		Category    *shared.SymptomCategory `json:"category"`
+		Severity    int                     `json:"severity" binding:"min=1,max=10"`
+		Duration    *int                    `json:"duration"`
+		BodyPart    string                  `json:"bodyPart"`
+		Type        *shared.SymptomType     `json:"type"`
+		Triggers    []string                `json:"triggers"`
+		Notes       string                  `json:"notes"`
+		PhotoURL    string                  `json:"photoUrl"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -49,7 +50,7 @@ func (h *SymptomHandler) CreateSymptom(c *gin.Context) {
 	}
 
 	// Create symptom with defaults
-	symptom := model.NewSymptom(userID, req.Name)
+	symptom := symptom.NewSymptom(userID, req.Name)
 	symptom.Description = req.Description
 
 	if req.RecordedAt != nil {
@@ -164,7 +165,7 @@ func (h *SymptomHandler) UpdateSymptom(c *gin.Context) {
 		return
 	}
 
-	var updates model.SymptomUpdate
+	var updates symptom.SymptomUpdate
 	if err := c.ShouldBindJSON(&updates); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": validation.FormatValidationError(err)})
 		return
@@ -268,7 +269,7 @@ func (h *SymptomHandler) GetSymptomsByCategory(c *gin.Context) {
 	}
 
 	categoryStr := c.Param("category")
-	category, err := model.ParseSymptomCategory(categoryStr)
+	category, err := shared.ParseSymptomCategory(categoryStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid symptom category"})
 		return
@@ -292,7 +293,7 @@ func (h *SymptomHandler) GetSymptomsByType(c *gin.Context) {
 	}
 
 	typeStr := c.Param("type")
-	symptomType, err := model.ParseSymptomType(typeStr)
+	symptomType, err := shared.ParseSymptomType(typeStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid symptom type"})
 		return
