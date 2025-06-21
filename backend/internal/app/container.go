@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/kjanat/poo-tracker/backend/internal/domain/analytics"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
@@ -12,6 +13,7 @@ import (
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/database"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/repository/memory"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service"
+	"go.uber.org/zap"
 )
 
 // Container holds all application dependencies
@@ -78,13 +80,14 @@ func NewContainer() (*Container, error) {
 	container.MedicationService = service.NewMedicationService(container.MedicationRepository)
 	container.SymptomService = service.NewSymptomService(container.SymptomRepository)
 	container.AnalyticsService = service.NewAnalyticsService(
-		container.BowelMovementService,
-		container.MealService,
-		container.SymptomService,
+		container.BowelMovementRepository,
+		container.MealRepository,
+		container.SymptomRepository,
 		container.MedicationService,
-		service.AnalyticsConfig{
+		zap.NewNop(),
+		&service.AnalyticsServiceConfig{
 			DefaultMedicationLimit: 1000,
-			MaxMedicationLimit:     5000,
+			DefaultDataWindow:      30 * 24 * time.Hour,
 		},
 	)
 
