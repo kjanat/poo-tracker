@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	bm "github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
 	rel "github.com/kjanat/poo-tracker/backend/internal/domain/relations"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 	"github.com/kjanat/poo-tracker/backend/internal/validation"

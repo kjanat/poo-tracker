@@ -59,23 +59,31 @@ If your code stinks, it won’t get merged. And yes, we’ll know.
 
    No SQL scripts in the repo, unless you're writing a damn seed file.
 
-7. **Photo uploads must stream.**
+7. **Pre-commit hooks for code quality.**
+
+   All linting, formatting, and type-checking is managed via [pre-commit](https://pre-commit.com) and the `.pre-commit-config.yaml` in the project root. Husky and lint-staged are no longer used.
+
+   - Install with `uv tool install pre-commit` (or `pip install pre-commit`)
+   - Run `pre-commit install` after cloning
+   - Hooks run on every commit, or manually with `pre-commit run --all-files`
+
+8. **Photo uploads must stream.**
 
    No base64 blobs in the database, you animal.
 
-8. **AI service is firewalled from main app.**
+9. **AI service is firewalled from main app.**
 
    Only ever accessible via backend. Don't let your SPA talk directly to Python, or you'll make me regret giving you network access.
 
-9. **Write tests.**
+10. **Write tests.**
 
-   Every new feature needs tests. If you "forget", the next person gets to refactor your code, and nobody wants that.
+    Every new feature needs tests. If you "forget", the next person gets to refactor your code, and nobody wants that.
 
-10. **Env vars go in `.env.example`**
+11. **Env vars go in `.env.example`**
 
 Don't hardcode keys, don't commit real secrets.
 
-11. **Follow commit conventions**:
+12. **Follow commit conventions**:
 
     ```txt
     feat: add Bristol stool chart selector

@@ -104,7 +104,6 @@ These example files contain **sample credentials only**. Replace them with your 
 
 ### Available Scripts
 
-
 ```bash
 # Development - All Services
 make dev              # Start frontend, Go backend and AI service
@@ -252,7 +251,8 @@ We encrypt your brown notes and hide them away. Nobody's reading your logs excep
 - RESTful API design
 - Comprehensive test coverage
 - ESLint with @typescript-eslint and Prettier (follow the config, don't "fix" it)
-- Use pnpm workspace commands for consistent development
+- Use pnpm workspace commands or Makefile targets for consistent development (never use `cd` in scripts)
+- All code quality checks are managed by pre-commit hooks
 
 ## 🚀 Deployment
 

@@ -8,11 +8,7 @@ import pandas as pd
 
 from ..config.logging import get_logger
 from ..models.database import AnalysisMetadata, BowelMovementData, MealData, SymptomData
-from ..models.responses import (
-    BristolAnalysis,
-    FrequencyStats,
-    TimingPattern,
-)
+from ..models.responses import BristolAnalysis, FrequencyStats, TimingPattern
 from ..utils.data_processing import DataProcessor
 from ..utils.health_metrics import HealthMetricsCalculator
 

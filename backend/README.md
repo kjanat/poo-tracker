@@ -235,3 +235,40 @@ The `main.go` file wires dependencies using constructor functions. A memory repo
 - Middleware-based authentication using JWT
 - Memory repositories can be swapped for PostgreSQL implementations
 - Clean separation: handlers → services → repositories
+
+## 🧹 Code Quality & Pre-commit Hooks
+
+All linting, formatting, and type-checking is managed via [pre-commit](https://pre-commit.com) and the `.pre-commit-config.yaml` in the project root. Husky and lint-staged are no longer used.
+
+**Setup:**
+
+```bash
+uv tool install pre-commit  # or pip install pre-commit
+pre-commit install
+```
+
+Hooks run on every commit, or manually with:
+
+```bash
+pre-commit run --all-files
+```
+
+## Contributing
+
+1. **Fork the repo** on GitHub
+2. **Clone your fork** locally
+3. **Install dependencies**: `go mod download`
+4. **Set up environment**: Copy `.env.example` to `.env` and configure
+5. **Run the server**: `go run ./cmd/server/main.go`
+6. **Make your changes** and test locally
+7. **Commit and push** to your fork
+8. **Create a pull request** on GitHub
+
+Please ensure your code adheres to the following guidelines:
+
+- Follow the existing code style and conventions
+- Write clear, descriptive commit messages
+- Test your changes thoroughly
+- Update documentation as needed
+
+All code quality checks are managed via pre-commit hooks. Ensure your code passes these checks before submitting a pull request.

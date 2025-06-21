@@ -49,18 +49,43 @@ poo-tracker/
 
 ---
 
+## Pre-commit Hooks & Code Quality
+
+All code quality checks (linting, formatting, type-checking, etc.) are now managed via [pre-commit](https://pre-commit.com) using the `.pre-commit-config.yaml` file in the project root. This replaces any previous use of Husky or lint-staged.
+
+**Setup:**
+
+```bash
+# Install pre-commit (if not already installed)
+uv tool install pre-commit  # or pip install pre-commit
+
+# Install hooks
+git config --global core.hooksPath .git/hooks
+pre-commit install
+```
+
+**Usage:**
+
+- Hooks will run automatically on `git commit`.
+- To run all hooks manually:
+
+  ```bash
+  pre-commit run --all-files
+  ```
+
+---
+
 ## Package Management & Workspace Commands
 
 ### 📦 pnpm Workspace Usage
 
-**ALWAYS use pnpm workspace commands** - never `cd` into directories:
+**ALWAYS use pnpm workspace commands or Makefile targets** - never `cd` into directories in scripts:
 
 ```bash
 # ✅ Correct workspace commands
 pnpm --filter @poo-tracker/frontend add react-router-dom
-pnpm --filter @poo-tracker/backend run dev
-pnpm --parallel run build
-pnpm --recursive run test
+make dev-frontend
+make lint
 
 # ❌ Incorrect - avoid cd commands in scripts
 cd frontend && pnpm add react-router-dom
@@ -400,9 +425,9 @@ chore: update dependencies
 
 ## Version & Updates
 
-**Last Updated**: June 15, 2025  
-**Version**: 2.0.0  
-**Major Changes**: Added pnpm workspace configuration, uv Python tooling  
+**Last Updated**: June 15, 2025
+**Version**: 2.0.0
+**Major Changes**: Added pnpm workspace configuration, uv Python tooling
 **Next Review**: When major architecture changes occur
 
 ---

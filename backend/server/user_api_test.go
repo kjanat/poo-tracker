@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/kjanat/poo-tracker/backend/internal/domain/user"
 	userDto "github.com/kjanat/poo-tracker/backend/internal/infrastructure/http/dto/user"
 	"github.com/kjanat/poo-tracker/backend/internal/middleware"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"

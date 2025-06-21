@@ -255,3 +255,20 @@ Each component follows the domain error model:
 2. **Event-Driven Processing**: Asynchronous analysis processing
 3. **Horizontal Scaling**: Multi-instance analytics processing
 4. **Data Partitioning**: Efficient data distribution strategies
+
+## 🧹 Code Quality & Pre-commit Hooks
+
+All linting, formatting, and type-checking is managed via [pre-commit](https://pre-commit.com) and the `.pre-commit-config.yaml` in the project root. Husky and lint-staged are no longer used.
+
+**Setup:**
+
+```bash
+uv tool install pre-commit  # or pip install pre-commit
+pre-commit install
+```
+
+Hooks run on every commit, or manually with:
+
+```bash
+pre-commit run --all-files
+```

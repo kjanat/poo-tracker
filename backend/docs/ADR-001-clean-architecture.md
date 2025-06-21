@@ -1,7 +1,7 @@
 # ADR-001: Clean Architecture with Dependency Injection
 
-**Date:** 2025-06-20  
-**Status:** Accepted  
+**Date:** 2025-06-20
+**Status:** Accepted
 **Deciders:** Backend Development Team
 
 ## Context

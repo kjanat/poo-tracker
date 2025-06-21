@@ -78,25 +78,5 @@
     "vite": "^6.3.5"
   },
   "private": true,
-  "preinstall": "npx only-allow pnpm",
-  "prepare": "husky",
-  "lint-staged": {
-    "backend/**/*.go": [
-      "pnpm format:backend"
-    ],
-    "frontend/**/*.{ts,tsx,js,jsx}": [
-      "bash -c 'cd frontend && pnpm type-check'",
-      "pnpm format:frontend"
-    ],
-    "ai-service/**/*.py": [
-      "pnpm lint:fix:ai",
-      "pnpm format:ai"
-    ],
-    "*.{json,md,yml,yaml}": [
-      "pnpm format:prettier"
-    ],
-    "*.{css,scss,less}": [
-      "pnpm format:prettier"
-    ]
-  }
+  "preinstall": "npx only-allow pnpm"
 }

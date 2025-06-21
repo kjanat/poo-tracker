@@ -23,8 +23,8 @@ Our testing strategy follows the **Testing Pyramid**:
 
 ### 1. Unit Tests
 
-**What**: Test individual functions/methods in isolation  
-**Speed**: Fast (< 1ms per test)  
+**What**: Test individual functions/methods in isolation
+**Speed**: Fast (< 1ms per test)
 **Coverage**: 80%+ of business logic
 
 ```go
@@ -55,8 +55,8 @@ func TestUserService_Register(t *testing.T) {
 
 ### 2. Integration Tests
 
-**What**: Test component interactions (service + repository)  
-**Speed**: Medium (1-10ms per test)  
+**What**: Test component interactions (service + repository)
+**Speed**: Medium (1-10ms per test)
 **Coverage**: Critical user flows
 
 ```go
@@ -85,8 +85,8 @@ func TestUserRepository_CRUD(t *testing.T) {
 
 ### 3. End-to-End Tests (Future)
 
-**What**: Test complete user journeys via HTTP  
-**Speed**: Slow (100ms+ per test)  
+**What**: Test complete user journeys via HTTP
+**Speed**: Slow (100ms+ per test)
 **Coverage**: Happy path scenarios
 
 ## 🛠️ Testing Tools
