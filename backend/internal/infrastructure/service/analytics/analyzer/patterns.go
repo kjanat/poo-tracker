@@ -1,6 +1,8 @@
 package analyzer
 
 import (
+	"sort"
+
 	"github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
@@ -49,11 +51,29 @@ func (ta *TrendAnalyzer) AnalyzeLifestylePatterns(meals []meal.Meal, movements [
 
 // Helper methods for pattern analysis
 func (ta *TrendAnalyzer) analyzeMealTimings(meals []meal.Meal) []shared.MealTiming {
-	// TODO: Implement meal timing analysis
-	// - Group meals by time of day (breakfast, lunch, dinner)
-	// - Calculate average timing for each meal type
-	// - Identify irregular patterns
-	return []shared.MealTiming{}
+	if len(meals) == 0 {
+		return []shared.MealTiming{}
+	}
+
+	hourFreq := make(map[int]int)
+	for _, m := range meals {
+		hour := m.MealTime.Hour()
+		hourFreq[hour]++
+	}
+
+	timings := make([]shared.MealTiming, 0, len(hourFreq))
+	for h, freq := range hourFreq {
+		timings = append(timings, shared.MealTiming{
+			TimeOfDay: shared.NewTimeOfDay(h, 0),
+			Frequency: freq,
+		})
+	}
+
+	sort.Slice(timings, func(i, j int) bool {
+		return timings[i].TimeOfDay.Hour < timings[j].TimeOfDay.Hour
+	})
+
+	return timings
 }
 
 func (ta *TrendAnalyzer) identifyCommonSymptomMap(symptoms []symptom.Symptom) map[string]int {
