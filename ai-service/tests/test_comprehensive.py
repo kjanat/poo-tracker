@@ -87,7 +87,7 @@ class TestAppStructure:
         """Test that app is a proper FastAPI instance."""
         assert isinstance(app, FastAPI)
         assert app.title == "Poo Tracker AI Service"
-        assert app.version == "1.0.0"
+        assert app.version == "0.1.0"
 
     def test_app_routes(self):
         """Test that all expected routes are registered."""

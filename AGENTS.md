@@ -18,10 +18,11 @@ poo-tracker/
 │   ├── src/
 │   ├── package.json    # @poo-tracker/frontend
 │   └── vite.config.ts
-├── backend/            # Node.js + Express v5 + Prisma ORM
-│   ├── src/
-│   ├── prisma/
-│   └── package.json    # @poo-tracker/backend
+├── backend/            # Go + Gin + In-memory repositories (PostgreSQL planned)
+│   ├── internal/       # Domain models, repositories, services, middleware
+│   ├── server/         # HTTP handlers and routing
+│   ├── main.go         # Application entry point with dependency injection
+│   └── go.mod          # Go module configuration
 ├── ai-service/         # Python FastAPI + Redis + ML/AI features
 │   ├── main.py         # FastAPI application and analysis logic
 │   ├── test_main.py    # Test suite
@@ -40,11 +41,37 @@ poo-tracker/
 ### 🎯 Key Technologies
 
 - **Frontend**: React 19, Vite, TypeScript, TailwindCSS v4
-- **Backend**: Node.js, Express v5, Prisma ORM, PostgreSQL
+- **Backend**: Go, Gin, In-memory repositories (PostgreSQL + migrations planned)
 - **AI Service**: Python 3.9+, FastAPI, Redis, NumPy, Pandas, scikit-learn
-- **Package Management**: pnpm 9+ (Node.js), uv (Python)
+- **Package Management**: pnpm 9+ (Node.js), uv (Python), Go modules
 - **Infrastructure**: Docker, PostgreSQL, Redis, MinIO (S3-compatible)
 - **Workspace**: pnpm workspaces for monorepo management
+
+---
+
+## Pre-commit Hooks & Code Quality
+
+All code quality checks (linting, formatting, type-checking, etc.) are now managed via [pre-commit](https://pre-commit.com) using the `.pre-commit-config.yaml` file in the project root. This replaces any previous use of Husky or lint-staged.
+
+**Setup:**
+
+```bash
+# Install pre-commit (if not already installed)
+uv tool install pre-commit  # or pip install pre-commit
+
+# Install hooks
+git config --global core.hooksPath .git/hooks
+pre-commit install
+```
+
+**Usage:**
+
+- Hooks will run automatically on `git commit`.
+- To run all hooks manually:
+
+  ```bash
+  pre-commit run --all-files
+  ```
 
 ---
 
@@ -52,14 +79,13 @@ poo-tracker/
 
 ### 📦 pnpm Workspace Usage
 
-**ALWAYS use pnpm workspace commands** - never `cd` into directories:
+**ALWAYS use pnpm workspace commands or Makefile targets** - never `cd` into directories in scripts:
 
 ```bash
 # ✅ Correct workspace commands
 pnpm --filter @poo-tracker/frontend add react-router-dom
-pnpm --filter @poo-tracker/backend run dev
-pnpm --parallel run build
-pnpm --recursive run test
+make dev-frontend
+make lint
 
 # ❌ Incorrect - avoid cd commands in scripts
 cd frontend && pnpm add react-router-dom
@@ -96,15 +122,16 @@ python -m pip install -r requirements.txt
 - Import order: React imports → Third-party → Local imports
 - **Workspace-aware imports**: Use relative paths within workspace
 
-### 🚀 Backend (Node.js/Express)
+### 🚀 Backend (Go/Gin)
 
-- **TypeScript is mandatory**
-- Express v5 syntax - NO wildcard routes (`app.use('*', ...)`)
-- Use Prisma ORM for all database operations
+- **Go is mandatory** - Clean architecture with dependency injection
+- Use **Gin framework** for HTTP routing and middleware
+- In-memory repositories for development (PostgreSQL planned for production)
 - RESTful API design - No GraphQL
 - Environment variables in `.env` files (never commit secrets)
 - Error handling with proper HTTP status codes
-- **Workspace commands**: Use `pnpm --filter @poo-tracker/backend` for operations
+- **Go modules**: Use `go mod` for dependency management
+- **Workspace commands**: Use root `pnpm` scripts for Go operations
 
 ### 🤖 AI Service (Python)
 
@@ -119,23 +146,39 @@ python -m pip install -r requirements.txt
 
 ### 📦 Workspace Package Management
 
-**Frontend/Backend** (pnpm workspace):
+**Frontend/AI Service** (pnpm workspace):
 
 ```bash
 # Add dependencies to specific workspace
 pnpm --filter @poo-tracker/frontend add axios
-pnpm --filter @poo-tracker/backend add express-rate-limit
+pnpm --filter @poo-tracker/ai-service add fastapi  # If it were Node.js
 
 # Add dev dependencies to root workspace
 pnpm add -Dw prettier eslint
 
 # Run scripts on specific workspace
 pnpm --filter @poo-tracker/frontend run build
-pnpm --filter @poo-tracker/backend run test
+make dev-ai  # Runs AI service via uv
 
 # Run scripts on all workspaces
-pnpm --parallel run dev
-pnpm --recursive run build
+make dev
+make build
+```
+
+**Backend** (Go modules):
+
+```bash
+# Backend operations (from root or backend directory)
+make dev-backend      # go run -C backend .
+make build-backend    # go build -C backend -o bin/server .
+make test-backend     # go test -C backend ./...
+make lint-backend     # golangci-lint run in backend
+
+# Go dependencies (in backend directory)
+cd backend
+go mod tidy           # Clean up dependencies
+go get github.com/gin-gonic/gin  # Add dependency
+go mod download       # Download dependencies
 ```
 
 **Python** (uv):
@@ -159,7 +202,7 @@ uvx pytest          # Run tests
 ### 🧪 Required Tests
 
 - **Frontend**: Vitest for unit/component tests
-- **Backend**: Vitest + Supertest for API testing
+- **Backend**: Go's built-in testing with `go test`
 - **AI Service**: pytest + pytest-asyncio for FastAPI testing
 
 ### 🔬 Test Execution
@@ -169,11 +212,11 @@ uvx pytest          # Run tests
 ```bash
 # Individual workspace testing
 pnpm --filter @poo-tracker/frontend test
-pnpm --filter @poo-tracker/backend test
+pnpm test:backend     # go test -C backend ./...
 
 # All workspaces
 pnpm test       # Runs all workspace tests
-pnpm test:watch # Watch mode for all workspaces
+pnpm test:watch # Watch mode for frontend
 
 # AI service testing (must be in directory)
 cd ai-service && uvx pytest
@@ -196,13 +239,22 @@ cd ai-service && uvx pytest --cov=main # With coverage
 
 All code changes must pass these checks:
 
-**Frontend/Backend** (workspace commands):
+**Frontend/AI Service** (workspace commands):
 
 ```bash
-pnpm lint     # ESLint across all workspaces
+pnpm lint     # ESLint across workspaces + Go linting
 pnpm lint:fix # Auto-fix linting issues
 pnpm build    # Production build test
 pnpm test     # All workspace tests
+```
+
+**Backend** (Go):
+
+```bash
+pnpm lint:backend     # golangci-lint run in backend
+pnpm test:backend     # go test -C backend ./...
+pnpm build:backend    # go build backend
+go fmt ./...          # Format Go code (from backend dir)
 ```
 
 **AI Service**:
@@ -228,7 +280,7 @@ uvx mypy main.py          # Type checking
 - PostgreSQL for primary database
 - Redis for caching and session storage
 - MinIO for S3-compatible file storage
-- Workspace commands: `pnpm docker:up`, `pnpm docker:down`
+- Workspace commands: `make docker-up`, `make docker-down`
 
 ---
 
@@ -356,7 +408,7 @@ chore: update dependencies
 
 - **NEVER use `cd` in scripts** - Use `pnpm --filter` instead
 - **Respect package scoping** - `@poo-tracker/frontend`, `@poo-tracker/backend`
-- **Use workspace scripts** - `pnpm dev`, `pnpm build`, `pnpm test`
+- **Use workspace scripts** - `make dev`, `make build`, `make test`
 - **Share common configs** - TypeScript, Prettier, ESLint in root when possible
 - **Python isolation** - Keep Python dependencies in [`ai-service/pyproject.toml`](ai-service/pyproject.toml) and use `uv` for management
 
@@ -373,9 +425,9 @@ chore: update dependencies
 
 ## Version & Updates
 
-**Last Updated**: June 15, 2025  
-**Version**: 2.0.0  
-**Major Changes**: Added pnpm workspace configuration, uv Python tooling  
+**Last Updated**: June 15, 2025
+**Version**: 2.0.0
+**Major Changes**: Added pnpm workspace configuration, uv Python tooling
 **Next Review**: When major architecture changes occur
 
 ---

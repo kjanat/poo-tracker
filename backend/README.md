@@ -1,426 +1,274 @@
 # Poo Tracker Backend
 
-> Node.js REST API for bowel movement tracking with Express v5, TypeScript, and Prisma ORM
+A comprehensive health tracking application backend built in Go, following Domain-Driven Design (DDD) principles with clean architecture patterns.
 
-The backend provides a robust, type-safe REST API for managing users, bowel movement entries, meals, file uploads, and analytics. Built with modern Node.js practices and comprehensive testing.
+## Project Overview
 
-## 🚀 Features
+The Poo Tracker backend provides a REST API for comprehensive digestive health monitoring, including bowel movement tracking, meal logging, symptom monitoring, medication management, and advanced health analytics.
 
-- **RESTful API Design**: Clean, predictable endpoints following REST conventions
-- **Authentication & Authorization**: JWT-based auth with secure user management
-- **Database Management**: PostgreSQL with Prisma ORM for type-safe queries
-- **File Upload Handling**: S3-compatible storage for photos with streaming uploads
-- **Data Validation**: Comprehensive input validation and sanitization
-- **Error Handling**: Structured error responses with proper HTTP status codes
-- **API Documentation**: Comprehensive endpoint documentation
-- **Health Monitoring**: Health check endpoints for monitoring and deployment
-- **Analytics Integration**: Seamless connection to AI service for pattern analysis
+## Architecture
 
-## 🛠 Tech Stack
+The project follows a clean architecture with clear separation of concerns:
 
-- **Runtime**: Node.js 22+ with TypeScript
-- **Framework**: Express v5 with modern middleware
-- **Database**: PostgreSQL with Prisma ORM v6
-- **Authentication**: JWT tokens with bcrypt password hashing
-- **File Storage**: S3-compatible (MinIO for development, AWS S3 for production)
-- **Validation**: Zod for runtime type checking and validation
-- **Testing**: Vitest + Supertest for comprehensive API testing
-- **Development**: tsx for TypeScript execution with hot reload
-- **Code Quality**: ESLint + Prettier for consistent code style
-
-## 📋 Prerequisites
-
-- Node.js 22+
-- pnpm 9+ (installed at workspace root)
-- PostgreSQL database (or Docker for development)
-- Redis (optional, for caching and sessions)
-- S3-compatible storage service
-
-## 🔧 Installation & Setup
-
-### Using Workspace Commands (Recommended)
-
-```bash
-# From the root directory
-pnpm install
-
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your database and service configurations
-
-# Run database migrations
-pnpm --filter @poo-tracker/backend db:migrate
-
-# Start development server
-pnpm --filter @poo-tracker/backend dev
-
-# Or use the workspace shortcut
-pnpm dev:backend
+```
+backend/
+├── cmd/                    # Application entry points
+│   └── server/            # Main server application
+├── internal/              # Private application code
+│   ├── domain/           # Business logic and domain models
+│   ├── infrastructure/   # External dependencies and implementations
+│   └── app/             # Application services and orchestration
+├── server/               # HTTP server and API handlers
+├── docs/                # API documentation
+└── data/                # Database files (development)
 ```
 
-> **Security Note**: The default usernames and passwords in
-> [`docker-compose.yml`](../docker-compose.yml) are for **local development
-> only**. Generate unique, strong credentials for PostgreSQL, MinIO and Redis
-> before deploying to production.
+## Domain Structure
 
-### Manual Setup (if needed)
+### Core Domains
+
+#### 1. Bowel Movement Domain (`internal/domain/bowelmovement/`)
+
+**Purpose**: Tracks bowel movements with comprehensive health metrics
+
+**Key Models**:
+
+- `BowelMovement`: Core tracking model with Bristol Stool Scale (1-7)
+- `BowelMovementDetails`: Extended metadata and descriptions
+- Pain, strain, satisfaction metrics (1-10 scale)
+- Duration tracking and urgency levels
+- Photo attachments and detailed notes
+
+**Service Operations**:
+
+- Create, read, update, delete bowel movement entries
+- Date range queries for analytics
+- User-specific data with privacy controls
+- Statistical aggregations
+
+#### 2. Meal Domain (`internal/domain/meal/`)
+
+**Purpose**: Comprehensive meal and nutrition tracking
+
+**Key Models**:
+
+- `Meal`: Nutritional tracking with calorie counting
+- Ingredient lists and dietary restrictions
+- Meal timing and portion sizes
+- Fiber content and dietary trigger tracking
+- Photo documentation
+
+**Service Operations**:
+
+- Meal logging with nutritional analysis
+- Dietary pattern analysis
+- Trigger food identification
+- Nutrition goal tracking
+
+#### 3. Symptom Domain (`internal/domain/symptom/`)
+
+**Purpose**: Symptom tracking and pattern recognition
+
+**Key Models**:
+
+- `Symptom`: Comprehensive symptom tracking
+- Severity scales (1-10) and duration tracking
+- Body part localization and symptom categorization
+- Trigger identification and correlation analysis
+
+**Service Operations**:
+
+- Symptom logging with severity tracking
+- Pattern recognition and trigger analysis
+- Correlation with meals and medications
+- Trend analysis over time
+
+#### 4. Medication Domain (`internal/domain/medication/`)
+
+**Purpose**: Medication management and adherence tracking
+
+**Key Models**:
+
+- `Medication`: Comprehensive medication tracking
+- Dosage, frequency, and administration tracking
+- Side effect monitoring and effectiveness assessment
+- Start/end dates and PRN (as-needed) medications
+
+**Service Operations**:
+
+- Medication schedule management
+- Adherence tracking and reporting
+- Side effect correlation analysis
+- Effectiveness assessment
+
+#### 5. Analytics Domain (`internal/domain/analytics/`)
+
+**Purpose**: Advanced health analytics and insights
+
+**Key Features**:
+
+- Cross-domain health overview generation
+- Correlation analysis between health factors
+- Trend analysis and pattern recognition
+- Personalized health scoring (0-100)
+- Evidence-based recommendations
+- Risk factor identification
+
+**Service Operations**:
+
+- `GetUserHealthOverview()`: Comprehensive health summary
+- `GetCorrelationAnalysis()`: Factor relationship analysis
+- `GetTrendAnalysis()`: Time-series health trends
+- `GetBehaviorPatterns()`: Behavioral pattern recognition
+- `GetHealthInsights()`: Actionable health insights
+- `GetHealthScore()`: Overall health scoring
+- `GetRecommendations()`: Personalized recommendations
+
+## Development
 
 ```bash
-# Navigate to backend directory
-cd backend
+# Run the server
+go run ./cmd/server/main.go
 
+# Run tests
+go test ./...
+
+# Build for production
+go build -o bin/server ./cmd/server/main.go
+```
+
+### Quick Start
+
+```bash
 # Install dependencies
-pnpm install
+go mod download
 
 # Set up environment
-cp ../.env.example .env
-
-# Run migrations
-pnpm db:migrate
+cp .env.example .env
+# Edit .env with your configuration
 
 # Start development server
-pnpm dev
+go run cmd/server/main.go
 ```
 
-## 🏃‍♂️ Development
+### Configuration
 
-### Development Server
+All environment variables used by the backend are listed in `.env.example` with
+safe defaults. Copy this file to `.env` and adjust the values for your local or
+production setup.
+
+### Architecture
+
+- `internal/domain` – domain models
+- `internal/repository` – repository interfaces and implementations
+- `internal/service` – business logic with pluggable analytics strategies
+- `server` – HTTP handlers and routing
+
+The `main.go` file wires dependencies using constructor functions. A memory repository is used by default but can be swapped out for a real database implementation.
+
+### Endpoints
+
+- `GET /health` – basic health check
+- `GET /api/bowel-movements` – list entries
+- `POST /api/bowel-movements` – create entry
+  - Request body: `{"userId": "string", "bristolType": 1-7, "notes": "optional"}`
+- `GET /api/bowel-movements/:id` – get entry
+- `PUT /api/bowel-movements/:id` – update entry
+  - Request body: `{"bristolType": 1-7, "notes": "optional"}` (partial updates supported)
+- `DELETE /api/bowel-movements/:id` – delete entry
+- `GET /api/meals` – list meals
+- `POST /api/meals` – create meal
+  - Request body: `{"userId": "string", "name": "string", "calories": number}`
+- `GET /api/meals/:id` – get meal
+- `PUT /api/meals/:id` – update meal
+  - Request body: `{"name": "string", "calories": number}` (partial updates supported)
+- `DELETE /api/meals/:id` – delete meal
+- `GET /api/analytics` – summary statistics
+  - Response: Analytics data based on configured strategy
+
+#### BowelMovement Details (Enhanced tracking)
+
+- `POST /api/bowel-movements/:id/details` – create detailed information for bowel movement
+  - Request body: `{"notes": "string", "detailedNotes": "string", "environment": "string", "preConditions": "string", "postConditions": "string", "aiRecommendations": "string", "tags": ["string"], "weatherCondition": "string", "stressLevel": 1-10, "sleepQuality": 1-10, "exerciseIntensity": 1-10}`
+- `GET /api/bowel-movements/:id/details` – get detailed information
+- `PUT /api/bowel-movements/:id/details` – update detailed information
+- `DELETE /api/bowel-movements/:id/details` – delete detailed information
+
+#### User Management
+
+- `POST /api/register` – create user account
+  - Request body: `{"email": "string", "password": "string", "name": "string"}`
+- `POST /api/login` – authenticate user
+  - Request body: `{"email": "string", "password": "string"}`
+  - Response: User data with JWT token
+- `GET /api/profile` – get authenticated user profile (requires auth header)
+
+## Current Implementation Status
+
+### ✅ Completed Features
+
+- Clean architecture with dependency injection
+- In-memory repositories for bowel movements, meals, and users
+- **Enhanced BowelMovement model with separated details for performance**
+- **BowelMovementDetails with comprehensive tracking fields and AI analysis**
+- JWT authentication with user registration and login
+- Comprehensive validation for all endpoints
+- Full CRUD operations for bowel movements, meals, and details
+- Analytics service with pluggable strategies
+- Comprehensive test coverage
+- RESTful API design
+- **Automatic HasDetails flag synchronization between models**
+
+### 🔄 In Progress / Planned
+
+- **Database**: Migration from in-memory to PostgreSQL
+- **File Storage**: Photo upload integration with MinIO/S3
+- **Advanced Models**: Symptoms, medications, and their relationships
+- **Enhanced Security**: Rate limiting, 2FA, password reset
+- **Data Export**: PDF reports and data export functionality
+- **Advanced Analytics**: Pattern detection and health insights
+
+### 🏗️ Architecture Notes
+
+- Uses Go's built-in dependency injection via constructor functions
+- Strategy pattern for analytics (easily extensible)
+- Middleware-based authentication using JWT
+- Memory repositories can be swapped for PostgreSQL implementations
+- Clean separation: handlers → services → repositories
+
+## 🧹 Code Quality & Pre-commit Hooks
+
+All linting, formatting, and type-checking is managed via [pre-commit](https://pre-commit.com) and the `.pre-commit-config.yaml` in the project root. Husky and lint-staged are no longer used.
+
+**Setup:**
 
 ```bash
-# Using workspace commands (recommended)
-pnpm dev:backend
-
-# Or directly
-pnpm --filter @poo-tracker/backend dev
-
-# Manual approach
-cd backend && pnpm dev
+uv tool install pre-commit  # or pip install pre-commit
+pre-commit install
 ```
 
-The API will be available at: <http://localhost:3002>
-
-### Database Operations
+Hooks run on every commit, or manually with:
 
 ```bash
-# Run migrations
-pnpm --filter @poo-tracker/backend db:migrate
-
-# Reset database (⚠️ destructive!)
-pnpm --filter @poo-tracker/backend db:reset
-
-# Seed database with test data
-pnpm --filter @poo-tracker/backend db:seed
-
-# Open Prisma Studio (database GUI)
-pnpm --filter @poo-tracker/backend db:studio
-
-# Generate Prisma client
-pnpm --filter @poo-tracker/backend db:generate
+pre-commit run --all-files
 ```
 
-### Build & Production
-
-```bash
-# Build for production
-pnpm --filter @poo-tracker/backend build
-
-# Start production server
-pnpm --filter @poo-tracker/backend start
-```
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-pnpm --filter @poo-tracker/backend test
-
-# Watch mode for development
-pnpm --filter @poo-tracker/backend test:watch
-
-# Coverage report
-pnpm --filter @poo-tracker/backend test:coverage
-```
-
-### Test Coverage Goals
-
-- **Unit Tests**: All utilities, services, and middleware (100% coverage)
-- **Integration Tests**: All API endpoints with various scenarios
-- **Database Tests**: Prisma models and queries
-- **Authentication Tests**: JWT handling and user management
-
-## 🎨 Code Quality
-
-```bash
-# Lint code
-pnpm --filter @poo-tracker/backend lint
-
-# Fix linting issues
-pnpm --filter @poo-tracker/backend lint:fix
-
-# Format code (handled by Prettier in workspace)
-pnpm format
-```
-
-## 📁 Project Structure
-
-```text
-backend/
-├── prisma/
-│   ├── schema.prisma           # Database schema definition
-│   ├── migrations/             # Database migration files
-│   └── seed.sql/              # Database seeding scripts
-├── public/                     # Static assets (logos, etc.)
-├── src/
-│   ├── middleware/            # Express middleware
-│   │   ├── auth.ts           # JWT authentication
-│   │   └── errorHandler.ts   # Global error handling
-│   ├── routes/               # API route handlers
-│   │   ├── auth.ts          # Authentication endpoints
-│   │   ├── entries.ts       # Bowel movement CRUD
-│   │   ├── meals.ts         # Meal tracking
-│   │   ├── uploads.ts       # File upload handling
-│   │   └── analytics.ts     # Data analysis endpoints
-│   ├── services/            # Business logic services
-│   │   └── ImageProcessingService.ts
-│   ├── utils/              # Utility functions
-│   │   ├── filename.ts     # File naming utilities
-│   │   └── seed.ts         # Database seeding
-│   ├── config.ts          # Application configuration
-│   └── index.ts           # Application entry point
-├── package.json           # Dependencies and scripts
-├── tsconfig.json         # TypeScript configuration
-├── jest.config.js       # Test configuration (legacy)
-└── vitest.config.ts     # Vitest configuration
-```
-
-## 🌐 API Endpoints
-
-### Authentication
-
-- `POST /auth/register` - User registration
-- `POST /auth/login` - User login
-- `GET /auth/me` - Get current user profile
-
-### Bowel Movement Entries
-
-- `GET /entries` - List user's entries (with pagination)
-- `POST /entries` - Create new entry
-- `GET /entries/:id` - Get specific entry
-- `PUT /entries/:id` - Update entry
-- `DELETE /entries/:id` - Delete entry
-
-### Meals
-
-- `GET /meals` - List user's meals
-- `POST /meals` - Create new meal
-- `GET /meals/:id` - Get specific meal
-- `PUT /meals/:id` - Update meal
-- `DELETE /meals/:id` - Delete meal
-
-### File Uploads
-
-- `POST /uploads/photos` - Upload entry photos
-- `GET /uploads/photos/:filename` - Get photo (signed URL)
-- `DELETE /uploads/photos/:filename` - Delete photo
-
-### Analytics
-
-- `GET /analytics/overview` - User's health overview
-- `GET /analytics/patterns` - Pattern analysis
-- `GET /analytics/correlations` - Meal-entry correlations
-- `POST /analytics/analyze` - Request AI analysis
-
-### Health & Monitoring
-
-- `GET /health` - Service health check
-- `GET /health/db` - Database connectivity check
-
-## 🗄️ Database Schema
-
-### Core Tables
-
-- **User**: User accounts and profiles
-- **UserAuth**: Authentication credentials (separate for security)
-- **Entry**: Bowel movement records
-- **Meal**: Meal tracking data
-- **MealEntry**: Many-to-many relationship between meals and entries
-- **Photo**: File metadata for uploaded images
-
-### Key Relationships
-
-- Users → Entries (one-to-many)
-- Users → Meals (one-to-many)
-- Meals ↔ Entries (many-to-many via MealEntry)
-- Entries → Photos (one-to-many)
-
-## ⚙️ Configuration
-
-### Environment Variables
-
-Copy `backend/.env.example` to `.env` and adjust the values:
-
-```env
-# Database
-DATABASE_URL="postgresql://poo_user:secure_password_123@localhost:5432/poo_tracker"
-
-# JWT Authentication
-JWT_SECRET="your-super-secret-jwt-key"
-JWT_EXPIRES_IN="7d"
-
-# S3/MinIO Storage
-S3_ENDPOINT="http://localhost:9000"
-S3_BUCKET="poo-photos"
-S3_ACCESS_KEY="minioadmin"
-S3_SECRET_KEY="minioadmin123"
-S3_REGION="us-east-1"
-
-# AI Service Integration
-AI_SERVICE_URL="http://localhost:8001"
-
-# Server Configuration
-PORT=3002
-NODE_ENV="development"
-
-# Optional: Redis for caching
-REDIS_URL="redis://localhost:6379"
-```
-
-### Prisma Configuration
-
-The database schema is defined in `prisma/schema.prisma` with:
-
-- Type-safe database queries
-- Automatic migration generation
-- Rich relationship modeling
-- Built-in validation
-
-## 🔒 Security Features
-
-### Authentication & Authorization
-
-- JWT-based stateless authentication
-- Bcrypt password hashing with salt rounds
-- Protected routes with middleware
-- User-scoped data access
-
-### Data Protection
-
-- Input validation with Zod schemas
-- SQL injection prevention (Prisma ORM)
-- XSS protection with sanitization
-- CORS configuration for cross-origin requests
-
-### File Upload Security
-
-- File type validation
-- Size limits and streaming uploads
-- Secure filename generation
-- S3 signed URLs for controlled access
-
-## 🚀 Performance Features
-
-### Database Optimization
-
-- Connection pooling with Prisma
-- Efficient queries with proper indexing
-- Pagination for large datasets
-- Selective field loading
-
-### Caching Strategy
-
-- Redis integration for session caching
-- API response caching for analytics
-- S3 signed URL caching
-- Database query result caching
-
-## 🧪 Testing Strategy
-
-### Unit Tests
-
-- All utility functions (`utils/`)
-- Service layer logic (`services/`)
-- Middleware functions (`middleware/`)
-
-### Integration Tests
-
-- Complete API endpoint testing
-- Database operations
-- Authentication flows
-- File upload scenarios
-
-### Test Coverage
-
-Current test coverage: **17.79%** (actively improving)
-
-- ✅ **middleware/auth.ts**: 100% coverage
-- ✅ **middleware/errorHandler.ts**: 100% coverage
-- ✅ **services/ImageProcessingService.ts**: 100% coverage
-- ✅ **utils/filename.ts**: 100% coverage
-- ✅ **routes/auth.ts**: 53.65% coverage (15 integration tests)
-
-## 🔗 Service Integration
-
-### AI Service Communication
-
-```typescript
-// Example AI service integration
-const analysisResult = await fetch(`${AI_SERVICE_URL}/analyze`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ entries, meals })
-})
-```
-
-### S3/MinIO Integration
-
-```typescript
-// Example file upload
-const uploadResult = await s3Client.upload({
-  Bucket: process.env.S3_BUCKET,
-  Key: generateSecureFilename(file),
-  Body: fileStream,
-  ContentType: file.mimetype
-})
-```
-
-## 🚨 Health Considerations
-
-This API handles sensitive health data:
-
-- HIPAA-consideration ready architecture
-- Comprehensive audit logging
-- Data encryption at rest and in transit
-- User data export and deletion capabilities
-- Privacy-first design principles
-
-## 🤝 Contributing
-
-1. Follow TypeScript and Node.js best practices
-2. Write comprehensive tests for all new features
-3. Use Prisma for all database operations
-4. Implement proper error handling
-5. Add API documentation for new endpoints
-6. Follow the established project structure
-
-### API Development Guidelines
-
-- Use proper HTTP status codes
-- Implement comprehensive validation
-- Add proper error responses
-- Include request/response examples
-- Follow RESTful conventions
-- Use TypeScript interfaces for all data models
-
-## 🔗 Integration Points
-
-This backend integrates with:
-
-- **Frontend**: `../frontend/` - Serves the React application API needs
-- **AI Service**: `../ai-service/` - Forwards analysis requests and processes results
-- **Database**: PostgreSQL for persistent data storage
-- **Storage**: S3/MinIO for file storage and management
-- **Cache**: Redis for performance optimization
-
----
-
-_Built with 💩 and professional engineering standards for reliable health data management._
+## Contributing
+
+1. **Fork the repo** on GitHub
+2. **Clone your fork** locally
+3. **Install dependencies**: `go mod download`
+4. **Set up environment**: Copy `.env.example` to `.env` and configure
+5. **Run the server**: `go run ./cmd/server/main.go`
+6. **Make your changes** and test locally
+7. **Commit and push** to your fork
+8. **Create a pull request** on GitHub
+
+Please ensure your code adheres to the following guidelines:
+
+- Follow the existing code style and conventions
+- Write clear, descriptive commit messages
+- Test your changes thoroughly
+- Update documentation as needed
+
+All code quality checks are managed via pre-commit hooks. Ensure your code passes these checks before submitting a pull request.

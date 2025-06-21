@@ -25,8 +25,8 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 2. **Install dependencies:**
 
    ```bash
-   # Install Node.js dependencies (frontend + backend)
-   pnpm install
+   # Install Node.js dependencies (frontend only - backend now uses Go)
+   pnpm --filter @poo-tracker/frontend install
 
    # Install Python dependencies for AI service
    cd ai-service && uv sync && cd ..
@@ -37,7 +37,6 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
    ```bash
    cp .env.example .env
    cp frontend/.env.example frontend/.env.local
-   cp backend/.env.example backend/.env
    cp ai-service/.env.example ai-service/.env
    # Edit each file with your local values
    ```
@@ -46,23 +45,18 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
    ```bash
    # Start database and supporting services
-   pnpm docker:up
+   make docker-up
 
-   # Start all development servers (frontend + backend + AI)
-   pnpm dev:full
-
-   # OR start just frontend + backend
-   pnpm dev
+   # Start all development servers (frontend + Go backend + AI)
+   make dev
    ```
 
 5. **Set up the database:**
 
-   ```bash
-   # Run database migrations
-   pnpm db:migrate
+   Start the PostgreSQL database using Docker Compose:
 
-   # (Optional) Seed with test data
-   pnpm db:seed
+   ```bash
+   make docker-up
    ```
 
    A sample set of credentials for API testing is provided in
@@ -79,7 +73,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 ## 🏗️ Tech Stack
 
 - **Frontend**: React + Vite + TypeScript + TailwindCSS v4
-- **Backend**: Node.js + Express v5 + TypeScript + Prisma
+- **Backend**: Go + Gin
 - **Database**: PostgreSQL
 - **Storage**: MinIO (S3-compatible for photos)
 - **AI Service**: Python + FastAPI + scikit-learn
@@ -93,7 +87,6 @@ Each package ships with an `.env.example` file. Copy them and tweak the values b
 ```bash
 cp .env.example .env
 cp frontend/.env.example frontend/.env.local
-cp backend/.env.example backend/.env
 cp ai-service/.env.example ai-service/.env
 ```
 
@@ -113,36 +106,34 @@ These example files contain **sample credentials only**. Replace them with your 
 
 ```bash
 # Development - All Services
-pnpm dev:full         # Start frontend + backend + AI service
-pnpm dev              # Start frontend + backend only
-pnpm dev:frontend     # Start frontend only
-pnpm dev:backend      # Start backend only
-pnpm dev:ai           # Start AI service only
+make dev              # Start frontend, Go backend and AI service
+make dev-frontend     # Start frontend only
+make dev-backend      # Start Go backend only
+make dev-ai           # Start AI service only
 
 # Building
-pnpm build            # Build all projects
-pnpm build:frontend   # Build frontend only
-pnpm build:backend    # Build backend only
+make build            # Build all projects
+make build-frontend   # Build frontend only
+make build-backend    # Build Go backend only
 
 # Database Operations
-pnpm db:migrate       # Run Prisma migrations
-pnpm db:seed          # Seed database with test data
-pnpm db:studio        # Open Prisma Studio
+# (Database migrations handled via SQL scripts in Go backend)
 
 # Docker Services
-pnpm docker:up        # Start PostgreSQL, Redis, MinIO
-pnpm docker:down      # Stop all Docker services
+make docker-up        # Start PostgreSQL, Redis, MinIO
+make docker-down      # Stop all Docker services
 
 # Testing & Quality
-pnpm test             # Run all tests (frontend + backend)
-pnpm test:watch       # Run tests in watch mode
-pnpm lint             # Run linters on all projects
-pnpm lint:fix         # Auto-fix linting issues
-pnpm clean            # Clean all build artifacts
+make test             # Run all tests (frontend + backend)
+pnpm --filter @poo-tracker/frontend run test:watch   # Frontend watch mode
+make lint             # Run linters on all projects
+make lint-fix         # Auto-fix linting issues
+make clean            # Clean all build artifacts
 
 # Code Formatting
-pnpm prettier         # Format all files
-pnpm prettier:watch   # Watch and format on changes
+make format           # Format backend and AI service
+pnpm format:prettier  # Format all files
+pnpm format:prettier:watch   # Watch and format on changes
 ```
 
 ### Project Structure
@@ -153,10 +144,10 @@ poo-tracker/
 │   ├── src/
 │   ├── package.json
 │   └── vite.config.ts
-├── backend/            # Express.js API (TypeScript + Prisma)
-│   ├── src/
-│   ├── prisma/
-│   └── package.json
+├── backend/            # Go API (Gin framework)
+│   ├── *.go
+│   ├── go.mod
+│   └── README.md
 ├── ai-service/         # Python FastAPI AI service
 │   ├── main.py
 │   ├── pyproject.toml
@@ -173,11 +164,10 @@ This project uses **pnpm workspaces** for efficient monorepo management:
 ```bash
 # Install dependencies for specific workspace
 pnpm --filter @poo-tracker/frontend add react-router-dom
-pnpm --filter @poo-tracker/backend add express-rate-limit
+
 
 # Run commands on specific workspaces
 pnpm --filter @poo-tracker/frontend build
-pnpm --filter @poo-tracker/backend test
 
 # Run commands on all workspaces
 pnpm --recursive run build
@@ -186,16 +176,19 @@ pnpm --parallel run dev
 
 ### API Endpoints
 
-| Endpoint                 | Method   | Description                           |
-| ------------------------ | -------- | ------------------------------------- |
-| `/api/auth/register`     | `POST`   | Register a new user                   |
-| `/api/auth/login`        | `POST`   | Authenticate user                     |
-| `/api/entries`           | `GET`    | Get bowel movement entries            |
-| `/api/entries`           | `POST`   | Create a new bowel movement entry     |
-| `/api/entries/:id`       | `PUT`    | Update a bowel movement entry         |
-| `/api/entries/:id`       | `DELETE` | Delete a bowel movement entry         |
-| `/api/uploads/photo`     | `POST`   | Upload a photo of your bowel movement |
-| `/api/analytics/summary` | `GET`    | Get AI analysis summary               |
+| Endpoint                   | Method   | Description                       |
+| -------------------------- | -------- | --------------------------------- |
+| `/api/bowel-movements`     | `GET`    | List bowel movement entries       |
+| `/api/bowel-movements`     | `POST`   | Create a new bowel movement entry |
+| `/api/bowel-movements/:id` | `GET`    | Get a specific entry              |
+| `/api/bowel-movements/:id` | `PUT`    | Update a bowel movement entry     |
+| `/api/bowel-movements/:id` | `DELETE` | Delete a bowel movement entry     |
+| `/api/meals`               | `GET`    | List meal entries                 |
+| `/api/meals`               | `POST`   | Create a new meal entry           |
+| `/api/meals/:id`           | `GET`    | Get a specific meal               |
+| `/api/meals/:id`           | `PUT`    | Update a meal entry               |
+| `/api/meals/:id`           | `DELETE` | Delete a meal entry               |
+| `/api/analytics`           | `GET`    | Get simple analytics              |
 
 ## 📝 How it works
 
@@ -258,7 +251,8 @@ We encrypt your brown notes and hide them away. Nobody's reading your logs excep
 - RESTful API design
 - Comprehensive test coverage
 - ESLint with @typescript-eslint and Prettier (follow the config, don't "fix" it)
-- Use pnpm workspace commands for consistent development
+- Use pnpm workspace commands or Makefile targets for consistent development (never use `cd` in scripts)
+- All code quality checks are managed by pre-commit hooks
 
 ## 🚀 Deployment
 
@@ -317,11 +311,11 @@ table below lists the most relevant options. See
 
 ```bash
 # Build all projects
-pnpm build
+make build
 
 # Or build individually
-pnpm build:frontend
-pnpm build:backend
+make build-frontend
+make build-backend    # Build Go backend only
 
 # AI service
 uv run uvicorn ai_service.main:app

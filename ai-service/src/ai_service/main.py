@@ -17,9 +17,7 @@ from fastapi.responses import JSONResponse
 from .config.logging import get_logger, setup_logging
 from .config.settings import get_settings
 from .models.database import BowelMovementData, MealData, SymptomData
-from .models.requests import (
-    AnalysisRequest,
-)
+from .models.requests import AnalysisRequest
 from .models.responses import AnalysisResponse, ErrorResponse, HealthResponse
 from .services.analyzer import AnalyzerService
 from .services.health_assessor import HealthAssessorService
