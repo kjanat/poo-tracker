@@ -42,6 +42,16 @@ func TestIdentifyCommonIngredients(t *testing.T) {
 	assert.Equal(t, []string{"dairy", "gluten", "spicy"}, got)
 }
 
+func TestIdentifyCommonIngredientsFiber(t *testing.T) {
+	ta := &TrendAnalyzer{}
+	meals := []meal.Meal{
+		{FiberRich: true},
+	}
+
+	got := ta.identifyCommonIngredients(meals)
+	assert.Equal(t, []string{"fiber"}, got)
+}
+
 func TestIdentifyProblemIngredients(t *testing.T) {
 	ta := &TrendAnalyzer{}
 	meals := []meal.Meal{{Dairy: true}}
