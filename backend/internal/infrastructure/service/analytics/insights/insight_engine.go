@@ -62,7 +62,7 @@ func (ie *InsightEngine) GetRecommendationStrings(
 	recs := ie.GenerateRecommendations(bowelValues, mealValues, symptomValues)
 	var result []string
 	for _, rec := range recs {
-		result = append(result, rec.Message)
+		result = append(result, rec.Title)
 	}
 	return result
 }
@@ -116,13 +116,16 @@ func (ie *InsightEngine) analyzeBristolConsistency(movements []bowelmovement.Bow
 
 	if float64(type1and2Count)/float64(totalCount) > 0.5 {
 		insight = &shared.InsightRecommendation{
-			Type:       "LIFESTYLE",
-			Category:   "Bowel Health",
-			Message:    "Constipation Pattern Detected - Over 50% of your bowel movements indicate hard stools",
-			Evidence:   fmt.Sprintf("%d out of %d movements were Bristol types 1-2, indicating constipation", type1and2Count, totalCount),
+			Type:        "LIFESTYLE",
+			Category:    "Bowel Health",
+			Title:       "Constipation Pattern Detected",
+			Description: "Over 50% of your bowel movements indicate hard stools",
+			Evidence: []string{
+				fmt.Sprintf("%d out of %d movements were Bristol types 1-2, indicating constipation", type1and2Count, totalCount),
+			},
 			Priority:   "HIGH",
 			Confidence: 0.8,
-			ActionItems: []string{
+			ActionSteps: []string{
 				"Increase fiber intake with fruits, vegetables, and whole grains",
 				"Drink more water throughout the day",
 				"Consider adding physical activity to your routine",
@@ -131,13 +134,16 @@ func (ie *InsightEngine) analyzeBristolConsistency(movements []bowelmovement.Bow
 		}
 	} else if float64(type6and7Count)/float64(totalCount) > 0.4 {
 		insight = &shared.InsightRecommendation{
-			Type:       "LIFESTYLE",
-			Category:   "Bowel Health",
-			Message:    "Loose Stool Pattern Detected - Over 40% of your bowel movements indicate loose stools",
-			Evidence:   fmt.Sprintf("%d out of %d movements were Bristol types 6-7, indicating loose stools", type6and7Count, totalCount),
+			Type:        "LIFESTYLE",
+			Category:    "Bowel Health",
+			Title:       "Loose Stool Pattern Detected",
+			Description: "Over 40% of your bowel movements indicate loose stools",
+			Evidence: []string{
+				fmt.Sprintf("%d out of %d movements were Bristol types 6-7, indicating loose stools", type6and7Count, totalCount),
+			},
 			Priority:   "MEDIUM",
 			Confidence: 0.7,
-			ActionItems: []string{
+			ActionSteps: []string{
 				"Keep a food diary to identify potential triggers",
 				"Consider reducing dairy, gluten, or spicy foods temporarily",
 				"Stay hydrated to replace lost fluids",
