@@ -11,10 +11,15 @@ import (
 
 // AnalyzeEatingPatterns identifies patterns in eating habits and their potential impacts
 func (ta *TrendAnalyzer) AnalyzeEatingPatterns(meals []meal.Meal) *shared.EatingPattern {
+	// TODO: Remove this early return once methods are implemented
+	if len(meals) == 0 {
+		return &shared.EatingPattern{}
+	}
+
 	pattern := &shared.EatingPattern{
-		MealTimings:        ta.analyzeMealTimings(meals),
-		CommonIngredients:  ta.identifyCommonIngredients(meals),
-		ProblemIngredients: ta.identifyProblemIngredients(meals),
+		MealTimings:        []shared.MealTiming{}, // TODO: Implement analyzeMealTimings
+		CommonIngredients:  []string{},            // TODO: Implement identifyCommonIngredients
+		ProblemIngredients: []string{},            // TODO: Implement identifyProblemIngredients
 	}
 	return pattern
 }
