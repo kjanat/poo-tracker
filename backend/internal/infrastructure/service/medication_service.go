@@ -145,8 +145,7 @@ func (s *MedicationService) Update(ctx context.Context, id string, input *medica
 	}
 
 	// Check if medication exists
-	existing, err := s.repo.GetByID(ctx, id)
-	if err != nil {
+	if _, err := s.repo.GetByID(ctx, id); err != nil {
 		return nil, err
 	}
 
@@ -202,10 +201,10 @@ func (s *MedicationService) Update(ctx context.Context, id string, input *medica
 	}
 
 	// Return updated medication
-    updated, err := s.repo.GetByID(ctx, id)
-    if err != nil {
-        return nil, fmt.Errorf("failed to retrieve updated medication: %w", err)
-    }
+	updated, err := s.repo.GetByID(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve updated medication: %w", err)
+	}
 
 	return updated, nil
 }
