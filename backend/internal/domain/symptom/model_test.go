@@ -6,18 +6,25 @@ import (
 )
 
 func TestNewSymptomDefaults(t *testing.T) {
-	now := time.Now()
-	s := NewSymptom("u1", "Headache", 4, now)
-	if s.UserID != "u1" || s.Name != "Headache" || s.Severity != 4 {
-		t.Errorf("unexpected basic fields: %+v", s)
+	recorded := time.Now()
+	s := NewSymptom("user1", "Nausea", 5, recorded)
+
+	if s.UserID != "user1" {
+		t.Errorf("expected userID user1, got %s", s.UserID)
 	}
-	if !s.RecordedAt.Equal(now) {
-		t.Errorf("expected RecordedAt %v, got %v", now, s.RecordedAt)
+	if s.Name != "Nausea" {
+		t.Errorf("expected name Nausea, got %s", s.Name)
+	}
+	if s.Severity != 5 {
+		t.Errorf("expected severity 5, got %d", s.Severity)
+	}
+	if !s.RecordedAt.Equal(recorded) {
+		t.Errorf("expected recordedAt %v, got %v", recorded, s.RecordedAt)
 	}
 	if len(s.Triggers) != 0 {
-		t.Errorf("expected no triggers, got %d", len(s.Triggers))
+		t.Error("expected empty Triggers slice")
 	}
 	if s.CreatedAt.IsZero() || s.UpdatedAt.IsZero() {
-		t.Error("timestamps should be set")
+		t.Error("expected timestamps to be set")
 	}
 }
