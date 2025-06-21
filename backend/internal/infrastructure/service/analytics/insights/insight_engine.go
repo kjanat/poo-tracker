@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kjanat/poo-tracker/backend/internal/domain/analytics"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/medication"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
+	analytics "github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/shared"
 )
 

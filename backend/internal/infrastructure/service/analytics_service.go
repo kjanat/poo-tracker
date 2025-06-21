@@ -11,6 +11,7 @@ import (
 	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/medication"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
+	svcAnalytics "github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/aggregator"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/analyzer"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/calculator"
@@ -306,7 +307,7 @@ func (s *AnalyticsService) GetBehaviorPatterns(ctx context.Context, userID strin
 }
 
 // GetHealthInsights generates actionable health insights
-func (s *AnalyticsService) GetHealthInsights(ctx context.Context, userID string, start, end time.Time) (*analytics.HealthInsights, error) {
+func (s *AnalyticsService) GetHealthInsights(ctx context.Context, userID string, start, end time.Time) (*svcAnalytics.HealthInsights, error) {
 	if start.After(end) {
 		return nil, analytics.ErrInvalidDateRange
 	}
@@ -335,7 +336,7 @@ func (s *AnalyticsService) GetHealthInsights(ctx context.Context, userID string,
 	alertLevel := s.determineAlertLevel(overview, riskFactors)
 	confidenceLevel := s.calculateConfidenceLevel(overview)
 
-	return &analytics.HealthInsights{
+	return &svcAnalytics.HealthInsights{
 		KeyFindings:     keyFindings,
 		RiskFactors:     riskFactors,
 		PositiveFactors: positiveFactors,
@@ -388,7 +389,7 @@ func (s *AnalyticsService) GetHealthScore(ctx context.Context, userID string) (*
 }
 
 // GetRecommendations generates personalized recommendations
-func (s *AnalyticsService) GetRecommendations(ctx context.Context, userID string) ([]*analytics.Recommendation, error) {
+func (s *AnalyticsService) GetRecommendations(ctx context.Context, userID string) ([]*svcAnalytics.Recommendation, error) {
 	// Get recent data for recommendations
 	end := time.Now()
 	start := end.AddDate(0, 0, -30)
@@ -598,13 +599,13 @@ func (s *AnalyticsService) calculateScoreFactors(overview *analytics.HealthOverv
 	return []*analytics.ScoreFactor{}
 }
 
-func (s *AnalyticsService) generatePersonalizedRecommendations(insights *analytics.HealthInsights, healthScore *analytics.HealthScore) []*analytics.Recommendation {
+func (s *AnalyticsService) generatePersonalizedRecommendations(insights *svcAnalytics.HealthInsights, healthScore *analytics.HealthScore) []*svcAnalytics.Recommendation {
 	// For now, return a simple set of recommendations based on the insights
-	recommendations := make([]*analytics.Recommendation, 0)
+	recommendations := make([]*svcAnalytics.Recommendation, 0)
 
 	// Add recommendations based on alert level
 	if insights.AlertLevel == "HIGH" {
-		recommendations = append(recommendations, &analytics.Recommendation{
+		recommendations = append(recommendations, &svcAnalytics.Recommendation{
 			ID:             "high-alert-1",
 			Type:           "MEDICAL",
 			Category:       "Healthcare",
@@ -622,7 +623,7 @@ func (s *AnalyticsService) generatePersonalizedRecommendations(insights *analyti
 
 	// Add general recommendations based on score
 	if healthScore.OverallScore < 50 {
-		recommendations = append(recommendations, &analytics.Recommendation{
+		recommendations = append(recommendations, &svcAnalytics.Recommendation{
 			ID:             "low-score-1",
 			Type:           "LIFESTYLE",
 			Category:       "General Health",

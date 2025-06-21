@@ -10,6 +10,7 @@ import (
 	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/medication"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
+	svcAnalytics "github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service/analytics/shared"
 )
 
@@ -25,8 +26,8 @@ func NewCorrelationAnalyzer() *CorrelationAnalyzer {
 func (ca *CorrelationAnalyzer) CalculateMealBowelCorrelations(
 	meals []meal.Meal,
 	bowelMovements []bowelmovement.BowelMovement,
-) []*analytics.Correlation {
-	correlations := make([]*analytics.Correlation, 0)
+) []*svcAnalytics.Correlation {
+	correlations := make([]*svcAnalytics.Correlation, 0)
 
 	// Group data by day for correlation analysis
 	dailyData := ca.groupMealBowelDataByDay(meals, bowelMovements)
@@ -56,8 +57,8 @@ func (ca *CorrelationAnalyzer) CalculateMealBowelCorrelations(
 func (ca *CorrelationAnalyzer) CalculateMealSymptomCorrelations(
 	meals []meal.Meal,
 	symptoms []symptom.Symptom,
-) []*analytics.Correlation {
-	correlations := make([]*analytics.Correlation, 0)
+) []*svcAnalytics.Correlation {
+	correlations := make([]*svcAnalytics.Correlation, 0)
 
 	// Group data by day for correlation analysis
 	dailyData := ca.groupMealSymptomDataByDay(meals, symptoms)
@@ -183,7 +184,7 @@ func (ca *CorrelationAnalyzer) groupMealBowelDataByDay(
 	return result
 }
 
-func (ca *CorrelationAnalyzer) analyzeFiberBristolCorrelation(data []DailyMealBowelData) *analytics.Correlation {
+func (ca *CorrelationAnalyzer) analyzeFiberBristolCorrelation(data []DailyMealBowelData) *svcAnalytics.Correlation {
 	if len(data) < 3 {
 		return nil
 	}
@@ -200,7 +201,7 @@ func (ca *CorrelationAnalyzer) analyzeFiberBristolCorrelation(data []DailyMealBo
 	strength := shared.InterpretCorrelationStrength(coefficient)
 	confidence := shared.CalculateConfidenceScore(len(data))
 
-	return &analytics.Correlation{
+	return &svcAnalytics.Correlation{
 		Factor:      "Fiber-Rich Meals",
 		Outcome:     "Bristol Stool Type",
 		Strength:    shared.RoundToDecimalPlaces(coefficient, 3),
@@ -210,7 +211,7 @@ func (ca *CorrelationAnalyzer) analyzeFiberBristolCorrelation(data []DailyMealBo
 	}
 }
 
-func (ca *CorrelationAnalyzer) analyzeCalorieSatisfactionCorrelation(data []DailyMealBowelData) *analytics.Correlation {
+func (ca *CorrelationAnalyzer) analyzeCalorieSatisfactionCorrelation(data []DailyMealBowelData) *svcAnalytics.Correlation {
 	if len(data) < 3 {
 		return nil
 	}
@@ -227,7 +228,7 @@ func (ca *CorrelationAnalyzer) analyzeCalorieSatisfactionCorrelation(data []Dail
 	strength := shared.InterpretCorrelationStrength(coefficient)
 	confidence := shared.CalculateConfidenceScore(len(data))
 
-	return &analytics.Correlation{
+	return &svcAnalytics.Correlation{
 		Factor:      "Daily Calorie Intake",
 		Outcome:     "Bowel Movement Satisfaction",
 		Strength:    shared.RoundToDecimalPlaces(coefficient, 3),
@@ -237,7 +238,7 @@ func (ca *CorrelationAnalyzer) analyzeCalorieSatisfactionCorrelation(data []Dail
 	}
 }
 
-func (ca *CorrelationAnalyzer) analyzeSpicyPainCorrelation(data []DailyMealBowelData) *analytics.Correlation {
+func (ca *CorrelationAnalyzer) analyzeSpicyPainCorrelation(data []DailyMealBowelData) *svcAnalytics.Correlation {
 	if len(data) < 3 {
 		return nil
 	}
@@ -254,7 +255,7 @@ func (ca *CorrelationAnalyzer) analyzeSpicyPainCorrelation(data []DailyMealBowel
 	strength := shared.InterpretCorrelationStrength(coefficient)
 	confidence := shared.CalculateConfidenceScore(len(data))
 
-	return &analytics.Correlation{
+	return &svcAnalytics.Correlation{
 		Factor:      "Spicy Food Level",
 		Outcome:     "Bowel Movement Pain",
 		Strength:    shared.RoundToDecimalPlaces(coefficient, 3),
@@ -342,7 +343,7 @@ func (ca *CorrelationAnalyzer) groupMealSymptomDataByDay(
 	return result
 }
 
-func (ca *CorrelationAnalyzer) analyzeSpicyFoodSymptomCorrelation(data []DailyMealSymptomData) *analytics.Correlation {
+func (ca *CorrelationAnalyzer) analyzeSpicyFoodSymptomCorrelation(data []DailyMealSymptomData) *svcAnalytics.Correlation {
 	if len(data) < 3 {
 		return nil
 	}
@@ -359,7 +360,7 @@ func (ca *CorrelationAnalyzer) analyzeSpicyFoodSymptomCorrelation(data []DailyMe
 	strength := shared.InterpretCorrelationStrength(coefficient)
 	confidence := shared.CalculateConfidenceScore(len(data))
 
-	return &analytics.Correlation{
+	return &svcAnalytics.Correlation{
 		Factor:      "Spicy Food Consumption",
 		Outcome:     "Symptom Severity",
 		Strength:    shared.RoundToDecimalPlaces(coefficient, 3),
@@ -369,7 +370,7 @@ func (ca *CorrelationAnalyzer) analyzeSpicyFoodSymptomCorrelation(data []DailyMe
 	}
 }
 
-func (ca *CorrelationAnalyzer) analyzeDairySymptomCorrelation(data []DailyMealSymptomData) *analytics.Correlation {
+func (ca *CorrelationAnalyzer) analyzeDairySymptomCorrelation(data []DailyMealSymptomData) *svcAnalytics.Correlation {
 	if len(data) < 3 {
 		return nil
 	}
@@ -386,7 +387,7 @@ func (ca *CorrelationAnalyzer) analyzeDairySymptomCorrelation(data []DailyMealSy
 	strength := shared.InterpretCorrelationStrength(coefficient)
 	confidence := shared.CalculateConfidenceScore(len(data))
 
-	return &analytics.Correlation{
+	return &svcAnalytics.Correlation{
 		Factor:      "Dairy Consumption",
 		Outcome:     "Symptom Severity",
 		Strength:    shared.RoundToDecimalPlaces(coefficient, 3),
@@ -396,7 +397,7 @@ func (ca *CorrelationAnalyzer) analyzeDairySymptomCorrelation(data []DailyMealSy
 	}
 }
 
-func (ca *CorrelationAnalyzer) analyzeGlutenSymptomCorrelation(data []DailyMealSymptomData) *analytics.Correlation {
+func (ca *CorrelationAnalyzer) analyzeGlutenSymptomCorrelation(data []DailyMealSymptomData) *svcAnalytics.Correlation {
 	if len(data) < 3 {
 		return nil
 	}
@@ -413,7 +414,7 @@ func (ca *CorrelationAnalyzer) analyzeGlutenSymptomCorrelation(data []DailyMealS
 	strength := shared.InterpretCorrelationStrength(coefficient)
 	confidence := shared.CalculateConfidenceScore(len(data))
 
-	return &analytics.Correlation{
+	return &svcAnalytics.Correlation{
 		Factor:      "Gluten Consumption",
 		Outcome:     "Symptom Severity",
 		Strength:    shared.RoundToDecimalPlaces(coefficient, 3),
