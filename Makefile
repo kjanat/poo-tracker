@@ -69,9 +69,9 @@ format:
 	uv run ruff format ai-service
 
 format-backend:
-gofmt -s -w backend/**/*.go
+	gofmt -s -w backend/**/*.go
 format-ai:
-uv run ruff format ai-service
+	uv run ruff format ai-service
 
 clean:
-pnpm --filter @poo-tracker/frontend run clean
+	pnpm --filter @poo-tracker/frontend run clean
