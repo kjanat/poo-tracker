@@ -77,7 +77,7 @@ func (da *DataAggregator) AggregateDailyData(
 			data.MealCount++
 
 			// Count special meal types
-			if meal.SpicyLevel != nil && *meal.SpicyLevel > 0 {
+			if meal.SpicyLevel != nil && *meal.SpicyLevel >= SpicyThreshold {
 				data.SpicyMealCount++
 			}
 
