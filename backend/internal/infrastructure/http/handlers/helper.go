@@ -6,18 +6,26 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// extractUserID retrieves the user_id from the context ensuring it is a string.
-// If the value is missing or not a string, it writes a 401 response and returns false.
+// extractUserIDFromContext retrieves the user_id from context as a string.
+// Returns the user ID and an error if missing or invalid type.
+func extractUserIDFromContext(c *gin.Context) (string, error) {
+    userID, exists := c.Get("user_id")
+    if !exists {
+        return "", errors.New("user_id not found in context")
+    }
+    userIDStr, ok := userID.(string)
+    if !ok {
+        return "", errors.New("user_id is not a string")
+    }
+    return userIDStr, nil
+}
+
+// extractUserID retrieves the user_id from context and handles HTTP errors.
 func extractUserID(c *gin.Context) (string, bool) {
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
-		return "", false
-	}
-	userIDStr, ok := userID.(string)
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
-		return "", false
-	}
-	return userIDStr, true
+    userIDStr, err := extractUserIDFromContext(c)
+    if err != nil {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+        return "", false
+    }
+    return userIDStr, true
 }
