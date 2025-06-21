@@ -64,10 +64,9 @@ docker-down:
 	docker compose down
 
 ## Formatting
+format: clean
 	gofmt -s -w backend/**/*.go
-
 	uv run ruff format ai-service
-	pnpm --filter @poo-tracker/frontend run clean
 
 format-backend:
 gofmt -s -w backend/**/*.go
