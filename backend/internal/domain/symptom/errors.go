@@ -2,7 +2,8 @@ package symptom
 
 import (
 	"errors"
-	"fmt"
+
+	"github.com/kjanat/poo-tracker/backend/internal/domain/shared"
 )
 
 // Domain errors
@@ -20,38 +21,18 @@ var (
 	ErrDuplicateSymptom       = errors.New("duplicate symptom entry detected")
 )
 
-// ValidationError represents a validation error with field information
-type ValidationError struct {
-	Field   string `json:"field"`
-	Message string `json:"message"`
-}
+// ValidationError represents a validation error with field information.
+// Deprecated: use shared.ValidationError instead.
+type ValidationError = shared.ValidationError
 
-func (e ValidationError) Error() string {
-	return fmt.Sprintf("validation error on field '%s': %s", e.Field, e.Message)
-}
+// NewValidationError creates a new validation error.
+// Deprecated: use shared.NewValidationError instead.
+var NewValidationError = shared.NewValidationError
 
-// NewValidationError creates a new validation error
-func NewValidationError(field, message string) ValidationError {
-	return ValidationError{
-		Field:   field,
-		Message: message,
-	}
-}
+// BusinessRuleError represents a business rule violation.
+// Deprecated: use shared.BusinessRuleError instead.
+type BusinessRuleError = shared.BusinessRuleError
 
-// BusinessRuleError represents a business rule violation
-type BusinessRuleError struct {
-	Rule    string `json:"rule"`
-	Message string `json:"message"`
-}
-
-func (e BusinessRuleError) Error() string {
-	return fmt.Sprintf("business rule violation '%s': %s", e.Rule, e.Message)
-}
-
-// NewBusinessRuleError creates a new business rule error
-func NewBusinessRuleError(rule, message string) BusinessRuleError {
-	return BusinessRuleError{
-		Rule:    rule,
-		Message: message,
-	}
-}
+// NewBusinessRuleError creates a new business rule error.
+// Deprecated: use shared.NewBusinessRuleError instead.
+var NewBusinessRuleError = shared.NewBusinessRuleError
