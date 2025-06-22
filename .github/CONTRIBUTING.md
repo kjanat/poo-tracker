@@ -18,8 +18,8 @@ This guide will help you understand our development process and how to submit co
 
 ### Prerequisites
 
-- **Node.js** (v22 or higher)
-- **pnpm** (v8 or higher) - We don't use npm, get with the program
+- **Go** (v1.22 or higher) for backend (uses Gin + GORM)
+- **pnpm** (v8 or higher) for frontend (no npm)
 - **Docker** and **Docker Compose**
 - **Git** (obviously)
 - **Python** (v3.11 or higher) for AI service
@@ -31,7 +31,7 @@ This guide will help you understand our development process and how to submit co
 git clone https://github.com/YOUR_USERNAME/poo-tracker.git
 cd poo-tracker
 
-# Install dependencies
+# Install frontend dependencies
 pnpm --filter @poo-tracker/frontend install
 
 # Copy environment file
@@ -40,7 +40,7 @@ cp .env.example .env
 # Start development services
 docker-compose up -d
 
-# Backend written in Go - no migrations via pnpm
+# Backend written in Go - migrations are automatic via GORM
 
 # Start all services
 make dev
@@ -50,12 +50,12 @@ make dev
 
 ```text
 poo-tracker/
-├── 📱 frontend/          # React + Vite + TypeScript
-├── 🔧 backend/           # Node.js + Express + TypeScript
-├── 🤖 ai-service/        # Python + FastAPI
-├── 🐳 docker-compose.yml # Development environment
-├── 📋 package.json       # Root package.json
-└── 🏗️ pnpm-workspace.yaml # pnpm workspace config
+├── frontend/          # React + Vite + TypeScript
+├── backend/           # Go + Gin + GORM
+├── ai-service/        # Python + FastAPI
+├── docker-compose.yml # Development environment
+├── package.json       # Root package.json
+└── pnpm-workspace.yaml # pnpm workspace config
 ```
 
 ## 📋 Coding Standards
@@ -112,34 +112,34 @@ export const Toilet: React.FC<ToiletProps> = ({ isOccupied, onFlush }) => {
 }
 ```
 
-#### Backend (Node.js + Express + TypeScript)
+#### Backend (Go + Gin + GORM)
 
-```typescript
+```go
 // ✅ Good - Proper error handling and validation
-import { z } from 'zod'
-import { Request, Response, NextFunction } from 'express'
+import (
+	"net/http"
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+)
 
-const createPooSchema = z.object({
-  bristolScale: z.number().min(1).max(7),
-  imageUrl: z.string().url().optional(),
-  notes: z.string().max(500).optional()
-})
+type CreatePooRequest struct {
+	BristolScale int     `json:"bristolScale" binding:"required,min=1,max=7"`
+	ImageURL     *string `json:"imageUrl" binding:"omitempty,url"`
+	Notes        *string `json:"notes" binding:"omitempty,max=500"`
+}
 
-export const createPoo = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const data = createPooSchema.parse(req.body)
+var validate = validator.New()
 
-    const poo = await prisma.poo.create({
-      data: {
-        ...data,
-        userId: req.user.id
-      }
-    })
+func CreatePoo(c *gin.Context) {
+	var req CreatePooRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-    res.status(201).json(poo)
-  } catch (error) {
-    next(error)
-  }
+	// TODO: Save to database using GORM
+
+	c.JSON(http.StatusCreated, req)
 }
 ```
 

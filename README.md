@@ -8,7 +8,8 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 22+
+- [Go](https://golang.org/) 1.22+ (backend, uses Gin + GORM)
+- [Node.js](https://nodejs.org/) 22+ (frontend only)
 - [Docker](https://docs.docker.com/engine/) & [Docker Compose](https://docs.docker.com/compose/)
 - [pnpm](https://pnpm.io/) 9+ (because npm is for amateurs)
 - [uv](https://docs.astral.sh/uv/) for Python (because pip is for the weak)
@@ -25,7 +26,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 2. **Install dependencies:**
 
    ```bash
-   # Install Node.js dependencies (frontend only - backend now uses Go)
+   # Install Node.js dependencies (frontend only)
    pnpm --filter @poo-tracker/frontend install
 
    # Install Python dependencies for AI service
@@ -73,14 +74,14 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 ## 🏗️ Tech Stack
 
 - **Frontend**: React + Vite + TypeScript + TailwindCSS v4
-- **Backend**: Go + Gin
-- **Database**: PostgreSQL
+- **Backend**: Go + Gin + GORM
+- **Database**: PostgreSQL (or SQLite for dev)
 - **Storage**: MinIO (S3-compatible for photos)
 - **AI Service**: Python + FastAPI + scikit-learn
 - **Infrastructure**: Docker + Docker Compose
 - **Package Management**: pnpm (Node.js) + uv (Python)
 
-## 🗝️ Environment Variables
+## 📝 Environment Variables
 
 Each package ships with an `.env.example` file. Copy them and tweak the values before running anything:
 
@@ -117,7 +118,7 @@ make build-frontend   # Build frontend only
 make build-backend    # Build Go backend only
 
 # Database Operations
-# (Database migrations handled via SQL scripts in Go backend)
+# (Database migrations handled automatically by GORM in Go backend)
 
 # Docker Services
 make docker-up        # Start PostgreSQL, Redis, MinIO
@@ -138,13 +139,13 @@ pnpm format:prettier:watch   # Watch and format on changes
 
 ### Project Structure
 
-```graphql
+```text
 poo-tracker/
 ├── frontend/           # React frontend (Vite + TypeScript + TailwindCSS)
 │   ├── src/
 │   ├── package.json
 │   └── vite.config.ts
-├── backend/            # Go API (Gin framework)
+├── backend/            # Go API (Gin + GORM)
 │   ├── *.go
 │   ├── go.mod
 │   └── README.md
@@ -164,7 +165,6 @@ This project uses **pnpm workspaces** for efficient monorepo management:
 ```bash
 # Install dependencies for specific workspace
 pnpm --filter @poo-tracker/frontend add react-router-dom
-
 
 # Run commands on specific workspaces
 pnpm --filter @poo-tracker/frontend build
@@ -245,12 +245,13 @@ We encrypt your brown notes and hide them away. Nobody's reading your logs excep
 
 ### Coding Standards
 
-- TypeScript everywhere (no JS allowed)
+- TypeScript everywhere (frontend)
+- Go (Gin + GORM) for backend
 - Component-based architecture
 - TailwindCSS for styling (no CSS modules)
 - RESTful API design
 - Comprehensive test coverage
-- ESLint with @typescript-eslint and Prettier (follow the config, don't "fix" it)
+- ESLint with @typescript-eslint and Prettier (frontend)
 - Use pnpm workspace commands or Makefile targets for consistent development (never use `cd` in scripts)
 - All code quality checks are managed by pre-commit hooks
 
@@ -261,6 +262,9 @@ We encrypt your brown notes and hide them away. Nobody's reading your logs excep
 ```env
 # Database
 DATABASE_URL="postgresql://poo_user:secure_password_123@localhost:5432/poo_tracker"
+# For SQLite (development only):
+# SQLITE_DSN="backend/data/poo-tracker.db"
+# DB_TYPE="sqlite" # or "postgres"
 
 # Storage (MinIO)
 MINIO_ENDPOINT="localhost:9000"

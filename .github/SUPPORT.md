@@ -13,7 +13,7 @@ Please check these resources first:
 - 🔍 **[Existing Issues](https://github.com/kjanat/poo-tracker/issues)** - Someone might have already asked
 - 💬 **[Discussions](https://github.com/kjanat/poo-tracker/discussions)** - Community Q&A
 
-## 🆘 Getting Help
+## 🏘️ Getting Help
 
 ### For Users
 
@@ -51,6 +51,7 @@ If you're developing with or contributing to Poo Tracker:
 #### 2. 🏗️ Development Setup Issues
 
 - Check the **[Development Setup](CONTRIBUTING.md#-development-setup)** section
+- For backend, ensure Go and Docker are installed, and that your database is running (PostgreSQL or SQLite supported via GORM)
 - Common issues are documented with solutions
 
 #### 3. 🧪 Testing Problems
@@ -217,9 +218,14 @@ docker-compose ps
 - Make sure all dependencies are installed
 - Restart your IDE's TypeScript service
 
+**Go backend errors:**
+
+- Ensure Go is installed and in your PATH
+- Check that the database is running and accessible
+- Look for error messages in the backend logs
+
 **Build failures:**
 
-- Check for TypeScript errors first
 - Ensure all environment variables are set
 - Try clearing build cache
 
