@@ -8,7 +8,8 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 22+
+- [Go](https://golang.org/) 1.22+ (backend, uses Gin + GORM)
+- [Node.js](https://nodejs.org/) 22+ (frontend only)
 - [Docker](https://docs.docker.com/engine/) & [Docker Compose](https://docs.docker.com/compose/)
 - [pnpm](https://pnpm.io/) 9+ (because npm is for amateurs)
 - [uv](https://docs.astral.sh/uv/) for Python (because pip is for the weak)
@@ -25,8 +26,8 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 2. **Install dependencies:**
 
    ```bash
-   # Install Node.js dependencies (frontend + backend)
-   pnpm install
+   # Install Node.js dependencies (frontend only)
+   cd frontend && pnpm install
 
    # Install Python dependencies for AI service
    cd ai-service && uv sync && cd ..
@@ -37,7 +38,6 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
    ```bash
    cp .env.example .env
    cp frontend/.env.example frontend/.env.local
-   cp backend/.env.example backend/.env
    cp ai-service/.env.example ai-service/.env
    # Edit each file with your local values
    ```
@@ -46,23 +46,18 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
    ```bash
    # Start database and supporting services
-   pnpm docker:up
+   make docker-up
 
-   # Start all development servers (frontend + backend + AI)
-   pnpm dev:full
-
-   # OR start just frontend + backend
-   pnpm dev
+   # Start all development servers (frontend + Go backend + AI)
+   make dev
    ```
 
 5. **Set up the database:**
 
-   ```bash
-   # Run database migrations
-   pnpm db:migrate
+   Start the PostgreSQL database using Docker Compose:
 
-   # (Optional) Seed with test data
-   pnpm db:seed
+   ```bash
+   make docker-up
    ```
 
    A sample set of credentials for API testing is provided in
@@ -79,21 +74,20 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 ## 🏗️ Tech Stack
 
 - **Frontend**: React + Vite + TypeScript + TailwindCSS v4
-- **Backend**: Node.js + Express v5 + TypeScript + Prisma
-- **Database**: PostgreSQL
+- **Backend**: Go + Gin + GORM
+- **Database**: PostgreSQL (or SQLite for dev)
 - **Storage**: MinIO (S3-compatible for photos)
 - **AI Service**: Python + FastAPI + scikit-learn
 - **Infrastructure**: Docker + Docker Compose
 - **Package Management**: pnpm (Node.js) + uv (Python)
 
-## 🗝️ Environment Variables
+## 📝 Environment Variables
 
 Each package ships with an `.env.example` file. Copy them and tweak the values before running anything:
 
 ```bash
 cp .env.example .env
 cp frontend/.env.example frontend/.env.local
-cp backend/.env.example backend/.env
 cp ai-service/.env.example ai-service/.env
 ```
 
@@ -113,50 +107,49 @@ These example files contain **sample credentials only**. Replace them with your 
 
 ```bash
 # Development - All Services
-pnpm dev:full         # Start frontend + backend + AI service
-pnpm dev              # Start frontend + backend only
-pnpm dev:frontend     # Start frontend only
-pnpm dev:backend      # Start backend only
-pnpm dev:ai           # Start AI service only
+make dev              # Start frontend, Go backend and AI service
+make dev-frontend     # Start frontend only
+make dev-backend      # Start Go backend only
+make dev-ai           # Start AI service only
 
 # Building
-pnpm build            # Build all projects
-pnpm build:frontend   # Build frontend only
-pnpm build:backend    # Build backend only
+make build            # Build all projects
+make build-frontend   # Build frontend only
+make build-backend    # Build Go backend only
 
 # Database Operations
-pnpm db:migrate       # Run Prisma migrations
-pnpm db:seed          # Seed database with test data
-pnpm db:studio        # Open Prisma Studio
-
-# Docker Services
-pnpm docker:up        # Start PostgreSQL, Redis, MinIO
-pnpm docker:down      # Stop all Docker services
+# (Database migrations handled automatically by GORM in Go backend)
 
 # Testing & Quality
-pnpm test             # Run all tests (frontend + backend)
-pnpm test:watch       # Run tests in watch mode
-pnpm lint             # Run linters on all projects
-pnpm lint:fix         # Auto-fix linting issues
-pnpm clean            # Clean all build artifacts
+make test             # Run all tests (frontend + backend)
+make test-frontend    # Run frontend tests only
+make test-backend     # Run backend tests only
+make lint             # Run linters on all projects
+make lint-fix         # Auto-fix linting issues
+make clean            # Clean all build artifacts
 
 # Code Formatting
-pnpm prettier         # Format all files
-pnpm prettier:watch   # Watch and format on changes
+make format           # Format backend and AI service
+
+# For watch mode in frontend tests, use:
+#   make test-frontend WATCH=1
+# (or add a Makefile target if needed)
 ```
+
+> **Note:** Always use Makefile targets for all workflows (test, lint, build, dev). Do not use pnpm workspace commands directly.
 
 ### Project Structure
 
-```graphql
+```text
 poo-tracker/
 ├── frontend/           # React frontend (Vite + TypeScript + TailwindCSS)
 │   ├── src/
 │   ├── package.json
 │   └── vite.config.ts
-├── backend/            # Express.js API (TypeScript + Prisma)
-│   ├── src/
-│   ├── prisma/
-│   └── package.json
+├── backend/            # Go API (Gin + GORM)
+│   ├── *.go
+│   ├── go.mod
+│   └── README.md
 ├── ai-service/         # Python FastAPI AI service
 │   ├── main.py
 │   ├── pyproject.toml
@@ -172,12 +165,10 @@ This project uses **pnpm workspaces** for efficient monorepo management:
 
 ```bash
 # Install dependencies for specific workspace
-pnpm --filter @poo-tracker/frontend add react-router-dom
-pnpm --filter @poo-tracker/backend add express-rate-limit
+cd frontend && pnpm add react-router-dom
 
 # Run commands on specific workspaces
-pnpm --filter @poo-tracker/frontend build
-pnpm --filter @poo-tracker/backend test
+cd frontend && pnpm run build
 
 # Run commands on all workspaces
 pnpm --recursive run build
@@ -186,16 +177,19 @@ pnpm --parallel run dev
 
 ### API Endpoints
 
-| Endpoint                 | Method   | Description                           |
-| ------------------------ | -------- | ------------------------------------- |
-| `/api/auth/register`     | `POST`   | Register a new user                   |
-| `/api/auth/login`        | `POST`   | Authenticate user                     |
-| `/api/entries`           | `GET`    | Get bowel movement entries            |
-| `/api/entries`           | `POST`   | Create a new bowel movement entry     |
-| `/api/entries/:id`       | `PUT`    | Update a bowel movement entry         |
-| `/api/entries/:id`       | `DELETE` | Delete a bowel movement entry         |
-| `/api/uploads/photo`     | `POST`   | Upload a photo of your bowel movement |
-| `/api/analytics/summary` | `GET`    | Get AI analysis summary               |
+| Endpoint                   | Method   | Description                       |
+| -------------------------- | -------- | --------------------------------- |
+| `/api/bowel-movements`     | `GET`    | List bowel movement entries       |
+| `/api/bowel-movements`     | `POST`   | Create a new bowel movement entry |
+| `/api/bowel-movements/:id` | `GET`    | Get a specific entry              |
+| `/api/bowel-movements/:id` | `PUT`    | Update a bowel movement entry     |
+| `/api/bowel-movements/:id` | `DELETE` | Delete a bowel movement entry     |
+| `/api/meals`               | `GET`    | List meal entries                 |
+| `/api/meals`               | `POST`   | Create a new meal entry           |
+| `/api/meals/:id`           | `GET`    | Get a specific meal               |
+| `/api/meals/:id`           | `PUT`    | Update a meal entry               |
+| `/api/meals/:id`           | `DELETE` | Delete a meal entry               |
+| `/api/analytics`           | `GET`    | Get simple analytics              |
 
 ## 📝 How it works
 
@@ -252,13 +246,15 @@ We encrypt your brown notes and hide them away. Nobody's reading your logs excep
 
 ### Coding Standards
 
-- TypeScript everywhere (no JS allowed)
+- TypeScript everywhere (frontend)
+- Go (Gin + GORM) for backend
 - Component-based architecture
 - TailwindCSS for styling (no CSS modules)
 - RESTful API design
 - Comprehensive test coverage
-- ESLint with @typescript-eslint and Prettier (follow the config, don't "fix" it)
-- Use pnpm workspace commands for consistent development
+- ESLint with @typescript-eslint and Prettier (frontend)
+- Use pnpm workspace commands or Makefile targets for consistent development (never use `cd` in scripts)
+- All code quality checks are managed by pre-commit hooks
 
 ## 🚀 Deployment
 
@@ -267,6 +263,9 @@ We encrypt your brown notes and hide them away. Nobody's reading your logs excep
 ```env
 # Database
 DATABASE_URL="postgresql://poo_user:secure_password_123@localhost:5432/poo_tracker"
+# For SQLite (development only):
+# SQLITE_DSN="backend/data/poo-tracker.db"
+# DB_TYPE="sqlite" # or "postgres"
 
 # Storage (MinIO)
 MINIO_ENDPOINT="localhost:9000"
@@ -317,11 +316,11 @@ table below lists the most relevant options. See
 
 ```bash
 # Build all projects
-pnpm build
+make build
 
 # Or build individually
-pnpm build:frontend
-pnpm build:backend
+make build-frontend
+make build-backend    # Build Go backend only
 
 # AI service
 uv run uvicorn ai_service.main:app

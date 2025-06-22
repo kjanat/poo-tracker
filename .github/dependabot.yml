@@ -20,7 +20,7 @@ updates:
           - '*'
 
   # Backend dependencies
-  - package-ecosystem: 'npm'
+  - package-ecosystem: 'gomod'
     directory: '/backend'
     schedule:
       interval: 'weekly'

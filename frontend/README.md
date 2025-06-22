@@ -40,7 +40,7 @@ The frontend is a responsive, type-safe React application built with modern web 
 
 ```bash
 # From the root directory
-pnpm install
+pnpm --filter @poo-tracker/frontend install
 
 # Start development server
 pnpm --filter @poo-tracker/frontend dev
@@ -56,7 +56,7 @@ pnpm dev:frontend
 cd frontend
 
 # Install dependencies
-pnpm install
+pnpm --filter @poo-tracker/frontend install
 
 # Start development server
 pnpm dev
@@ -105,17 +105,21 @@ pnpm --filter @poo-tracker/frontend test:coverage
 pnpm --filter @poo-tracker/frontend test:ui
 ```
 
-## 🎨 Code Quality
+## 🧹 Code Quality & Pre-commit Hooks
+
+All linting, formatting, and type-checking is managed via [pre-commit](https://pre-commit.com) and the `.pre-commit-config.yaml` in the project root. Husky and lint-staged are no longer used.
+
+**Setup:**
 
 ```bash
-# Lint code
-pnpm --filter @poo-tracker/frontend lint
+uv tool install pre-commit  # or pip install pre-commit
+pre-commit install
+```
 
-# Fix linting issues
-pnpm --filter @poo-tracker/frontend lint:fix
+Hooks run on every commit, or manually with:
 
-# Format code (handled by Prettier in workspace)
-pnpm format
+```bash
+pre-commit run --all-files
 ```
 
 ## 📁 Project Structure
@@ -266,7 +270,7 @@ This application handles sensitive health data:
 
 This frontend integrates with:
 
-- **Backend API**: `../backend/` - Authentication, data storage, business logic
+- **Backend API**: Go/Gin service at `../backend/` - Authentication and data logic
 - **AI Service**: `../ai-service/` - Pattern analysis and recommendations
 - **Docker Services**: PostgreSQL, Redis, MinIO for complete functionality
 

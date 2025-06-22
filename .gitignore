@@ -542,3 +542,11 @@ prisma-shit.md
 poo-tracker.code-workspace
 login.json
 **/__pycache__/
+
+# Build artifacts
+backend/bin/
+**/tmp/
+backend/backend
+**/*.deprecated
+**/coverage.txt
+**/coverage.out

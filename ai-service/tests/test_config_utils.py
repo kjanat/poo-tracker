@@ -17,7 +17,7 @@ class TestSettings:
         """Test default settings values."""
         settings = Settings()
         assert settings.app_name == "Poo Tracker AI Service"
-        assert settings.app_version == "1.0.0"
+        assert settings.app_version == "0.1.0"
         assert settings.environment in ["development", "production", "testing"]
 
     @patch.dict(os.environ, {"ENVIRONMENT": "production"})

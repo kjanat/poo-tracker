@@ -1,9 +1,4 @@
-from .database import (
-    AnalysisMetadata,
-    BowelMovementData,
-    MealData,
-    SymptomData,
-)
+from .database import AnalysisMetadata, BowelMovementData, MealData, SymptomData
 from .requests import AnalysisRequest, BowelMovementEntry, MealEntry, SymptomEntry
 from .responses import (
     AnalysisResponse,

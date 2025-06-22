@@ -1,4 +1,0 @@
-packages:
-  - 'frontend'
-  - 'backend'
-  # ai-service excluded since it's Python

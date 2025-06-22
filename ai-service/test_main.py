@@ -50,7 +50,7 @@ def test_health_endpoint():
 def test_app_info():
     """Test that the app has correct metadata"""
     assert app.title == "Poo Tracker AI Service"
-    assert app.version == "1.0.0"
+    assert app.version == "0.1.0"
 
 
 def test_root_endpoint():

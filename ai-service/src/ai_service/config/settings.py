@@ -17,7 +17,7 @@ class Settings(BaseSettings):
 
     # Basic app settings
     app_name: str = "Poo Tracker AI Service"
-    app_version: str = "1.0.0"
+    app_version: str = "0.1.0"
     debug: bool = False
     environment: str = "development"
 

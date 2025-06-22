@@ -1,5 +1,5 @@
-pnpm-lock.yaml
-.pnpm-debug.log
+**/pnpm-lock.yaml
+**/.pnpm-debug.log
 **/dist
 **/build
 **/coverage

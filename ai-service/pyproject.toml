@@ -1,6 +1,6 @@
 [project]
 name = "poo-tracker-ai-service"
-version = "1.0.0"
+version = "0.1.0"
 description = "AI service for Poo Tracker analytics and insights"
 authors = [{ name = "Kaj Kowalski", email = "dev+poo-tracker@kjanat.com" }]
 readme = "README.md"

@@ -1,85 +1,69 @@
-# Copilot Instructions: Poo Tracker
+# 💩 Copilot Vibes: Poo Tracker
 
 ## Repo: [github.com/kjanat/poo-tracker](https://github.com/kjanat/poo-tracker)
 
 ### TL;DR
 
-If your code stinks, it won’t get merged. And yes, we’ll know.
+Keep it clean, make it work, and try not to break the toilet.
 
 ---
 
-## Tech Stack
+## 🛠️ What We’re Using
 
-- **Frontend**: React (with Vite), TypeScript, TailwindCSS
-- **Backend/API**: Node.js, Express, TypeScript
-- **Database**: PostgreSQL (use Prisma ORM, or GTFO)
-- **Storage**: S3-compatible for turd-photos (MinIO for local, AWS S3 for prod)
-- **AI / ML**: Python FastAPI service (Dockerized), talks to Node backend via REST
+- **Frontend**: React (Vite + TypeScript + TailwindCSS)
+- **Backend**: Go with Gin – clean arch, PostgreSQL, JWT-auth’d
+- **DB**: PostgreSQL, SQLite for dev
+- **File Storage**: S3-compatible (MinIO locally)
+- **AI Sidekick**: Python FastAPI in Docker, accessed via Go backend
 - **CI/CD**: GitHub Actions
-- **Testing**: Vitest (frontend), Jest/Supertest (backend), pytest (AI service)
-- **Linting**: ESLint with @typescript-eslint and Prettier (don't fight the config)
-- **Infra**: Docker everywhere. No raw installs.
-- **Package Managers**:
-  - pnpm (because npm is for amateurs)
-  - uv (for Python, because pip is for amateurs)
+- **Testing**: Vitest, go test, pytest
+- **Infra**: Everything Dockerized
+- **Package Managers**: `pnpm` (TS) and `uv` (Python)
 
 ---
 
-## Coding Practices
+## 🧘 Chill Dev Guidelines
 
-1. **TypeScript is not optional.**  
-   If you sneak in any plain JavaScript, I will revert your commit and send you a brown paper bag.
-2. **Component-based everything.**  
-   No 1,000-line files. If your React component grows a tumor, split it.
-3. **Tailwind > CSS files**  
-   No CSS modules, no SCSS, no “quick fixes” in styles.css. Utility-first or GTFO.
-4. **Backend: RESTful.**  
-   If you say “GraphQL” I’ll call your mother.
-5. **Database migrations with Prisma only.**  
-   No SQL scripts in the repo, unless you’re writing a damn seed file.
-6. **Photo uploads must stream.**  
-   No base64 blobs in the database, you animal.
-7. **AI service is firewalled from main app.**  
-   Only ever accessible via backend. Don’t let your SPA talk directly to Python, or you’ll make me regret giving you network access.
-8. **Write tests.**  
-   Every new feature needs tests. If you “forget”, the next person gets to refactor your code, and nobody wants that.
-9. **Env vars go in `.env.example`**  
-   Don’t hardcode keys, don’t commit real secrets.
-10. **Follow commit conventions**:
-
-    ```
-    feat: add Bristol stool chart selector
-    fix: correct off-by-one in shit counter
-    chore: update dependencies
-    ```
+- **TypeScript all the way** – plain JS just makes stuff harder later
+- **Keep components bite-sized** – if something’s getting chunky, break it up
+- **Tailwind only** – no global CSS drama, no modules, just utility classes
+- **REST over everything** – no GraphQL unless you’ve got a damn good reason
+- **Go patterns** – handle your errors, use pointers when it makes sense, follow the repo vibe
+- **Streaming uploads** – no base64 blobs in the DB, we’re not monsters
+- **Python lives behind Go** – don’t let the frontend chat with the AI directly
+- **Write tests** – doesn’t have to be perfect, just don’t leave future-you crying
+- **Use `.env.example`** – no real keys in the repo, ever
+- **Pre-commit hooks** – formatters and linters keep the peace
 
 ---
 
-## Branching, PRs, and CI
+## 🔀 Branching & PRs
 
-- **Branch off `master`**
-- Use feature branches (`feat/`, `fix/`, `chore/`).
-- Every PR needs a description, a passing test suite, and a code review from someone who’s at least 80% awake.
-- Green CI/CD or no merge.
-
----
-
-## What NOT to do
-
-- No direct pushes to `master`
-- No wild dependencies (“left-pad” jokes will get you a one-way ticket to dependency hell)
-- No copying Stack Overflow code without understanding it
-- No “console.log debugging” left in PRs
-- No “fix later” TODOs, unless it’s properly documented and assigned
+- Branch off `master`
+- Name it like: `feat/shiny-feature`, `fix/bug`, etc.
+- PRs should:
+  - Have a short description
+  - Pass tests
+  - Get at least one sleepy eyeball to review
+  - Not break CI
 
 ---
 
-## Golden Rules
+## 🙃 Stuff to Avoid
 
-- If you wouldn’t eat it, don’t ship it.
-- Clean code = Clean colon.
-- Don’t be an asshole in code reviews, unless the code really deserves it.
+- No direct commits to `master`
+- No random packages unless you know what they’re doing
+- No leftover `console.log` chaos
+- No TODOs without context
 
 ---
 
-That’s it. Now go code, you magnificent bastard.
+## 🧻 Final Words
+
+- If it looks like 💩, smells like 💩, or compiles like 💩... just refactor it.
+- Clean code = clean colon.
+- Don’t be a jerk. Review like you’d want to be reviewed.
+
+---
+
+Now go commit something beautiful.

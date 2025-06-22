@@ -210,21 +210,21 @@ pytest test_main.py
 pytest -v
 ```
 
-## 🔍 Code Quality
+## 🧹 Code Quality & Pre-commit Hooks
+
+All linting, formatting, and type-checking is managed via [pre-commit](https://pre-commit.com) and the `.pre-commit-config.yaml` in the project root. Husky and lint-staged are no longer used.
+
+**Setup:**
 
 ```bash
-# Format code
-black .
-isort .
+uv tool install pre-commit  # or pip install pre-commit
+pre-commit install
+```
 
-# Lint code
-ruff check .
+Hooks run on every commit, or manually with:
 
-# Type checking
-mypy main.py
-
-# Run all quality checks
-ruff check . && black --check . && isort --check . && mypy main.py
+```bash
+pre-commit run --all-files
 ```
 
 ## 🗂 Project Structure
@@ -299,7 +299,7 @@ This project is part of the Poo Tracker application suite.
 
 This service is designed to work with:
 
-- **Backend API**: Node.js/Express backend at `../backend/`
+- **Backend API**: Go/Gin backend at `../backend/`
 - **Frontend**: React application at `../frontend/`
 - **Database**: PostgreSQL with Prisma ORM
 - **Caching**: Redis for performance optimization

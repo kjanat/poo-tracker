@@ -23,48 +23,33 @@ jobs:
     strategy:
       matrix:
         node-version: [22, 24]
-
     steps:
       - name: 📦 Checkout
         uses: actions/checkout@v4
-
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: latest
-
-      - name: 📦 Setup Node.js ${{ matrix.node-version }}
+      - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-
+          node-version: 22
       - name: 📦 Install dependencies
-        run: pnpm install
-
+        run: make init-frontend
       - name: 🔍 Type check
-        run: pnpm type-check:frontend
-
-      - name: 🧹 Lint
-        run: pnpm lint:frontend
-
+        run: cd frontend && pnpm type-check
       - name: 🧪 Test
-        run: pnpm test:frontend
-
+        run: make test-frontend
       - name: Upload results to Trunk
-        # Run this step even if the test step ahead fails
         if: success() || failure()
         uses: trunk-io/analytics-uploader@main
         with:
-          # Path to your test results.
           junit-paths: frontend-junit.xml
-          # Provide your Trunk organization slug.
           org-slug: ${{ vars.TRUNK_ORG_SLUG }}
-          # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_API_TOKEN }}
         continue-on-error: true
-
       - name: 🏗️ Build
-        run: pnpm build:frontend
+        run: make build-frontend
 
   test-backend:
     name: 🚀 Backend Tests
@@ -73,113 +58,45 @@ jobs:
       contents: read
     strategy:
       matrix:
-        node-version: [22, 24]
-    env:
-      POSTGRES_DB: test_db
-      POSTGRES_USER: test_user
-      POSTGRES_PASSWORD: test_password
-      DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
-      REDIS_URL: redis://localhost:6379
-
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ env.POSTGRES_DB }}
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
-      redis:
-        image: redis:8-alpine
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
-
+        go-version: [1.22, 1.23, 1.24]
     steps:
       - name: 📦 Checkout
         uses: actions/checkout@v4
-
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: latest
-
-      - name: 📦 Setup Node.js ${{ matrix.node-version }}
+      - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-
+          node-version: 22
+      - name: 📦 Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
       - name: 📦 Install dependencies
-        run: pnpm install
-
-      - name: 🗄️ Setup test database
-        run: |
-          pnpm db:generate
-          pnpm db:migrate
-          pnpm db:seed
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          REDIS_URL: ${{ env.REDIS_URL }}
-
-      - name: 🔍 Type check
-        run: pnpm type-check:backend
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          REDIS_URL: ${{ env.REDIS_URL }}
-
-      - name: 🧹 Lint
-        run: pnpm lint:backend
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          REDIS_URL: ${{ env.REDIS_URL }}
-
+        run: make init-backend
       - name: 🧪 Test
-        run: pnpm test:backend
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          REDIS_URL: ${{ env.REDIS_URL }}
-
+        run: make test-backend
       - name: Upload results to Trunk
-        # Run this step even if the test step ahead fails
         if: success() || failure()
         uses: trunk-io/analytics-uploader@main
         with:
-          # Path to your test results.
           junit-paths: backend-junit.xml
-          # Provide your Trunk organization slug.
           org-slug: ${{ vars.TRUNK_ORG_SLUG }}
-          # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_API_TOKEN }}
         continue-on-error: true
-
       - name: 🏗️ Build
-        run: pnpm build:backend
+        run: make build-backend
 
   test-ai-service:
     name: 🤖 AI Service Tests
     runs-on: ubuntu-latest
     permissions:
       contents: read
-
-    defaults:
-      run:
-        shell: bash
-        working-directory: ./ai-service
     strategy:
       matrix:
         python-version: ['3.12', '3.13']
-
     services:
       redis:
         image: redis:8-alpine
@@ -190,21 +107,17 @@ jobs:
           --health-retries 5
         ports:
           - 6379:6379
-
     steps:
       - name: 📦 Checkout
         uses: actions/checkout@v4
-
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: latest
-
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
       - name: 📦 Install uv and 🐍 Python ${{ matrix.python-version }}
         uses: astral-sh/setup-uv@v6
         id: setup-uv
@@ -213,39 +126,18 @@ jobs:
           working-directory: ai-service
           version: latest
           python-version: ${{ matrix.python-version }}
-
       - name: 📦 Install dependencies
-        run: uv sync
-
-      - name: 🦀 Lint with Ruff
-        run: |
-          uv run ruff check . || \
-            uv run ruff check . --fix && \
-            echo "Fixed formatting"
-          uv run ruff format .
-
+        run: make init-ai
       - name: 🧪 Test with pytest
         env:
           REDIS_URL: redis://localhost:6379
-        run: |
-          if [ -n "$(find . -name 'test_*.py' -o -name '*_test.py' -maxdepth 2 | head -1)" ]; then
-            echo "Running tests..."
-            uv run pytest --tb=auto -vv --junit-xml=ai_service-junit.xml
-          else
-            echo "No test files found (test_*.py or *_test.py), skipping tests"
-            echo "✅ Test step completed (no tests to run)"
-          fi
-
+        run: make test-ai
       - name: Upload results to Trunk
-        # Run this step even if the test step ahead fails
         if: success() || failure()
         uses: trunk-io/analytics-uploader@main
         with:
-          # Path to your test results.
           junit-paths: '**/ai_service-junit.xml'
-          # Provide your Trunk organization slug.
           org-slug: ${{ vars.TRUNK_ORG_SLUG }}
-          # Provide your Trunk API token as a GitHub secret.
           token: ${{ secrets.TRUNK_API_TOKEN }}
         continue-on-error: true
 
@@ -255,14 +147,11 @@ jobs:
     needs: [test-frontend, test-backend, test-ai-service]
     permissions:
       contents: read
-
     steps:
       - name: 📦 Checkout
         uses: actions/checkout@v4
-
       - name: 🐳 Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
       - name: 🏗️ Build AI Service Docker image
         uses: docker/build-push-action@v6
         with:
@@ -273,7 +162,6 @@ jobs:
           provenance: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
       - name: 🧪 Test Docker Compose
         run: |
           docker compose -f docker-compose.yml config

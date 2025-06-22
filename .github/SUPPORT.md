@@ -13,7 +13,7 @@ Please check these resources first:
 - 🔍 **[Existing Issues](https://github.com/kjanat/poo-tracker/issues)** - Someone might have already asked
 - 💬 **[Discussions](https://github.com/kjanat/poo-tracker/discussions)** - Community Q&A
 
-## 🆘 Getting Help
+## 🏘️ Getting Help
 
 ### For Users
 
@@ -51,6 +51,7 @@ If you're developing with or contributing to Poo Tracker:
 #### 2. 🏗️ Development Setup Issues
 
 - Check the **[Development Setup](CONTRIBUTING.md#-development-setup)** section
+- For backend, ensure Go and Docker are installed, and that your database is running (PostgreSQL or SQLite supported via GORM)
 - Common issues are documented with solutions
 
 #### 3. 🧪 Testing Problems
@@ -197,7 +198,7 @@ docker-compose up -d
 ```bash
 # Clear cache and reinstall
 rm -rf node_modules pnpm-lock.yaml
-pnpm install
+cd frontend && pnpm install
 ```
 
 **Database connection issues:**
@@ -206,9 +207,7 @@ pnpm install
 # Check database is running
 docker-compose ps
 
-# Reset database
-cd backend
-pnpm prisma migrate reset
+# Backend written in Go - reset via SQL scripts if needed
 ```
 
 #### Development Issues
@@ -219,15 +218,20 @@ pnpm prisma migrate reset
 - Make sure all dependencies are installed
 - Restart your IDE's TypeScript service
 
+**Go backend errors:**
+
+- Ensure Go is installed and in your PATH
+- Check that the database is running and accessible
+- Look for error messages in the backend logs
+
 **Build failures:**
 
-- Check for TypeScript errors first
 - Ensure all environment variables are set
 - Try clearing build cache
 
-**Test failures:**
+- **Test failures:**
 
-- Run tests in isolation: `pnpm test -- --run`
+- Run tests in isolation: `cd frontend && pnpm run test -- --run`
 - Check test database configuration
 - Make sure test data is properly cleaned up
 
@@ -316,3 +320,13 @@ If you're not getting the help you need:
 Remember: There are no stupid questions, only stupid answers! 💩
 
 We're here to help you succeed with Poo Tracker. Don't hesitate to reach out! 🚀
+
+## 🛠️ Running Tests and Linting
+
+- Always use Makefile targets for testing, linting, and building:
+  - `make test-frontend` for frontend tests
+  - `make test-backend` for backend tests
+  - `make test` for all tests
+  - `make lint` for linting all services
+  - `make build` for building all services
+- Do not use pnpm workspace commands directly for these tasks.
