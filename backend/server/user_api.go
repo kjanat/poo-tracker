@@ -48,7 +48,7 @@ func (h *UserAPIHandlers) RegisterHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	user, token, err := h.AuthService.Register(req.Username, req.Password, req.Name)
+	user, token, err := h.AuthService.Register(req.Email, req.Password, req.Name)
 	if err != nil {
 		// Generic error response to avoid leaking internal details
 		http.Error(w, "registration failed", http.StatusBadRequest)

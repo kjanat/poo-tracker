@@ -314,7 +314,7 @@ func TestUserService_ValidatePassword(t *testing.T) {
 		{"no lowercase", "PASSWORD123!", user.ErrWeakPassword},
 		{"no digit", "Password!", user.ErrWeakPassword},
 		{"no special", "Password123", user.ErrWeakPassword},
-		{"valid", "Valid1!", nil},
+		{"valid", "Valid1!a", nil},
 	}
 
 	for _, tt := range tests {

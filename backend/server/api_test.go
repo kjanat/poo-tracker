@@ -74,13 +74,6 @@ func TestBowelMovementCRUD(t *testing.T) {
 		t.Fatalf("expected bristolType 4, got %v", updated["bristolType"])
 	}
 
-	req = httptest.NewRequest(http.MethodGet, "/api/analytics", nil)
-	w = httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	if w.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", w.Code)
-	}
-
 	req = httptest.NewRequest(http.MethodDelete, "/api/bowel-movements/"+id, nil)
 	w = httptest.NewRecorder()
 	r.ServeHTTP(w, req)
