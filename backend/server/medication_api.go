@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kjanat/poo-tracker/backend/internal/domain/medication"
+	medicationDomain "github.com/kjanat/poo-tracker/backend/internal/domain/medication"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/shared"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 	"github.com/kjanat/poo-tracker/backend/internal/validation"
@@ -53,7 +53,7 @@ func (h *MedicationHandler) CreateMedication(c *gin.Context) {
 	}
 
 	// Create medication with defaults
-	medication := medication.NewMedication(userID, req.Name, req.Dosage, req.Frequency)
+	medication := medicationDomain.NewMedication(userID, req.Name, req.Dosage, req.Frequency)
 	medication.GenericName = req.GenericName
 	medication.Brand = req.Brand
 	medication.Category = req.Category
@@ -187,7 +187,7 @@ func (h *MedicationHandler) UpdateMedication(c *gin.Context) {
 		return
 	}
 
-	var updates medication.MedicationUpdate
+	var updates medicationDomain.MedicationUpdate
 	if err := c.ShouldBindJSON(&updates); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": validation.FormatValidationError(err)})
 		return

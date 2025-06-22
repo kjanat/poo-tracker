@@ -143,15 +143,6 @@ func (a *App) deleteBowelMovement(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-func (a *App) getAnalytics(c *gin.Context) {
-	stats, err := a.analytics.Stats(c.Request.Context())
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, stats)
-}
-
 // Bowel Movement Details Handlers
 
 func (a *App) createBowelMovementDetails(c *gin.Context) {

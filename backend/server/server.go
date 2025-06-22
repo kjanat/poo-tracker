@@ -19,7 +19,6 @@ type App struct {
 	medications                repository.MedicationRepository
 	mealBowelRelations         repository.MealBowelMovementRelationRepository
 	mealSymptomRelations       repository.MealSymptomRelationRepository
-	analytics                  *service.Service
 	authService                service.AuthService
 	auditService               *service.AuditService
 	twoFactorService           *service.TwoFactorService
@@ -32,7 +31,7 @@ type App struct {
 	twoFactorHandler           *TwoFactorHandler
 }
 
-func New(repo repository.BowelMovementRepository, details repository.BowelMovementDetailsRepository, meals repository.MealRepository, symptoms repository.SymptomRepository, medications repository.MedicationRepository, mealBowelRelations repository.MealBowelMovementRelationRepository, mealSymptomRelations repository.MealSymptomRelationRepository, strategy service.AnalyticsStrategy, authService service.AuthService, twoFactorRepo repository.UserTwoFactorRepository, userRepo repository.UserRepository) *App {
+func New(repo repository.BowelMovementRepository, details repository.BowelMovementDetailsRepository, meals repository.MealRepository, symptoms repository.SymptomRepository, medications repository.MedicationRepository, mealBowelRelations repository.MealBowelMovementRelationRepository, mealSymptomRelations repository.MealSymptomRelationRepository, authService service.AuthService, twoFactorRepo repository.UserTwoFactorRepository, userRepo repository.UserRepository) *App {
 	engine := gin.Default()
 
 	// Add global middleware
@@ -60,7 +59,6 @@ func New(repo repository.BowelMovementRepository, details repository.BowelMoveme
 		medications:                medications,
 		mealBowelRelations:         mealBowelRelations,
 		mealSymptomRelations:       mealSymptomRelations,
-		analytics:                  service.New(repo, strategy),
 		authService:                authService,
 		auditService:               auditService,
 		twoFactorService:           twoFactorService,
@@ -149,8 +147,6 @@ func (a *App) registerRoutes() {
 	relations := api.Group("/relations")
 	relations.Use(middleware.JWTAuthMiddleware(a.authService))
 	relations.GET("/meals/:mealId", a.relationCoordinatorHandler.GetRelationsByMeal)
-
-	api.GET("/analytics", a.getAnalytics)
 
 	// User management routes
 	api.POST("/register", func(c *gin.Context) { a.userHandlers.RegisterHandler(c.Writer, c.Request) })

@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/shared"
-	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
+	symptomDomain "github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 	"github.com/kjanat/poo-tracker/backend/internal/validation"
 )
@@ -52,7 +52,11 @@ func (h *SymptomHandler) CreateSymptom(c *gin.Context) {
 	}
 
 	// Create symptom with defaults
-	symptom := symptom.NewSymptom(userID, req.Name)
+	recordedAt := time.Now()
+	if req.RecordedAt != nil {
+		recordedAt = *req.RecordedAt
+	}
+	symptom := symptomDomain.NewSymptom(userID, req.Name, req.Severity, recordedAt)
 	symptom.Description = req.Description
 
 	if req.RecordedAt != nil {
@@ -175,7 +179,7 @@ func (h *SymptomHandler) UpdateSymptom(c *gin.Context) {
 		return
 	}
 
-	var updates symptom.SymptomUpdate
+	var updates symptomDomain.SymptomUpdate
 	if err := c.ShouldBindJSON(&updates); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": validation.FormatValidationError(err)})
 		return

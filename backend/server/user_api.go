@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
-	"time"
 
 	user "github.com/kjanat/poo-tracker/backend/internal/domain/user"
 	userDto "github.com/kjanat/poo-tracker/backend/internal/infrastructure/http/dto/user"
@@ -49,16 +48,13 @@ func (h *UserAPIHandlers) RegisterHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	user, token, err := h.AuthService.Register(req.Email, req.Password, req.Name)
+	user, token, err := h.AuthService.Register(req.Username, req.Password, req.Name)
 	if err != nil {
 		// Generic error response to avoid leaking internal details
 		http.Error(w, "registration failed", http.StatusBadRequest)
 		return
 	}
-
-	// Calculate actual token expiration time (24 hours from now)
-	expiresAt := time.Now().Add(24 * time.Hour).Unix()
-	resp := userDto.LoginResponse{User: *user, Token: token, ExpiresAt: expiresAt}
+	resp := userDto.LoginResponse{User: userDto.ToUserResponse(user), Token: token}
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(resp); err != nil {
@@ -75,22 +71,19 @@ func (h *UserAPIHandlers) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Input validation
-	if strings.TrimSpace(req.Email) == "" || strings.TrimSpace(req.Password) == "" {
+	if strings.TrimSpace(req.Username) == "" || strings.TrimSpace(req.Password) == "" {
 		http.Error(w, "invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
 	// TODO: Implement rate limiting here to prevent brute force attacks
 
-	user, token, err := h.AuthService.Login(req.Email, req.Password)
+	user, token, err := h.AuthService.Login(req.Username, req.Password)
 	if err != nil {
 		http.Error(w, "invalid credentials", http.StatusUnauthorized)
 		return
 	}
-
-	// Calculate actual token expiration time
-	expiresAt := time.Now().Add(24 * time.Hour).Unix()
-	resp := userDto.LoginResponse{User: *user, Token: token, ExpiresAt: expiresAt}
+	resp := userDto.LoginResponse{User: userDto.ToUserResponse(user), Token: token}
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(resp); err != nil {
