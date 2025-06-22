@@ -11,8 +11,8 @@ Keep it clean, make it work, and try not to break the toilet.
 ## 🛠️ What We’re Using
 
 - **Frontend**: React (Vite + TypeScript + TailwindCSS)
-- **Backend**: Go with Gin – clean arch, in-memory for now, JWT-auth’d
-- **DB**: PostgreSQL planned, in-memory for dev
+- **Backend**: Go with Gin – clean arch, PostgreSQL, JWT-auth’d
+- **DB**: PostgreSQL, SQLite for dev
 - **File Storage**: S3-compatible (MinIO locally)
 - **AI Sidekick**: Python FastAPI in Docker, accessed via Go backend
 - **CI/CD**: GitHub Actions

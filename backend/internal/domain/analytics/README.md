@@ -4,7 +4,7 @@ The analytics domain provides comprehensive health analytics functionality for t
 
 ## Architecture
 
-```tree
+```graphql
 analytics/
 ├── models.go          # Core data structures for analytics
 ├── service.go         # Service interface and complex domain models

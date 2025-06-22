@@ -4,7 +4,7 @@ The infrastructure analytics services provide the implementation layer for analy
 
 ## Architecture
 
-```tree
+```graphql
 infrastructure/service/analytics/
 ├── analytics_service.go    # Main analytics service implementation
 ├── analytics.go           # Type aliases and shared definitions

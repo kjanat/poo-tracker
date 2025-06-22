@@ -12,13 +12,13 @@ This file specifies instructions and standards for all AI agents, bots, GitHub A
 
 ### 🏗️ pnpm Workspace Monorepo Layout
 
-```tree
+```graphql
 poo-tracker/
 ├── frontend/           # React + Vite + TypeScript + TailwindCSS v4
 │   ├── src/
 │   ├── package.json    # @poo-tracker/frontend
 │   └── vite.config.ts
-├── backend/            # Go + Gin + In-memory repositories (PostgreSQL planned)
+├── backend/            # Go + Gin + GORM repositories (PostgreSQL + SQLite for dev)
 │   ├── internal/       # Domain models, repositories, services, middleware
 │   ├── server/         # HTTP handlers and routing
 │   ├── main.go         # Application entry point with dependency injection
