@@ -140,6 +140,9 @@ func InterpretCorrelationStrength(coefficient float64) string {
 	}
 }
 
+// floatEpsilon is the smallest positive floating-point number
+const floatEpsilon = 1e-10
+
 // CalculateTrendSlope calculates the slope of a trend line using linear regression
 func CalculateTrendSlope(points []TrendPoint) float64 {
 	if len(points) < 2 {
