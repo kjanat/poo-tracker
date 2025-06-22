@@ -47,7 +47,7 @@ type MealResponse struct {
 	Description string    `json:"description,omitempty"`
 	MealTime    time.Time `json:"meal_time"`
 	Category    *string   `json:"category,omitempty"`
-	Cuisine     string    `json:"cuisine,omitempty"`
+	Cuisine     *string   `json:"cuisine,omitempty"`
 	Calories    int       `json:"calories,omitempty"`
 	SpicyLevel  *int      `json:"spicy_level,omitempty"`
 	FiberRich   bool      `json:"fiber_rich"`
@@ -85,7 +85,6 @@ func ToMealResponse(m *meal.Meal) MealResponse {
 		Name:        m.Name,
 		Description: m.Description,
 		MealTime:    m.MealTime,
-		Cuisine:     m.Cuisine,
 		Calories:    m.Calories,
 		SpicyLevel:  m.SpicyLevel,
 		FiberRich:   m.FiberRich,
@@ -101,6 +100,10 @@ func ToMealResponse(m *meal.Meal) MealResponse {
 	if m.Category != nil {
 		categoryStr := string(*m.Category)
 		response.Category = &categoryStr
+	}
+	// Convert cuisine if present
+	if m.Cuisine != "" {
+		response.Cuisine = &m.Cuisine
 	}
 
 	return response
