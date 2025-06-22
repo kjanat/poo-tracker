@@ -37,7 +37,7 @@ func main() {
 	twoFactorRepo := repository.NewMemoryUserTwoFactorRepository()
 
 	app := server.New(bowelRepo, detailsRepo, mealRepo, symptomRepo, medicationRepo,
-		mealBowelRelationRepo, mealSymptomRelationRepo, service.AvgBristol{}, auth, twoFactorRepo, userRepo)
+		mealBowelRelationRepo, mealSymptomRelationRepo, auth, twoFactorRepo, userRepo)
 
 	log.Println("Starting Poo Tracker server...")
 	if err := app.Engine.Run(); err != nil {

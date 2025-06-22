@@ -28,7 +28,7 @@ func TestHealth(t *testing.T) {
 	mealBowelRelationRepo := repository.NewMemoryMealBowelMovementRelationRepository()
 	mealSymptomRelationRepo := repository.NewMemoryMealSymptomRelationRepository()
 	twoFactorRepo := repository.NewMemoryUserTwoFactorRepository()
-	app := New(repo, detailsRepo, meals, symptomRepo, medicationRepo, mealBowelRelationRepo, mealSymptomRelationRepo, service.AvgBristol{}, authService, twoFactorRepo, userRepo)
+	app := New(repo, detailsRepo, meals, symptomRepo, medicationRepo, mealBowelRelationRepo, mealSymptomRelationRepo, authService, twoFactorRepo, userRepo)
 	req, _ := http.NewRequest(http.MethodGet, "/health", nil)
 	w := httptest.NewRecorder()
 	app.Engine.ServeHTTP(w, req)

@@ -56,9 +56,6 @@ func TestRegisterHandler_Success(t *testing.T) {
 	if resp.Token == "" {
 		t.Error("Expected token to be set")
 	}
-	if resp.ExpiresAt == 0 {
-		t.Error("Expected ExpiresAt to be set")
-	}
 }
 
 func TestRegisterHandler_InvalidEmail(t *testing.T) {
@@ -110,7 +107,7 @@ func TestLoginHandler_Success(t *testing.T) {
 	}
 
 	reqBody := userDto.LoginRequest{
-		Email:    "login@example.com",
+		Username: "login@example.com",
 		Password: "password123",
 	}
 	jsonBody, _ := json.Marshal(reqBody)
@@ -138,7 +135,7 @@ func TestLoginHandler_InvalidCredentials(t *testing.T) {
 	userHandlers := createTestUserHandlers()
 
 	reqBody := userDto.LoginRequest{
-		Email:    "nonexistent@example.com",
+		Username: "nonexistent@example.com",
 		Password: "wrongpassword",
 	}
 	jsonBody, _ := json.Marshal(reqBody)
@@ -172,7 +169,7 @@ func TestProfileHandler_Success(t *testing.T) {
 		t.Errorf("Expected status 200, got %d", w.Code)
 	}
 
-	var respUser user.User
+	var respUser userDto.UserResponse
 	if err := json.NewDecoder(w.Body).Decode(&respUser); err != nil {
 		t.Fatal("Failed to decode response")
 	}

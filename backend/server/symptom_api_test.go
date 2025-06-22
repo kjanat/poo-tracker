@@ -12,7 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/shared"
-	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
+	symptomDomain "github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 )
 
@@ -46,7 +46,7 @@ func TestSymptomAPI_CreateSymptom(t *testing.T) {
 		t.Errorf("Expected status %d, got %d", http.StatusCreated, w.Code)
 	}
 
-	var response symptom.Symptom
+	var response symptomDomain.Symptom
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal response: %v", err)
@@ -102,7 +102,7 @@ func TestSymptomAPI_GetSymptom(t *testing.T) {
 	handler := NewSymptomHandler(repo)
 
 	// Create a symptom first
-	symptom := symptom.NewSymptom("test-user", "Test Symptom")
+	symptom := symptomDomain.NewSymptom("test-user", "Test Symptom", 5, time.Now())
 	created, _ := repo.Create(context.TODO(), symptom)
 
 	router := gin.New()
@@ -120,7 +120,7 @@ func TestSymptomAPI_GetSymptom(t *testing.T) {
 		t.Errorf("Expected status %d, got %d", http.StatusOK, w.Code)
 	}
 
-	var response symptom.Symptom
+	var response symptomDomain.Symptom
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal response: %v", err)
@@ -142,7 +142,7 @@ func TestSymptomAPI_GetSymptom_AccessDenied(t *testing.T) {
 	handler := NewSymptomHandler(repo)
 
 	// Create a symptom for different user
-	symptom := symptom.NewSymptom("other-user", "Other User Symptom")
+	symptom := symptomDomain.NewSymptom("other-user", "Other User Symptom", 5, time.Now())
 	created, _ := repo.Create(context.TODO(), symptom)
 
 	router := gin.New()
@@ -168,9 +168,9 @@ func TestSymptomAPI_GetSymptoms(t *testing.T) {
 	handler := NewSymptomHandler(repo)
 
 	// Create symptoms for the user
-	symptom1 := symptom.NewSymptom("test-user", "Symptom 1")
-	symptom2 := symptom.NewSymptom("test-user", "Symptom 2")
-	symptom3 := symptom.NewSymptom("other-user", "Other User Symptom")
+	symptom1 := symptomDomain.NewSymptom("test-user", "Symptom 1", 5, time.Now())
+	symptom2 := symptomDomain.NewSymptom("test-user", "Symptom 2", 5, time.Now())
+	symptom3 := symptomDomain.NewSymptom("other-user", "Other User Symptom", 5, time.Now())
 
 	// Create test data (ignore errors in test setup)
 	_, _ = repo.Create(context.TODO(), symptom1)
@@ -192,7 +192,7 @@ func TestSymptomAPI_GetSymptoms(t *testing.T) {
 		t.Errorf("Expected status %d, got %d", http.StatusOK, w.Code)
 	}
 
-	var response map[string][]symptom.Symptom
+	var response map[string][]symptomDomain.Symptom
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal response: %v", err)
@@ -211,7 +211,7 @@ func TestSymptomAPI_UpdateSymptom(t *testing.T) {
 	handler := NewSymptomHandler(repo)
 
 	// Create a symptom first
-	symptom := symptom.NewSymptom("test-user", "Original")
+	symptom := symptomDomain.NewSymptom("test-user", "Original", 5, time.Now())
 	created, _ := repo.Create(context.TODO(), symptom)
 
 	router := gin.New()
@@ -238,7 +238,7 @@ func TestSymptomAPI_UpdateSymptom(t *testing.T) {
 		t.Errorf("Expected status %d, got %d", http.StatusOK, w.Code)
 	}
 
-	var response symptom.Symptom
+	var response symptomDomain.Symptom
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal response: %v", err)
@@ -264,7 +264,7 @@ func TestSymptomAPI_DeleteSymptom(t *testing.T) {
 	handler := NewSymptomHandler(repo)
 
 	// Create a symptom first
-	symptom := symptom.NewSymptom("test-user", "To Delete")
+	symptom := symptomDomain.NewSymptom("test-user", "To Delete", 5, time.Now())
 	created, _ := repo.Create(context.TODO(), symptom)
 
 	router := gin.New()
@@ -299,11 +299,8 @@ func TestSymptomAPI_GetSymptomsByDateRange(t *testing.T) {
 	yesterday := now.Add(-24 * time.Hour)
 
 	// Create symptoms at different times
-	symptom1 := symptom.NewSymptom("test-user", "Yesterday")
-	symptom1.RecordedAt = yesterday
-
-	symptom2 := symptom.NewSymptom("test-user", "Today")
-	symptom2.RecordedAt = now
+	symptom1 := symptomDomain.NewSymptom("test-user", "Yesterday", 5, yesterday)
+	symptom2 := symptomDomain.NewSymptom("test-user", "Today", 5, now)
 
 	_, _ = repo.Create(context.TODO(), symptom1)
 	_, _ = repo.Create(context.TODO(), symptom2)
@@ -327,7 +324,7 @@ func TestSymptomAPI_GetSymptomsByDateRange(t *testing.T) {
 		return
 	}
 
-	var response map[string][]symptom.Symptom
+	var response map[string][]symptomDomain.Symptom
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal response: %v", err)
@@ -347,10 +344,10 @@ func TestSymptomAPI_GetSymptomsByCategory(t *testing.T) {
 
 	category := shared.SymptomCategoryDigestive
 
-	symptom1 := symptom.NewSymptom("test-user", "Digestive")
+	symptom1 := symptomDomain.NewSymptom("test-user", "Digestive", 5, time.Now())
 	symptom1.Category = &category
 
-	symptom2 := symptom.NewSymptom("test-user", "Other")
+	symptom2 := symptomDomain.NewSymptom("test-user", "Other", 5, time.Now())
 	// No category
 
 	_, _ = repo.Create(context.TODO(), symptom1)
@@ -371,7 +368,7 @@ func TestSymptomAPI_GetSymptomsByCategory(t *testing.T) {
 		t.Errorf("Expected status %d, got %d", http.StatusOK, w.Code)
 	}
 
-	var response map[string][]symptom.Symptom
+	var response map[string][]symptomDomain.Symptom
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal response: %v", err)

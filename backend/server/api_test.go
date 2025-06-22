@@ -15,7 +15,6 @@ import (
 func setup() *App {
 	repo := repository.NewMemoryBowelRepo()
 	meals := repository.NewMemoryMealRepo()
-	strategy := service.AvgBristol{}
 
 	// Create a mock auth service for testing
 	userRepo := repository.NewMemoryUserRepository()
@@ -31,7 +30,7 @@ func setup() *App {
 	mealBowelRelationRepo := repository.NewMemoryMealBowelMovementRelationRepository()
 	mealSymptomRelationRepo := repository.NewMemoryMealSymptomRelationRepository()
 	twoFactorRepo := repository.NewMemoryUserTwoFactorRepository()
-	return New(repo, detailsRepo, meals, symptomRepo, medicationRepo, mealBowelRelationRepo, mealSymptomRelationRepo, strategy, authService, twoFactorRepo, userRepo)
+	return New(repo, detailsRepo, meals, symptomRepo, medicationRepo, mealBowelRelationRepo, mealSymptomRelationRepo, authService, twoFactorRepo, userRepo)
 }
 
 func TestBowelMovementCRUD(t *testing.T) {

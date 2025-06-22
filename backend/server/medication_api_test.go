@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kjanat/poo-tracker/backend/internal/domain/medication"
+	medicationDomain "github.com/kjanat/poo-tracker/backend/internal/domain/medication"
 	"github.com/kjanat/poo-tracker/backend/internal/repository"
 )
 
@@ -44,7 +44,7 @@ func TestMedicationAPI_CreateMedication(t *testing.T) {
 		t.Errorf("Expected status %d, got %d", http.StatusCreated, w.Code)
 	}
 
-	var response medication.Medication
+	var response medicationDomain.Medication
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal response: %v", err)
@@ -101,7 +101,7 @@ func TestMedicationAPI_GetMedication(t *testing.T) {
 	handler := NewMedicationHandler(repo)
 
 	// Create a medication first
-	medication := medication.NewMedication("test-user", "Test Med", "10mg", "daily")
+	medication := medicationDomain.NewMedication("test-user", "Test Med", "10mg", "daily")
 	created, _ := repo.Create(context.TODO(), medication)
 
 	router := gin.New()
@@ -119,7 +119,7 @@ func TestMedicationAPI_GetMedication(t *testing.T) {
 		t.Errorf("Expected status %d, got %d", http.StatusOK, w.Code)
 	}
 
-	var response medication.Medication
+	var response medicationDomain.Medication
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal response: %v", err)
@@ -141,7 +141,7 @@ func TestMedicationAPI_GetMedication_AccessDenied(t *testing.T) {
 	handler := NewMedicationHandler(repo)
 
 	// Create a medication for different user
-	medication := medication.NewMedication("other-user", "Other Med", "10mg", "daily")
+	medication := medicationDomain.NewMedication("other-user", "Other Med", "10mg", "daily")
 	created, _ := repo.Create(context.TODO(), medication)
 
 	router := gin.New()
@@ -167,9 +167,9 @@ func TestMedicationAPI_GetMedications(t *testing.T) {
 	handler := NewMedicationHandler(repo)
 
 	// Create medications for the user
-	med1 := medication.NewMedication("test-user", "Med 1", "10mg", "daily")
-	med2 := medication.NewMedication("test-user", "Med 2", "20mg", "twice daily")
-	med3 := medication.NewMedication("other-user", "Other Med", "30mg", "weekly")
+	med1 := medicationDomain.NewMedication("test-user", "Med 1", "10mg", "daily")
+	med2 := medicationDomain.NewMedication("test-user", "Med 2", "20mg", "twice daily")
+	med3 := medicationDomain.NewMedication("other-user", "Other Med", "30mg", "weekly")
 
 	// Create test data (ignore errors in test setup)
 	_, _ = repo.Create(context.TODO(), med1)
@@ -191,7 +191,7 @@ func TestMedicationAPI_GetMedications(t *testing.T) {
 		t.Errorf("Expected status %d, got %d", http.StatusOK, w.Code)
 	}
 
-	var response map[string][]medication.Medication
+	var response map[string][]medicationDomain.Medication
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal response: %v", err)
@@ -210,10 +210,10 @@ func TestMedicationAPI_GetActiveMedications(t *testing.T) {
 	handler := NewMedicationHandler(repo)
 
 	// Create active and inactive medications
-	activeMed := medication.NewMedication("test-user", "Active Med", "10mg", "daily")
+	activeMed := medicationDomain.NewMedication("test-user", "Active Med", "10mg", "daily")
 	activeMed.IsActive = true
 
-	inactiveMed := medication.NewMedication("test-user", "Inactive Med", "20mg", "daily")
+	inactiveMed := medicationDomain.NewMedication("test-user", "Inactive Med", "20mg", "daily")
 	inactiveMed.IsActive = false
 
 	// Create test data (ignore errors in test setup)
@@ -235,7 +235,7 @@ func TestMedicationAPI_GetActiveMedications(t *testing.T) {
 		t.Errorf("Expected status %d, got %d", http.StatusOK, w.Code)
 	}
 
-	var response map[string][]medication.Medication
+	var response map[string][]medicationDomain.Medication
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal response: %v", err)
@@ -258,7 +258,7 @@ func TestMedicationAPI_UpdateMedication(t *testing.T) {
 	handler := NewMedicationHandler(repo)
 
 	// Create a medication first
-	medication := medication.NewMedication("test-user", "Original", "10mg", "daily")
+	medication := medicationDomain.NewMedication("test-user", "Original", "10mg", "daily")
 	created, _ := repo.Create(context.TODO(), medication)
 
 	router := gin.New()
@@ -286,7 +286,7 @@ func TestMedicationAPI_UpdateMedication(t *testing.T) {
 		t.Errorf("Expected status %d, got %d", http.StatusOK, w.Code)
 	}
 
-	var response medication.Medication
+	var response medicationDomain.Medication
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal response: %v", err)
@@ -312,7 +312,7 @@ func TestMedicationAPI_DeleteMedication(t *testing.T) {
 	handler := NewMedicationHandler(repo)
 
 	// Create a medication first
-	medication := medication.NewMedication("test-user", "To Delete", "10mg", "daily")
+	medication := medicationDomain.NewMedication("test-user", "To Delete", "10mg", "daily")
 	created, _ := repo.Create(context.TODO(), medication)
 
 	router := gin.New()
@@ -344,7 +344,7 @@ func TestMedicationAPI_MarkAsTaken(t *testing.T) {
 	handler := NewMedicationHandler(repo)
 
 	// Create a medication first
-	medication := medication.NewMedication("test-user", "Test Med", "10mg", "daily")
+	medication := medicationDomain.NewMedication("test-user", "Test Med", "10mg", "daily")
 	created, _ := repo.Create(context.TODO(), medication)
 
 	router := gin.New()
