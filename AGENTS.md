@@ -79,17 +79,18 @@ pre-commit install
 
 ### 📦 pnpm Workspace Usage
 
-**ALWAYS use pnpm workspace commands or Makefile targets** - never `cd` into directories in scripts:
+**ALWAYS use Makefile targets for all test, lint, build, and dev workflows.**
 
 ```bash
 # ✅ Correct workspace commands
-pnpm --filter @poo-tracker/frontend add react-router-dom
-make dev-frontend
+make dev-frontend # OR use: cd frontend && pnpm run dev
 make lint
+make test
+make build
 
-# ❌ Incorrect - avoid cd commands in scripts
-cd frontend && pnpm add react-router-dom
-cd backend && pnpm run dev
+# ❌ Incorrect - avoid pnpm workspace commands directly for these workflows
+pnpm --filter @poo-tracker/frontend run test
+pnpm --filter @poo-tracker/frontend run build
 ```
 
 ### 🐍 Python Package Management
@@ -150,7 +151,7 @@ python -m pip install -r requirements.txt
 
 ```bash
 # Add dependencies to specific workspace
-pnpm --filter @poo-tracker/frontend add axios
+cd frontend && pnpm add axios
 pnpm --filter @poo-tracker/ai-service add fastapi  # If it were Node.js
 
 # Add dev dependencies to root workspace
@@ -176,9 +177,9 @@ make lint-backend     # golangci-lint run in backend
 
 # Go dependencies (in backend directory)
 cd backend
-go mod tidy           # Clean up dependencies
+go mod tidy                      # Clean up dependencies
 go get github.com/gin-gonic/gin  # Add dependency
-go mod download       # Download dependencies
+go mod download                  # Download dependencies
 ```
 
 **Python** (uv):

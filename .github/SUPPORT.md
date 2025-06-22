@@ -198,7 +198,7 @@ docker-compose up -d
 ```bash
 # Clear cache and reinstall
 rm -rf node_modules pnpm-lock.yaml
-pnpm --filter @poo-tracker/frontend install
+cd frontend && pnpm install
 ```
 
 **Database connection issues:**
@@ -231,7 +231,7 @@ docker-compose ps
 
 - **Test failures:**
 
-- Run tests in isolation: `pnpm --filter @poo-tracker/frontend run test -- --run`
+- Run tests in isolation: `cd frontend && pnpm run test -- --run`
 - Check test database configuration
 - Make sure test data is properly cleaned up
 
@@ -320,3 +320,13 @@ If you're not getting the help you need:
 Remember: There are no stupid questions, only stupid answers! 💩
 
 We're here to help you succeed with Poo Tracker. Don't hesitate to reach out! 🚀
+
+## 🛠️ Running Tests and Linting
+
+- Always use Makefile targets for testing, linting, and building:
+  - `make test-frontend` for frontend tests
+  - `make test-backend` for backend tests
+  - `make test` for all tests
+  - `make lint` for linting all services
+  - `make build` for building all services
+- Do not use pnpm workspace commands directly for these tasks.

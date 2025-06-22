@@ -32,7 +32,7 @@ git clone https://github.com/YOUR_USERNAME/poo-tracker.git
 cd poo-tracker
 
 # Install frontend dependencies
-pnpm --filter @poo-tracker/frontend install
+cd frontend && pnpm install
 
 # Copy environment file
 cp .env.example .env
@@ -50,11 +50,11 @@ make dev
 
 ```text
 poo-tracker/
-├── frontend/          # React + Vite + TypeScript
-├── backend/           # Go + Gin + GORM
-├── ai-service/        # Python + FastAPI
-├── docker-compose.yml # Development environment
-├── package.json       # Root package.json
+├── frontend/           # React + Vite + TypeScript
+├── backend/            # Go + Gin + GORM
+├── ai-service/         # Python + FastAPI
+├── docker-compose.yml  # Development environment
+├── package.json        # Root package.json
 └── pnpm-workspace.yaml # pnpm workspace config
 ```
 
@@ -255,21 +255,15 @@ test: add unit tests for poo analytics service
 ### Running Tests
 
 ```bash
-
-# Run all tests
+# To run frontend tests, use:
+make test-frontend
+# To run backend tests, use:
+make test-backend
+# To run all tests:
 make test
 
-# Frontend tests only
-pnpm --filter @poo-tracker/frontend run test
-
-# Backend tests only
-go test -C backend ./...
-
-# AI service tests only
-cd ai-service && python -m pytest
-
-# Watch mode for development
-pnpm --filter @poo-tracker/frontend run test:watch
+# To run frontend tests in watch mode:
+cd frontend && pnpm run test:watch
 ```
 
 ### Test Requirements

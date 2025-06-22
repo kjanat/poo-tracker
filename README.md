@@ -27,7 +27,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
    ```bash
    # Install Node.js dependencies (frontend only)
-   pnpm --filter @poo-tracker/frontend install
+   cd frontend && pnpm install
 
    # Install Python dependencies for AI service
    cd ai-service && uv sync && cd ..
@@ -120,22 +120,23 @@ make build-backend    # Build Go backend only
 # Database Operations
 # (Database migrations handled automatically by GORM in Go backend)
 
-# Docker Services
-make docker-up        # Start PostgreSQL, Redis, MinIO
-make docker-down      # Stop all Docker services
-
 # Testing & Quality
 make test             # Run all tests (frontend + backend)
-pnpm --filter @poo-tracker/frontend run test:watch   # Frontend watch mode
+make test-frontend    # Run frontend tests only
+make test-backend     # Run backend tests only
 make lint             # Run linters on all projects
 make lint-fix         # Auto-fix linting issues
 make clean            # Clean all build artifacts
 
 # Code Formatting
 make format           # Format backend and AI service
-pnpm format:prettier  # Format all files
-pnpm format:prettier:watch   # Watch and format on changes
+
+# For watch mode in frontend tests, use:
+#   make test-frontend WATCH=1
+# (or add a Makefile target if needed)
 ```
+
+> **Note:** Always use Makefile targets for all workflows (test, lint, build, dev). Do not use pnpm workspace commands directly.
 
 ### Project Structure
 
@@ -164,10 +165,10 @@ This project uses **pnpm workspaces** for efficient monorepo management:
 
 ```bash
 # Install dependencies for specific workspace
-pnpm --filter @poo-tracker/frontend add react-router-dom
+cd frontend && pnpm add react-router-dom
 
 # Run commands on specific workspaces
-pnpm --filter @poo-tracker/frontend build
+cd frontend && pnpm run build
 
 # Run commands on all workspaces
 pnpm --recursive run build
