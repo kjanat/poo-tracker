@@ -163,7 +163,7 @@ func CalculateTrendSlope(points []TrendPoint) float64 {
 	denominator := (n*sumXX - sumX*sumX)
 
 	// Check for division by zero
-	if math.Abs(denominator) < 1e-10 { // Use small epsilon for floating point comparison
+	if math.Abs(denominator) < floatEpsilon { // Use small epsilon for floating point comparison
 		// If all x values are identical (or nearly so), return a flat slope (0)
 		// This indicates no discernible trend in the data
 		return 0.0
