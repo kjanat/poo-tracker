@@ -117,29 +117,50 @@ export const Toilet: React.FC<ToiletProps> = ({ isOccupied, onFlush }) => {
 ```go
 // ✅ Good - Proper error handling and validation
 import (
-	"net/http"
-	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
+    "net/http"
+    "github.com/gin-gonic/gin"
+    "github.com/go-playground/validator/v10"
 )
 
 type CreatePooRequest struct {
-	BristolScale int     `json:"bristolScale" binding:"required,min=1,max=7"`
-	ImageURL     *string `json:"imageUrl" binding:"omitempty,url"`
-	Notes        *string `json:"notes" binding:"omitempty,max=500"`
+    BristolScale int     `json:"bristolScale" binding:"required,min=1,max=7"`
+    ImageURL     *string `json:"imageUrl" binding:"omitempty,url"`
+    Notes        *string `json:"notes" binding:"omitempty,max=500"`
 }
 
 var validate = validator.New()
 
 func CreatePoo(c *gin.Context) {
-	var req CreatePooRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+    var req CreatePooRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
-	// TODO: Save to database using GORM
+    // Save to database using GORM through repository pattern
+    bowelMovement, err := bm.NewBowelMovement(req.UserID, req.BristolType)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
-	c.JSON(http.StatusCreated, req)
+    // Apply any additional fields from request
+    // ... set optional fields on bowelMovement ...
+
+    // Validate before saving
+    if validationErrors := validation.ValidateBowelMovement(bowelMovement); validationErrors.HasErrors() {
+        c.JSON(http.StatusBadRequest, gin.H{"error": validationErrors.Error()})
+        return
+    }
+
+    // Save using repository (GORM underneath)
+    created, err := a.repo.Create(c.Request.Context(), bowelMovement)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusCreated, created)
 }
 ```
 

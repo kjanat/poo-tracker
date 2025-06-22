@@ -207,8 +207,8 @@ func (s *AnalyticsService) GetCorrelationAnalysis(ctx context.Context, userID st
 	mealSymptomCorrelations := s.correlationAnalyzer.CalculateMealSymptomCorrelations(mealValues, symptomValues)
 	medicationEffectiveness := s.correlationAnalyzer.CalculateMedicationEffectiveness(medicationValues, symptomValues, bowelMovementValues)
 
-	// TODO: Implement trigger analysis in analyzer component
-	triggerAnalysis := []*analytics.TriggerEffect{}
+	// Calculate trigger analysis using the correlation analyzer
+	triggerAnalysis := s.correlationAnalyzer.CalculateTriggerAnalysis(mealValues, symptomValues, bowelMovementValues)
 
 	return &analytics.CorrelationAnalysis{
 		MealBowelCorrelations:   mealBowelCorrelations,
@@ -406,8 +406,8 @@ func (s *AnalyticsService) GetRecommendations(ctx context.Context, userID string
 	return recommendations, nil
 }
 
-// TODO: These are stub implementations - replace with proper analytics components
 // Pattern analysis methods delegate to specialized analyzers
+// These methods use the TrendAnalyzer to perform pattern analysis and convert results to domain models
 func (s *AnalyticsService) analyzeEatingPatterns(meals []*meal.Meal) *analytics.EatingPattern {
 	mealValues := s.convertMealPointers(meals)
 	sharedPattern := s.trendAnalyzer.AnalyzeEatingPatterns(mealValues)

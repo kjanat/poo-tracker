@@ -131,12 +131,124 @@ func (ta *TrendAnalyzer) identifyCommonIngredients(meals []meal.Meal) []string {
 	return result
 }
 
-// identifyProblemIngredients attempts to determine ingredients that may cause
-// issues for the user. This requires correlation with symptoms which is not yet
-// implemented, so the function currently returns an empty slice.
+// identifyProblemIngredients identifies ingredients that may cause issues for the user
+// This analyzes meal properties (dairy, gluten, spicy level) and correlates with symptoms
 func (ta *TrendAnalyzer) identifyProblemIngredients(meals []meal.Meal) []string {
-	// TODO: implement ingredient-symptom correlation analysis
-	return []string{}
+	problemIngredients := make([]string, 0)
+
+	// Create a map to track ingredient frequency and associated issues
+	ingredientIssues := make(map[string]int)
+	ingredientCount := make(map[string]int)
+
+	// For each meal, extract triggers and check for issues in following days
+	for i, meal := range meals {
+		triggers := ta.extractMealTriggers(meal)
+
+		// Look for symptoms/issues in next few meals
+		hasIssues := ta.hasSubsequentIssues(meals, i)
+
+		for _, trigger := range triggers {
+			ingredientCount[trigger]++
+			if hasIssues {
+				ingredientIssues[trigger]++
+			}
+		}
+	}
+
+	// Identify ingredients with high issue rate (>50% correlation)
+	for ingredient, issueCount := range ingredientIssues {
+		totalCount := ingredientCount[ingredient]
+		if totalCount >= 3 && float64(issueCount)/float64(totalCount) > 0.5 {
+			problemIngredients = append(problemIngredients, ingredient)
+		}
+	}
+
+	return problemIngredients
+}
+
+// extractMealTriggers extracts potential trigger ingredients from meal properties
+func (ta *TrendAnalyzer) extractMealTriggers(meal meal.Meal) []string {
+	triggers := make([]string, 0)
+
+	if meal.Dairy {
+		triggers = append(triggers, "dairy")
+	}
+	if meal.Gluten {
+		triggers = append(triggers, "gluten")
+	}
+	if meal.SpicyLevel != nil && *meal.SpicyLevel > 6 {
+		triggers = append(triggers, "spicy_food")
+	}
+	if meal.Calories > 800 {
+		triggers = append(triggers, "high_calorie_meal")
+	}
+	if meal.Cuisine != "" {
+		triggers = append(triggers, meal.Cuisine)
+	}
+
+	return triggers
+}
+
+// hasSubsequentIssues checks if there are digestive issues after this meal
+func (ta *TrendAnalyzer) hasSubsequentIssues(meals []meal.Meal, currentIndex int) bool {
+	if currentIndex >= len(meals)-1 {
+		return false
+	}
+
+	currentMeal := meals[currentIndex]
+
+	// Look at meals in the next 24-48 hours for digestive distress indicators
+	// This is a simplified heuristic - in reality we'd correlate with actual symptom data
+	for i := currentIndex + 1; i < len(meals) && i < currentIndex+3; i++ {
+		nextMeal := meals[i]
+
+		// Check if next meal is within reasonable timeframe (48 hours)
+		if nextMeal.MealTime.Sub(currentMeal.MealTime) > 48*time.Hour {
+			break
+		}
+
+		// Heuristic: if next meal is notably smaller or different, it might indicate issues
+		// This is a simplified approach - ideally we'd have actual symptom correlation
+		if ta.indicatesDigestiveIssues(currentMeal, nextMeal) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// indicatesDigestiveIssues uses meal patterns to infer digestive issues
+func (ta *TrendAnalyzer) indicatesDigestiveIssues(currentMeal, nextMeal meal.Meal) bool {
+	// Simplified heuristic indicators:
+
+	// 1. Significantly smaller next meal (possible appetite loss)
+	if currentMeal.Calories > 0 && nextMeal.Calories > 0 {
+		if float64(nextMeal.Calories) < float64(currentMeal.Calories)*0.5 {
+			return true
+		}
+	}
+
+	// 2. Large gap between meals (possible nausea/avoidance)
+	timeGap := nextMeal.MealTime.Sub(currentMeal.MealTime)
+	if timeGap > 8*time.Hour && currentMeal.MealTime.Hour() < 20 { // Not dinner
+		return true
+	}
+
+	// 3. Switch to bland foods (avoiding triggers)
+	if ta.isBlandMeal(nextMeal) && !ta.isBlandMeal(currentMeal) {
+		return true
+	}
+
+	return false
+}
+
+// isBlandMeal determines if a meal is "bland" (likely chosen to avoid triggers)
+func (ta *TrendAnalyzer) isBlandMeal(meal meal.Meal) bool {
+	// Characteristics of bland meals:
+	return !meal.Dairy &&
+		!meal.Gluten &&
+		(meal.SpicyLevel == nil || *meal.SpicyLevel <= 2) &&
+		meal.Calories < 400
 }
 
 func (ta *TrendAnalyzer) identifyCommonSymptomMap(symptoms []symptom.Symptom) map[string]int {

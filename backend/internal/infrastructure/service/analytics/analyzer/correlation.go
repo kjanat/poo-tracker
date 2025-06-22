@@ -104,6 +104,29 @@ func (ca *CorrelationAnalyzer) CalculateMedicationEffectiveness(
 	return effectiveness
 }
 
+// CalculateTriggerAnalysis analyzes potential triggers for symptoms and bowel issues
+func (ca *CorrelationAnalyzer) CalculateTriggerAnalysis(
+	meals []meal.Meal,
+	symptoms []symptom.Symptom,
+	bowelMovements []bowelmovement.BowelMovement,
+) []*analytics.TriggerEffect {
+	triggers := make([]*analytics.TriggerEffect, 0)
+
+	// Analyze food-based triggers
+	foodTriggers := ca.analyzeFoodTriggers(meals, symptoms, bowelMovements)
+	triggers = append(triggers, foodTriggers...)
+
+	// Analyze timing-based triggers
+	timingTriggers := ca.analyzeTimingTriggers(meals, symptoms, bowelMovements)
+	triggers = append(triggers, timingTriggers...)
+
+	// Analyze stress-based triggers (if stress data is available)
+	stressTriggers := ca.analyzeStressTriggers(symptoms, bowelMovements)
+	triggers = append(triggers, stressTriggers...)
+
+	return triggers
+}
+
 // Helper functions for meal-bowel correlations
 
 type DailyMealBowelData struct {
@@ -566,6 +589,344 @@ func (ca *CorrelationAnalyzer) calculateMedicationEffectivenessScore(
 	return math.Max(0, math.Min(100, score))
 }
 
+// Trigger analysis methods
+
+// analyzeFoodTriggers identifies food ingredients that trigger symptoms or bowel issues
+func (ca *CorrelationAnalyzer) analyzeFoodTriggers(
+	meals []meal.Meal,
+	symptoms []symptom.Symptom,
+	bowelMovements []bowelmovement.BowelMovement,
+) []*analytics.TriggerEffect {
+	triggers := make([]*analytics.TriggerEffect, 0)
+
+	// Group data by ingredient
+	ingredientData := ca.groupDataByIngredient(meals, symptoms, bowelMovements)
+
+	for ingredient, data := range ingredientData {
+		// Calculate symptom increase after consuming ingredient
+		symptomIncrease := ca.calculateSymptomIncrease(data.symptoms, data.mealDays)
+
+		// Calculate bowel impact after consuming ingredient
+		bowelImpact := ca.calculateBowelImpact(data.bowelMovements, data.mealDays)
+
+		// Only include if there's significant impact
+		if symptomIncrease > 0.2 || math.Abs(bowelImpact) > 0.3 {
+			triggers = append(triggers, &analytics.TriggerEffect{
+				Trigger:         ingredient,
+				SymptomIncrease: symptomIncrease,
+				BowelImpact:     bowelImpact,
+				Frequency:       len(data.mealDays),
+				Severity:        ca.calculateTriggerSeverity(symptomIncrease, bowelImpact),
+			})
+		}
+	}
+
+	return triggers
+}
+
+// analyzeTimingTriggers identifies meal timing patterns that trigger issues
+func (ca *CorrelationAnalyzer) analyzeTimingTriggers(
+	meals []meal.Meal,
+	symptoms []symptom.Symptom,
+	bowelMovements []bowelmovement.BowelMovement,
+) []*analytics.TriggerEffect {
+	triggers := make([]*analytics.TriggerEffect, 0)
+
+	// Analyze late eating patterns
+	lateEatingImpact := ca.analyzeLateEatingImpact(meals, symptoms, bowelMovements)
+	if lateEatingImpact.SymptomIncrease > 0.15 || math.Abs(lateEatingImpact.BowelImpact) > 0.2 {
+		triggers = append(triggers, &analytics.TriggerEffect{
+			Trigger:         "late_eating",
+			SymptomIncrease: lateEatingImpact.SymptomIncrease,
+			BowelImpact:     lateEatingImpact.BowelImpact,
+			Frequency:       lateEatingImpact.Frequency,
+			Severity:        ca.calculateTriggerSeverity(lateEatingImpact.SymptomIncrease, lateEatingImpact.BowelImpact),
+		})
+	}
+
+	// Analyze large meal patterns
+	largeMealImpact := ca.analyzeLargeMealImpact(meals, symptoms, bowelMovements)
+	if largeMealImpact.SymptomIncrease > 0.15 || math.Abs(largeMealImpact.BowelImpact) > 0.2 {
+		triggers = append(triggers, &analytics.TriggerEffect{
+			Trigger:         "large_meals",
+			SymptomIncrease: largeMealImpact.SymptomIncrease,
+			BowelImpact:     largeMealImpact.BowelImpact,
+			Frequency:       largeMealImpact.Frequency,
+			Severity:        ca.calculateTriggerSeverity(largeMealImpact.SymptomIncrease, largeMealImpact.BowelImpact),
+		})
+	}
+
+	return triggers
+}
+
+// analyzeStressTriggers identifies stress-based triggers for symptoms
+func (ca *CorrelationAnalyzer) analyzeStressTriggers(
+	symptoms []symptom.Symptom,
+	bowelMovements []bowelmovement.BowelMovement,
+) []*analytics.TriggerEffect {
+	triggers := make([]*analytics.TriggerEffect, 0)
+
+	// TODO: Implement stress analysis when stress data becomes available
+	// For now, return empty slice
+
+	return triggers
+}
+
+// Helper types and functions for trigger analysis
+type ingredientData struct {
+	mealDays       []time.Time
+	symptoms       []symptom.Symptom
+	bowelMovements []bowelmovement.BowelMovement
+}
+
+type triggerImpact struct {
+	SymptomIncrease float64
+	BowelImpact     float64
+	Frequency       int
+}
+
+// groupDataByIngredient groups data by ingredient for analysis
+func (ca *CorrelationAnalyzer) groupDataByIngredient(
+	meals []meal.Meal,
+	symptoms []symptom.Symptom,
+	bowelMovements []bowelmovement.BowelMovement,
+) map[string]*ingredientData {
+	data := make(map[string]*ingredientData)
+
+	// Process each meal and extract ingredients from meal properties
+	for _, meal := range meals {
+		mealDay := meal.MealTime.Truncate(24 * time.Hour)
+
+		// Extract potential ingredients/triggers from meal properties
+		triggers := ca.extractMealTriggers(meal)
+
+		for _, trigger := range triggers {
+			if data[trigger] == nil {
+				data[trigger] = &ingredientData{
+					mealDays:       make([]time.Time, 0),
+					symptoms:       make([]symptom.Symptom, 0),
+					bowelMovements: make([]bowelmovement.BowelMovement, 0),
+				}
+			}
+
+			// Add meal day if not already present
+			found := false
+			for _, day := range data[trigger].mealDays {
+				if day.Equal(mealDay) {
+					found = true
+					break
+				}
+			}
+			if !found {
+				data[trigger].mealDays = append(data[trigger].mealDays, mealDay)
+			}
+		}
+	}
+
+	// Add symptoms and bowel movements within 24 hours of trigger consumption
+	for _, triggerData := range data {
+		for _, mealDay := range triggerData.mealDays {
+			// Add symptoms within 24 hours
+			for _, symptom := range symptoms {
+				if symptom.RecordedAt.After(mealDay) &&
+					symptom.RecordedAt.Before(mealDay.Add(24*time.Hour)) {
+					triggerData.symptoms = append(triggerData.symptoms, symptom)
+				}
+			}
+
+			// Add bowel movements within 24 hours
+			for _, bm := range bowelMovements {
+				if bm.RecordedAt.After(mealDay) &&
+					bm.RecordedAt.Before(mealDay.Add(24*time.Hour)) {
+					triggerData.bowelMovements = append(triggerData.bowelMovements, bm)
+				}
+			}
+		}
+	}
+
+	return data
+}
+
+// calculateSymptomIncrease calculates the increase in symptoms after consuming an ingredient
+func (ca *CorrelationAnalyzer) calculateSymptomIncrease(
+	symptoms []symptom.Symptom,
+	mealDays []time.Time,
+) float64 {
+	if len(mealDays) == 0 {
+		return 0
+	}
+
+	totalSeverity := 0.0
+	for _, symptom := range symptoms {
+		totalSeverity += float64(symptom.Severity)
+	}
+
+	// Average symptom severity per meal day with this ingredient
+	avgSeverityWithIngredient := totalSeverity / float64(len(mealDays))
+
+	// For now, use a simplified calculation
+	// In a more sophisticated implementation, we'd compare against baseline
+	return math.Min(avgSeverityWithIngredient/10.0, 1.0) // Normalize to 0-1
+}
+
+// calculateBowelImpact calculates the impact on bowel movements after consuming an ingredient
+func (ca *CorrelationAnalyzer) calculateBowelImpact(
+	bowelMovements []bowelmovement.BowelMovement,
+	mealDays []time.Time,
+) float64 {
+	if len(mealDays) == 0 {
+		return 0
+	}
+
+	totalPain := 0.0
+	totalStrain := 0.0
+	count := 0
+
+	for _, bm := range bowelMovements {
+		totalPain += float64(bm.Pain)
+		totalStrain += float64(bm.Strain)
+		count++
+	}
+
+	if count == 0 {
+		return 0
+	}
+
+	// Calculate average negative impact (higher pain/strain = negative impact)
+	avgImpact := (totalPain + totalStrain) / float64(count)
+	return math.Min(avgImpact/10.0, 1.0) // Normalize to 0-1
+}
+
+// analyzeLateEatingImpact analyzes the impact of eating late
+func (ca *CorrelationAnalyzer) analyzeLateEatingImpact(
+	meals []meal.Meal,
+	symptoms []symptom.Symptom,
+	bowelMovements []bowelmovement.BowelMovement,
+) triggerImpact {
+	lateEatingThreshold := 20 // 8 PM
+	lateMealDays := make([]time.Time, 0)
+
+	// Identify late eating days
+	for _, meal := range meals {
+		if meal.MealTime.Hour() >= lateEatingThreshold {
+			mealDay := meal.MealTime.Truncate(24 * time.Hour)
+			found := false
+			for _, day := range lateMealDays {
+				if day.Equal(mealDay) {
+					found = true
+					break
+				}
+			}
+			if !found {
+				lateMealDays = append(lateMealDays, mealDay)
+			}
+		}
+	}
+
+	// Calculate impact
+	relatedSymptoms := make([]symptom.Symptom, 0)
+	relatedBowelMovements := make([]bowelmovement.BowelMovement, 0)
+
+	for _, day := range lateMealDays {
+		nextDay := day.Add(24 * time.Hour)
+
+		// Find symptoms the next day
+		for _, symptom := range symptoms {
+			if symptom.RecordedAt.After(day) && symptom.RecordedAt.Before(nextDay.Add(24*time.Hour)) {
+				relatedSymptoms = append(relatedSymptoms, symptom)
+			}
+		}
+
+		// Find bowel movements the next day
+		for _, bm := range bowelMovements {
+			if bm.RecordedAt.After(day) && bm.RecordedAt.Before(nextDay.Add(24*time.Hour)) {
+				relatedBowelMovements = append(relatedBowelMovements, bm)
+			}
+		}
+	}
+
+	return triggerImpact{
+		SymptomIncrease: ca.calculateSymptomIncrease(relatedSymptoms, lateMealDays),
+		BowelImpact:     ca.calculateBowelImpact(relatedBowelMovements, lateMealDays),
+		Frequency:       len(lateMealDays),
+	}
+}
+
+// analyzeLargeMealImpact analyzes the impact of large meals
+func (ca *CorrelationAnalyzer) analyzeLargeMealImpact(
+	meals []meal.Meal,
+	symptoms []symptom.Symptom,
+	bowelMovements []bowelmovement.BowelMovement,
+) triggerImpact {
+	// Calculate average meal size for baseline
+	totalCalories := 0
+	mealCount := 0
+	for _, meal := range meals {
+		if meal.Calories > 0 {
+			totalCalories += meal.Calories
+			mealCount++
+		}
+	}
+
+	if mealCount == 0 {
+		return triggerImpact{}
+	}
+
+	avgCalories := float64(totalCalories) / float64(mealCount)
+	largeMealThreshold := avgCalories * 1.5 // 50% above average
+
+	largeMealDays := make([]time.Time, 0)
+
+	// Identify large meal days
+	for _, meal := range meals {
+		if meal.Calories > 0 && float64(meal.Calories) > largeMealThreshold {
+			mealDay := meal.MealTime.Truncate(24 * time.Hour)
+			found := false
+			for _, day := range largeMealDays {
+				if day.Equal(mealDay) {
+					found = true
+					break
+				}
+			}
+			if !found {
+				largeMealDays = append(largeMealDays, mealDay)
+			}
+		}
+	}
+
+	// Calculate impact similar to late eating
+	relatedSymptoms := make([]symptom.Symptom, 0)
+	relatedBowelMovements := make([]bowelmovement.BowelMovement, 0)
+
+	for _, day := range largeMealDays {
+		nextDay := day.Add(24 * time.Hour)
+
+		for _, symptom := range symptoms {
+			if symptom.RecordedAt.After(day) && symptom.RecordedAt.Before(nextDay.Add(24*time.Hour)) {
+				relatedSymptoms = append(relatedSymptoms, symptom)
+			}
+		}
+
+		for _, bm := range bowelMovements {
+			if bm.RecordedAt.After(day) && bm.RecordedAt.Before(nextDay.Add(24*time.Hour)) {
+				relatedBowelMovements = append(relatedBowelMovements, bm)
+			}
+		}
+	}
+
+	return triggerImpact{
+		SymptomIncrease: ca.calculateSymptomIncrease(relatedSymptoms, largeMealDays),
+		BowelImpact:     ca.calculateBowelImpact(relatedBowelMovements, largeMealDays),
+		Frequency:       len(largeMealDays),
+	}
+}
+
+// calculateTriggerSeverity calculates the overall severity of a trigger
+func (ca *CorrelationAnalyzer) calculateTriggerSeverity(symptomIncrease, bowelImpact float64) float64 {
+	// Combine symptom increase and bowel impact with weights
+	return (symptomIncrease*0.6 + math.Abs(bowelImpact)*0.4)
+}
+
 // Utility functions
 
 func (ca *CorrelationAnalyzer) generateCorrelationDescription(factor, outcome string, coefficient float64, strength string) string {
@@ -576,4 +937,35 @@ func (ca *CorrelationAnalyzer) generateCorrelationDescription(factor, outcome st
 
 	return fmt.Sprintf("There is a %s %s correlation between %s and %s (r=%.3f).",
 		strength, direction, factor, outcome, coefficient)
+}
+
+// extractMealTriggers extracts potential trigger foods from meal properties
+func (ca *CorrelationAnalyzer) extractMealTriggers(meal meal.Meal) []string {
+	triggers := make([]string, 0)
+
+	// Add triggers based on meal properties
+	if meal.Dairy {
+		triggers = append(triggers, "dairy")
+	}
+	if meal.Gluten {
+		triggers = append(triggers, "gluten")
+	}
+	if meal.SpicyLevel != nil && *meal.SpicyLevel > 5 {
+		triggers = append(triggers, "spicy_food")
+	}
+	if meal.Calories > 800 { // High calorie meals
+		triggers = append(triggers, "high_calorie")
+	}
+
+	// Add cuisine-based triggers
+	if meal.Cuisine != "" {
+		triggers = append(triggers, "cuisine_"+meal.Cuisine)
+	}
+
+	// If no specific triggers found, use general meal category
+	if len(triggers) == 0 && meal.Category != nil {
+		triggers = append(triggers, "meal_category_"+meal.Category.String())
+	}
+
+	return triggers
 }

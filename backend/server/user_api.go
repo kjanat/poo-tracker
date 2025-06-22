@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+	"time"
 
 	user "github.com/kjanat/poo-tracker/backend/internal/domain/user"
 	userDto "github.com/kjanat/poo-tracker/backend/internal/infrastructure/http/dto/user"
@@ -13,14 +14,44 @@ import (
 	"github.com/kjanat/poo-tracker/backend/internal/validation"
 )
 
+// getClientIP extracts the client's IP address from request headers
+func getClientIP(r *http.Request) string {
+	// Check for X-Forwarded-For header (for reverse proxies)
+	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
+		// X-Forwarded-For can contain multiple IPs, take the first one
+		if parts := strings.Split(xff, ","); len(parts) > 0 {
+			return strings.TrimSpace(parts[0])
+		}
+	}
+
+	// Check for X-Real-IP header
+	if xri := r.Header.Get("X-Real-IP"); xri != "" {
+		return xri
+	}
+
+	// Fallback to RemoteAddr
+	ip := r.RemoteAddr
+	if lastColon := strings.LastIndex(ip, ":"); lastColon != -1 {
+		ip = ip[:lastColon]
+	}
+	return ip
+}
+
 // UserAPIHandlers handles user-related API endpoints with dependency injection
 type UserAPIHandlers struct {
-	AuthService service.AuthService // Made public for middleware access
+	AuthService  service.AuthService // Made public for middleware access
+	loginLimiter *middleware.RateLimiter
 }
 
 // NewUserAPIHandlers creates a new UserAPIHandlers with the provided auth service
 func NewUserAPIHandlers(authService service.AuthService) *UserAPIHandlers {
-	return &UserAPIHandlers{AuthService: authService}
+	// Create a stricter rate limiter for login attempts (5 attempts per minute)
+	loginLimiter := middleware.NewRateLimiter(5, time.Minute)
+
+	return &UserAPIHandlers{
+		AuthService:  authService,
+		loginLimiter: loginLimiter,
+	}
 }
 
 func (h *UserAPIHandlers) RegisterHandler(w http.ResponseWriter, r *http.Request) {
@@ -76,7 +107,12 @@ func (h *UserAPIHandlers) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Implement rate limiting here to prevent brute force attacks
+	// Rate limiting to prevent brute force attacks
+	clientIP := getClientIP(r)
+	if !h.loginLimiter.Allow(clientIP) {
+		http.Error(w, "too many login attempts, please try again later", http.StatusTooManyRequests)
+		return
+	}
 
 	user, token, err := h.AuthService.Login(req.Username, req.Password)
 	if err != nil {
