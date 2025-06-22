@@ -150,10 +150,6 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 	// Get user ID from JWT context (will be set by auth middleware)
 	userIDStr, ok := extractUserID(c)
 	if !ok {
-		return
-	}
-	userIDStr, ok := userID.(string)
-	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user token"})
 		return
 	}
@@ -320,10 +316,6 @@ func (h *UserHandler) ChangePassword(c *gin.Context) {
 func (h *UserHandler) GetSettings(c *gin.Context) {
 	// Get user ID from JWT context
 	userIDStr, ok := extractUserID(c)
-	if !ok {
-		return
-	}
-	userIDStr, ok := userID.(string)
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid user token"})
 		return

@@ -23,9 +23,10 @@ func TestCreateAndGetMedication(t *testing.T) {
 	db := setupTestDB(t)
 	repo := NewMedicationRepository(db)
 	ctx := context.Background()
-	m := &medication.Medication{ID: "test-id", UserID: "user-1", Name: "Aspirin"}
+	validUUID := "123e4567-e89b-12d3-a456-426614174000"
+	m := &medication.Medication{ID: validUUID, UserID: "user-1", Name: "Aspirin"}
 	assert.NoError(t, repo.Create(ctx, m))
-	got, err := repo.GetByID(ctx, "test-id")
+	got, err := repo.GetByID(ctx, validUUID)
 	assert.NoError(t, err)
-	assert.Equal(t, "test-id", got.ID)
+	assert.Equal(t, validUUID, got.ID)
 }

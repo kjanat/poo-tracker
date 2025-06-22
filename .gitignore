@@ -549,3 +549,4 @@ backend/bin/
 backend/backend
 **/*.deprecated
 **/coverage.txt
+**/coverage.out

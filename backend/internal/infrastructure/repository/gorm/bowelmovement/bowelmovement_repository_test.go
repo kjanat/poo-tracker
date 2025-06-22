@@ -23,7 +23,15 @@ func TestCreateAndGetBowelMovement(t *testing.T) {
 	db := setupTestDB(t)
 	repo := NewBowelMovementRepository(db)
 	ctx := context.Background()
-	bm := &bowelmovement.BowelMovement{ID: "test-id", UserID: "user-1"}
+	bm := &bowelmovement.BowelMovement{
+		ID:           "test-id",
+		UserID:       "user-1",
+		BristolType:  4, // Use a valid Bristol type (1-7)
+		Pain:         1,
+		Strain:       1,
+		Satisfaction: 5,
+		Floaters:     false,
+	}
 	assert.NoError(t, repo.Create(ctx, bm))
 	got, err := repo.GetByID(ctx, "test-id")
 	assert.NoError(t, err)

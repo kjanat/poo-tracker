@@ -23,9 +23,10 @@ func TestCreateAndGetSymptom(t *testing.T) {
 	db := setupTestDB(t)
 	repo := NewSymptomRepository(db)
 	ctx := context.Background()
-	s := &symptom.Symptom{ID: "test-id", UserID: "user-1", Name: "Headache"}
+	validUUID := "123e4567-e89b-12d3-a456-426614174001"
+	s := &symptom.Symptom{ID: validUUID, UserID: "user-1", Name: "Headache"}
 	assert.NoError(t, repo.Create(ctx, s))
-	got, err := repo.GetByID(ctx, "test-id")
+	got, err := repo.GetByID(ctx, validUUID)
 	assert.NoError(t, err)
-	assert.Equal(t, "test-id", got.ID)
+	assert.Equal(t, validUUID, got.ID)
 }

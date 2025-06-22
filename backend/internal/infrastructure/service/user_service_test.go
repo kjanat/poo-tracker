@@ -135,7 +135,7 @@ func TestUserService_Register(t *testing.T) {
 		Email:    "test@example.com",
 		Username: "testuser",
 		Name:     "Test User",
-		Password: "password123",
+		Password: "Str0ngP@ssw0rd!", // Use a strong password to pass validation
 	}
 
 	mockRepo.On("EmailExists", ctx, input.Email).Return(false, nil)
@@ -165,7 +165,7 @@ func TestUserService_Register_EmailExists(t *testing.T) {
 		Email:    "existing@example.com",
 		Username: "testuser",
 		Name:     "Test User",
-		Password: "password123",
+		Password: "Str0ngP@ssw0rd!", // Use a strong password to pass validation
 	}
 
 	mockRepo.On("EmailExists", ctx, input.Email).Return(true, nil)
@@ -229,7 +229,7 @@ func TestUserService_Login(t *testing.T) {
 
 	input := &user.LoginInput{
 		EmailOrUsername: "test@example.com",
-		Password:        "password123",
+		Password:        "Str0ngP@ssw0rd!", // Use a strong password for login
 	}
 
 	// Create a test user
@@ -241,7 +241,7 @@ func TestUserService_Login(t *testing.T) {
 	}
 
 	// Create test auth with properly hashed password
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("Str0ngP@ssw0rd!"), bcrypt.DefaultCost)
 	testAuth := &user.UserAuth{
 		UserID:       testUser.ID,
 		PasswordHash: string(hashedPassword),
@@ -281,7 +281,7 @@ func TestUserService_Login_InvalidCredentials(t *testing.T) {
 		Name:     "Test User",
 	}
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("Str0ngP@ssw0rd!"), bcrypt.DefaultCost)
 	testAuth := &user.UserAuth{
 		UserID:       testUser.ID,
 		PasswordHash: string(hashedPassword),
