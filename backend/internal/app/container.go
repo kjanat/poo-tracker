@@ -11,6 +11,10 @@ import (
 	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/user"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/database"
+	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/repository/gorm/bowelmovement as gormbowelmovement"
+	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/repository/gorm/meal as gormmeal"
+	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/repository/gorm/medication as gormmedication"
+	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/repository/gorm/symptom as gormsymptom"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/repository/memory"
 	"github.com/kjanat/poo-tracker/backend/internal/infrastructure/service"
 	"go.uber.org/zap"
@@ -68,10 +72,10 @@ func NewContainer() (*Container, error) {
 
 	// Initialize repositories
 	container.UserRepository = memory.NewUserRepository()
-	container.BowelMovementRepository = memory.NewBowelMovementRepository()
-	container.MealRepository = memory.NewMealRepository()
-	container.MedicationRepository = memory.NewMedicationRepository()
-	container.SymptomRepository = memory.NewSymptomRepository()
+	container.BowelMovementRepository = gormbowelmovement.NewBowelMovementRepository(db.GetDB())
+	container.MealRepository = gormmeal.NewMealRepository(db.GetDB())
+	container.MedicationRepository = gormmedication.NewMedicationRepository(db.GetDB())
+	container.SymptomRepository = gormsymptom.NewSymptomRepository(db.GetDB())
 
 	// Initialize services
 	container.UserService = service.NewUserService(container.UserRepository)

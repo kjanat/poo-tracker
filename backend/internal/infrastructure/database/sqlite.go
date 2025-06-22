@@ -9,6 +9,9 @@ import (
 	"gorm.io/gorm/logger"
 
 	"github.com/kjanat/poo-tracker/backend/internal/domain/bowelmovement"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/meal"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/medication"
+	"github.com/kjanat/poo-tracker/backend/internal/domain/symptom"
 	"github.com/kjanat/poo-tracker/backend/internal/domain/user"
 )
 
@@ -49,5 +52,8 @@ func (s *SQLiteDatabase) Migrate() error {
 	return s.db.AutoMigrate(
 		&user.User{},
 		&bowelmovement.BowelMovementDB{},
+		&meal.MealDB{},
+		&symptom.SymptomDB{},
+		&medication.MedicationDB{},
 	)
 }
