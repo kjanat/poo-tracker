@@ -21,16 +21,16 @@
     "pnpm": ">=9.0.0"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.80.7",
+    "@tanstack/react-query": "^5.81.2",
     "axios": "^1.10.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
-    "lucide-react": "^0.517.0",
+    "lucide-react": "^0.522.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.58.1",
     "react-router-dom": "^7.6.2",
-    "recharts": "^2.15.3",
+    "recharts": "^3.0.0",
     "sonner": "^2.0.5",
     "zustand": "^5.0.5"
   },
@@ -44,7 +44,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
-    "@vitejs/plugin-react": "^4.5.2",
+    "@vitejs/plugin-react": "^4.6.0",
     "autoprefixer": "^10.4.21",
     "jsdom": "^26.1.0",
     "postcss": "^8.5.6",
