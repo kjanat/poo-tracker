@@ -2,7 +2,8 @@
 
 > Node.js REST API for bowel movement tracking with Express v5, TypeScript, and Prisma ORM
 
-The backend provides a robust, type-safe REST API for managing users, bowel movement entries, meals, file uploads, and analytics. Built with modern Node.js practices and comprehensive testing.
+The backend provides a robust, type-safe REST API for managing users, bowel movement entries, meals,
+file uploads, and analytics. Built with modern Node.js practices and comprehensive testing.
 
 ## 🚀 Features
 
@@ -60,9 +61,8 @@ pnpm dev:backend
 ```
 
 > **Security Note**: The default usernames and passwords in
-> [`docker-compose.yml`](../docker-compose.yml) are for **local development
-> only**. Generate unique, strong credentials for PostgreSQL, MinIO and Redis
-> before deploying to production.
+> [`docker-compose.yml`](../docker-compose.yml) are for **local development only**. Generate unique,
+> strong credentials for PostgreSQL, MinIO and Redis before deploying to production.
 
 ### Manual Setup (if needed)
 
@@ -397,11 +397,11 @@ This API handles sensitive health data:
 ## 🤝 Contributing
 
 1. Follow TypeScript and Node.js best practices
-2. Write comprehensive tests for all new features
-3. Use Prisma for all database operations
-4. Implement proper error handling
-5. Add API documentation for new endpoints
-6. Follow the established project structure
+1. Write comprehensive tests for all new features
+1. Use Prisma for all database operations
+1. Implement proper error handling
+1. Add API documentation for new endpoints
+1. Follow the established project structure
 
 ### API Development Guidelines
 
@@ -422,6 +422,6 @@ This backend integrates with:
 - **Storage**: S3/MinIO for file storage and management
 - **Cache**: Redis for performance optimization
 
----
+______________________________________________________________________
 
 _Built with 💩 and professional engineering standards for reliable health data management._

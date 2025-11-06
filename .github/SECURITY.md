@@ -11,7 +11,8 @@ We actively support the following versions of Poo Tracker with security updates:
 
 ## 🚨 Reporting a Vulnerability
 
-We take security vulnerabilities seriously. If you discover a security issue, please follow these steps:
+We take security vulnerabilities seriously. If you discover a security issue, please follow these
+steps:
 
 ### 🔐 Private Disclosure
 
@@ -20,16 +21,19 @@ We take security vulnerabilities seriously. If you discover a security issue, pl
 Instead, please report security issues through one of these methods:
 
 1. **GitHub Security Advisories** (Preferred)
+
    - Go to [Security Advisories](https://github.com/kjanat/poo-tracker/security/advisories/new)
    - Click "Report a vulnerability"
    - Fill out the form with details
 
-2. **Email**
+1. **Email**
+
    - Send details to: <poo-tracker+security@kjanat.com>
    - Include "SECURITY" in the subject line
    - Use PGP encryption if possible (key available on request)
 
-3. **Discord** (For urgent issues)
+1. **Discord** (For urgent issues)
+
    - Direct message @kjanat on Discord
    - Mention it's a security issue
 
@@ -111,9 +115,9 @@ The following are generally considered out of scope:
 We follow responsible disclosure practices:
 
 1. **Private reporting** of vulnerabilities
-2. **Coordination** on timeline for fixes
-3. **Public disclosure** only after fixes are released
-4. **Credit** given to researchers (unless requested otherwise)
+1. **Coordination** on timeline for fixes
+1. **Public disclosure** only after fixes are released
+1. **Credit** given to researchers (unless requested otherwise)
 
 ## 💡 Security Tips for Users
 
@@ -132,6 +136,6 @@ For security-related questions or concerns:
 - **General Questions**: Use GitHub Discussions
 - **Urgent Issues**: Discord @kjanat
 
----
+______________________________________________________________________
 
 Remember: Security is everyone's responsibility. When in doubt, report it! 🛡️

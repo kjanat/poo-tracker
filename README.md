@@ -2,7 +2,10 @@
 
 <img align="right" width="150" height="150" src="branding/logo.svg">
 
-Ever wondered if your gut's on a winning streak, or if your last kebab is about to take its revenge? Welcome to **Poo Tracker**, the brutally honest app that lets you log every majestic turd, rabbit pellet, and volcanic diarrhea eruption without shame or censorship. Because your bowel movements _do_ matter, and no, your GP isn't getting this level of data.
+Ever wondered if your gut's on a winning streak, or if your last kebab is about to take its revenge?
+Welcome to **Poo Tracker**, the brutally honest app that lets you log every majestic turd, rabbit
+pellet, and volcanic diarrhea eruption without shame or censorship. Because your bowel movements
+_do_ matter, and no, your GP isn't getting this level of data.
 
 ## 🚀 Quick Start
 
@@ -22,7 +25,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
    cd poo-tracker
    ```
 
-2. **Install dependencies:**
+1. **Install dependencies:**
 
    ```bash
    # Install Node.js dependencies (frontend + backend)
@@ -32,7 +35,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
    cd ai-service && uv sync && cd ..
    ```
 
-3. **Set up environment variables:**
+1. **Set up environment variables:**
 
    ```bash
    cp .env.example .env
@@ -42,7 +45,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
    # Edit each file with your local values
    ```
 
-4. **Start the services:**
+1. **Start the services:**
 
    ```bash
    # Start database and supporting services
@@ -55,7 +58,7 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
    pnpm dev
    ```
 
-5. **Set up the database:**
+1. **Set up the database:**
 
    ```bash
    # Run database migrations
@@ -66,10 +69,10 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
    ```
 
    A sample set of credentials for API testing is provided in
-   [`login.example.json`](login.example.json). Copy this file to
-   `login.json` if you need a local login file that's ignored by Git.
+   [`login.example.json`](login.example.json). Copy this file to `login.json` if you need a local
+   login file that's ignored by Git.
 
-6. **Open your browser:**
+1. **Open your browser:**
 
 - Frontend: <http://localhost:5173>
 - Backend API: <http://localhost:3002>
@@ -88,7 +91,8 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
 ## 🗝️ Environment Variables
 
-Each package ships with an `.env.example` file. Copy them and tweak the values before running anything:
+Each package ships with an `.env.example` file. Copy them and tweak the values before running
+anything:
 
 ```bash
 cp .env.example .env
@@ -97,15 +101,21 @@ cp backend/.env.example backend/.env
 cp ai-service/.env.example ai-service/.env
 ```
 
-These example files contain **sample credentials only**. Replace them with your real secrets and **never commit private keys or passwords** to the repository.
+These example files contain **sample credentials only**. Replace them with your real secrets and
+**never commit private keys or passwords** to the repository.
 
 ## 📖 What's the fucking point?
 
-- **Track your shits**: Log every glorious bowel movement in a timeline worthy of its own Netflix docu-series. Date, time, volume, Bristol score, color, floaters—you name it.
-- **Photo evidence**: Snap a pic for science (or just to traumatize your friends and family). Upload and catalog the full visual glory of your rectal output.
-- **Meal log**: Record what you've stuffed down your throat so you can finally prove that Taco Tuesday was, in fact, a war crime against your colon.
-- **AI-powered analysis**: Our cold, heartless machine learning model doesn't judge—just coldly correlates your food, stress, and fiber intake with your latest gut grenade.
-- **Export & share**: PDF reports for your doctor, gastroenterologist, or weird fetish community. It's your data, so overshare as you wish.
+- **Track your shits**: Log every glorious bowel movement in a timeline worthy of its own Netflix
+  docu-series. Date, time, volume, Bristol score, color, floaters—you name it.
+- **Photo evidence**: Snap a pic for science (or just to traumatize your friends and family). Upload
+  and catalog the full visual glory of your rectal output.
+- **Meal log**: Record what you've stuffed down your throat so you can finally prove that Taco
+  Tuesday was, in fact, a war crime against your colon.
+- **AI-powered analysis**: Our cold, heartless machine learning model doesn't judge—just coldly
+  correlates your food, stress, and fiber intake with your latest gut grenade.
+- **Export & share**: PDF reports for your doctor, gastroenterologist, or weird fetish community.
+  It's your data, so overshare as you wish.
 
 ## 🔧 Development
 
@@ -202,13 +212,15 @@ pnpm --parallel run dev
 ## 📝 How it works
 
 1. **Eat** something questionable.
-2. **Shit**. (Preferably in a toilet, but we're not here to kink-shame.)
-3. **Log** your experience in Poo Tracker—optionally add a photo, rate your suffering, describe the smell if you're brave enough.
-4. **Repeat** until you finally realize you're lactose intolerant or have IBS.
+1. **Shit**. (Preferably in a toilet, but we're not here to kink-shame.)
+1. **Log** your experience in Poo Tracker—optionally add a photo, rate your suffering, describe the
+   smell if you're brave enough.
+1. **Repeat** until you finally realize you're lactose intolerant or have IBS.
 
 ## 🔒 Privacy, baby
 
-We encrypt your brown notes and hide them away. Nobody's reading your logs except you—and whatever godforsaken AI wants to learn about the day-after effects of your sushi buffet.
+We encrypt your brown notes and hide them away. Nobody's reading your logs except you—and whatever
+godforsaken AI wants to learn about the day-after effects of your sushi buffet.
 
 ## 👥 Who is this for?
 
@@ -246,11 +258,11 @@ We encrypt your brown notes and hide them away. Nobody's reading your logs excep
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feat/amazing-feature`)
-3. Follow the coding standards (see [AGENTS.md](AGENTS.md))
-4. Write tests for new features
-5. Commit using conventional commits (`feat: add Bristol chart selector`)
-6. Push and create a Pull Request
+1. Create a feature branch (`git checkout -b feat/amazing-feature`)
+1. Follow the coding standards (see [AGENTS.md](AGENTS.md))
+1. Write tests for new features
+1. Commit using conventional commits (`feat: add Bristol chart selector`)
+1. Push and create a Pull Request
 
 ### Coding Standards
 
@@ -333,9 +345,9 @@ JWT_SECRET="your-super-secret-jwt-key-change-in-production"
 
 ### AI Service Environment Variables
 
-The AI service has its own `.env` file located at `ai-service/.env.example`. The
-table below lists the most relevant options. See
-[ai-service/README.md](ai-service/README.md) for full configuration details.
+The AI service has its own `.env` file located at `ai-service/.env.example`. The table below lists
+the most relevant options. See [ai-service/README.md](ai-service/README.md) for full configuration
+details.
 
 | Variable                 | Purpose                                      |
 | ------------------------ | -------------------------------------------- |
@@ -390,11 +402,12 @@ See the [LICENSE](LICENSE) file for full license details.
 
 **TL;DR**: Keep it open source, keep it free. Don't be a corporate asshole.
 
----
+______________________________________________________________________
 
-**Disclaimer:** Not responsible for phone screen damage caused by ill-advised photo documentation. Use with pride, shame, or scientific detachment. Up to you.
+**Disclaimer:** Not responsible for phone screen damage caused by ill-advised photo documentation.
+Use with pride, shame, or scientific detachment. Up to you.
 
----
+______________________________________________________________________
 
 **Golden Rule:** If your code stinks, it won't get merged. And yes, we'll know. 💩
 

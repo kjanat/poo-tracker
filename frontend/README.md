@@ -2,7 +2,9 @@
 
 > Modern React application for tracking bowel movements with style and zero shame
 
-The frontend is a responsive, type-safe React application built with modern web technologies. It provides an intuitive interface for logging bowel movements, tracking meals, viewing analytics, and managing health data.
+The frontend is a responsive, type-safe React application built with modern web technologies. It
+provides an intuitive interface for logging bowel movements, tracking meals, viewing analytics, and
+managing health data.
 
 ## 🚀 Features
 
@@ -249,11 +251,11 @@ This application handles sensitive health data:
 ## 🤝 Contributing
 
 1. Follow React and TypeScript best practices
-2. Use functional components with hooks
-3. Write tests for new components and features
-4. Follow the established file structure
-5. Use workspace commands for consistency
-6. Ensure responsive design for all new features
+1. Use functional components with hooks
+1. Write tests for new components and features
+1. Follow the established file structure
+1. Use workspace commands for consistency
+1. Ensure responsive design for all new features
 
 ### Component Guidelines
 
@@ -271,6 +273,6 @@ This frontend integrates with:
 - **AI Service**: `../ai-service/` - Pattern analysis and recommendations
 - **Docker Services**: PostgreSQL, Redis, MinIO for complete functionality
 
----
+______________________________________________________________________
 
 _Built with ❤️ and a healthy sense of humor for tracking life's most honest moments._
