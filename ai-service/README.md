@@ -306,6 +306,6 @@ This service is designed to work with:
 - **Database**: PostgreSQL with Prisma ORM
 - **Caching**: Redis for performance optimization
 
-______________________________________________________________________
+---
 
 _Built with ❤️ and a healthy sense of humor for the Poo Tracker project._

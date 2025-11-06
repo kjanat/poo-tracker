@@ -427,7 +427,7 @@ We appreciate all contributions! Contributors are recognized through:
 - **Community shout-outs**
 - **Maintainer privileges** for consistent contributors
 
-______________________________________________________________________
+---
 
 ## Final Words
 
@@ -438,7 +438,7 @@ questions, make mistakes, or suggest improvements.
 
 Happy coding, you magnificent bastards! 🚀
 
-______________________________________________________________________
+---
 
 _For questions about contributing, reach out to [@kjanat](https://github.com/kjanat) or start a
 discussion._

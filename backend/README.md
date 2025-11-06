@@ -422,6 +422,6 @@ This backend integrates with:
 - **Storage**: S3/MinIO for file storage and management
 - **Cache**: Redis for performance optimization
 
-______________________________________________________________________
+---
 
 _Built with 💩 and professional engineering standards for reliable health data management._

@@ -402,12 +402,12 @@ See the [LICENSE](LICENSE) file for full license details.
 
 **TL;DR**: Keep it open source, keep it free. Don't be a corporate asshole.
 
-______________________________________________________________________
+---
 
 **Disclaimer:** Not responsible for phone screen damage caused by ill-advised photo documentation.
 Use with pride, shame, or scientific detachment. Up to you.
 
-______________________________________________________________________
+---
 
 **Golden Rule:** If your code stinks, it won't get merged. And yes, we'll know. 💩
 
