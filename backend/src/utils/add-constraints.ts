@@ -2,6 +2,11 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
+/**
+ * Adds a predefined set of SQL CHECK constraints to the application's database tables.
+ *
+ * Executes a list of ALTER TABLE ... ADD CONSTRAINT statements via the Prisma client and logs a success message with the constraint name for each constraint applied or an error message if application fails.
+ */
 async function addConstraints() {
   const constraints = [
     `ALTER TABLE users ADD CONSTRAINT IF NOT EXISTS check_email_format

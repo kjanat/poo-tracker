@@ -33,6 +33,12 @@ const CustomTooltip = ({ active, payload }: TooltipProps) => {
   return null
 }
 
+/**
+ * Render a bar chart showing the distribution of Bristol stool types from the provided summary.
+ *
+ * @param summary - AnalyticsSummary whose `bristolDistribution` array is used to build the chart data
+ * @returns The JSX element containing the rendered distribution chart
+ */
 export function BristolDistributionChart({ summary }: BristolDistributionChartProps) {
   const chartData = summary.bristolDistribution.map((item) => ({
     type: item.type,
