@@ -6,6 +6,33 @@ interface BristolDistributionChartProps {
   summary: AnalyticsSummary
 }
 
+interface TooltipProps {
+  active?: boolean
+  payload?: Array<{
+    payload: {
+      type: number
+      description: string
+      count: number
+    }
+  }>
+}
+
+const CustomTooltip = ({ active, payload }: TooltipProps) => {
+  if (active && payload && payload.length) {
+    const data = payload[0]?.payload
+    if (!data) return null
+
+    return (
+      <div className="bg-white p-3 border border-gray-200 rounded shadow">
+        <p className="font-medium">{`Type ${data.type}`}</p>
+        <p className="text-sm text-gray-600">{data.description}</p>
+        <p className="text-blue-600">{`Count: ${data.count}`}</p>
+      </div>
+    )
+  }
+  return null
+}
+
 export function BristolDistributionChart({ summary }: BristolDistributionChartProps) {
   const chartData = summary.bristolDistribution.map((item) => ({
     type: item.type,
@@ -13,33 +40,6 @@ export function BristolDistributionChart({ summary }: BristolDistributionChartPr
     description: BristolAnalyzer.getDescription(item.type),
     color: BristolAnalyzer.getColor(item.type)
   }))
-
-  interface TooltipProps {
-    active?: boolean
-    payload?: Array<{
-      payload: {
-        type: number
-        description: string
-        count: number
-      }
-    }>
-  }
-
-  const CustomTooltip = ({ active, payload }: TooltipProps) => {
-    if (active && payload && payload.length) {
-      const data = payload[0]?.payload
-      if (!data) return null
-
-      return (
-        <div className="bg-white p-3 border border-gray-200 rounded shadow">
-          <p className="font-medium">{`Type ${data.type}`}</p>
-          <p className="text-sm text-gray-600">{data.description}</p>
-          <p className="text-blue-600">{`Count: ${data.count}`}</p>
-        </div>
-      )
-    }
-    return null
-  }
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">

@@ -16,13 +16,14 @@ This is a FastAPI-based microservice that provides intelligent analysis of bowel
 
 ## 🛠 Tech Stack
 
-- **Framework**: FastAPI 0.115.12
+- **Framework**: FastAPI 0.115+
 - **Language**: Python 3.9+
 - **Data Analysis**: pandas, numpy, scikit-learn
-- **Caching**: Redis 6.2.0
+- **Caching**: Redis (optional, with graceful degradation)
 - **API Documentation**: Built-in Swagger/OpenAPI
 - **Testing**: pytest with asyncio support
-- **Code Quality**: ruff, black, isort, mypy
+- **Code Quality**: ruff for linting and formatting
+- **Package Manager**: uv (fast Python package manager)
 - **Containerization**: Docker
 
 ## 📋 Prerequisites

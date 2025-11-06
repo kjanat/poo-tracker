@@ -208,10 +208,12 @@ export class BowelMovementService {
 
     return {
       totalBowelMovements,
-      bristolDistribution: bristolStats.map((stat) => ({
-        type: stat.bristolType,
-        count: stat._count.bristolType
-      })),
+      bristolDistribution: bristolStats.map(
+        (stat: { bristolType: number; _count: { bristolType: number } }) => ({
+          type: stat.bristolType,
+          count: stat._count.bristolType
+        })
+      ),
       averageSatisfaction: satisfactionAvg._avg.satisfaction,
       averagePain: painAvg._avg.pain,
       recentBowelMovements
