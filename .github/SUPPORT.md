@@ -245,13 +245,11 @@ pnpm prisma migrate reset
    ```
 
 1. **Use the debugger:**
-
    - Frontend: Browser dev tools
    - Backend: VS Code debugger or `console.log`
    - AI Service: Python debugger or print statements
 
 1. **Isolate the problem:**
-
    - Test individual components
    - Use minimal reproduction cases
    - Check network requests in dev tools
@@ -305,7 +303,7 @@ If you're not getting the help you need:
 1. **Tag maintainers** - Use @mentions sparingly and only when necessary
 1. **Contact directly** - Email for urgent or sensitive matters
 
-______________________________________________________________________
+---
 
 ## 💡 Pro Tips
 
@@ -315,7 +313,7 @@ ______________________________________________________________________
 - **Show your work** - explain what you've already tried
 - **Follow up** - let us know if solutions work
 
-______________________________________________________________________
+---
 
 Remember: There are no stupid questions, only stupid answers! 💩
 

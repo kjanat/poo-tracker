@@ -33,7 +33,7 @@ ______________________________________________________________________
 1. **Component-based everything.** No 1,000-line files. If your React component grows a tumor, split
    it.
 
-1. **Tailwind > CSS files** No CSS modules, no SCSS, no “quick fixes” in styles.css. Utility-first
+1. **Tailwind > CSS files** No CSS modules, no SCSS, no "quick fixes" in styles.css. Utility-first
    or GTFO.
 
 1. **Backend: RESTful.** If you say “GraphQL” I’ll call your mother.
@@ -53,7 +53,7 @@ ______________________________________________________________________
 
 1. **Follow commit conventions**:
 
-   ```
+   ```bash
    feat: add Bristol stool chart selector
    fix: correct off-by-one in shit counter
    chore: update dependencies

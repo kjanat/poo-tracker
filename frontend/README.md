@@ -273,6 +273,6 @@ This frontend integrates with:
 - **AI Service**: `../ai-service/` - Pattern analysis and recommendations
 - **Docker Services**: PostgreSQL, Redis, MinIO for complete functionality
 
-______________________________________________________________________
+---
 
 _Built with ❤️ and a healthy sense of humor for tracking life's most honest moments._
