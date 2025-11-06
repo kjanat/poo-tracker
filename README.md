@@ -324,8 +324,8 @@ The pre-commit hooks include:
 
 ### Docker Images
 
-Pre-built Docker images are automatically published to GitHub Container Registry (GHCR) on every push
-to `master`:
+Pre-built Docker images are automatically published to GitHub Container Registry (GHCR) on every
+push to `master`:
 
 ```bash
 # Pull the latest AI service image
