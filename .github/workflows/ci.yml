@@ -342,14 +342,6 @@ jobs:
             VCS_REF=${{ github.sha }}
             VERSION=${{ steps.meta-ai.outputs.version }}
 
-      - name: 📋 Generate SBOM attestation for AI Service
-        uses: actions/attest-sbom@v1
-        with:
-          subject-name: ghcr.io/${{ github.repository }}/ai-service
-          subject-digest: ${{ steps.push-ai.outputs.digest }}
-          sbom-path: ${{ steps.push-ai.outputs.metadata }}
-          push-to-registry: true
-
       - name: ✍️ Generate provenance attestation for AI Service
         uses: actions/attest-build-provenance@v1
         with:
