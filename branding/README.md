@@ -34,13 +34,11 @@ This directory contains all the branding assets for the Poo Tracker application,
 The branding assets are integrated throughout the poo-tracker frontend:
 
 1. **HTML Head** (`frontend/index.html`):
-
    - Multiple favicon sizes for different contexts
    - PWA manifest integration
    - Mobile app meta tags
 
 2. **React Components**:
-
    - `Logo.tsx` - TypeScript component with size/className props
    - Used in Navbar, HomePage, and LoginPage
 
