@@ -6,7 +6,7 @@
 
 If your code stinks, it won’t get merged. And yes, we’ll know.
 
-______________________________________________________________________
+---
 
 ## Tech Stack
 
@@ -23,7 +23,7 @@ ______________________________________________________________________
   - pnpm (because npm is for amateurs)
   - uv (for Python, because pip is for amateurs)
 
-______________________________________________________________________
+---
 
 ## Coding Practices
 
@@ -59,7 +59,7 @@ ______________________________________________________________________
    chore: update dependencies
    ```
 
-______________________________________________________________________
+---
 
 ## Branching, PRs, and CI
 
@@ -69,7 +69,7 @@ ______________________________________________________________________
   80% awake.
 - Green CI/CD or no merge.
 
-______________________________________________________________________
+---
 
 ## What NOT to do
 
@@ -79,7 +79,7 @@ ______________________________________________________________________
 - No “console.log debugging” left in PRs
 - No “fix later” TODOs, unless it’s properly documented and assigned
 
-______________________________________________________________________
+---
 
 ## Golden Rules
 
@@ -87,6 +87,6 @@ ______________________________________________________________________
 - Clean code = Clean colon.
 - Don’t be an asshole in code reviews, unless the code really deserves it.
 
-______________________________________________________________________
+---
 
 That’s it. Now go code, you magnificent bastard.

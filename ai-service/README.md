@@ -91,6 +91,23 @@ uvicorn ai_service.main:app --host 0.0.0.0 --port 8000 --workers 4
 
 ### Docker
 
+#### Using Pre-built Images from GHCR
+
+```bash
+# Pull the latest image
+docker pull ghcr.io/kjanat/poo-tracker/ai-service:latest
+
+# Run the container
+docker run -p 8000:8000 ghcr.io/kjanat/poo-tracker/ai-service:latest
+
+# With Redis connection
+docker run -p 8000:8000 \
+  -e REDIS_URL=redis://your-redis-host:6379 \
+  ghcr.io/kjanat/poo-tracker/ai-service:latest
+```
+
+#### Building Locally
+
 ```bash
 # Build the image
 docker build -t poo-tracker-ai .
