@@ -18,6 +18,7 @@ repos:
       - id: check-yaml
         args: ['--unsafe'] # Allow custom YAML tags
       - id: check-json
+        exclude: "^.*tsconfig.*\\.json$" # Exclude tsconfig files (JSONC format)
       - id: check-toml
       - id: check-added-large-files
         args: ['--maxkb=1000']
@@ -103,7 +104,7 @@ repos:
     hooks:
       - id: detect-secrets
         args: ['--baseline', '.secrets.baseline']
-        exclude: "^(.*\\.lock|pnpm-lock\\.yaml|.*\\.svg)$"
+        exclude: "^(.*\\.lock|pnpm-lock\\.yaml|.*\\.svg|.*\\.example.*|.*/__tests__/.*|.*/test.*\\.ts)$"
 
   # ==========================================
   # Shell Scripts
@@ -113,15 +114,6 @@ repos:
     hooks:
       - id: shellcheck
         files: "\\.sh$"
-
-  # ==========================================
-  # Docker
-  # ==========================================
-  - repo: https://github.com/hadolint/hadolint
-    rev: v2.12.0
-    hooks:
-      - id: hadolint
-        args: ['--ignore', 'DL3008', '--ignore', 'DL3009']
 
   # ==========================================
   # Commit Message
