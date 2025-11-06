@@ -78,8 +78,8 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
 ## 🏗️ Tech Stack
 
-- **Frontend**: React 19 + Vite 6 + TypeScript 5.8 + TailwindCSS v4
-- **Backend**: Node.js 22 + Express v5 + TypeScript 5.8 + Prisma v6.10
+- **Frontend**: React 19 + Vite 6 + TypeScript 5.9 + TailwindCSS v4
+- **Backend**: Node.js 22 + Express v5 + TypeScript 5.9 + Prisma v6.10
 - **Database**: PostgreSQL 17
 - **Storage**: MinIO (S3-compatible for photos)
 - **AI Service**: Python 3.9+ + FastAPI + scikit-learn
@@ -137,7 +137,7 @@ pnpm docker:down      # Stop all Docker services
 # Testing & Quality
 pnpm test             # Run all tests (frontend + backend)
 pnpm test:watch       # Run tests in watch mode
-pnpm type-check       # Run TypeScript type checking
+pnpm typecheck        # Run TypeScript type checking
 pnpm lint             # Run linters on all projects
 pnpm lint:fix         # Auto-fix linting issues
 pnpm clean            # Clean all build artifacts

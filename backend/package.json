@@ -21,7 +21,7 @@
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset",
     "db:constraints": "tsx src/utils/add-constraints.ts",
-    "type-check": "tsc --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "engines": {
     "node": ">=22.0.0",

@@ -26,10 +26,10 @@
     "test:backend": "pnpm --filter @poo-tracker/backend run test",
     "test:frontend": "pnpm --filter @poo-tracker/frontend run test",
     "test:watch": "pnpm --recursive run test:watch",
-    "type-check": "pnpm --recursive run type-check",
-    "type-check:frontend": "pnpm --filter @poo-tracker/frontend run type-check",
-    "type-check:backend": "pnpm --filter @poo-tracker/backend run type-check",
-    "type-check:ai": "uv run ruff check ai-service",
+    "typecheck": "pnpm --recursive run typecheck",
+    "typecheck:frontend": "pnpm --filter @poo-tracker/frontend run typecheck",
+    "typecheck:backend": "pnpm --filter @poo-tracker/backend run typecheck",
+    "typecheck:ai": "uv run ruff check ai-service",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "db:generate": "pnpm --filter @poo-tracker/backend run db:generate",
@@ -85,11 +85,11 @@
   },
   "lint-staged": {
     "backend/**/*.{ts,tsx,js,jsx}": [
-      "bash -c 'cd backend && pnpm type-check'",
+      "bash -c 'cd backend && pnpm typecheck'",
       "pnpm format:backend"
     ],
     "frontend/**/*.{ts,tsx,js,jsx}": [
-      "bash -c 'cd frontend && pnpm type-check'",
+      "bash -c 'cd frontend && pnpm typecheck'",
       "pnpm format:frontend"
     ],
     "ai-service/**/*.py": [

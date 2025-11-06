@@ -19,7 +19,9 @@ const mockPrismaClient = vi.hoisted(() => ({
 }))
 
 vi.mock('@prisma/client', () => ({
-  PrismaClient: vi.fn().mockImplementation(() => mockPrismaClient)
+  PrismaClient: function PrismaClient() {
+    return mockPrismaClient
+  }
 }))
 
 vi.mock('../../config', () => ({
