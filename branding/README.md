@@ -35,15 +35,18 @@ source `logo.svg` file using our automated SVG conversion workflow.
 The branding assets are integrated throughout the poo-tracker frontend:
 
 1. **HTML Head** (`frontend/index.html`):
+
    - Multiple favicon sizes for different contexts
    - PWA manifest integration
    - Mobile app meta tags
 
 1. **React Components**:
+
    - `Logo.tsx` - TypeScript component with size/className props
    - Used in Navbar, HomePage, and LoginPage
 
 1. **PWA Manifest** (`frontend/public/manifest.json`):
+
    - App name, description, theme colors
    - Icon definitions for installation
    - Standalone app configuration
