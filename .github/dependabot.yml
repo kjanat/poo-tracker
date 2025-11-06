@@ -2,45 +2,11 @@ version: 2
 updates:
   # Frontend dependencies
   - package-ecosystem: 'npm'
+    directories:
+      - "/"
+      - "/frontend"
+      - "/backend"
     directory: '/frontend'
-    schedule:
-      interval: 'weekly'
-      day: 'monday'
-      time: '09:00'
-    open-pull-requests-limit: 2
-    labels:
-      - 'dependencies'
-      - 'frontend'
-    commit-message:
-      prefix: '⬆️'
-      include: 'scope'
-    groups:
-      frontend-deps:
-        patterns:
-          - '*'
-
-  # Backend dependencies
-  - package-ecosystem: 'npm'
-    directory: '/backend'
-    schedule:
-      interval: 'weekly'
-      day: 'monday'
-      time: '09:00'
-    open-pull-requests-limit: 2
-    labels:
-      - 'dependencies'
-      - 'backend'
-    commit-message:
-      prefix: '⬆️'
-      include: 'scope'
-    groups:
-      backend-deps:
-        patterns:
-          - '*'
-
-  # Root workspace dependencies
-  - package-ecosystem: 'npm'
-    directory: '/'
     schedule:
       interval: 'weekly'
       day: 'monday'
@@ -48,17 +14,16 @@ updates:
     open-pull-requests-limit: 1
     labels:
       - 'dependencies'
-      - 'workspace'
     commit-message:
       prefix: '⬆️'
       include: 'scope'
     groups:
-      root-deps:
+      all:
         patterns:
           - '*'
 
   # AI Service Python dependencies
-  - package-ecosystem: 'pip'
+  - package-ecosystem: 'uv'
     directory: '/ai-service'
     schedule:
       interval: 'weekly'
@@ -73,13 +38,15 @@ updates:
       prefix: '⬆️'
       include: 'scope'
     groups:
-      ai-service-py:
+      all:
         patterns:
           - '*'
 
   # Docker dependencies
   - package-ecosystem: 'docker'
-    directory: '/ai-service'
+    directories:
+      - '/'
+      - '/ai-service'
     schedule:
       interval: 'weekly'
       day: 'monday'
@@ -90,10 +57,15 @@ updates:
       - 'docker'
     commit-message:
       prefix: '🐳'
+    groups:
+      all:
+        patterns:
+          - '*'
 
   # Docker Compose
-  - package-ecosystem: 'docker'
-    directory: '/'
+  - package-ecosystem: '	docker-compose'
+    directories:
+      - '/'
     schedule:
       interval: 'weekly'
       day: 'monday'
@@ -104,6 +76,10 @@ updates:
       - 'docker-compose'
     commit-message:
       prefix: '🐳'
+    groups:
+      all:
+        patterns:
+          - '*'
 
   # GitHub Actions
   - package-ecosystem: 'github-actions'
@@ -118,3 +94,7 @@ updates:
       - 'github-actions'
     commit-message:
       prefix: '⚡'
+    groups:
+      all:
+        patterns:
+          - '*'
