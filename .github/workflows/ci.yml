@@ -42,7 +42,7 @@ jobs:
         run: pnpm install
 
       - name: 🔍 Type check
-        run: pnpm type-check:frontend
+        run: pnpm typecheck:frontend
 
       - name: 🧹 Lint
         run: pnpm lint:frontend
@@ -133,7 +133,7 @@ jobs:
           REDIS_URL: ${{ env.REDIS_URL }}
 
       - name: 🔍 Type check
-        run: pnpm type-check:backend
+        run: pnpm typecheck:backend
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
           REDIS_URL: ${{ env.REDIS_URL }}
