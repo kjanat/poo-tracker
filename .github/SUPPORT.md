@@ -10,7 +10,8 @@ Please check these resources first:
 
 - 📚 **[README](../README.md)** - Basic setup and usage information
 - 📖 **[Documentation](https://github.com/kjanat/poo-tracker/wiki)** - Detailed guides and tutorials
-- 🔍 **[Existing Issues](https://github.com/kjanat/poo-tracker/issues)** - Someone might have already asked
+- 🔍 **[Existing Issues](https://github.com/kjanat/poo-tracker/issues)** - Someone might have already
+  asked
 - 💬 **[Discussions](https://github.com/kjanat/poo-tracker/discussions)** - Community Q&A
 
 ## 🆘 Getting Help
@@ -60,7 +61,8 @@ If you're developing with or contributing to Poo Tracker:
 
 #### 4. 🔧 Architecture Questions
 
-- Use **[GitHub Discussions](https://github.com/kjanat/poo-tracker/discussions)** for design questions
+- Use **[GitHub Discussions](https://github.com/kjanat/poo-tracker/discussions)** for design
+  questions
 - Tag discussions with appropriate labels
 
 ## 📞 Contact Methods
@@ -242,12 +244,14 @@ pnpm prisma migrate reset
    docker-compose logs ai-service
    ```
 
-2. **Use the debugger:**
+1. **Use the debugger:**
+
    - Frontend: Browser dev tools
    - Backend: VS Code debugger or `console.log`
    - AI Service: Python debugger or print statements
 
-3. **Isolate the problem:**
+1. **Isolate the problem:**
+
    - Test individual components
    - Use minimal reproduction cases
    - Check network requests in dev tools
@@ -278,7 +282,8 @@ pnpm prisma migrate reset
 | **Question**        | Within 24-48 hours | Usually same day |
 | **Documentation**   | Within 48 hours    | 1-2 weeks        |
 
-_Note: These are goals, not guarantees. Response times may vary based on complexity and maintainer availability._
+_Note: These are goals, not guarantees. Response times may vary based on complexity and maintainer
+availability._
 
 ## 🤝 Community Guidelines
 
@@ -295,12 +300,12 @@ When asking for help:
 If you're not getting the help you need:
 
 1. **Wait for response time** - Give it at least 48 hours for non-critical issues
-2. **Provide more details** - Add additional context to your request
-3. **Try different channels** - Move from Discord to GitHub Issues for example
-4. **Tag maintainers** - Use @mentions sparingly and only when necessary
-5. **Contact directly** - Email for urgent or sensitive matters
+1. **Provide more details** - Add additional context to your request
+1. **Try different channels** - Move from Discord to GitHub Issues for example
+1. **Tag maintainers** - Use @mentions sparingly and only when necessary
+1. **Contact directly** - Email for urgent or sensitive matters
 
----
+______________________________________________________________________
 
 ## 💡 Pro Tips
 
@@ -310,7 +315,7 @@ If you're not getting the help you need:
 - **Show your work** - explain what you've already tried
 - **Follow up** - let us know if solutions work
 
----
+______________________________________________________________________
 
 Remember: There are no stupid questions, only stupid answers! 💩
 

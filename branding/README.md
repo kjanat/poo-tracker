@@ -1,6 +1,7 @@
 # Poo Tracker Branding Assets
 
-This directory contains all the branding assets for the Poo Tracker application, generated from the source `logo.svg` file using our automated SVG conversion workflow.
+This directory contains all the branding assets for the Poo Tracker application, generated from the
+source `logo.svg` file using our automated SVG conversion workflow.
 
 ## Generated Assets
 
@@ -34,15 +35,18 @@ This directory contains all the branding assets for the Poo Tracker application,
 The branding assets are integrated throughout the poo-tracker frontend:
 
 1. **HTML Head** (`frontend/index.html`):
+
    - Multiple favicon sizes for different contexts
    - PWA manifest integration
    - Mobile app meta tags
 
-2. **React Components**:
+1. **React Components**:
+
    - `Logo.tsx` - TypeScript component with size/className props
    - Used in Navbar, HomePage, and LoginPage
 
-3. **PWA Manifest** (`frontend/public/manifest.json`):
+1. **PWA Manifest** (`frontend/public/manifest.json`):
+
    - App name, description, theme colors
    - Icon definitions for installation
    - Standalone app configuration
@@ -68,9 +72,9 @@ Assets are generated using our custom SVG Converter GitHub Action:
 ### Usage Standards
 
 1. **Primary Logo**: Use `logo.svg` for all scalable contexts
-2. **Favicons**: Automatically handled by HTML head configuration
-3. **React Components**: Import `Logo` component, specify size prop
-4. **Mobile Apps**: Use appropriate PNG sizes for different screen densities
+1. **Favicons**: Automatically handled by HTML head configuration
+1. **React Components**: Import `Logo` component, specify size prop
+1. **Mobile Apps**: Use appropriate PNG sizes for different screen densities
 
 ### Brand Colors
 
@@ -92,9 +96,9 @@ Assets are generated using our custom SVG Converter GitHub Action:
 ### Updating the Logo
 
 1. Edit `branding/logo.svg` with your design changes
-2. Commit and push to trigger automatic asset generation
-3. New assets will be generated and committed automatically
-4. Update any hardcoded references if needed
+1. Commit and push to trigger automatic asset generation
+1. New assets will be generated and committed automatically
+1. Update any hardcoded references if needed
 
 ### Adding New Formats
 

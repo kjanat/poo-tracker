@@ -16,7 +16,8 @@ Closes #<!-- issue number -->
 
 - [ ] 🐛 Bug fix (non-breaking change which fixes an issue)
 - [ ] ✨ New feature (non-breaking change which adds functionality)
-- [ ] 💥 Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] 💥 Breaking change (fix or feature that would cause existing functionality to not work as
+  expected)
 - [ ] 📚 Documentation update
 - [ ] 🔧 Refactoring (no functional changes)
 - [ ] ⚡ Performance improvement
@@ -59,8 +60,8 @@ Closes #<!-- issue number -->
 <!-- Provide step-by-step instructions for testing this PR -->
 
 1.
-2.
-3.
+1.
+1.
 
 ## 📸 Screenshots
 
@@ -120,7 +121,7 @@ Closes #<!-- issue number -->
 
 @kjanat
 
----
+______________________________________________________________________
 
 ## Code Quality Reminder
 

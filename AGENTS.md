@@ -2,11 +2,14 @@
 
 ## Overview
 
-This file specifies instructions and standards for all AI agents, bots, GitHub Actions, and automated tools operating within the **poo-tracker** repository. All agents must follow these guidelines when reading, analyzing, changing, or generating code.
+This file specifies instructions and standards for all AI agents, bots, GitHub Actions, and
+automated tools operating within the **poo-tracker** repository. All agents must follow these
+guidelines when reading, analyzing, changing, or generating code.
 
-**Target Audience**: AI coding assistants, GitHub Actions, automated deployment tools, linting bots, and any other autonomous systems interacting with this codebase.
+**Target Audience**: AI coding assistants, GitHub Actions, automated deployment tools, linting bots,
+and any other autonomous systems interacting with this codebase.
 
----
+______________________________________________________________________
 
 ## Project Structure & Architecture
 
@@ -46,7 +49,7 @@ poo-tracker/
 - **Infrastructure**: Docker, PostgreSQL, Redis, MinIO (S3-compatible)
 - **Workspace**: pnpm workspaces for monorepo management
 
----
+______________________________________________________________________
 
 ## Package Management & Workspace Commands
 
@@ -82,7 +85,7 @@ pip install fastapi
 python -m pip install -r requirements.txt
 ```
 
----
+______________________________________________________________________
 
 ## Coding Conventions & Style Guide
 
@@ -152,7 +155,7 @@ uvx ruff check .    # Lint code
 uvx pytest          # Run tests
 ```
 
----
+______________________________________________________________________
 
 ## Testing Protocols
 
@@ -188,7 +191,7 @@ cd ai-service && uvx pytest --cov=main # With coverage
 - Mock external dependencies (Redis, PostgreSQL) appropriately
 - Use workspace-aware test commands
 
----
+______________________________________________________________________
 
 ## Automated Checks & CI/CD
 
@@ -217,10 +220,14 @@ uvx mypy main.py          # Type checking
 
 ### 🚦 GitHub Actions Workflows
 
-- **CI Pipeline** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)): Code formatting, linting, and testing
-- **Format Pipeline** ([`.github/workflows/format.yml`](.github/workflows/format.yml)): Asset generation
-- **SVG Converter** ([`.github/workflows/svg-convert.yml`](.github/workflows/svg-convert.yml)): Asset generation
-- **Release Pipeline** ([`.github/workflows/release.yml`](.github/workflows/release.yml)): Deployment automation
+- **CI Pipeline** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)): Code formatting,
+  linting, and testing
+- **Format Pipeline** ([`.github/workflows/format.yml`](.github/workflows/format.yml)): Asset
+  generation
+- **SVG Converter** ([`.github/workflows/svg-convert.yml`](.github/workflows/svg-convert.yml)):
+  Asset generation
+- **Release Pipeline** ([`.github/workflows/release.yml`](.github/workflows/release.yml)):
+  Deployment automation
 
 ### 🐳 Docker & Infrastructure
 
@@ -230,7 +237,7 @@ uvx mypy main.py          # Type checking
 - MinIO for S3-compatible file storage
 - Workspace commands: `pnpm docker:up`, `pnpm docker:down`
 
----
+______________________________________________________________________
 
 ## Pull Request Guidelines
 
@@ -266,7 +273,7 @@ chore: update dependencies
 - [ ] No breaking changes (or clearly documented)
 - [ ] Environment variables documented in [`.env.example`](.env.example)
 
----
+______________________________________________________________________
 
 ## Task & Workflow Definitions
 
@@ -274,7 +281,9 @@ chore: update dependencies
 
 - **Trigger**: SVG file changes in `branding/` directory
 - **Action**: Convert SVGs to ICO, PNG, React, React Native formats
-- **Tool**: [`kjanat/svg-converter-action`](https://github.com/kjanat/svg-converter-action 'GitHub: kjanat/svg-converter-action'), a custom GitHub Action
+- **Tool**:
+  [`kjanat/svg-converter-action`](https://github.com/kjanat/svg-converter-action "GitHub: kjanat/svg-converter-action"),
+  a custom GitHub Action
 - **Output**: Auto-commit generated assets
 
 ### 🔧 Dependency Update Agent
@@ -291,7 +300,7 @@ chore: update dependencies
 - **Requirements**: All CI checks must pass
 - **Build**: Use `pnpm build` for workspace builds
 
----
+______________________________________________________________________
 
 ## Directory/Scope Rules
 
@@ -305,21 +314,22 @@ chore: update dependencies
 
 ### 🚨 Protected Areas
 
-- **Never modify**: [`pnpm-lock.yaml`](pnpm-lock.yaml), [`uv.lock`](ai-service/uv.lock), generated migration files
+- **Never modify**: [`pnpm-lock.yaml`](pnpm-lock.yaml), [`uv.lock`](ai-service/uv.lock), generated
+  migration files
 - **Careful with**: Database schema changes, Docker configurations, workspace structure
 - **Always validate**: Environment variable changes, workspace dependencies
 
----
+______________________________________________________________________
 
 ## Error Handling & Escalation
 
 ### ❌ When Things Go Wrong
 
 1. **Log detailed error messages** with context
-2. **Include relevant file paths** and line numbers
-3. **Capture command output** for debugging
-4. **Check workspace configuration** for dependency issues
-5. **Reference this AGENTS.md** for guidance
+1. **Include relevant file paths** and line numbers
+1. **Capture command output** for debugging
+1. **Check workspace configuration** for dependency issues
+1. **Reference this AGENTS.md** for guidance
 
 ### 🆘 Escalation Process
 
@@ -335,22 +345,22 @@ chore: update dependencies
 - **Issues**: Use GitHub Issues for bugs/feature requests
 - **Discussions**: Use GitHub Discussions for questions
 
----
+______________________________________________________________________
 
 ## Golden Rules for Agents
 
 ### 💎 The Sacred Laws
 
 1. **🚫 No broken builds** - If tests fail, fix or abort
-2. **🎯 TypeScript everywhere** - No JavaScript allowed in frontend/backend
-3. **🧪 Test everything** - No untested code
-4. **📚 Document changes** - Update docs when needed
-5. **🔒 Never commit secrets** - Use environment variables
-6. **🎨 Follow the style** - Use project formatters and linters
-7. **🔄 Use proper tools** - pnpm for Node.js, uv for Python
-8. **🐳 Docker for dev** - Use docker-compose for local development
-9. **🏗️ Respect workspace** - Use pnpm workspace commands exclusively
-10. **📦 Modern tooling** - uv for Python, pnpm 9+ for Node.js
+1. **🎯 TypeScript everywhere** - No JavaScript allowed in frontend/backend
+1. **🧪 Test everything** - No untested code
+1. **📚 Document changes** - Update docs when needed
+1. **🔒 Never commit secrets** - Use environment variables
+1. **🎨 Follow the style** - Use project formatters and linters
+1. **🔄 Use proper tools** - pnpm for Node.js, uv for Python
+1. **🐳 Docker for dev** - Use docker-compose for local development
+1. **🏗️ Respect workspace** - Use pnpm workspace commands exclusively
+1. **📦 Modern tooling** - uv for Python, pnpm 9+ for Node.js
 
 ### 🔧 Workspace-Specific Rules
 
@@ -358,7 +368,8 @@ chore: update dependencies
 - **Respect package scoping** - `@poo-tracker/frontend`, `@poo-tracker/backend`
 - **Use workspace scripts** - `pnpm dev`, `pnpm build`, `pnpm test`
 - **Share common configs** - TypeScript, Prettier, ESLint in root when possible
-- **Python isolation** - Keep Python dependencies in [`ai-service/pyproject.toml`](ai-service/pyproject.toml) and use `uv` for management
+- **Python isolation** - Keep Python dependencies in
+  [`ai-service/pyproject.toml`](ai-service/pyproject.toml) and use `uv` for management
 
 ### 🎉 Success Metrics
 
@@ -369,15 +380,14 @@ chore: update dependencies
 - Documentation updated 📖
 - PR approved by human reviewer 👤
 
----
+______________________________________________________________________
 
 ## Version & Updates
 
-**Last Updated**: June 15, 2025  
-**Version**: 2.0.0  
-**Major Changes**: Added pnpm workspace configuration, uv Python tooling  
-**Next Review**: When major architecture changes occur
+**Last Updated**: June 15, 2025 **Version**: 2.0.0 **Major Changes**: Added pnpm workspace
+configuration, uv Python tooling **Next Review**: When major architecture changes occur
 
----
+______________________________________________________________________
 
-_Remember: If your code stinks, it won't get merged. Use the workspace properly, keep it clean, tested, and documented!_ 💩✨
+_Remember: If your code stinks, it won't get merged. Use the workspace properly, keep it clean,
+tested, and documented!_ 💩✨

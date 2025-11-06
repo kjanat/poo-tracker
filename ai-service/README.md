@@ -2,7 +2,8 @@
 
 > AI-powered analysis for bowel movement patterns and correlations
 
-This is a FastAPI-based microservice that provides intelligent analysis of bowel movement data, meal correlations, and generates personalized health insights and recommendations.
+This is a FastAPI-based microservice that provides intelligent analysis of bowel movement data, meal
+correlations, and generates personalized health insights and recommendations.
 
 ## 🚀 Features
 
@@ -103,9 +104,8 @@ docker run -p 8000:8000 -e REDIS_URL=redis://your-redis-host:6379 poo-tracker-ai
 
 #### Docker + Redis Quickstart
 
-Running the container with a Redis instance lets the service cache results and improves
-overall performance. Specify the `REDIS_URL` and `PORT` environment variables when starting
-the image.
+Running the container with a Redis instance lets the service cache results and improves overall
+performance. Specify the `REDIS_URL` and `PORT` environment variables when starting the image.
 
 ```bash
 # Launch Redis (optional)
@@ -283,14 +283,15 @@ The service gracefully handles Redis unavailability:
 
 ## 🚨 Health Disclaimers
 
-This AI service provides **educational insights only** and should not replace professional medical advice. Users experiencing persistent digestive issues should consult healthcare providers.
+This AI service provides **educational insights only** and should not replace professional medical
+advice. Users experiencing persistent digestive issues should consult healthcare providers.
 
 ## 🤝 Contributing
 
 1. Follow the coding standards defined in `pyproject.toml`
-2. Run tests and quality checks before submitting
-3. Update tests for new features
-4. Follow the existing code style and patterns
+1. Run tests and quality checks before submitting
+1. Update tests for new features
+1. Follow the existing code style and patterns
 
 ## 📝 License
 
@@ -305,6 +306,6 @@ This service is designed to work with:
 - **Database**: PostgreSQL with Prisma ORM
 - **Caching**: Redis for performance optimization
 
----
+______________________________________________________________________
 
 _Built with ❤️ and a healthy sense of humor for the Poo Tracker project._
