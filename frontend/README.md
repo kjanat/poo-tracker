@@ -27,7 +27,7 @@ The frontend is a responsive, type-safe React application built with modern web 
 - **Charts**: Recharts for data visualizations
 - **HTTP Client**: Axios for API communication
 - **Testing**: Vitest + React Testing Library
-- **Type Safety**: TypeScript 5.8 throughout
+- **Type Safety**: TypeScript 5.9 throughout
 
 ## 📋 Prerequisites
 
