@@ -178,10 +178,12 @@ export class MealService {
 
     return {
       totalMeals,
-      mealsByCategory: categoryStats.map((stat) => ({
-        category: stat.category || 'Uncategorized',
-        count: stat._count.category
-      })),
+      mealsByCategory: categoryStats.map(
+        (stat: { category: string | null; _count: { category: number } }) => ({
+          category: stat.category || 'Uncategorized',
+          count: stat._count.category
+        })
+      ),
       averageSpicyLevel: spicyAvg._avg.spicyLevel,
       dietaryDistribution: {
         fiberRich: dietaryStats[0],

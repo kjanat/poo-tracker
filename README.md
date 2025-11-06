@@ -78,13 +78,13 @@ Ever wondered if your gut's on a winning streak, or if your last kebab is about 
 
 ## 🏗️ Tech Stack
 
-- **Frontend**: React + Vite + TypeScript + TailwindCSS v4
-- **Backend**: Node.js + Express v5 + TypeScript + Prisma
-- **Database**: PostgreSQL
+- **Frontend**: React 19 + Vite 6 + TypeScript 5.8 + TailwindCSS v4
+- **Backend**: Node.js 22 + Express v5 + TypeScript 5.8 + Prisma v6.10
+- **Database**: PostgreSQL 17
 - **Storage**: MinIO (S3-compatible for photos)
-- **AI Service**: Python + FastAPI + scikit-learn
+- **AI Service**: Python 3.9+ + FastAPI + scikit-learn
 - **Infrastructure**: Docker + Docker Compose
-- **Package Management**: pnpm (Node.js) + uv (Python)
+- **Package Management**: pnpm 9+ (Node.js) + uv (Python)
 
 ## 🗝️ Environment Variables
 
@@ -128,6 +128,7 @@ pnpm build:backend    # Build backend only
 pnpm db:migrate       # Run Prisma migrations
 pnpm db:seed          # Seed database with test data
 pnpm db:studio        # Open Prisma Studio
+pnpm db:reset         # Reset database (⚠️ destructive!)
 
 # Docker Services
 pnpm docker:up        # Start PostgreSQL, Redis, MinIO
@@ -136,13 +137,14 @@ pnpm docker:down      # Stop all Docker services
 # Testing & Quality
 pnpm test             # Run all tests (frontend + backend)
 pnpm test:watch       # Run tests in watch mode
+pnpm type-check       # Run TypeScript type checking
 pnpm lint             # Run linters on all projects
 pnpm lint:fix         # Auto-fix linting issues
 pnpm clean            # Clean all build artifacts
 
 # Code Formatting
-pnpm prettier         # Format all files
-pnpm prettier:watch   # Watch and format on changes
+pnpm format           # Format all files (Node.js + Python)
+pnpm format:all       # Format all JavaScript/TypeScript files
 ```
 
 ### Project Structure

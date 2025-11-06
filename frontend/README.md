@@ -17,20 +17,21 @@ The frontend is a responsive, type-safe React application built with modern web 
 
 ## 🛠 Tech Stack
 
-- **Framework**: React 19.1.0 with hooks and functional components
-- **Build Tool**: Vite with TypeScript support
+- **Framework**: React 19 with hooks and functional components
+- **Build Tool**: Vite 6 with TypeScript support
 - **Styling**: TailwindCSS v4 with utility-first approach
 - **Routing**: React Router DOM v7 for navigation
-- **State Management**: React Query for server state + Zustand for client state
+- **State Management**: TanStack Query for server state + Zustand for client state
 - **Forms**: React Hook Form with validation
 - **Icons**: Lucide React for beautiful SVG icons
+- **Charts**: Recharts for data visualizations
 - **HTTP Client**: Axios for API communication
 - **Testing**: Vitest + React Testing Library
-- **Type Safety**: TypeScript throughout
+- **Type Safety**: TypeScript 5.8 throughout
 
 ## 📋 Prerequisites
 
-- Node.js 18+
+- Node.js 22+
 - pnpm 9+ (installed at workspace root)
 - Backend API running on `http://localhost:3002`
 
