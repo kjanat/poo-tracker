@@ -243,7 +243,6 @@ pnpm prisma migrate reset
    ```
 
 2. **Use the debugger:**
-
    - Frontend: Browser dev tools
    - Backend: VS Code debugger or `console.log`
    - AI Service: Python debugger or print statements
