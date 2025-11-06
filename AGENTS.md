@@ -9,7 +9,7 @@ guidelines when reading, analyzing, changing, or generating code.
 **Target Audience**: AI coding assistants, GitHub Actions, automated deployment tools, linting bots,
 and any other autonomous systems interacting with this codebase.
 
-______________________________________________________________________
+---
 
 ## Project Structure & Architecture
 
@@ -49,7 +49,7 @@ poo-tracker/
 - **Infrastructure**: Docker, PostgreSQL, Redis, MinIO (S3-compatible)
 - **Workspace**: pnpm workspaces for monorepo management
 
-______________________________________________________________________
+---
 
 ## Package Management & Workspace Commands
 
@@ -85,7 +85,7 @@ pip install fastapi
 python -m pip install -r requirements.txt
 ```
 
-______________________________________________________________________
+---
 
 ## Coding Conventions & Style Guide
 
@@ -155,7 +155,7 @@ uvx ruff check .    # Lint code
 uvx pytest          # Run tests
 ```
 
-______________________________________________________________________
+---
 
 ## Testing Protocols
 
@@ -191,7 +191,7 @@ cd ai-service && uvx pytest --cov=main # With coverage
 - Mock external dependencies (Redis, PostgreSQL) appropriately
 - Use workspace-aware test commands
 
-______________________________________________________________________
+---
 
 ## Automated Checks & CI/CD
 
@@ -237,7 +237,7 @@ uvx mypy main.py          # Type checking
 - MinIO for S3-compatible file storage
 - Workspace commands: `pnpm docker:up`, `pnpm docker:down`
 
-______________________________________________________________________
+---
 
 ## Pull Request Guidelines
 
@@ -273,7 +273,7 @@ chore: update dependencies
 - [ ] No breaking changes (or clearly documented)
 - [ ] Environment variables documented in [`.env.example`](.env.example)
 
-______________________________________________________________________
+---
 
 ## Task & Workflow Definitions
 
@@ -282,7 +282,7 @@ ______________________________________________________________________
 - **Trigger**: SVG file changes in `branding/` directory
 - **Action**: Convert SVGs to ICO, PNG, React, React Native formats
 - **Tool**:
-  [`kjanat/svg-converter-action`](https://github.com/kjanat/svg-converter-action "GitHub: kjanat/svg-converter-action"),
+  [`kjanat/svg-converter-action`](https://github.com/kjanat/svg-converter-action 'GitHub: kjanat/svg-converter-action'),
   a custom GitHub Action
 - **Output**: Auto-commit generated assets
 
@@ -300,7 +300,7 @@ ______________________________________________________________________
 - **Requirements**: All CI checks must pass
 - **Build**: Use `pnpm build` for workspace builds
 
-______________________________________________________________________
+---
 
 ## Directory/Scope Rules
 
@@ -319,7 +319,7 @@ ______________________________________________________________________
 - **Careful with**: Database schema changes, Docker configurations, workspace structure
 - **Always validate**: Environment variable changes, workspace dependencies
 
-______________________________________________________________________
+---
 
 ## Error Handling & Escalation
 
@@ -345,7 +345,7 @@ ______________________________________________________________________
 - **Issues**: Use GitHub Issues for bugs/feature requests
 - **Discussions**: Use GitHub Discussions for questions
 
-______________________________________________________________________
+---
 
 ## Golden Rules for Agents
 
@@ -380,14 +380,14 @@ ______________________________________________________________________
 - Documentation updated 📖
 - PR approved by human reviewer 👤
 
-______________________________________________________________________
+---
 
 ## Version & Updates
 
 **Last Updated**: June 15, 2025 **Version**: 2.0.0 **Major Changes**: Added pnpm workspace
 configuration, uv Python tooling **Next Review**: When major architecture changes occur
 
-______________________________________________________________________
+---
 
 _Remember: If your code stinks, it won't get merged. Use the workspace properly, keep it clean,
 tested, and documented!_ 💩✨

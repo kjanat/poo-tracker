@@ -88,6 +88,7 @@ _do_ matter, and no, your GP isn't getting this level of data.
 - **AI Service**: Python 3.9+ + FastAPI + scikit-learn
 - **Infrastructure**: Docker + Docker Compose
 - **Package Management**: pnpm 9+ (Node.js) + uv (Python)
+- **Container Registry**: GitHub Container Registry (GHCR)
 
 ## 🗝️ Environment Variables
 
@@ -320,6 +321,49 @@ The pre-commit hooks include:
 - Conventional commit validation
 
 ## 🚀 Deployment
+
+### Docker Images
+
+Pre-built Docker images are automatically published to GitHub Container Registry (GHCR) on every push
+to `master`:
+
+```bash
+# Pull the latest AI service image
+docker pull ghcr.io/kjanat/poo-tracker/ai-service:latest
+
+# Run with Docker Compose (uses published images)
+docker compose up -d
+```
+
+**Image Features:**
+
+- ✅ Multi-architecture support (amd64, arm64)
+- ✅ SBOM (Software Bill of Materials) attestation
+- ✅ Provenance attestation for supply chain security
+- ✅ Signed with Cosign (keyless signing via Sigstore)
+- ✅ Automated security scanning
+- ✅ OCI-compliant metadata and labels
+
+**Verify Image Signature:**
+
+```bash
+# Install cosign
+brew install cosign  # macOS
+# or: https://docs.sigstore.dev/cosign/installation/
+
+# Verify the image signature
+cosign verify ghcr.io/kjanat/poo-tracker/ai-service:latest \
+  --certificate-identity-regexp="https://github.com/kjanat/poo-tracker" \
+  --certificate-oidc-issuer=https://token.actions.githubusercontent.com
+```
+
+**View SBOM:**
+
+```bash
+# Download and view the SBOM
+docker buildx imagetools inspect ghcr.io/kjanat/poo-tracker/ai-service:latest \
+  --format "{{ json .SBOM }}"
+```
 
 ### Environment Variables
 
