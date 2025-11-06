@@ -543,5 +543,6 @@ poo-tracker.code-workspace
 login.json
 **/__pycache__/
 
-# Pre-commit
-.pre-commit-config.yaml.bak
+*.bak
+
+package-lock.json
