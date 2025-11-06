@@ -542,3 +542,6 @@ prisma-shit.md
 poo-tracker.code-workspace
 login.json
 **/__pycache__/
+
+# Pre-commit
+.pre-commit-config.yaml.bak

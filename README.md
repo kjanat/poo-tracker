@@ -262,6 +262,51 @@ We encrypt your brown notes and hide them away. Nobody's reading your logs excep
 - ESLint with @typescript-eslint and Prettier (follow the config, don't "fix" it)
 - Use pnpm workspace commands for consistent development
 
+### Pre-Commit Hooks
+
+This project uses both `husky` with `lint-staged` and supports `pre-commit` framework:
+
+#### Option 1: Husky (Automatically Installed)
+
+Husky hooks are automatically set up when you run `pnpm install`. They will:
+
+- Type check changed TypeScript files
+- Format changed files with Prettier
+- Lint and format Python files with Ruff
+
+#### Option 2: Pre-Commit Framework (Optional)
+
+For more comprehensive checks, install the `pre-commit` framework:
+
+```bash
+# Install pre-commit (choose one)
+pip install pre-commit
+# or
+pipx install pre-commit
+# or
+uvx --from pre-commit pre-commit install
+
+# Install the git hooks
+pre-commit install
+pre-commit install --hook-type commit-msg
+
+# Run on all files (optional)
+pre-commit run --all-files
+```
+
+The pre-commit hooks include:
+
+- Trailing whitespace removal
+- End-of-file fixing
+- YAML/JSON/TOML validation
+- Large file detection
+- Merge conflict detection
+- Secret detection
+- Markdown formatting
+- Shell script linting (shellcheck)
+- Docker file linting (hadolint)
+- Conventional commit validation
+
 ## 🚀 Deployment
 
 ### Environment Variables
