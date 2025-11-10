@@ -61,7 +61,7 @@
     "@types/node": "^24.10.0",
     "@typescript-eslint/eslint-plugin": "^8.46.3",
     "@typescript-eslint/parser": "^8.46.3",
-    "@vitest/coverage-v8": "^4.0.7",
+    "@vitest/coverage-v8": "^4.0.8",
     "concurrently": "^9.2.1",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
@@ -77,7 +77,7 @@
     "prettier-eslint": "^16.4.2",
     "prettier-plugin-prisma": "^5.0.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.7"
+    "vitest": "^4.0.8"
   },
   "engines": {
     "node": ">=22.0.0",
